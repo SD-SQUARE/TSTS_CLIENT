@@ -4,6 +4,9 @@
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+}
 
 /* SYSTEM COLORING SCHEMA */
 
@@ -11,6 +14,7 @@
     --color-primary: #021d40;
     --color-secondary: #a67d03;
     --color-white: #f2f2f2;
+    --color-dark-white: #E5E4EE;
     --color-black: #070e16;
     --color-gray: #808080;
 }
@@ -31,6 +35,9 @@
 
 .white-color{
     color: var(--color-white) !important;
+}
+.dark-white-color{
+    color: var(--color-dark-white) !important;
 }
 .white-bg{
     background-color: var(--color-white) !important;

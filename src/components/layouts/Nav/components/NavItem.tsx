@@ -1,7 +1,8 @@
 // NavItem 
 import { NavLink } from "react-router-dom";
 import { APP_BASE_PATH } from "../../../../app/config";
-
+import Text from "antd/es/typography/Text"
+import styles from "./navbar_item.module.css";
 /**
  * A reusable React component for creating a navigation item.
  * It uses the `NavLink` component from `react-router-dom` to create a link to the specified path.
@@ -13,7 +14,13 @@ import { APP_BASE_PATH } from "../../../../app/config";
  * <NavItem to="/about">About</NavItem>
  */
 const NavItem = ({ children, to = "/" }) => {
-    return <NavLink to={`${APP_BASE_PATH}${to}`}>{children}</NavLink>
+    return <NavLink
+        to={`${APP_BASE_PATH}${to}`}
+        className={({ isActive }) =>
+            `${styles.navItem} ${isActive ? styles.activeNavItem : ""}`
+        }>
+        {children}
+    </NavLink>
 };
 
 export default NavItem;

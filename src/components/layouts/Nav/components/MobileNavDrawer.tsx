@@ -4,6 +4,7 @@ import NavTail from "./NavTail";
 import NavPanel from "./NavPanel";
 import i18n from "../../../../i18n";
 import { useTranslation } from "react-i18next";
+import styles from './navbar_item.module.css';
 
 const MobileNavDrawer = ({ open, setOpen, children }) => {
     const { t } = useTranslation();
@@ -27,6 +28,7 @@ const MobileNavDrawer = ({ open, setOpen, children }) => {
                     {t("NAVIGATION_TITLE")}
                 </div>
             }
+            className={styles.mobile_drawer_bg}
         >
             <NavPanel closeDrawer={() => setOpen(false)}>
                 {children}

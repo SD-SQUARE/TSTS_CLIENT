@@ -1,0 +1,42 @@
+.navItem {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-black);
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.dark_mode .navItem
+{ 
+    color: var(--color-white);
+}
+
+/* Hover effect */
+.navItem:hover {
+    background-color: var(--color-secondary);
+    color: #000;
+}
+
+/* Active link */
+.activeNavItem {
+    border: 1px solid var(--color-secondary);
+    color: var(--color-black);
+}
+
+.dark_mode .activeNavItem
+{ 
+    color: var(--color-white);
+}
+
+.mobile_drawer_bg{
+    background-color: var(--color-dark-white) !important;
+}
+
+/* RTL support */
+:global(html[dir="rtl"]) .navItem {
+    text-align: right;
+}

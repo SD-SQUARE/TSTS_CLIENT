@@ -35,6 +35,8 @@ const LanguageSwitcher = () => {
                 items,
                 onClick: ({ key }) => onChange(key),
             }}
+            placement="bottom"
+            arrow
         >
             <Space style={{ cursor: "pointer", userSelect: "none" }}>
                 <span style={{ fontSize: 28 }}>{languages[lang].flag}</span>
