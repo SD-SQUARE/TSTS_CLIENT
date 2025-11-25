@@ -31,7 +31,7 @@ export const useAdmins = () => {
   return useQuery({
     queryKey: ['admins'],
     queryFn: async () => {
-      const response = await api.get<UserApiResponse>('/lockups/admins');
+      const response = await api.get<UserApiResponse>('/v1/lockups/admins');
 
       return response.data.users;
     },
@@ -44,7 +44,7 @@ export const useTechnicians = () => {
   return useQuery({
     queryKey: ['technicians'],
     queryFn: async () => {
-      const response = await api.get<UserApiResponse>('/lockups/technicians/');
+      const response = await api.get<UserApiResponse>('/v1/lockups/technicians/');
 
       return response.data.users;
     },
@@ -59,7 +59,7 @@ export const useSpecializations = () => {
     queryKey: ['specializations'],
     queryFn: async () => {
 
-      const response = await api.get<GroupFormData>('/lockups/specializations/');
+      const response = await api.get<GroupFormData>('/v1/lockups/specializations/');
 
 
 
@@ -75,7 +75,7 @@ export const useSpecializations = () => {
 export const useAddGroup = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: GroupFormData) => api.post('/groups/', data),
+    mutationFn: (data: GroupFormData) => api.post('/v1/groups/', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
     },
@@ -91,7 +91,7 @@ export const useEditGroup = (groupId: string) => {
       if (groupId === 'dummy-id-for-add-mode') {
         throw new Error("Attempted to edit a group without a valid ID.");
       }
-      return api.put(`/groups/${groupId}`, data);
+      return api.put(`/v1/groups/${groupId}`, data);
     }, onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
     },

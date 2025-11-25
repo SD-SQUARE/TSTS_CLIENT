@@ -16,10 +16,11 @@ function App() {
                 <NavBar>
                     <NavItem to="/">Home</NavItem>
                     <NavItem to="/about">About</NavItem>
+                    <NavItem to="/identities">Identities</NavItem>
                 </NavBar>
 
                 {/* Pages Content */}
-                <Body>
+                <Body >
                     <AppRoutes />
                 </Body>
                 {/* Footer */}

@@ -201,7 +201,8 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                 dataSource={data?.data || []}
                 rowKey="id"
                 loading={isLoading || deleteMutation.isPending}
-                scroll={{ x: "max-content" }}
+                scroll={{ x: "max-content", y: "calc(100vh - 310px)" }}
+                bordered
                 pagination={false}
             />
 

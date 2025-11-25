@@ -8,8 +8,13 @@ const AppFooter = () => {
     const { t } = useTranslation();
 
     return (
-        <Footer style={{ textAlign: "center" }} className="primary-bg" >
-            <Text strong className="gray-color" >
+        <Footer style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            maxHeight: "1em",
+        }} className="primary-bg" >
+            <Text strong className="gray-color">
                 {t('FOOTER')} © {new Date().getFullYear()}
             </Text>
         </Footer>

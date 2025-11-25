@@ -2,11 +2,14 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    scroll-behavior: smooth;
+    scrollbar-color: var(--color-primary) transparent;
+    scrollbar-width: thin;
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
+    
 }
 
-html {
-    scroll-behavior: smooth;
-}
 
 /* SYSTEM COLORING SCHEMA */
 
