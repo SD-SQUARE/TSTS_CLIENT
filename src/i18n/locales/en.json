@@ -1,4 +1,17 @@
 {
+  "LOGO": "Helwan University",
+  "LOGO_ALTER": "Helwan University",
+  "HOME": "Home",
+  "CONTACT_US": "Contact Us",
+  "Services": "Services",
+  "LOGIN": "Login",
+  "FORGET_PASSWORD": "Forget Password",
+  "FOOTER": "Created By CITC",
+  "GO_BACK": "Go Back",
+  "NOT_FOUND": "Sorry, the page you visited does not exist.",
+  "NOT_ALLOWED": "Sorry, you are not allowed to access this page.",
+  "SERVER_ERROR": "Sorry, something went wrong. Please try again later.",
+  "NAVIGATION_TITLE": "Ticketing System",
     "forgotPassword": {
         "title": "Forgot Password",
         "steps": {

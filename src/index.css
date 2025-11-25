@@ -3,3 +3,56 @@
     padding: 0;
     box-sizing: border-box;
 }
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* SYSTEM COLORING SCHEMA */
+
+:root {
+    --color-primary: #021d40;
+    --color-secondary: #a67d03;
+    --color-white: #f2f2f2;
+    --color-dark-white: #E5E4EE;
+    --color-black: #070e16;
+    --color-gray: #808080;
+}
+
+.primary-color{
+    color: var(--color-primary) !important;
+}
+.primary-bg{
+    background-color: var(--color-primary) !important;
+}
+
+.secondary-color{
+    color: var(--color-secondary) !important;
+}
+.secondary-bg{
+    background-color: var(--color-secondary) !important;
+}
+
+.white-color{
+    color: var(--color-white) !important;
+}
+.dark-white-color{
+    color: var(--color-dark-white) !important;
+}
+.white-bg{
+    background-color: var(--color-white) !important;
+}
+
+.black-color{
+    color: var(--color-black) !important;
+}
+.black-bg{
+    background-color: var(--color-black) !important;
+}
+
+.gray-color{
+    color: var(--color-gray) !important;
+}
+.gray-bg{
+    background-color: var(--color-gray) !important;
+}

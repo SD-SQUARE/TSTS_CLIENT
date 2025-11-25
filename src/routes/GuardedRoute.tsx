@@ -1,5 +1,6 @@
 import { Navigate } from "react-router-dom";
 
+// TODO: use redux store
 export default function GuardedRoute({ roles = [], permissions = [], children }) {
     const role = sessionStorage.getItem("role");
     const saved = sessionStorage.getItem("permissions");
