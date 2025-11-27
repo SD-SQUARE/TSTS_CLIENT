@@ -1,12 +1,13 @@
-import { Card } from "antd";
-import { LoginForm } from "../components/LoginForm";
+import React from 'react';
+import LoginForm from "../components/LoginForm";
+import PublicLayout from "../../../components/PublicLayout"; 
 
 export const LoginPage = () => {
     return (
-        <div style={{ height: "100vh", display: "grid", placeItems: "center" }}>
-            <Card title="Login" style={{ width: 350 }}>
+        <PublicLayout>
+            <div style={{ width: '100%', maxWidth: '950px' }}>
                 <LoginForm />
-            </Card>
-        </div>
+            </div>
+        </PublicLayout>
     );
 };

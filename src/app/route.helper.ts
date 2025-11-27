@@ -17,10 +17,12 @@ const API_BASE_URL: string = `${API_PROTOCOL}://${API_HOST}:${API_PORT}/api`;
  * const url = ApiUrlBuilder(`users`, `v2`);
  * // url will be `/v2/users`
  */
-export const ApiUrlBuilder = (path: string, version: string | null = `v1`): string => {
-    const API_VERSION: string = version ?? `v1`;
+export const ApiUrlBuilder = (path: string, version: string | null = 'v1'): string => {
+    const API_VERSION: string = version ?? 'v1';
 
-    return `/${API_VERSION}/${path}`;
+    const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+
+    return `/${API_VERSION}/${cleanPath}`;
 };
 
 /**
@@ -45,9 +47,8 @@ export const ApiPathMutator = (route: string, params?: Record<string, string | n
     let finalRoute = route;
 
     if (params) {
-        // Iterate over the parameters and replace the placeholders
         Object.entries(params).forEach(([key, value]) => {
-            finalRoute = finalRoute.replace(`:${key}`, String(value));
+            finalRoute = finalRoute.replace(`:${key}`, encodeURIComponent(String(value)));
         });
     }
 
@@ -57,7 +58,7 @@ export const ApiPathMutator = (route: string, params?: Record<string, string | n
 
 
 export enum PATH_NAMES {
-    BASE_PATH = "", // TODO: Update with base folder name http://<domain>/base-folder/profile
+    BASE_PATH = "", 
     HEALTH = `health`,
     NOTFOUND = `not-found`,
     NOTIMPELEMENTED = `not-implemented`,
@@ -73,7 +74,7 @@ export enum PATH_NAMES {
     VIEW_USER_PROFILE = `view-user-profile`,
     VIEW_USER_GROUPS = `view-user-groups`,
     VIEW_USER_SPECIALIZATIONS = `view-user-specializations`,
-    WORK_HOURS = `work-hours`, // add, edit also
+    WORK_HOURS = `work-hours`, 
     SELECTED_WORK_HOURS = `selected-work-hours`,
     REQUESTERS = `requesters`,
     TECHNICIANS = `technicians`,
