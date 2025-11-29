@@ -180,10 +180,10 @@ const UserFormModal: React.FC<{
             width={750}
             destroyOnHidden
         >
-            <Steps current={current} style={{ marginBottom: 24 }}>
-                {steps.map(item => (
+            <Steps current={current} style={{ marginBottom: 24 }} items={steps}>
+                {/* {steps.map(item => (
                     <Steps.Step key={item.title} title={t(item.title)} />
-                ))}
+                ))} */}
             </Steps>
 
             <div className="steps-content">
