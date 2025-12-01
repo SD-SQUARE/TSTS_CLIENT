@@ -4,12 +4,12 @@ import { LoginPage } from "../features/login/pages/LoginPage";
 import HomePage from "../components/Home";
 import MainLayout from "../components/MainLayout";
 
-import UniversitiesPage from "../features/profile/pages/Universities";
-import DomainsPage from "../features/profile/pages/Domains";
-import DepartmentsPage from "../features/profile/pages//Departments";
-import SpecializationsPage from "../features/profile/pages/Specializations";
-import WorkHoursPage from "../features/profile/pages/WorkHours";
-import PermissionsPage from "../features/profile/pages/Permissions";
+import UniversitiesPage from "../features/universities/components/Universities";
+import DomainsPage from "../features/domains/components/Domains";
+import DepartmentsPage from "../features/departments/components/Departments";
+import SpecializationsPage from "../features/specializations/components/Specializations";
+import WorkHoursPage from "../features/work-hours/components/WorkHours";
+import PermissionsPage from "../features/permissions/components/Permissions";
 
 export const AppRoutes = () => {
     return (

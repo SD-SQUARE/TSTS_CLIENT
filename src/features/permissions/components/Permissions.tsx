@@ -3,8 +3,7 @@ import { Form, Input, Checkbox, Card, Row, Col, Typography } from 'antd';
 import { GenericCrudPage } from '../../../components/GenericCrudPage';
 // import { permissionApi } from '../services/api'; // commented for now (api)
 // import axiosInstance from '../services/api';     // commented for now (axios)
-// import { API_ROUTES_PATHS, PATH_NAMES } from '../app/route.helper';
-import type { PermissionProfile } from '../types';
+import type { PermissionProfile } from '../../profile/types';
 
 const { Text } = Typography;
 
@@ -78,7 +77,7 @@ const PermissionsPage: React.FC = () => {
   const columns = [
     { title: 'Profile Name', dataIndex: 'name_en', key: 'name' },
     { title: 'Code', dataIndex: 'code', key: 'code' }, 
-    { title: 'Description', dataIndex: 'description', key: 'description' },
+    { title: 'Description', dataIndex: 'description_en', key: 'description' },
   ];
 
   const formItems = (

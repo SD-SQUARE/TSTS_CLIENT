@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Input, Tooltip } from 'antd';
 import { GenericCrudPage } from '../../../components/GenericCrudPage';
-import type { University } from '../types';
+import type { University } from '../../profile/types';
 // import { universityApi } from '../services/api'; // commented for now
 import { useTranslation } from "react-i18next";
 

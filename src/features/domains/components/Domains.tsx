@@ -4,7 +4,7 @@
 import React, { useState } from "react";
 import { Form, Input, Select, Tag, Tooltip } from "antd";
 import { GenericCrudPage } from "../../../components/GenericCrudPage";
-import type { Domain } from "../types";
+import type { Domain } from "../../profile/types";
 import { useTranslation } from "react-i18next";
 
 const MOCK_UNIVERSITIES = [
@@ -61,7 +61,6 @@ const DomainsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [selectedUni, setSelectedUni] = useState<number | null>(null);
 
-  // Filter universities for dropdown labels based on language
   const uniOptions = MOCK_UNIVERSITIES.map((u) => ({
     label: i18n.language === "ar" ? u.label_ar : u.label_en,
     value: u.value,

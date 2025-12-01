@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, Select, Tooltip } from "antd";
 import { GenericCrudPage } from "../../../components/GenericCrudPage";
-import type { Specialization, Department } from "../types";
+import type { Specialization, Department } from "../../profile/types";
 import { useTranslation } from "react-i18next";
 
 // ----------- TEMP STATIC DATA -----------
