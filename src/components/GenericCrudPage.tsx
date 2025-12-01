@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Space, Popconfirm, message } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import { BaseCrudService } from '../services/api';
+import { BaseCrudService } from '../features/profile/services/api';
 
 interface GenericCrudProps<T> {
   title: string;
@@ -132,7 +132,8 @@ export const GenericCrudPage = <T extends { id: string | number }>({
         
         {!disableAdd && (
           <Button 
-            type="primary" 
+            // type="primary"
+            style={{backgroundColor:'#cad8ec'}} 
             icon={<PlusOutlined />} 
             onClick={openAddModal}
             size="large"

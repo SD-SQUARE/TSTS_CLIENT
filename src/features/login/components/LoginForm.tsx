@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Form, Input, Button, Typography, Alert ,Image} from "antd";
-import { MailOutlined } from "@ant-design/icons";
 import { loginSchema } from "../schema/LoginSchema";
 import { loginSuccess } from "../store/authSlice";
 import loginImage from "../../../assets/HU-bg-clear.png"
@@ -18,19 +17,31 @@ const LoginForm = () => {
   
   const validateForm = (values: any) => {
     const result = loginSchema.safeParse(values);
+  
     if (!result.success) {
-      const fieldErrors = Object.entries(result.error.flatten().fieldErrors);
-      fieldErrors.forEach(([field, messages]) => {
-        form.setFields([{ name: field, errors: messages }]);
-      });
+      const errors = result.error.flatten().fieldErrors;
+  
+      const firstField = Object.keys(errors)[0];
+      const firstMessage = errors[firstField]?.[0] ?? "";
+  
+      form.setFields([
+        {
+          name: firstField,
+          errors: [firstMessage],
+        },
+      ]);
+  
       return false;
     }
+  
     form.setFields([
       { name: "email", errors: [] },
       { name: "password", errors: [] },
     ]);
+  
     return true;
   };
+  
 
   const onFinish = async (values: any) => {
     if (!validateForm(values)) return;
@@ -89,28 +100,37 @@ const LoginForm = () => {
           requiredMark={false}
           validateTrigger="onChange"
         >
-          <Form.Item
-            name="email"
-            label={
-              <span className="form-label">
-                <MailOutlined className="label-icon" style={{ marginRight: 6 }} />
-                Email
-              </span>
-            }
-          >
-            <Input placeholder="example@mail.com" className="login-input" />
-          </Form.Item>
+        <Form.Item
+          name="email"
+          label="Email"
+          validateTrigger="onChange"
+          validateDebounce={400}
+          validateFirst
+          rules={[
+            { required: true, message: "Email is required" },
+            { type: "email", message: "Invalid email address format" },
+          ]}
+        >
+          <Input placeholder="example@mail.com" className="login-input" />
+        </Form.Item>
 
-          <Form.Item
-            name="password"
-            label={
-              <span className="form-label">
-                |** Password
-              </span>
-            }
-          >
-            <Input.Password placeholder="********" className="login-input" />
-          </Form.Item>
+        <Form.Item
+          name="password"
+          label="Password"
+          validateTrigger="onChange"
+          validateDebounce={400}
+          validateFirst
+          rules={[
+            { required: true, message: "Password is required" },
+            { min: 6, message: "Must be at least 6 characters" },
+            { pattern: /[A-Z]/, message: "Must contain an uppercase letter" },
+            { pattern: /[0-9]/, message: "Must contain a number" },
+            { pattern: /[^A-Za-z0-9]/, message: "Must contain a special character" },
+          ]}
+        >
+          <Input.Password placeholder="********" className="login-input" />
+        </Form.Item>
+
 
           <div className="forgot-password">
             <a href="#">Forget password?</a>

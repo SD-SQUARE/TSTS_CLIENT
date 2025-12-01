@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Layout, Menu, Avatar, Switch, Typography, Drawer, Button, Image } from 'antd';
 import { UserOutlined, MenuOutlined } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import logo from "../assets/HU-bg-clear.png"
-import { PAGES_ROUTES_PATHS, PATH_NAMES } from '../app/route.helper';
+import logo from "../assets/HU-bg-clear.png";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Text } = Typography;
@@ -14,12 +13,12 @@ const MainLayout: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const menuItems = [
-    { key: PAGES_ROUTES_PATHS[PATH_NAMES.WORK_HOURS], label: 'Work Hours' },
-    { key: PAGES_ROUTES_PATHS[PATH_NAMES.UNIVERSITIES], label: 'Universities' },
-    { key: PAGES_ROUTES_PATHS[PATH_NAMES.DOMAINS], label: 'Domains' },
-    { key: PAGES_ROUTES_PATHS[PATH_NAMES.DEPARTMENTS], label: 'Departments' },
-    { key: PAGES_ROUTES_PATHS[PATH_NAMES.SPECIALIZATIONS], label: 'Specializations' },
-    { key: PAGES_ROUTES_PATHS[PATH_NAMES.PERMISSIONS], label: 'Permissions' },
+    { key: "/work-hours", label: 'Work Hours' },
+    { key: "/universities", label: 'Universities' },
+    { key: "/domains", label: 'Domains' },
+    { key: "/departments", label: 'Departments' },
+    { key: "/specializations", label: 'Specializations' },
+    { key: "/permissions", label: 'Permissions' },
   ];
 
   return (
@@ -33,8 +32,8 @@ const MainLayout: React.FC = () => {
           />
         </div>
 
-        <div style={{width: '70px', height:'70px'}} >
-            <Image src={logo} preview={false}/>
+        <div style={{ width: '70px', height:'70px' }}>
+          <Image src={logo} preview={false}/>
         </div>
         
         <div className="desktop-only" style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
@@ -110,12 +109,3 @@ const MainLayout: React.FC = () => {
 };
 
 export default MainLayout;
-
-
-
-
-
-
-
-
-

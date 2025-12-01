@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input, Checkbox, Card, Row, Col, Typography } from 'antd';
-import { GenericCrudPage } from '../components/GenericCrudPage';
+import { GenericCrudPage } from '../../../components/GenericCrudPage';
 // import { permissionApi } from '../services/api'; // commented for now (api)
 // import axiosInstance from '../services/api';     // commented for now (axios)
 // import { API_ROUTES_PATHS, PATH_NAMES } from '../app/route.helper';
@@ -23,23 +23,23 @@ const STATIC_AVAILABLE_PERMISSIONS = [
 const STATIC_PROFILES: PermissionProfile[] = [
   { 
     id: 1, 
-    name: 'Super Admin', 
+    name_en: 'Super Admin', 
     code: 'SUPER_ADMIN', 
-    description: 'Full system access', 
+    description_en: 'Full system access', 
     permissions: ['USER_VIEW', 'USER_CREATE', 'USER_DELETE', 'SETTINGS_MANAGE', 'REPORTS_VIEW', 'DATA_EXPORT'] 
   },
   { 
     id: 2, 
-    name: 'HR Manager', 
+    name_en: 'HR Manager', 
     code: 'HR_MANAGER', 
-    description: 'Can manage users and work hours', 
+    description_en: 'Can manage users and work hours', 
     permissions: ['USER_VIEW', 'USER_CREATE', 'USER_EDIT', 'WORKHOURS_MANAGE'] 
   },
   { 
     id: 3, 
-    name: 'Viewer', 
+    name_en: 'Viewer', 
     code: 'VIEWER_ONLY', 
-    description: 'Read-only access', 
+    description_en: 'Read-only access', 
     permissions: ['USER_VIEW', 'REPORTS_VIEW'] 
   },
 ];
@@ -76,7 +76,7 @@ const PermissionsPage: React.FC = () => {
   }, []);
 
   const columns = [
-    { title: 'Profile Name', dataIndex: 'name', key: 'name' },
+    { title: 'Profile Name', dataIndex: 'name_en', key: 'name' },
     { title: 'Code', dataIndex: 'code', key: 'code' }, 
     { title: 'Description', dataIndex: 'description', key: 'description' },
   ];

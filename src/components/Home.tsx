@@ -2,6 +2,13 @@ import { Button, Typography, Carousel, Card, Row, Col } from "antd";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useRef } from "react";
+import img1 from "../assets/gam3a.jpg";
+import img2 from "../assets/secureAccess.jpg";
+import img3 from "../assets/manage.webp";
+import UserManagement from "../assets/UserManagement.webp"
+import Analytics from "../assets/Analytics-Dashboard.webp"
+import SupportCenter from "../assets/support-center.jpg"
+
 
 const { Title, Paragraph } = Typography;
 
@@ -11,17 +18,17 @@ const services = [
   {
     title: "User Management",
     desc: "Add, edit, and control user accounts.",
-    img: "/images/user-management.png",
+    img: UserManagement,
   },
   {
     title: "Analytics Dashboard",
     desc: "View insights and real-time stats.",
-    img: "/images/analytics-dashboard.png",
+    img: Analytics,
   },
   {
     title: "Support Center",
     desc: "Get quick help and assistance.",
-    img: "/images/support-center.png",
+    img: SupportCenter,
   },
 ];
 
@@ -49,44 +56,29 @@ const HomePage = () => {
         </button>
 
         <Carousel autoplay dots ref={carouselRef} className="welcome-carousel">
-          <div>
-            <div className="welcome-content">
-              <Title level={1} className="welcome-title">
-                Welcome to the System
-              </Title>
-              <Paragraph className="welcome-text">
-                Access your tools, manage information, and explore features easily.
-              </Paragraph>
-              <Button className="get-started-btn" onClick={handleGetStarted}>
-                Get Started
-              </Button>
-            </div>
-          </div>
+  
+  {[img1, img2, img3].map((image, index) => (
+    <div key={index}>
+      <div
+        className="welcome-slide"
+        style={{
+          backgroundImage: `url(${image})`,
+        }}
+      >
+        <div className="welcome-content">
+          <Title level={1} className="welcome-title">Welcome to the System</Title>
+          <Paragraph className="welcome-text">
+            Access your tools, manage information, and explore features easily.
+          </Paragraph>
+          <Button className="get-started-btn" onClick={handleGetStarted}>
+            Get Started
+          </Button>
+        </div>
+      </div>
+    </div>
+  ))}
 
-          <div>
-            <div className="welcome-content">
-              <Title level={1} className="welcome-title">Fast & Secure Access</Title>
-              <Paragraph className="welcome-text">
-                Your data is protected with modern authentication standards.
-              </Paragraph>
-              <Button className="get-started-btn" onClick={handleGetStarted}>
-                Login Now
-              </Button>
-            </div>
-          </div>
-
-          <div>
-            <div className="welcome-content">
-              <Title level={1} className="welcome-title">Manage Everything Easily</Title>
-              <Paragraph className="welcome-text">
-                A smooth dashboard to handle daily operations.
-              </Paragraph>
-              <Button className="get-started-btn" onClick={handleGetStarted}>
-                Explore
-              </Button>
-            </div>
-          </div>
-        </Carousel>
+</Carousel>
 
         <button
           className="carousel-arrow right-arrow"

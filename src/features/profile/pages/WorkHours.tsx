@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, Input, TimePicker, Checkbox, Switch, Tag } from 'antd';
-import { GenericCrudPage } from '../components/GenericCrudPage';
+import { GenericCrudPage } from '../../../components/GenericCrudPage';
 // import { workHoursApi } from '../services/api'; //comented for now
 import type { WorkHour } from '../types';
 
@@ -8,7 +8,7 @@ import type { WorkHour } from '../types';
 const STATIC_DATA: WorkHour[] = [
   {
     id: 1,
-    name: 'Morning Shift',
+    name_en: 'Morning Shift',
     startTime: '08:00',
     endTime: '16:00',
     isActive: true,
@@ -16,7 +16,7 @@ const STATIC_DATA: WorkHour[] = [
   },
   {
     id: 2,
-    name: 'Evening Shift',
+    name_en: 'Evening Shift',
     startTime: '16:00',
     endTime: '00:00',
     isActive: true,
@@ -24,7 +24,7 @@ const STATIC_DATA: WorkHour[] = [
   },
   {
     id: 3,
-    name: 'Weekend Shift',
+    name_en: 'Weekend Shift',
     startTime: '10:00',
     endTime: '15:00',
     isActive: false,
@@ -69,7 +69,7 @@ const WorkHoursPage: React.FC = () => {
   const columns = [
     { 
       title: 'Name', 
-      dataIndex: 'name', 
+      dataIndex: 'name_en', 
       key: 'name' 
     },
     { 
