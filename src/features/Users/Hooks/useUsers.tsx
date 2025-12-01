@@ -3,7 +3,6 @@ import api from "../../../api/http";
 import type { Lookup, ProfileLookup, UserListItem } from "../Types/users";
 
 
-// Generic fetch
 export const useUsers = (role: string, page: number, pageSize: number) => {
     return useQuery({
         queryKey: ["users", role, page, pageSize],
@@ -16,6 +15,19 @@ export const useUsers = (role: string, page: number, pageSize: number) => {
                 total: Math.floor(res.data.meta_data?.total || 0)
             };
         },
+    });
+};
+
+export const useUserDetail = (role: string, id?: string) => {
+    return useQuery({
+        queryKey: ["userDetail", role, id],
+        queryFn: async () => {
+            if (!id) return null;
+            const res = await api.get(`/users/${role}/${id}`);
+            return res.data as UserListItem;
+        },
+        enabled: !!id, 
+        staleTime: 5 * 60 * 1000, 
     });
 };
 
@@ -47,19 +59,29 @@ export const useUniversities = () =>
         staleTime: Infinity,
     });
 
-export const useDomains = () =>
+export const useDomains = (universityId?: string) =>
     useQuery({
-        queryKey: ["domains"],
-        queryFn: async () =>
-            (await api.get("/lockups/domains/")).data.domains as Lookup[],
+        queryKey: ["domains", universityId],
+        queryFn: async () => {
+            if (!universityId) return [];
+            const url = `/lockups/universities/${universityId}/domains`;
+            const res = await api.get(url);
+            return res.data.domains as Lookup[];
+        },
+        enabled: !!universityId,
         staleTime: Infinity,
     });
 
-export const useDepartments = () =>
+export const useDepartments = (domainId?: string) =>
     useQuery({
-        queryKey: ["departments"],
-        queryFn: async () =>
-            (await api.get("/lockups/departments/")).data.departments as Lookup[],
+        queryKey: ["departments", domainId],
+        queryFn: async () => {
+            if (!domainId) return [];
+            const url = `/lockups/domains/${domainId}/departments`;
+            const res = await api.get(url);
+            return res.data.departments as Lookup[];
+        },
+        enabled: !!domainId,
         staleTime: Infinity,
     });
 

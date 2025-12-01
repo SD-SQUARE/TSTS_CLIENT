@@ -5,7 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 
 
 import { useTranslation } from "react-i18next";
-import type { UserFormData } from "../../Types/users";
+import type { Lookup, UserFormData } from "../../Types/users";
 import { useDepartments, useDomains, useUniversities } from "../../Hooks/useUsers";
 import RequiredTag from "../../../../components/RequiredTag";
 
@@ -13,31 +13,66 @@ import RequiredTag from "../../../../components/RequiredTag";
 interface Props { initialData: UserFormData; onNext: (data: Partial<UserFormData>) => void; }
 
 const StepJobLocation: React.FC<Props> = ({ initialData, onNext }) => {
-    const { handleSubmit, control, formState: { errors }, reset } =
+    const { handleSubmit, control, formState: { errors }, reset, watch, setValue } =
         useForm<UserFormData>({ defaultValues: initialData, mode: "onChange" });
     useEffect(() => { reset(initialData); }, [initialData, reset]);
 
     const { t } = useTranslation();
+
+    const selectedUniversity = watch('university');
+    const selectedDomain = watch('domain');
+    
+    const universityId = selectedUniversity?.id;
+    const domainId = selectedDomain?.id;
     
     const { data: universities, isLoading: uniLoading } = useUniversities();
-    const { data: domains, isLoading: domainLoading } = useDomains();
-    const { data: departments, isLoading: depLoading } = useDepartments();
+    const { data: domains, isLoading: domainLoading } = useDomains(universityId);
+    const { data: departments, isLoading: depLoading } = useDepartments(domainId);
+
+    useEffect(() => {
+        if (initialData.university?.id !== universityId) {
+            setValue('domain', null, { shouldValidate: true });
+            setValue('departments', [], { shouldValidate: true });
+        }
+    }, [universityId, initialData.university?.id, setValue]);
+
+    useEffect(() => {
+        if (initialData.domain?.id !== domainId) {
+            setValue('departments', [], { shouldValidate: true });
+        }
+    }, [domainId, initialData.domain?.id, setValue]);
 
     const onSubmit = (data: UserFormData) => {
         onNext({
-            job: data.job,
+            job_en: data.job_en,
+            job_ar: data.job_ar,
             university: data.university,
             domain: data.domain,
             departments: data.departments,
         });
     };
 
+    const filterOption = (input: string, option: { value: string; label: string } | undefined) => {
+        if (!option || !option.label) return false;
+        return option.label.toLowerCase().includes(input.toLowerCase());
+    };
+
+    const mapLookupToOptions = (data: Lookup[] | undefined) => {
+        return data?.map(item => ({ value: item.id, label: item.name })) || [];
+    };
+
     return (
         <Card title= {t("user_list.job_location")}>
             <Form layout="vertical" onFinish={handleSubmit(onSubmit)} id="step-form" requiredMark={false}>
-                <Form.Item label={<Flex gap="small"><span>{t("user_list.job_title")}</span><RequiredTag /></Flex>}
-                    validateStatus={errors.job ? "error" : ""} help={errors.job?.message} required>
-                    <Controller name="job" control={control}
+                <Form.Item label={<Flex gap="small"><span>{t("user_list.job_title_en")}</span><RequiredTag /></Flex>}
+                    validateStatus={errors.job_en ? "error" : ""} help={errors.job_en?.message} required>
+                    <Controller name="job_en" control={control}
+                        rules={{ required: "Required" }}
+                        render={({ field }) => <Input {...field} className="ant-input" />} />
+                </Form.Item>
+                <Form.Item label={<Flex gap="small"><span>{t("user_list.job_title_ar")}</span><RequiredTag /></Flex>}
+                    validateStatus={errors.job_ar ? "error" : ""} help={errors.job_ar?.message} required>
+                    <Controller name="job_ar" control={control}
                         rules={{ required: "Required" }}
                         render={({ field }) => <Input {...field} className="ant-input" />} />
                 </Form.Item>
@@ -50,7 +85,8 @@ const StepJobLocation: React.FC<Props> = ({ initialData, onNext }) => {
                                 {...field}
                                 loading={uniLoading}
                                 showSearch
-                                options={universities?.map(u => ({ value: u.id, label: u.name }))}
+                                filterOption={filterOption}
+                                options={mapLookupToOptions(universities)}
                                 value={field.value?.id}
                                 onChange={(id) => {
                                     const selected = universities?.find(u => u.id === id) ?? null;
@@ -67,9 +103,11 @@ const StepJobLocation: React.FC<Props> = ({ initialData, onNext }) => {
                         render={({ field }) => (
                             <Select
                                 {...field}
+                                disabled={!universityId}
                                 loading={domainLoading}
                                 showSearch
-                                options={domains?.map(d => ({ value: d.id, label: d.name }))}
+                                filterOption={filterOption}
+                                options={mapLookupToOptions(domains)}
                                 value={field.value?.id}
                                 onChange={(id) => {
                                     const selected = domains?.find(d => d.id === id) ?? null;
@@ -86,9 +124,12 @@ const StepJobLocation: React.FC<Props> = ({ initialData, onNext }) => {
                         render={({ field }) => (
                             <Select
                                 {...field}
+                                disabled={!domainId}
                                 mode="multiple"
                                 loading={depLoading}
-                                options={departments?.map(d => ({ value: d.id, label: d.name }))}
+                                showSearch
+                                filterOption={filterOption}
+                                options={mapLookupToOptions(departments)}
                                 value={field.value?.map(d => d.id)}
                                 onChange={(ids: string[]) => {
                                     const selected = departments?.filter(dep => ids.includes(dep.id)) || [];

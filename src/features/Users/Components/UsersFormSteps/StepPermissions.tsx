@@ -24,6 +24,11 @@ const StepPermissions: React.FC<Props> = ({ initialData, onNext }) => {
             specializations: data.specializations,
         });
     };
+    const filterOption = (input: string, option: { value: string; label: string } | undefined) => {
+        if (!option || !option.label) return false;
+        
+        return option.label.toLowerCase().includes(input.toLowerCase());
+    };
 
     return (
         <Card title= {t("user_list.perms")}>
@@ -37,6 +42,7 @@ const StepPermissions: React.FC<Props> = ({ initialData, onNext }) => {
                                 {...field}
                                 loading={profilesLoading}
                                 showSearch
+                                filterOption={filterOption}
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 options={profiles?.map(p => ({ value: p.id, label: (p as any).name_en }))}
 
@@ -58,6 +64,8 @@ const StepPermissions: React.FC<Props> = ({ initialData, onNext }) => {
                                 {...field}
                                 mode="multiple"
                                 loading={specsLoading}
+                                showSearch
+                                filterOption={filterOption}
                                 options={specializations?.map(s => ({ value: s.id, label: s.name }))}
                                 value={field.value?.map(s => s.id)}
                                 onChange={(ids: string[]) => {

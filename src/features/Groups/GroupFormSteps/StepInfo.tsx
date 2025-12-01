@@ -32,10 +32,10 @@ const StepInfo: React.FC<StepProps> = ({ initialData, onNext }) => {
     const onSubmit = (data: GroupFormData) => {
 
         onNext({
-            nameArabic: data.nameArabic,
-            nameEnglish: data.nameEnglish,
-            descriptionArabic: data.descriptionArabic,
-            descriptionEnglish: data.descriptionEnglish,
+            name_ar: data.name_ar,
+            name_en: data.name_en,
+            description_ar: data.description_ar,
+            description_en: data.description_en,
         });
     };
 
@@ -45,9 +45,9 @@ const StepInfo: React.FC<StepProps> = ({ initialData, onNext }) => {
                 <Form.Item label={<Flex align="start" gap="small">
                     <span>{t('translation.name_ar')}</span>
                     <RequiredTag />
-                </Flex>} validateStatus={errors.nameArabic ? 'error' : ''} help={errors.nameArabic?.message} required>
+                </Flex>} validateStatus={errors.name_ar ? 'error' : ''} help={errors.name_ar?.message} required>
                     <Controller
-                        name="nameArabic"
+                        name="name_ar"
                         control={control}
                         rules={{ required: t('required') }}
                         render={({ field }) => (
@@ -59,9 +59,9 @@ const StepInfo: React.FC<StepProps> = ({ initialData, onNext }) => {
                 <Form.Item label={<Flex align="start" gap="small">
                     <span>{t('translation.name_en')}</span>
                     <RequiredTag />
-                </Flex>} validateStatus={errors.nameEnglish ? 'error' : ''} help={errors.nameEnglish?.message} required>
+                </Flex>} validateStatus={errors.name_en ? 'error' : ''} help={errors.name_en?.message} required>
                     <Controller
-                        name="nameEnglish"
+                        name="name_en"
                         control={control}
                         rules={{ required: t('required') }}
                         render={({ field }) => <Input {...field} />}
@@ -69,9 +69,9 @@ const StepInfo: React.FC<StepProps> = ({ initialData, onNext }) => {
                 <Form.Item label={<Flex align="start" gap="small">
                     <span>{t('translation.description_ar')}</span>
                     <RequiredTag />
-                </Flex>} validateStatus={errors.descriptionArabic ? 'error' : ''} help={errors.descriptionArabic?.message} required>
+                </Flex>} validateStatus={errors.description_ar ? 'error' : ''} help={errors.description_ar?.message} required>
                     <Controller
-                        name="descriptionArabic"
+                        name="description_ar"
                         control={control}
                         rules={{ required: t('required') }}
                         render={({ field }) => <Input.TextArea rows={4} {...field} />}
@@ -79,9 +79,9 @@ const StepInfo: React.FC<StepProps> = ({ initialData, onNext }) => {
                 <Form.Item label={<Flex align="start" gap="small">
                     <span>{t('translation.description_en')}</span>
                     <RequiredTag />
-                </Flex>} validateStatus={errors.descriptionEnglish ? 'error' : ''} help={errors.descriptionEnglish?.message} required>
+                </Flex>} validateStatus={errors.description_en ? 'error' : ''} help={errors.description_en?.message} required>
                     <Controller
-                        name="descriptionEnglish"
+                        name="description_en"
                         control={control}
                         rules={{ required: t('required') }}
                         render={({ field }) => <Input.TextArea rows={4} {...field} />}

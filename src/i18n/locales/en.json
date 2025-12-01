@@ -67,7 +67,15 @@
     "group_deleted_success": "Group deleted successfully!",
     "group_deleted_error": "Failed to delete group.",
     "user_deleted_success": "User deleted successfully!",
-    "user_deleted_error": "Failed to delete user."
+    "user_deleted_error": "Failed to delete user.",
+    "group_id_missing": "Group ID is missing.",
+    "error_fetching_group": "Failed to fetch group.",
+    "group_not_found": "Group not found.",
+    "back_to_list": "Back to List",
+    "color": "Color",
+    "user_id_or_role_missing": "User ID or Role is missing.",
+    "error_fetching_user": "Failed to fetch user.",
+    "user_not_found_message": "User not found."
   },
   "group_form": {
     "add_title": "Add New Group",
@@ -85,17 +93,25 @@
     "edit_success": "Group updated successfully!",
     "submit_error": "Failed to save group. Please check all fields.",
     "head_name_placeholder": "Enter Head Name (or select user)",
-    "team_leader_placeholder": "Select Team Leader (or enter name)",
+    "team_leader_placeholder": "Select Team Leader",
     "add_head": "Add Another Head",
     "select_specializations": "Select one or more specializations",
     "at_least_one_head_required": "At least one Head must be assigned.",
-    "select_heads_placeholder": "Select one or more group heads"
+    "select_heads_placeholder": "Select one or more group heads",
+    "view_title": "Group Details"
   },
   "required": "Required field",
   "user_list": {
+    "full_name": "Full Name",
     "fname": "First Name",
+    "fname_en": "First Name (English)",
+    "fname_ar": "First Name (Arabic)",
     "mname": "Middle Name",
+    "mname_en": "Middle Name (English)",
+    "mname_ar": "Middle Name (Arabic)",
     "lname": "Last Name",
+    "lname_en": "Last Name (English)",
+    "lname_ar": "Last Name (Arabic)",
     "ssn": "SSN",
     "email": "Email",
     "password": "Password",
@@ -113,6 +129,8 @@
     "yes": "Yes",
     "no": "No",
     "job_title": "Job Title",
+    "job_title_en": "Job Title (English)",
+    "job_title_ar": "Job Title (Arabic)",
     "university": "University",
     "domain": "Domain",
     "department": "Department",
@@ -137,6 +155,10 @@
     "jobLocation_title": "Job / Location",
     "perm_title": "Permissions",
     "access_title": "Access",
-    "image": "Image"
+    "image": "Image",
+    "group": "Groups",
+    "status": "Status",
+    "details": "Details",
+    "view_user_title": "User Details"
   }
 }

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Table, Button, Space, Popconfirm, message, Pagination, Tooltip, Popover } from 'antd';
+import { Table, Button, Space, Popconfirm, message, Pagination, Tooltip, Popover, Typography } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
@@ -8,11 +8,16 @@ import GroupFormModal from './GroupFormModal';
 import type { Group, NamedObject } from './Types/groups';
 import AvatarDisplay from '../../components/AvatarDisplay';
 import { useDeleteGroup, useGroups } from './Hooks/useGroups';
+import { useNavigate } from 'react-router-dom';
 
+const { Paragraph } = Typography;
 
 const GroupsList: React.FC = () => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [pagination, setPagination] = useState({ page: 1, pageSize: 10 });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [ellipsis, setEllipsis] = useState(true);
 
     const { data, isLoading } = useGroups(pagination.page, pagination.pageSize);
     const deleteMutation = useDeleteGroup();
@@ -32,8 +37,7 @@ const GroupsList: React.FC = () => {
     };
 
     const handleView = (id: string) => {
-
-        console.log(`Maps to view page for ID: ${id}`);
+        navigate(`/groups/${id}`);
     };
 
     const handleDelete = async (id: string) => {
@@ -56,16 +60,7 @@ const GroupsList: React.FC = () => {
         setPagination({ page, pageSize });
     };
 
-    const TRUNCATION_STYLE: React.CSSProperties = {
-        // Standard properties for flexbox and overflow control
-        display: '-webkit-box',
-        WebkitLineClamp: 1, // Limit to 3 lines
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        maxWidth: '200px', // Explicit max width for stability
-        cursor: 'pointer', // Indicate clickability
-    };
+
 
 
     const columns: ColumnsType<Group> = [
@@ -92,30 +87,28 @@ const GroupsList: React.FC = () => {
         {
             title: t('translation.description_ar'), dataIndex: 'description_ar', key: 'descriptionArabic', width: 200,
             render: (description: string) => (
-                // Use Popover for click-to-show functionality
                 <Popover
-                    title={t('translation.description_ar')} // Title in the Popover header
-                    content={<div style={{ maxWidth: 400 }}>{description}</div>} // Full description content
-                    trigger="click" // Trigger on click
+                    title={t('translation.description_ar')}
+                    content={<div style={{ maxWidth: 400 }}>{description}</div>} 
+                    trigger="click" 
                     placement="topLeft"
                 >
-                    {/* The clickable, truncated element */}
-                    <span style={TRUNCATION_STYLE}>{description || '-'}</span>
+                    <Paragraph ellipsis={ellipsis ? { rows: 1, expandable: true, symbol: 'more' } : false}>{description}</Paragraph>
+                    
                 </Popover>
             ),
         },
         {
             title: t('translation.description_en'), dataIndex: 'description_en', key: 'descriptionEnglish', width: 200,
             render: (description: string) => (
-                // Use Popover for click-to-show functionality
                 <Popover
-                    title={t('translation.description_en')} // Title in the Popover header
-                    content={<div style={{ maxWidth: 400 }}>{description}</div>} // Full description content
-                    trigger="click" // Trigger on click
+                    title={t('translation.description_en')}
+                    content={<div style={{ maxWidth: 400 }}>{description}</div>} 
+                    trigger="click" 
                     placement="topLeft"
                 >
-                    {/* The clickable, truncated element */}
-                    <span style={TRUNCATION_STYLE}>{description || '-'}</span>
+                    <Paragraph ellipsis={ellipsis ? { rows: 1, expandable: true, symbol: 'more' } : false}>{description}</Paragraph>
+
                 </Popover>
             ),
         },

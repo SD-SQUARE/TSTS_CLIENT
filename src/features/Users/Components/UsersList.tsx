@@ -10,23 +10,27 @@ import type { UserListItem } from "../Types/users";
 import { useDeleteUser, useUsers } from "../Hooks/useUsers";
 import AvatarDisplay from "../../../components/AvatarDisplay";
 import UserFormModal from "./UsersFormModal";
+import { useNavigate } from "react-router-dom";
 
 
 
 
 export const UserList: React.FC<{ role: string }> = ({ role }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const navigate = useNavigate();
+    const currentLanguage = i18n.language;
     const [pagination, setPagination] = useState({ page: 1, pageSize: 10 });
     const { data, isLoading } = useUsers(role, pagination.page, pagination.pageSize);
     const deleteMutation = useDeleteUser(role);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [editingUser, setEditingUser] = useState<UserListItem | undefined>();
 
+
     const handleAdd = () => { setEditingUser(undefined); setIsModalVisible(true); };
     const handleView = (id: string) => {
-
-        console.log(`Maps to view page for ID: ${id}`);
-    }; const handleEdit = (user: UserListItem) => { setEditingUser(user); setIsModalVisible(true); };
+        navigate(`/users/${role}/${id}`);
+    }; 
+    const handleEdit = (user: UserListItem) => { setEditingUser(user); setIsModalVisible(true); };
     const handleDelete = async (id: string) => {
         try { await deleteMutation.mutateAsync(id); message.success(t("translation.user_deleted_success")); }
         catch { message.error(t("translation.user_deleted_error")); }
@@ -42,7 +46,6 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
         const remainingContacts = contacts.slice(1);
         const remainingCount = remainingContacts.length;
 
-        // Content for the Popover (the list of all extra numbers)
         const popoverContent = (
             <div style={{ padding: '4px 0' }}>
                 {remainingContacts.map((c, i) => <div key={i} style={{ marginBottom: 4 }}>{c}</div>)}
@@ -51,15 +54,13 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
 
         return (
             <Space size={8}>
-                {/* 1. Display the first contact number */}
                 <span>{firstContact}</span>
 
-                {/* 2. Clickable Overflow Indicator */}
                 {remainingCount > 0 && (
                     <Popover
                         content={popoverContent}
                         title={t(titleKey)}
-                        trigger="click" // Open/close on click
+                        trigger="click"
                         placement="right"
                     >
                         <Tag
@@ -67,7 +68,6 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                             style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                         >
                             +{remainingCount}
-                            {/* Add the arrow icon next to the count */}
                             <DownOutlined style={{ fontSize: '10px', marginLeft: 4 }} />
                         </Tag>
                     </Popover>
@@ -93,9 +93,9 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
             width: 60,
         },
 
-        { title: t("user_list.fname"), dataIndex: "first_name", key: "first_name" },
-        { title: t("user_list.mname"), dataIndex: "mid_name", key: "mid_name" },
-        { title: t("user_list.lname"), dataIndex: "last_name", key: "last_name" },
+        { title: t("user_list.fname"), dataIndex: `first_name_${currentLanguage}`, key: "first_name" },
+        { title: t("user_list.mname"), dataIndex: `mid_name_${currentLanguage}`, key: "mid_name" },
+        { title: t("user_list.lname"), dataIndex: `last_name_${currentLanguage}`, key: "last_name" },
         { title: t("user_list.ssn"), dataIndex: "ssn", key: "ssn" },
 
         {
@@ -112,7 +112,35 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
             render: (mobiles: string[]) =>
                 renderContactList(mobiles, t("user_list.mobile")),
         },
-        { title: t("user_list.job_title"), dataIndex: "job", key: "job" },
+        { title: t("user_list.job_title"), dataIndex: `job_${currentLanguage}`, key: "job" },
+        ...(role !== "requesters" ? [{
+            title: t("user_list.group"),
+            dataIndex: "groups",
+            key: "groups",
+            render: (groups: any[]) => {
+                if (!groups || groups.length === 0) {
+                    return "-";
+                }
+                
+                const nameKey = `name_${currentLanguage}`;
+
+                return (
+                    <Space size="small">
+                        {groups
+                            .filter(Boolean)
+                            .map((group) => {
+                                const localizedGroup = {
+                                    ...group,
+                                    name: group[nameKey] || group.name, 
+                                };
+                                return (
+                                    <AvatarDisplay key={localizedGroup.id} member={localizedGroup} />
+                                );
+                            })}
+                    </Space>
+                );
+            },
+        }] : []),
         {
             title: t("user_list.university"),
             dataIndex: ["university", "name"],

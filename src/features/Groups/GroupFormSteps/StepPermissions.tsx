@@ -20,7 +20,6 @@ const StepPermissions: React.FC<StepProps> = ({ initialData, onSubmit, isSubmitt
     const { data: specializations, isLoading: isLoadingSpecs } = useSpecializations();
 
 
-    // At the top of your component after useForm()
 const { handleSubmit, control, formState: { errors }, reset } = useForm<GroupFormData>({
     defaultValues: initialData,
     mode: 'onChange',
@@ -30,7 +29,6 @@ const { handleSubmit, control, formState: { errors }, reset } = useForm<GroupFor
         reset(initialData);
     }, [initialData, reset]);
 
-    // console.log(initialData);
 
     const submitTrigger = useCallback(() => {
         handleSubmit((data) => onSubmit(data))();
@@ -49,6 +47,12 @@ const { handleSubmit, control, formState: { errors }, reset } = useForm<GroupFor
             id,
             name: allSpecs?.find((opt) => opt.id === id)?.name ?? "",
         }));
+
+        const filterOption = (input: string, option: { value: string; label: string } | undefined) => {
+            if (!option || !option.label) return false;
+            
+            return option.label.toLowerCase().includes(input.toLowerCase());
+        };
 
     return (
         <Card title={t('group_form.step_permissions_card_title')}>
@@ -78,6 +82,8 @@ const { handleSubmit, control, formState: { errors }, reset } = useForm<GroupFor
                                 options={mapToAntdOptions(specializations)}
                                 loading={isLoadingSpecs}
                                 disabled={isSubmitting}
+                                showSearch
+                                filterOption={filterOption}
                                 value={field.value?.map((s) => s.id) ?? []}
                                 onChange={(ids) => {
                                     field.onChange(

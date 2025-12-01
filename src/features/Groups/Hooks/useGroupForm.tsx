@@ -39,6 +39,19 @@ export const useAdmins = () => {
   });
 };
 
+export const useGroupDetail = (id?: string) => {
+  return useQuery({
+    queryKey: ['groupDetail', id],
+    queryFn: async () => {
+      if (!id) return null;
+      const response = await api.get<GroupFormData>(`/groups/${id}`);
+      return response.data;
+    },
+    enabled: !!id,
+    staleTime: Infinity,
+  })
+}
+
 
 export const useTechnicians = () => {
   return useQuery({

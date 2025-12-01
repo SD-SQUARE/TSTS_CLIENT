@@ -2,6 +2,7 @@
         id: string;
         name: string;
         description?: string;
+        color?: string;
     }
     
     export interface ProfileLookup extends Lookup {
@@ -9,25 +10,28 @@
         name_ar: string;
         description_en?: string;
         description_ar?: string;
-        // and permissions if needed
     }
     
     
     export interface UserListItem {
         id: string;
-        image: string; // for avatar preview
+        image: string; 
         email: string;
         user_type: string;
-        first_name: string;
-        mid_name: string;
-        last_name: string;
+        first_name_en: string;
+        first_name_ar: string;
+        mid_name_en: string;
+        mid_name_ar: string;
+        last_name_en: string;
+        last_name_ar: string;
         ssn: string;
         university?: Lookup;
         domain?: Lookup;
         departments: Lookup[];
         contacts: { phones: string[]; mobiles: string[] };
         status: "Active" | "InActive";
-        job: string;
+        job_en: string;
+        job_ar: string;
         groups?: Lookup[];
         permission_profile?: Lookup;
         specializations?: Lookup[];
@@ -35,12 +39,16 @@
     
     export interface UserFormData {
         image: File | string | null;
-        first_name: string;
-        mid_name: string;
-        last_name: string;
+        first_name_en: string;
+        first_name_ar: string;
+        mid_name_en: string;
+        mid_name_ar: string;
+        last_name_en: string;
+        last_name_ar: string;
         ssn: string;
         contacts: { phones: string[]; mobiles: string[] };
-        job: string;
+        job_en: string;
+        job_ar: string;
         university: Lookup | null;
         domain: Lookup | null;
         departments: Lookup[];
@@ -55,12 +63,16 @@
     
     export interface UserPayload {
         image: File | string | null;
-        first_name: string;
-        mid_name: string;
-        last_name: string;
+        first_name_en: string;
+        first_name_ar: string;
+        mid_name_en: string;
+        mid_name_ar: string;
+        last_name_en: string;
+        last_name_ar: string;
         ssn: string;
         contacts: { phones: string[]; mobiles: string[] };
-        job: string;
+        job_en: string;
+        job_ar: string;
         email: string;
         password: string;
         status: "Active" | "InActive";

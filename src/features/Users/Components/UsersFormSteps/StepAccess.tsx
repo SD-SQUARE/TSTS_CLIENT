@@ -27,10 +27,8 @@ const StepAccess: React.FC<Props> = ({
 
     useEffect(() => { reset(initialData); }, [initialData, reset]);
 
-    // For Modal trigger logic (see your modal)
     const submitTrigger = useCallback(() => {
         handleSubmit((data) => {
-            // console.log(data);
             return onSubmit(data);
         })();
     }, [handleSubmit, onSubmit]);

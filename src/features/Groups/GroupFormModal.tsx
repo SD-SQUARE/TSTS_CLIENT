@@ -2,7 +2,7 @@
 
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Modal, Steps, Button, Space, message } from 'antd';
+import { Modal, Steps, Button, Space, message, Spin } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 
@@ -10,7 +10,7 @@ import StepInfo from './GroupFormSteps/StepInfo';
 import StepManagers from './GroupFormSteps/StepManagers';
 import StepPermissions from './GroupFormSteps/StepPermissions';
 import type { Group, GroupFormData } from './Types/groups';
-import { useAddGroup, useEditGroup } from './Hooks/useGroupForm';
+import { useAddGroup, useEditGroup, useGroupDetail } from './Hooks/useGroupForm';
 
 
 interface GroupFormModalProps {
@@ -19,6 +19,20 @@ interface GroupFormModalProps {
     groupData?: Group;
 }
 
+const generateDarkRandomColor = (): string => {
+    // Helper function to generate a two-digit hex segment (00 to 50)
+    const generateHexSegment = () => {
+        // Max decimal value of 80 (0x50)
+        const num = Math.floor(Math.random() * 81); 
+        return num.toString(16).padStart(2, '0');
+    };
+
+    const r = generateHexSegment();
+    const g = generateHexSegment();
+    const b = generateHexSegment();
+
+    return `#${r}${g}${b}`;
+};
 
 
 const steps = [
@@ -29,27 +43,27 @@ const steps = [
 
 
 const initialFormData: GroupFormData = {
-    nameArabic: '',
-    nameEnglish: '',
-    descriptionArabic: '',
-    descriptionEnglish: '',
+    name_ar: '',
+    name_en: '',
+    description_ar: '',
+    description_en: '',
     color: '#60203d',
     heads: [],
-    teamLeaders: null,
+    team_leader: null,
     specializations: [],
 };
 
 const cleanPayload = (data: GroupFormData) => {
     const payload: any = {
-        name_ar: data.nameArabic,
-        name_en: data.nameEnglish,
-        description_ar: data.descriptionArabic,
-        description_en: data.descriptionEnglish,
+        name_ar: data.name_ar,
+        name_en: data.name_en,
+        description_ar: data.description_ar,
+        description_en: data.description_en,
         color: data.color
     };
 
-    if (data.teamLeaders && data.teamLeaders.id) {
-        payload.team_leader_id = data.teamLeaders.id;
+    if (data.team_leader && data.team_leader.id) {
+        payload.team_leader_id = data.team_leader.id;
     } else {
         payload.team_leader_id = null;
     }
@@ -92,30 +106,39 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
         onClose();
     };
 
-
+    const { data: fetchedGroupDetail, isLoading: isFetchingDetail } = useGroupDetail( groupData?.id);
+    const isModalLoading = isEditing && isFetchingDetail;
     useEffect(() => {
-        if (groupData && isVisible) {
-            //FIXME : fix this Render warning properly
+        if(!isVisible){
             // eslint-disable-next-line react-hooks/set-state-in-effect
-            setFormData({
-                nameArabic: groupData.name_ar,
-                nameEnglish: groupData.name_en,
-                descriptionArabic: groupData.description_ar,
-                descriptionEnglish: groupData.description_en,
-                color: groupData.color,
-                heads: groupData.heads?.map(h => ({ id: h.id, name: h.name })) || [],
-                specializations: groupData.specializations?.map(s => ({ id: s.id, name: s.name })) || [],
-                teamLeaders: groupData.team_leader
-                    ? { id: groupData.team_leader.id, name: groupData.team_leader.name }
-                    : null,
-            });
-        } else if (!groupData && isVisible) {
+            setCurrent(0);
             setFormData(initialFormData);
+            return;
         }
-        if (isVisible) {
+        if (groupData) {
+            //FIXME : fix this Render warning properly
+            if(fetchedGroupDetail) {
+                
+                // eslint-disable-next-line react-hooks/set-state-in-effect
+                setFormData({
+                    name_ar: fetchedGroupDetail.name_ar,
+                    name_en: fetchedGroupDetail.name_en,
+                    description_ar: fetchedGroupDetail.description_ar,
+                    description_en: fetchedGroupDetail.description_en,
+                    color: fetchedGroupDetail.color,
+                    heads: fetchedGroupDetail.heads?.map(h => ({ id: h.id, name: h.name })) || [],
+                    specializations: fetchedGroupDetail.specializations?.map(s => ({ id: s.id, name: s.name })) || [],
+                    team_leader: fetchedGroupDetail.team_leader
+                        ? { id: fetchedGroupDetail.team_leader.id, name: fetchedGroupDetail.team_leader.name }
+                        : null,
+                });
+                setCurrent(0);
+            }
+        } else{
+            setFormData(initialFormData);
             setCurrent(0);
         }
-    }, [groupData, isVisible]);
+    }, [groupData, isVisible, fetchedGroupDetail]);
 
 
 
@@ -131,16 +154,16 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
 
     const handleSubmit = useCallback(async (finalStepData: any) => {
         const finalData: GroupFormData = { ...formData, ...finalStepData };
-        
+        if (!isEditing) {
+            finalData.color = generateDarkRandomColor();
+        }
         const cleanedPayload = cleanPayload(finalData);
 
         try {
             if (isEditing && editMutation) {
-                console.log(cleanedPayload);
                 await editMutation.mutateAsync(cleanedPayload); 
                 message.success(t('group_form.edit_success'));
             } else {
-                console.log(cleanedPayload);
                 await addMutation.mutateAsync(cleanedPayload); 
                 message.success(t('group_form.add_success'));
             }
@@ -169,6 +192,7 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
             footer={null}
             width={700}
         >
+            <Spin spinning={isModalLoading}>
             <Steps current={current} style={{ marginBottom: 24 }}>
                 {steps.map(item => (
                     <Steps.Step key={item.title} title={t(`group_form.step_${item.title}`)} />
@@ -212,6 +236,7 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
                     )}
                 </Space>
             </div>
+            </Spin>
         </Modal>
     );
 };
