@@ -3,7 +3,7 @@ import { Form, Input, Checkbox, Card, Row, Col, Typography } from 'antd';
 import { GenericCrudPage } from '../../../components/GenericCrudPage';
 // import { permissionApi } from '../services/api'; // commented for now (api)
 // import axiosInstance from '../services/api';     // commented for now (axios)
-import type { PermissionProfile } from '../../profile/types';
+import type { PermissionProfile } from '../types/types';
 
 const { Text } = Typography;
 
@@ -85,7 +85,7 @@ const PermissionsPage: React.FC = () => {
       <Form.Item 
         name="name" 
         label="Profile Name" 
-        rules={[{ required: true, message: 'Profile name is required' }]}
+        rules={[{ required: true, message: 'Profile name is required',},]}
       >
         <Input placeholder="e.g. HR Manager" />
       </Form.Item>

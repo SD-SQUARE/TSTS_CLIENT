@@ -4,7 +4,9 @@
   "description_en": "Description (English)",
   "description_ar": "Description (Arabic)",
   "required": "This field is required",
-  "universities": "Universities"
+  "universities": "Universities",
+  "english_only": "English characters only",
+  "arabic_only": "Arabic characters only"
 }
 
   

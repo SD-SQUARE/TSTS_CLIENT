@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Input, TimePicker, Checkbox, Switch, Tag } from 'antd';
 import { GenericCrudPage } from '../../../components/GenericCrudPage';
 // import { workHoursApi } from '../services/api'; //comented for now
-import type { WorkHour } from '../../profile/types';
+import type { WorkHour } from '../types/types';
 
 
 const STATIC_DATA: WorkHour[] = [

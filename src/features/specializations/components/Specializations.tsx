@@ -2,8 +2,10 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, Select, Tooltip } from "antd";
 import { GenericCrudPage } from "../../../components/GenericCrudPage";
-import type { Specialization, Department } from "../../profile/types";
+import type { Specialization,  } from "../types/types";
+import type {Department} from "../../departments/types/types"
 import { useTranslation } from "react-i18next";
+
 
 // ----------- TEMP STATIC DATA -----------
 const STATIC_DEPARTMENTS: Department[] = [
@@ -122,22 +124,46 @@ const SpecializationsPage: React.FC = () => {
   const formItems = (
     <>
       {/* Name EN */}
-      <Form.Item name="name_en" label={t("name_en")} rules={[{ required: true, message: t("required") }]}>
+      <Form.Item name="name_en" label={t("name_en")}  rules={[
+    { required: true, message: t("required") },
+    {
+      pattern: /^[A-Za-z0-9\s.,-]*$/,
+      message: t("english_only"),
+    },
+  ]}>
         <Input placeholder={t("name_en")} />
       </Form.Item>
 
       {/* Name AR */}
-      <Form.Item name="name_ar" label={t("name_ar")} rules={[{ required: true, message: t("required") }]}>
+    <Form.Item name="name_ar" label={t("name_ar")} rules={[
+    { required: true, message: t("required") },
+    {
+      pattern: /^[\u0600-\u06FF\s0-9.,-]*$/,
+      message: t("arabic_only"),
+    },
+  ]}>
         <Input placeholder={t("name_ar")} style={{ direction: "rtl", textAlign: "right" }} />
       </Form.Item>
 
       {/* Description EN */}
-      <Form.Item name="description_en" label={t("description_en")}>
+      <Form.Item name="description_en" label={t("description_en")}
+      rules={[
+        {
+          pattern: /^[A-Za-z0-9\s.,-]*$/,
+          message: t("english_only"),
+        },
+      ]}>
         <Input.TextArea placeholder={t("description_en")} rows={4} />
       </Form.Item>
 
       {/* Description AR */}
-      <Form.Item name="description_ar" label={t("description_ar")}>
+      <Form.Item name="description_ar" label={t("description_ar")}
+      rules={[
+        {
+          pattern: /^[\u0600-\u06FF\s0-9.,-]*$/,
+          message: t("arabic_only"),
+        },
+      ]}>
         <Input.TextArea placeholder={t("description_ar")} rows={4} style={{ direction: "rtl", textAlign: "right" }} />
       </Form.Item>
 

@@ -4,5 +4,7 @@
   "description_en": "الوصف بالإنجليزية",
   "description_ar": "الوصف بالعربية",
   "required": "هذا الحقل مطلوب",
-  "universities": "الجامعات"
+  "universities": "الجامعات",
+  "english_only": "يجب إدخال أحرف إنجليزية فقط",
+  "arabic_only": "يجب إدخال أحرف عربية فقط"
 }

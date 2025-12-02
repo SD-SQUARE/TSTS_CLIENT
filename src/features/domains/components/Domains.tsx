@@ -4,7 +4,7 @@
 import React, { useState } from "react";
 import { Form, Input, Select, Tag, Tooltip } from "antd";
 import { GenericCrudPage } from "../../../components/GenericCrudPage";
-import type { Domain } from "../../profile/types";
+import type { Domain } from "../types/types";
 import { useTranslation } from "react-i18next";
 
 const MOCK_UNIVERSITIES = [
@@ -127,19 +127,45 @@ const DomainsPage: React.FC = () => {
 
   const formItems = (
     <>
-      <Form.Item name="name_en" label={t("name_en")} rules={[{ required: true, message: t("required") }]}>
+            <Form.Item name="name_en" label={t("name_en")} 
+       rules={[
+    { required: true, message: t("required") },
+    {
+      pattern: /^[A-Za-z0-9\s.,-]*$/,
+      message: t("english_only"),
+    },
+  ]}>
         <Input placeholder={t("name_en")} />
       </Form.Item>
 
-      <Form.Item name="name_ar" label={t("name_ar")} rules={[{ required: true, message: t("required") }]}>
+      <Form.Item name="name_ar" label={t("name_ar")} rules={[
+    { required: true, message: t("required") },
+    {
+      pattern: /^[\u0600-\u06FF\s0-9.,-]*$/,
+      message: t("arabic_only"),
+    },
+  ]}>
         <Input placeholder={t("name_ar")} style={{ direction: "rtl", textAlign: "right" }} />
       </Form.Item>
 
-      <Form.Item name="description_en" label={t("description_en")}>
+      
+      <Form.Item name="description_en" label={t("description_en")}
+      rules={[
+        {
+          pattern: /^[A-Za-z0-9\s.,-]*$/,
+          message: t("english_only"),
+        },
+      ]}>
         <Input.TextArea placeholder={t("description_en")} rows={4} />
       </Form.Item>
 
-      <Form.Item name="description_ar" label={t("description_ar")}>
+      <Form.Item name="description_ar" label={t("description_ar")}
+      rules={[
+        {
+          pattern: /^[\u0600-\u06FF\s0-9.,-]*$/,
+          message: t("arabic_only"),
+        },
+      ]}>
         <Input.TextArea placeholder={t("description_ar")} rows={4} style={{ direction: "rtl", textAlign: "right" }} />
       </Form.Item>
 

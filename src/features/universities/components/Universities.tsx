@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Input, Tooltip } from 'antd';
 import { GenericCrudPage } from '../../../components/GenericCrudPage';
-import type { University } from '../../profile/types';
+import type { University } from '../types/types';
 // import { universityApi } from '../services/api'; // commented for now
 import { useTranslation } from "react-i18next";
 
@@ -102,30 +102,43 @@ const columns = [
       <Form.Item 
         name="name_en" 
         label={t("name_en")}
-        rules={[{ required: true }]}
-      >
+        rules={[
+          { required: true, message: t("required") },
+          {
+            pattern: /^[A-Za-z0-9\s.,-]*$/,
+            message: t("english_only"),
+          },
+        ]}>
         <Input placeholder="Helwan University" />
       </Form.Item>
   
-      <Form.Item 
-        name="name_ar" 
-        label={t("name_ar")}
-        rules={[{ required: true }]}
-      >
+      <Form.Item name="name_ar" label={t("name_ar")} rules={[
+    { required: true, message: t("required") },
+    {
+      pattern: /^[\u0600-\u06FF\s0-9.,-]*$/,
+      message: t("arabic_only"),
+    },
+  ]}>
         <Input placeholder="جامعة حلوان" style={{ direction: "rtl" }} />
       </Form.Item>
   
-      <Form.Item 
-        name="description_en" 
-        label={t("description_en")}
-      >
+      <Form.Item name="description_en" label={t("description_en")}
+      rules={[
+        {
+          pattern: /^[A-Za-z0-9\s.,-]*$/,
+          message: t("english_only"),
+        },
+      ]}>
         <Input.TextArea rows={4} />
       </Form.Item>
   
-      <Form.Item 
-        name="description_ar" 
-        label={t("description_ar")}
-      >
+      <Form.Item name="description_ar" label={t("description_ar")}
+      rules={[
+        {
+          pattern: /^[\u0600-\u06FF\s0-9.,-]*$/,
+          message: t("arabic_only"),
+        },
+      ]}>
         <Input.TextArea rows={4} style={{ direction: "rtl" }} />
       </Form.Item>
     </>

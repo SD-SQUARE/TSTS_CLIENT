@@ -19,6 +19,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
   formItems,
   disableAdd = false,
 }: GenericCrudProps<T>) => {
+  
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
