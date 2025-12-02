@@ -1,8 +1,9 @@
 import React from 'react';
 import { Form, Input, TimePicker, Checkbox, Switch, Tag } from 'antd';
 import { GenericCrudPage } from '../../../components/GenericCrudPage';
-// import { workHoursApi } from '../services/api'; //comented for now
-import type { WorkHour } from '../types/types';
+import { useGenericCrud } from '../../../api/common/hooks/common-hooks';
+import type { WorkHour, CreateWorkHourDto, UpdateWorkHourDto } from '../types/types';
+import { useTranslation } from "react-i18next";
 
 
 const STATIC_DATA: WorkHour[] = [
@@ -32,28 +33,28 @@ const STATIC_DATA: WorkHour[] = [
   },
 ];
 
-const mockService = {
-  getAll: async () => {
-    console.log('Fetching static data...');
-    return new Promise<WorkHour[]>((resolve) => {
-      setTimeout(() => resolve(STATIC_DATA), 500);
-    });
+const mockWorkHourService = {
+  getAll: async (): Promise<WorkHour[]> => {
+    return new Promise((resolve) => setTimeout(() => resolve(STATIC_DATA), 500));
   },
-  create: async (data: any) => {
-    console.log('Mock Create:', data);
-    return Promise.resolve(data);
+  create: async (data: CreateWorkHourDto): Promise<WorkHour> => {
+    console.log('Mock Create WorkHour:', data);
+    const newWorkHour = { ...data, id: Date.now() } as WorkHour;
+    return Promise.resolve(newWorkHour);
   },
-  update: async (id: string | number, data: any) => {
-    console.log('Mock Update:', id, data);
-    return Promise.resolve(data);
+  update: async (id: string | number, data: UpdateWorkHourDto): Promise<WorkHour> => {
+    console.log('Mock Update WorkHour:', id, data);
+    const updated = { ...data, id } as WorkHour;
+    return Promise.resolve(updated);
   },
-  delete: async (id: string | number) => {
-    console.log('Mock Delete:', id);
+  delete: async (id: string | number): Promise<void> => {
+    console.log('Mock Delete WorkHour:', id);
     return Promise.resolve();
-  }
-} as any; 
+  },
+};
 
 const WorkHoursPage: React.FC = () => {
+  const { t } = useTranslation();
   const daysOptions = [
     { label: 'Sun', value: 0 },
     { label: 'Mon', value: 1 },
@@ -65,6 +66,20 @@ const WorkHoursPage: React.FC = () => {
   ];
 
   const getDayLabel = (val: number) => daysOptions.find(d => d.value === val)?.label || val;
+
+  const {
+    data,
+    isLoading,
+    createMutation,
+    updateMutation,
+    deleteMutation,
+  } = useGenericCrud<WorkHour, CreateWorkHourDto, UpdateWorkHourDto>({
+    queryKey: ['workHours'],
+    fetchFn: mockWorkHourService.getAll,
+    createFn: mockWorkHourService.create,
+    updateFn: ({ id, data }) => mockWorkHourService.update(id, data),
+    deleteFn: mockWorkHourService.delete,
+  });
 
   const columns = [
     { 
@@ -85,7 +100,7 @@ const WorkHoursPage: React.FC = () => {
       key: 'days',
       render: (days: number[]) => (
         <>
-          {days.sort().map(d => (
+          {days?.sort().map(d => (
             <Tag color="blue" key={d}>{getDayLabel(d)}</Tag>
           ))}
         </>
@@ -106,9 +121,10 @@ const WorkHoursPage: React.FC = () => {
   const formItems = (
     <>
       <Form.Item 
-        name="name" 
+        name="name_en" 
         label="Shift Name" 
-        rules={[{ required: true, message: 'Please enter a name' }]}
+        rules={[{ required: true, message: 'Please enter a name' },
+        { pattern: /^[A-Za-z0-9\s.,-]*$/, message: t("english_only") }]}
       >
         <Input placeholder="e.g. Morning Shift" />
       </Form.Item>
@@ -118,7 +134,7 @@ const WorkHoursPage: React.FC = () => {
           name="startTime" 
           label="Start Time" 
           style={{ flex: 1 }}
-          rules={[{ required: true }]}
+          rules={[{ required: true, message: 'Please select start time' }]}
         >
           <TimePicker format="HH:mm" style={{ width: '100%' }} />
         </Form.Item>
@@ -127,7 +143,7 @@ const WorkHoursPage: React.FC = () => {
           name="endTime" 
           label="End Time" 
           style={{ flex: 1 }}
-          rules={[{ required: true }]}
+          rules={[{ required: true, message: 'Please select end time' }]}
         >
           <TimePicker format="HH:mm" style={{ width: '100%' }} />
         </Form.Item>
@@ -147,13 +163,16 @@ const WorkHoursPage: React.FC = () => {
     </>
   );
 
-
   return (
     <GenericCrudPage<WorkHour>
       title="Work Hours (Test Mode)"
-      service={mockService} 
       columns={columns}
       formItems={formItems}
+      data={data}
+      isLoading={isLoading}
+      createMutation={createMutation}
+      updateMutation={updateMutation}
+      deleteMutation={deleteMutation}
       disableAdd={true}
     />
   );

@@ -7,3 +7,6 @@ export interface WorkHour extends BaseEntity {
   isActive: boolean;
   timeZone?: string;
 }
+
+export type CreateWorkHourDto = Omit<WorkHour, 'id'>;
+export type UpdateWorkHourDto = Partial<CreateWorkHourDto>;

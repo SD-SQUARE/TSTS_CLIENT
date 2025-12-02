@@ -1,5 +1,5 @@
 import { BaseCrudService } from "../../../api/common/services/common-services";
-import type { WorkHour } from "../../profile/types/index";
+import type { WorkHour } from "../types/types";
 
 export const workHoursApi = new BaseCrudService<WorkHour>(
   "/work-hours",

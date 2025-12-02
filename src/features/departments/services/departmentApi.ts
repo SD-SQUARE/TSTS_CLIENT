@@ -1,6 +1,6 @@
 import axiosInstance from "../../../api/http";
 import { BaseCrudService } from "../../../api/common/services/common-services";
-import type { Department } from "../../profile/types/index";
+import type { Department } from "../types/types";
 
 class DepartmentService extends BaseCrudService<Department> {
   async getUsersInDept(deptId: string | number) {

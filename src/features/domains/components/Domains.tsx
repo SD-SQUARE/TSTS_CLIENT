@@ -1,10 +1,8 @@
-
-// import { domainApi } from '../services/api'; // commented for now
-
 import React, { useState } from "react";
-import { Form, Input, Select, Tag, Tooltip } from "antd";
+import { Form, Input, Select, Tooltip } from "antd";
 import { GenericCrudPage } from "../../../components/GenericCrudPage";
-import type { Domain } from "../types/types";
+import { useGenericCrud } from "../../../api/common/hooks/common-hooks";
+import type { Domain, CreateDomainDto, UpdateDomainDto } from "../types/types";
 import { useTranslation } from "react-i18next";
 
 const MOCK_UNIVERSITIES = [
@@ -48,18 +46,43 @@ const STATIC_DOMAINS: Domain[] = [
   },
 ];
 
-const mockService = {
-  getAll: async () => new Promise<Domain[]>((resolve) => setTimeout(() => resolve(STATIC_DOMAINS), 500)),
-  create: async (data: any) => { console.log("Mock Create Domain:", data); return Promise.resolve(data); },
-  update: async (id: string | number, data: any) => { console.log("Mock Update Domain:", id, data); return Promise.resolve(data); },
-  delete: async (id: string | number) => { console.log("Mock Delete Domain:", id); return Promise.resolve(); },
-} as any;
-
-// -----------------------------------------
+const mockDomainService = {
+  getAll: async (): Promise<Domain[]> => {
+    return new Promise((resolve) => setTimeout(() => resolve(STATIC_DOMAINS), 500));
+  },
+  create: async (data: CreateDomainDto): Promise<Domain> => {
+    console.log("Mock Create Domain:", data);
+    const newDomain = { ...data, id: Date.now() } as Domain;
+    return Promise.resolve(newDomain);
+  },
+  update: async (id: string | number, data: UpdateDomainDto): Promise<Domain> => {
+    console.log("Mock Update Domain:", id, data);
+    const updated = { ...data, id } as Domain;
+    return Promise.resolve(updated);
+  },
+  delete: async (id: string | number): Promise<void> => {
+    console.log("Mock Delete Domain:", id);
+    return Promise.resolve();
+  },
+};
 
 const DomainsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [selectedUni, setSelectedUni] = useState<number | null>(null);
+
+  const {
+    data,
+    isLoading,
+    createMutation,
+    updateMutation,
+    deleteMutation,
+  } = useGenericCrud<Domain, CreateDomainDto, UpdateDomainDto>({
+    queryKey: ['domains'],
+    fetchFn: mockDomainService.getAll,
+    createFn: mockDomainService.create,
+    updateFn: ({ id, data }) => mockDomainService.update(id, data),
+    deleteFn: mockDomainService.delete,
+  });
 
   const uniOptions = MOCK_UNIVERSITIES.map((u) => ({
     label: i18n.language === "ar" ? u.label_ar : u.label_en,
@@ -127,45 +150,45 @@ const DomainsPage: React.FC = () => {
 
   const formItems = (
     <>
-            <Form.Item name="name_en" label={t("name_en")} 
-       rules={[
-    { required: true, message: t("required") },
-    {
-      pattern: /^[A-Za-z0-9\s.,-]*$/,
-      message: t("english_only"),
-    },
-  ]}>
+      <Form.Item 
+        name="name_en" 
+        label={t("name_en")} 
+        rules={[
+          { required: true, message: t("required") },
+          { pattern: /^[A-Za-z0-9\s.,-]*$/, message: t("english_only") },
+        ]}
+      >
         <Input placeholder={t("name_en")} />
       </Form.Item>
 
-      <Form.Item name="name_ar" label={t("name_ar")} rules={[
-    { required: true, message: t("required") },
-    {
-      pattern: /^[\u0600-\u06FF\s0-9.,-]*$/,
-      message: t("arabic_only"),
-    },
-  ]}>
+      <Form.Item 
+        name="name_ar" 
+        label={t("name_ar")} 
+        rules={[
+          { required: true, message: t("required") },
+          { pattern: /^[\u0600-\u06FF\s0-9.,-]*$/, message: t("arabic_only") },
+        ]}
+      >
         <Input placeholder={t("name_ar")} style={{ direction: "rtl", textAlign: "right" }} />
       </Form.Item>
 
-      
-      <Form.Item name="description_en" label={t("description_en")}
-      rules={[
-        {
-          pattern: /^[A-Za-z0-9\s.,-]*$/,
-          message: t("english_only"),
-        },
-      ]}>
+      <Form.Item 
+        name="description_en" 
+        label={t("description_en")}
+        rules={[
+          { pattern: /^[A-Za-z0-9\s.,-]*$/, message: t("english_only") },
+        ]}
+      >
         <Input.TextArea placeholder={t("description_en")} rows={4} />
       </Form.Item>
 
-      <Form.Item name="description_ar" label={t("description_ar")}
-      rules={[
-        {
-          pattern: /^[\u0600-\u06FF\s0-9.,-]*$/,
-          message: t("arabic_only"),
-        },
-      ]}>
+      <Form.Item 
+        name="description_ar" 
+        label={t("description_ar")}
+        rules={[
+          { pattern: /^[\u0600-\u06FF\s0-9.,-]*$/, message: t("arabic_only") },
+        ]}
+      >
         <Input.TextArea placeholder={t("description_ar")} rows={4} style={{ direction: "rtl", textAlign: "right" }} />
       </Form.Item>
 
@@ -188,7 +211,11 @@ const DomainsPage: React.FC = () => {
       title={t("domains")}
       columns={columns}
       formItems={formItems}
-      service={mockService}
+      data={data}
+      isLoading={isLoading}
+      createMutation={createMutation}
+      updateMutation={updateMutation}
+      deleteMutation={deleteMutation}
     />
   );
 };

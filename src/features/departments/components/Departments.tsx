@@ -1,10 +1,8 @@
-
-// import { departmentApi } from '../services/api'; // commented for now
-
 import React, { useState } from "react";
-import { Form, Input, Select, Tag, Tooltip } from "antd";
+import { Form, Input, Select, Tooltip } from "antd";
 import { GenericCrudPage } from "../../../components/GenericCrudPage";
-import type { Department } from "../types/types";
+import { useGenericCrud } from "../../../api/common/hooks/common-hooks";
+import type { Department, CreateDepartmentDto, UpdateDepartmentDto } from "../types/types";
 import { useTranslation } from "react-i18next";
 
 const MOCK_UNIVERSITIES = [
@@ -42,18 +40,43 @@ const STATIC_DEPARTMENTS: Department[] = [
   },
 ];
 
-const mockService = {
-  getAll: async () => new Promise<Department[]>((resolve) => setTimeout(() => resolve(STATIC_DEPARTMENTS), 500)),
-  create: async (data: any) => { console.log("Mock Create Dept:", data); return Promise.resolve(data); },
-  update: async (id: string | number, data: any) => { console.log("Mock Update Dept:", id, data); return Promise.resolve(data); },
-  delete: async (id: string | number) => { console.log("Mock Delete Dept:", id); return Promise.resolve(); },
-} as any;
-
-// -----------------------------------------
+const mockDepartmentService = {
+  getAll: async (): Promise<Department[]> => {
+    return new Promise((resolve) => setTimeout(() => resolve(STATIC_DEPARTMENTS), 500));
+  },
+  create: async (data: CreateDepartmentDto): Promise<Department> => {
+    console.log("Mock Create Department:", data);
+    const newDept = { ...data, id: Date.now() } as Department;
+    return Promise.resolve(newDept);
+  },
+  update: async (id: string | number, data: UpdateDepartmentDto): Promise<Department> => {
+    console.log("Mock Update Department:", id, data);
+    const updated = { ...data, id } as Department;
+    return Promise.resolve(updated);
+  },
+  delete: async (id: string | number): Promise<void> => {
+    console.log("Mock Delete Department:", id);
+    return Promise.resolve();
+  },
+};
 
 const DepartmentsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [selectedUni, setSelectedUni] = useState<number | null>(null);
+
+  const {
+    data,
+    isLoading,
+    createMutation,
+    updateMutation,
+    deleteMutation,
+  } = useGenericCrud<Department, CreateDepartmentDto, UpdateDepartmentDto>({
+    queryKey: ['departments'],
+    fetchFn: mockDepartmentService.getAll,
+    createFn: mockDepartmentService.create,
+    updateFn: ({ id, data }) => mockDepartmentService.update(id, data),
+    deleteFn: mockDepartmentService.delete,
+  });
 
   const uniOptions = MOCK_UNIVERSITIES.map((u) => ({
     label: i18n.language === "ar" ? u.label_ar : u.label_en,
@@ -120,44 +143,45 @@ const DepartmentsPage: React.FC = () => {
 
   const formItems = (
     <>
-      <Form.Item name="name_en" label={t("name_en")} 
-       rules={[
-    { required: true, message: t("required") },
-    {
-      pattern: /^[A-Za-z0-9\s.,-]*$/,
-      message: t("english_only"),
-    },
-  ]}>
+      <Form.Item 
+        name="name_en" 
+        label={t("name_en")} 
+        rules={[
+          { required: true, message: t("required") },
+          { pattern: /^[A-Za-z0-9\s.,-]*$/, message: t("english_only") },
+        ]}
+      >
         <Input placeholder={t("name_en")} />
       </Form.Item>
 
-      <Form.Item name="name_ar" label={t("name_ar")} rules={[
-    { required: true, message: t("required") },
-    {
-      pattern: /^[\u0600-\u06FF\s0-9.,-]*$/,
-      message: t("arabic_only"),
-    },
-  ]}>
+      <Form.Item 
+        name="name_ar" 
+        label={t("name_ar")} 
+        rules={[
+          { required: true, message: t("required") },
+          { pattern: /^[\u0600-\u06FF\s0-9.,-]*$/, message: t("arabic_only") },
+        ]}
+      >
         <Input placeholder={t("name_ar")} style={{ direction: "rtl", textAlign: "right" }} />
       </Form.Item>
 
-      <Form.Item name="description_en" label={t("description_en")}
-      rules={[
-        {
-          pattern: /^[A-Za-z0-9\s.,-]*$/,
-          message: t("english_only"),
-        },
-      ]}>
+      <Form.Item 
+        name="description_en" 
+        label={t("description_en")}
+        rules={[
+          { pattern: /^[A-Za-z0-9\s.,-]*$/, message: t("english_only") },
+        ]}
+      >
         <Input.TextArea placeholder={t("description_en")} rows={4} />
       </Form.Item>
 
-      <Form.Item name="description_ar" label={t("description_ar")}
-      rules={[
-        {
-          pattern: /^[\u0600-\u06FF\s0-9.,-]*$/,
-          message: t("arabic_only"),
-        },
-      ]}>
+      <Form.Item 
+        name="description_ar" 
+        label={t("description_ar")}
+        rules={[
+          { pattern: /^[\u0600-\u06FF\s0-9.,-]*$/, message: t("arabic_only") },
+        ]}
+      >
         <Input.TextArea placeholder={t("description_ar")} rows={4} style={{ direction: "rtl", textAlign: "right" }} />
       </Form.Item>
 
@@ -180,7 +204,11 @@ const DepartmentsPage: React.FC = () => {
       title={t("departments")}
       columns={columns}
       formItems={formItems}
-      service={mockService}
+      data={data}
+      isLoading={isLoading}
+      createMutation={createMutation}
+      updateMutation={updateMutation}
+      deleteMutation={deleteMutation}
     />
   );
 };

@@ -13,3 +13,6 @@ export interface SystemPermission {
   label: string;
   group: string;
 }
+
+export type CreatePermissionProfileDto = Omit<PermissionProfile, 'id'>;
+export type UpdatePermissionProfileDto = Partial<CreatePermissionProfileDto>;
