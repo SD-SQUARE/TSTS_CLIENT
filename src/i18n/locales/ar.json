@@ -56,6 +56,7 @@
     "heads": "الرؤساء",
     "team_leader": "قائد الفريق",
     "specializations": "التخصصات",
+    "specialization_detail": "تفاصيل التخصص",
     "operations": "العمليات",
     "edit": "تعديل",
     "view": "عرض",
@@ -75,7 +76,15 @@
     "color": "لون",
     "user_id_or_role_missing": "معرف المستخدم او الدور مفقود.",
     "error_fetching_user": "فشل في جلب المستخدم.",
-    "user_not_found_message": "لم يتم العثور على المستخدم."
+    "user_not_found_message": "لم يتم العثور على المستخدم.",
+    "users" : "المستخدمين",
+    "available_technicians" : "المهندسين المتاحين",
+    "search_users" : "ابحث عن المستخدمين",
+    "not_found" : "لم يتم العثور على نتيجة",
+    "assigned_technicians" : "المهندسين المعينين",
+    "save_assignments" : "حفظ التعيينات",
+    "assignment_success" : "تم تعيين المهندسين بنجاح!",
+    "assignment_failed" : "فشل في تعيين المهندسين."
 },
 "group_form": {
     "add_title": "اضافة مجموعة جديدة",
@@ -98,9 +107,18 @@
     "select_specializations": "اختر واحد او اكثر من التخصصات",
     "at_least_one_head_required": "يجب تعيين على الاقل رئس واحد",
     "select_heads_placeholder": "اختر واحد او اكثر من المستخدمين",
-    "view_title": "تفاصيل المجموعة"
+    "view_title": "تفاصيل المجموعة",
+    "tab_info": "معلومات",
+    "tab_assign": "تعيين"
 },
     "required": "حقل مطلوب",
+    "password_8_chars": "كلمة المرور يجب ان تكون على الاقل 8 حروف",
+    "password_lowercase": "كلمة المرور يجب ان تحتوي على حرف صغير",
+    "password_uppercase": "كلمة المرور يجب ان تحتوي على حرف كبير",
+    "password_number": "كلمة المرور يجب ان تحتوي على رقم",
+    "password_special": "كلمة المرور يجب ان تحتوي على حرف خاص",
+    "english_only": "حروف انجليزية فقط مسموحة",
+    "arabic_only": "حروف عربية فقط مسموحة",
     "user_list": {
         "full_name": "الاسم الكامل",
         "fname": "الاسم الاول",

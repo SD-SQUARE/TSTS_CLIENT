@@ -56,6 +56,7 @@
     "heads": "Heads",
     "team_leader": "Team Leader",
     "specializations": "Specializations",
+    "specialization_detail": "Specialization Detail",
     "operations": "Operations",
     "edit": "Edit",
     "view": "View",
@@ -75,7 +76,15 @@
     "color": "Color",
     "user_id_or_role_missing": "User ID or Role is missing.",
     "error_fetching_user": "Failed to fetch user.",
-    "user_not_found_message": "User not found."
+    "user_not_found_message": "User not found.",
+    "users" : "Users",
+    "available_technicians": "Available Technicians",
+    "search_users": "Search Users",
+    "not_found": "Not Found",
+    "assigned_technicians": "Assigned Technicians",
+    "save_assignments": "Save Assignments",
+    "assignment_success": "Assignment saved successfully!",
+    "assignment_failed": "Failed to save assignment."
   },
   "group_form": {
     "add_title": "Add New Group",
@@ -98,9 +107,18 @@
     "select_specializations": "Select one or more specializations",
     "at_least_one_head_required": "At least one Head must be assigned.",
     "select_heads_placeholder": "Select one or more group heads",
-    "view_title": "Group Details"
+    "view_title": "Group Details",
+    "tab_info": "Info",
+    "tab_assign": "Assign"
   },
   "required": "Required field",
+  "password_8_chars": "Password must be at least 8 characters long",
+  "password_lowercase": "Password must contain at least one lowercase letter",
+  "password_uppercase": "Password must contain at least one uppercase letter",
+  "password_number": "Password must contain at least one number",
+  "password_special": "Password must contain at least one special character",
+  "english_only": "Only English characters are allowed",
+  "arabic_only": "Only Arabic characters are allowed",
   "user_list": {
     "full_name": "Full Name",
     "fname": "First Name",

@@ -3,13 +3,28 @@ import api from "../../../api/http";
 import type { Lookup, ProfileLookup, UserListItem } from "../Types/users";
 
 
-export const useUsers = (role: string, page: number, pageSize: number) => {
+export const useUsers = (
+    role: string, 
+    page: number, 
+    pageSize: number, 
+    searchQuery: { [key: string]: string } = {}
+) => {
+        const activeSearch = Object.entries(searchQuery)
+        .filter(([, value]) => value)
+        .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+
     return useQuery({
-        queryKey: ["users", role, page, pageSize],
+        queryKey: ["users", role, page, pageSize, activeSearch],
+        
         queryFn: async () => {
             const res = await api.get(`/users/${role}/`, {
-                params: { page, page_size: pageSize },
+                params: { 
+                    page, 
+                    page_size: pageSize, 
+                    ...activeSearch,
+                },
             });
+            
             return {
                 data: res.data.users as UserListItem[],
                 total: Math.floor(res.data.meta_data?.total || 0)

@@ -5,10 +5,10 @@ import api from '../../../api/http';
 import type { Group } from '../Types/groups';
 
 
-export const useGroups = (page: number, pageSize: number) => {
+export const useGroups = (page: number, pageSize: number, searchQuery: {[key: string]: string} = {}) => {
   return useQuery({
-    queryKey: ['groups', page, pageSize],
-    queryFn: () => fetchGroups(page, pageSize),
+    queryKey: ['groups', page, pageSize, searchQuery],
+    queryFn: () => fetchGroups(page, pageSize, searchQuery),
 
   });
 };
@@ -40,10 +40,11 @@ interface GroupApiResponse {
 
 
 
-export const fetchGroups = async (page: number, pageSize: number): Promise<{ data: Group[], total: number }> => {
+export const fetchGroups = async (page: number, pageSize: number, searchQuery: {[key: string]: string}): Promise<{ data: Group[], total: number }> => {
 
+  const query = Object.entries(searchQuery).filter(([,value]) => value).reduce((acc, [key, value]) => ({...acc, [key]: value}), {});
   const response = await api.get<GroupApiResponse>(`/groups/`, {
-    params: { page, page_size: pageSize },
+    params: { page, page_size: pageSize, ...query },
   });
 
   console.log(response.data);

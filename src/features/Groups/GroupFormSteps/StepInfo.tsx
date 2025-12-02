@@ -8,17 +8,24 @@ import type { GroupFormData } from '../Types/groups';
 import RequiredTag from '../../../components/RequiredTag';
 
 
+const ENGLISH_REGEX = /^[A-Za-z\s]+$/;
+const ARABIC_REGEX = /^[\u0600-\u06FF\s\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+$/u;
+
+interface ApiErrorField {
+    field: string;
+    message: string;
+}
 
 interface StepProps {
     initialData: GroupFormData;
     onNext: (data: Partial<GroupFormData>) => void;
-
+    apiErrors?: ApiErrorField[];
 }
 
-const StepInfo: React.FC<StepProps> = ({ initialData, onNext }) => {
+const StepInfo: React.FC<StepProps> = ({ initialData, onNext, apiErrors }) => {
     const { t } = useTranslation();
 
-    const { handleSubmit, control, formState: { errors }, reset } = useForm<GroupFormData>({
+    const { handleSubmit, control, formState: { errors }, reset, setError } = useForm<GroupFormData>({
         defaultValues: initialData,
         mode: 'onChange',
     });
@@ -27,6 +34,20 @@ const StepInfo: React.FC<StepProps> = ({ initialData, onNext }) => {
         reset(initialData);
     }, [initialData, reset]);
 
+    useEffect(() => {
+        if (apiErrors && apiErrors.length > 0) {
+            apiErrors.forEach(err => {
+                setError(
+                    err.field as keyof GroupFormData, 
+                    { 
+                        type: 'server', 
+                        message: err.message 
+                    },
+                    { shouldFocus: true }
+                );
+            });
+        }
+    }, [apiErrors, setError]);
 
 
     const onSubmit = (data: GroupFormData) => {
@@ -49,7 +70,10 @@ const StepInfo: React.FC<StepProps> = ({ initialData, onNext }) => {
                     <Controller
                         name="name_ar"
                         control={control}
-                        rules={{ required: t('required') }}
+                        rules={{ required: t("required"), pattern: {
+                            value: ARABIC_REGEX,
+                            message: t("arabic_only"),
+                        } }}
                         render={({ field }) => (
 
                             <Input {...field} />
@@ -63,7 +87,10 @@ const StepInfo: React.FC<StepProps> = ({ initialData, onNext }) => {
                     <Controller
                         name="name_en"
                         control={control}
-                        rules={{ required: t('required') }}
+                        rules={{ required: t("required"), pattern: {
+                            value: ENGLISH_REGEX,
+                            message: t("english_only"),
+                        } }}
                         render={({ field }) => <Input {...field} />}
                     />                </Form.Item>
                 <Form.Item label={<Flex align="start" gap="small">
@@ -73,7 +100,10 @@ const StepInfo: React.FC<StepProps> = ({ initialData, onNext }) => {
                     <Controller
                         name="description_ar"
                         control={control}
-                        rules={{ required: t('required') }}
+                        rules={{ required: t("required"), pattern: {
+                            value: ARABIC_REGEX,
+                            message: t("arabic_only"),
+                        } }}
                         render={({ field }) => <Input.TextArea rows={4} {...field} />}
                     />                </Form.Item>
                 <Form.Item label={<Flex align="start" gap="small">
@@ -83,7 +113,10 @@ const StepInfo: React.FC<StepProps> = ({ initialData, onNext }) => {
                     <Controller
                         name="description_en"
                         control={control}
-                        rules={{ required: t('required') }}
+                        rules={{ required: t("required"), pattern: {
+                            value: ENGLISH_REGEX,
+                            message: t("english_only"),
+                        } }}
                         render={({ field }) => <Input.TextArea rows={4} {...field} />}
                     />                </Form.Item>
             </Form>

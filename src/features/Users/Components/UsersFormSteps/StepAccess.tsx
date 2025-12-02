@@ -53,9 +53,17 @@ const StepAccess: React.FC<Props> = ({
                     validateStatus={errors.password ? "error" : ""} help={errors.password?.message} required>
                     <Controller name="password" control={control}
                         rules={{
-                            required: "Required",
-                            minLength: { value: 6, message: "At least 6 chars" },
-                            validate: v => /[A-Z]/.test(v) && /[0-9]/.test(v) || "Must use A-Z and 0-9",
+                            required: t("required"),
+                            minLength: {
+                                value: 8,
+                                message: t("password_8_chars"),
+                            },
+                            validate: {
+                                hasUpperCase: (v) => /[A-Z]/.test(v) || t("password_uppercase"),
+                                hasNumber: (v) => /[0-9]/.test(v) || t("password_number"),
+                                hasSpecialChar: (v) => /[^A-Za-z0-9\s]/.test(v) || t("password_special"),
+                                hasLowerCase: (v) => /[a-z]/.test(v) || t("password_lowercase"),
+                            },
                         }}
                         render={({ field }) => <Input.Password {...field} />} />
                 </Form.Item>

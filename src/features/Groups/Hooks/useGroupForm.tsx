@@ -73,9 +73,6 @@ export const useSpecializations = () => {
     queryFn: async () => {
 
       const response = await api.get<GroupFormData>('/lockups/specializations/');
-
-
-
       return response.data.specializations;
     },
 
@@ -83,7 +80,19 @@ export const useSpecializations = () => {
   });
 };
 
-
+export const useAssignUsers = (groupId: string | undefined) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+      mutationFn: (userIds: string[]) => {
+          if (!groupId) throw new Error("Group ID is missing for assignment.");
+          return api.post(`/groups/${groupId}/assign`, { userIds });
+      },
+      onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['groupDetail', groupId] });
+          queryClient.invalidateQueries({ queryKey: ['groups'] });
+      },
+  });
+};
 
 export const useAddGroup = () => {
   const queryClient = useQueryClient();

@@ -6,6 +6,8 @@ import { useTranslation } from "react-i18next";
 import type { UserFormData } from "../../Types/users";
 import RequiredTag from "../../../../components/RequiredTag";
 
+const ENGLISH_REGEX = /^[A-Za-z\s]+$/;
+const ARABIC_REGEX = /^[\u0600-\u06FF\s\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+$/u;
 
 interface Props { initialData: UserFormData; onNext: (data: Partial<UserFormData>) => void; }
 
@@ -84,37 +86,55 @@ const StepInfo: React.FC<Props> = ({ initialData, onNext }) => {
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.fname_en")}</span><RequiredTag /></Flex>}
                     validateStatus={errors.first_name_en ? "error" : ""} help={errors.first_name_en?.message} required>
                     <Controller name="first_name_en" control={control}
-                        rules={{ required: "Required" }}
+                        rules={{ required: t("required"), pattern: {
+                            value: ENGLISH_REGEX,
+                            message: t("english_only"),
+                        } }}
                         render={({ field }) => <Input {...field} />} />
                 </Form.Item>
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.fname_ar")}</span><RequiredTag /></Flex>}
                     validateStatus={errors.first_name_ar ? "error" : ""} help={errors.first_name_ar?.message} required>
                     <Controller name="first_name_ar" control={control}
-                        rules={{ required: "Required" }}
+                        rules={{ required: t("required"), pattern: {
+                            value: ARABIC_REGEX,
+                            message: t("arabic_only"),
+                        } }}
                         render={({ field }) => <Input {...field} />} />
                 </Form.Item>
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.mname_en")}</span><RequiredTag /></Flex>}
                     validateStatus={errors.mid_name_en ? "error" : ""} help={errors.mid_name_en?.message} required>
                     <Controller name="mid_name_en" control={control}
-                        rules={{ required: "Required" }}
+                        rules={{ required: t("required"), pattern: {
+                            value: ENGLISH_REGEX,
+                            message: t("english_only"),
+                        } }}
                         render={({ field }) => <Input {...field} />} />
                 </Form.Item>
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.mname_ar")}</span><RequiredTag /></Flex>}
                     validateStatus={errors.mid_name_ar ? "error" : ""} help={errors.mid_name_ar?.message} required>
                     <Controller name="mid_name_ar" control={control}
-                        rules={{ required: "Required" }}
+                        rules={{ required: t("required"), pattern: {
+                            value: ARABIC_REGEX,
+                            message: t("arabic_only"),
+                        } }}
                         render={({ field }) => <Input {...field} />} />
                 </Form.Item>
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.lname_en")}</span><RequiredTag /></Flex>}
                     validateStatus={errors.last_name_en ? "error" : ""} help={errors.last_name_en?.message} required>
                     <Controller name="last_name_en" control={control}
-                        rules={{ required: "Required" }}
+                        rules={{ required: t("required"), pattern: {
+                            value: ENGLISH_REGEX,
+                            message: t("english_only"),
+                        } }}
                         render={({ field }) => <Input {...field} />} />
                 </Form.Item>
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.lname_ar")}</span><RequiredTag /></Flex>}
                     validateStatus={errors.last_name_ar ? "error" : ""} help={errors.last_name_ar?.message} required>
                     <Controller name="last_name_ar" control={control}
-                        rules={{ required: "Required" }}
+                        rules={{ required: t("required"), pattern: {
+                            value: ARABIC_REGEX,
+                            message: t("arabic_only"),
+                        } }}
                         render={({ field }) => <Input {...field} />} />
                 </Form.Item>
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.ssn")}</span><RequiredTag /></Flex>}

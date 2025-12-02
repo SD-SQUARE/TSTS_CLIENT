@@ -19,10 +19,13 @@ interface GroupFormModalProps {
     groupData?: Group;
 }
 
+interface ApiErrorField {
+    field: string;
+    message: string;
+}
+
 const generateDarkRandomColor = (): string => {
-    // Helper function to generate a two-digit hex segment (00 to 50)
     const generateHexSegment = () => {
-        // Max decimal value of 80 (0x50)
         const num = Math.floor(Math.random() * 81); 
         return num.toString(16).padStart(2, '0');
     };
@@ -79,6 +82,7 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
     const [current, setCurrent] = useState(0);
     const [formData, setFormData] = useState<GroupFormData>(initialFormData);
     const [stepSubmitTrigger, setStepSubmitTrigger] = useState<(() => void) | null>(null);
+    const [apiErrors, setApiErrors] = useState<ApiErrorField[]>([]);
     const isEditing = !!groupData;
 
     const resetKey = isVisible ? 'visible' : 'hidden';
@@ -96,13 +100,10 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
     const isSubmitting = addMutation.isPending || editMutation?.isPending;
 
     const resetModalState = () => {
-
         setCurrent(0);
-
         setFormData(initialFormData);
-
         setStepSubmitTrigger(null);
-
+        setApiErrors([]);
         onClose();
     };
 
@@ -113,6 +114,7 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setCurrent(0);
             setFormData(initialFormData);
+            setApiErrors([]);
             return;
         }
         if (groupData) {
@@ -138,16 +140,19 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
             setFormData(initialFormData);
             setCurrent(0);
         }
+        setApiErrors([]);
     }, [groupData, isVisible, fetchedGroupDetail]);
 
 
 
     const next = (stepData: any) => {
+        setApiErrors([]);
         setFormData((prev) => ({ ...prev, ...stepData }));
         setCurrent(current + 1);
     };
 
     const prev = () => {
+        setApiErrors([]);
         setCurrent(current - 1);
     };
 
@@ -169,6 +174,17 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
             }
             resetModalState();
         } catch (error: any) {
+            if (error.response && error.response.data && Array.isArray(error.response.data.errors)) {
+                const nameErrors = error.response.data.errors.filter((err: any) => 
+                    err.field === 'name_ar' || err.field === 'name_en'
+                );
+                
+                if (nameErrors.length > 0) {
+                    setApiErrors(nameErrors);
+                    setCurrent(0);
+                    return; 
+                }
+            }
             const errorMsg = error.response?.data?.message || t('group_form.submit_error');
             message.error(errorMsg);
         }
@@ -207,6 +223,8 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
 
                     isSubmitting={isSubmitting}
                     onTriggerSubmit={handleTriggerSubmit}
+
+                    apiErrors={apiErrors}
                 />
             </div>
 
