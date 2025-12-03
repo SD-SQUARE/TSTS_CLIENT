@@ -53,7 +53,7 @@ const UserFormModal: React.FC<{
     const { t } = useTranslation();
     const [current, setCurrent] = useState(0);
     const [formData, setFormData] = useState<UserFormData>(initialFormData);
-    const [stepSubmitTrigger, setStepSubmitTrigger] = useState<(() => void) | null>(null);
+    // const [stepSubmitTrigger, setStepSubmitTrigger] = useState<(() => void) | null>(null);
 
     const { data: fetchedUserDetail, isLoading: isFetchingDetail } = useUserDetail(role, userData?.id);
     const isModalLoading = isFetchingDetail; 
@@ -103,7 +103,7 @@ const UserFormModal: React.FC<{
     const resetModalState = () => {
         setCurrent(0);
         setFormData(initialFormData);
-        setStepSubmitTrigger(null);
+        // setStepSubmitTrigger(null);
         onClose();
     };
 
@@ -174,7 +174,7 @@ const UserFormModal: React.FC<{
             });
 
             try {
-                console.log(cleanedPayload);
+                // console.log(cleanedPayload);
                 await addOrEditMutation.mutateAsync(formPayload);
                 message.success(t(userData ? "user_list.edit_success" : "user_list.add_success"));
                 resetModalState();
@@ -190,7 +190,7 @@ const UserFormModal: React.FC<{
     const CurrentStepComponent = steps[current].component;
     const isLastStep = current === steps.length - 1;
 
-    const handleTriggerSubmit = useCallback((trigger: () => void) => setStepSubmitTrigger(() => trigger), []);
+    // const handleTriggerSubmit = useCallback((trigger: () => void) => setStepSubmitTrigger(() => trigger), []);
 
 
 
@@ -216,7 +216,7 @@ const UserFormModal: React.FC<{
                     onNext={next}
                     onSubmit={handleSubmit}
                     isSubmitting={addOrEditMutation.isPending}
-                    onTriggerSubmit={handleTriggerSubmit}
+                    // onTriggerSubmit={handleTriggerSubmit}
                 />
             </div>
 
@@ -231,10 +231,11 @@ const UserFormModal: React.FC<{
                         </Button>
                     )}
                     {isLastStep && (
-                        <Button type="primary" loading={addOrEditMutation.isPending}
-                            onClick={() => {
-                                if (stepSubmitTrigger) stepSubmitTrigger();
-                            }}>
+                        <Button form="step-form" htmlType="submit" type="primary" loading={addOrEditMutation.isPending}
+                            // onClick={() => {
+                            //     if (stepSubmitTrigger) stepSubmitTrigger();
+                            // }}
+                            >
                             {t("user_list.submit")}
                         </Button>
                     )}

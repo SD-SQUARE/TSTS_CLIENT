@@ -47,7 +47,7 @@ export const fetchGroups = async (page: number, pageSize: number, searchQuery: {
     params: { page, page_size: pageSize, ...query },
   });
 
-  console.log(response.data);
+  // console.log(response.data);
 
 
   return {

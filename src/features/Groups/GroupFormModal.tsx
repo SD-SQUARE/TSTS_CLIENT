@@ -81,7 +81,7 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
     const { t } = useTranslation();
     const [current, setCurrent] = useState(0);
     const [formData, setFormData] = useState<GroupFormData>(initialFormData);
-    const [stepSubmitTrigger, setStepSubmitTrigger] = useState<(() => void) | null>(null);
+    // const [stepSubmitTrigger, setStepSubmitTrigger] = useState<(() => void) | null>(null);
     const [apiErrors, setApiErrors] = useState<ApiErrorField[]>([]);
     const isEditing = !!groupData;
 
@@ -102,7 +102,7 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
     const resetModalState = () => {
         setCurrent(0);
         setFormData(initialFormData);
-        setStepSubmitTrigger(null);
+        // setStepSubmitTrigger(null);
         setApiErrors([]);
         onClose();
     };
@@ -197,9 +197,9 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
     const CurrentStepComponent = steps[current].component;
     const isLastStep = current === steps.length - 1;
 
-    const handleTriggerSubmit = useCallback((trigger: () => void) => {
-        setStepSubmitTrigger(() => trigger);
-    }, []);
+    // const handleTriggerSubmit = useCallback((trigger: () => void) => {
+    //     setStepSubmitTrigger(() => trigger);
+    // }, []);
 
 
     return (
@@ -225,7 +225,7 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
                     onSubmit={handleSubmit}
 
                     isSubmitting={isSubmitting}
-                    onTriggerSubmit={handleTriggerSubmit}
+                    // onTriggerSubmit={handleTriggerSubmit}
 
                     apiErrors={apiErrors}
                 />
@@ -247,10 +247,12 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
                     )}
                     {isLastStep && (
                         <Button
+                            form='step-form'
+                            htmlType='submit'
                             type="primary"
                             loading={isSubmitting}
 
-                            onClick={() => stepSubmitTrigger && stepSubmitTrigger()}
+                            // onClick={() => stepSubmitTrigger && stepSubmitTrigger()}
                         >
                             {t('group_form.submit')}
                         </Button>

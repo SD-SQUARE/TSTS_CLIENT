@@ -10,8 +10,8 @@ import { useDepartments, useDomains, useUniversities } from "../../Hooks/useUser
 import RequiredTag from "../../../../components/RequiredTag";
 
 
-const ENGLISH_REGEX = /^[A-Za-z\s]+$/;
-const ARABIC_REGEX = /^[\u0600-\u06FF\s\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+$/u;
+const ENGLISH_REGEX = /^[A-Za-z\s.,!?'"()@&$-]+$/;
+const ARABIC_REGEX = /^[\u0600-\u06FF\s\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF.,!?'"()@&$-]+$/u;
 
 
 interface Props { initialData: UserFormData; onNext: (data: Partial<UserFormData>) => void; }

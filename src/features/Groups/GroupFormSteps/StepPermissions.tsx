@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Controller, useForm } from "react-hook-form";
-import { useCallback, useEffect } from "react";
+import {  useEffect } from "react";
 import React from "react";
 import { Card, Flex, Form, Select } from "antd";
 import type { GroupFormData } from "../Types/groups";
@@ -12,15 +12,15 @@ interface StepProps {
     initialData: GroupFormData;
     onSubmit: (data: Partial<GroupFormData>) => void;
     isSubmitting: boolean;
-    onTriggerSubmit: (submitTrigger: () => void) => void;
+    // onTriggerSubmit: (submitTrigger: () => void) => void;
 }
 
-const StepPermissions: React.FC<StepProps> = ({ initialData, onSubmit, isSubmitting, onTriggerSubmit }) => {
+const StepPermissions: React.FC<StepProps> = ({ initialData, onSubmit, isSubmitting }) => {
     const { t } = useTranslation();
     const { data: specializations, isLoading: isLoadingSpecs } = useSpecializations();
 
 
-const { handleSubmit, control, formState: { errors }, reset } = useForm<GroupFormData>({
+const { handleSubmit,  control, formState: { errors }, reset } = useForm<GroupFormData>({
     defaultValues: initialData,
     mode: 'onChange',
 });
@@ -30,14 +30,18 @@ const { handleSubmit, control, formState: { errors }, reset } = useForm<GroupFor
     }, [initialData, reset]);
 
 
-    const submitTrigger = useCallback(() => {
+    // const submitTrigger = useCallback(() => {
+    //     handleSubmit((data) => onSubmit(data))();
+    // }, [handleSubmit, onSubmit]);
+
+
+    // React.useEffect(() => {
+    //     onTriggerSubmit(submitTrigger);
+    // }, [submitTrigger, onTriggerSubmit]);
+
+    const localHandleSubmit = () => {
         handleSubmit((data) => onSubmit(data))();
-    }, [handleSubmit, onSubmit]);
-
-
-    React.useEffect(() => {
-        onTriggerSubmit(submitTrigger);
-    }, [submitTrigger, onTriggerSubmit]);
+    }
 
     const mapToAntdOptions = (data) =>
         data?.map((item) => ({ value: item.id, label: item.name })) ?? [];
@@ -56,7 +60,7 @@ const { handleSubmit, control, formState: { errors }, reset } = useForm<GroupFor
 
     return (
         <Card title={t('group_form.step_permissions_card_title')}>
-            <Form layout="vertical" id="step-form" requiredMark={false}>
+            <Form layout="vertical" id="step-form" requiredMark={false} onFinish={localHandleSubmit}>
                 <Form.Item
                     label={
                         <Flex align="start" gap="small">
