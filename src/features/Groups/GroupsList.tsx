@@ -1,11 +1,11 @@
 import React, { useRef, useState } from 'react';
-import { Table, Button, Space, Popconfirm, message, Pagination, Tooltip, Popover, Typography, Tag, Input } from 'antd'; 
-import { EditOutlined, DeleteOutlined, EyeOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'; 
+import { Table, Button, Space, Popconfirm, message, Pagination, Tooltip, Popover, Typography, Tag, Input } from 'antd';
+import { EditOutlined, DeleteOutlined, EyeOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import type { ColumnsType } from 'antd/es/table'; 
+import type { ColumnsType } from 'antd/es/table';
 import type { InputRef, TableColumnType } from 'antd';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
-import Highlighter from 'react-highlight-words'; 
+import Highlighter from 'react-highlight-words';
 
 import GroupFormModal from './GroupFormModal';
 import type { Group, NamedObject } from './Types/groups';
@@ -129,7 +129,7 @@ const GroupsList: React.FC = () => {
     };
 
     const handleView = (id: string) => {
-        navigate(`/groups/${id}`);
+        navigate(`/identities/groups/${id}`);
     };
 
     const handleDelete = async (id: string) => {
@@ -169,8 +169,8 @@ const GroupsList: React.FC = () => {
                             trigger="hover"
                             placement="topLeft"
                         >
-                            <Tag 
-                                color="blue" 
+                            <Tag
+                                color="blue"
                                 style={{ cursor: 'pointer', maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis' }}
                             >
                                 {spec.name.substring(0, 15)}...
@@ -195,28 +195,28 @@ const GroupsList: React.FC = () => {
                 );
             },
         },
-        { 
-            title: t('translation.name_ar'), 
-            dataIndex: 'name_ar', 
+        {
+            title: t('translation.name_ar'),
+            dataIndex: 'name_ar',
             key: 'nameArabic',
-            ...getColumnSearchProps('name'), 
-        },
-        { 
-            title: t('translation.name_en'), 
-            dataIndex: 'name_en', 
-            key: 'nameEnglish',
-            ...getColumnSearchProps('name'), 
+            ...getColumnSearchProps('name'),
         },
         {
-            title: t('translation.description_ar'), 
-            dataIndex: 'description_ar', 
-            key: 'descriptionArabic', 
+            title: t('translation.name_en'),
+            dataIndex: 'name_en',
+            key: 'nameEnglish',
+            ...getColumnSearchProps('name'),
+        },
+        {
+            title: t('translation.description_ar'),
+            dataIndex: 'description_ar',
+            key: 'descriptionArabic',
             width: 200,
             render: (description: string) => (
                 <Popover
                     title={t('translation.description_ar')}
-                    content={<div style={{ maxWidth: 400 }}>{description}</div>} 
-                    trigger="hover" 
+                    content={<div style={{ maxWidth: 400 }}>{description}</div>}
+                    trigger="hover"
                     placement="topLeft"
                 >
                     <Typography.Paragraph ellipsis={{
@@ -225,20 +225,20 @@ const GroupsList: React.FC = () => {
                         expanded,
                         onExpand: (_, info) => setExpanded(info.expanded),
                     }}
-                        >{description}</Typography.Paragraph>
+                    >{description}</Typography.Paragraph>
                 </Popover>
             ),
         },
         {
-            title: t('translation.description_en'), 
-            dataIndex: 'description_en', 
-            key: 'descriptionEnglish', 
+            title: t('translation.description_en'),
+            dataIndex: 'description_en',
+            key: 'descriptionEnglish',
             width: 200,
             render: (description: string) => (
                 <Popover
                     title={t('translation.description_en')}
-                    content={<div style={{ maxWidth: 400 }}>{description}</div>} 
-                    trigger="hover" 
+                    content={<div style={{ maxWidth: 400 }}>{description}</div>}
+                    trigger="hover"
                     placement="topLeft"
                 >
                     <Typography.Paragraph ellipsis={{
@@ -247,7 +247,7 @@ const GroupsList: React.FC = () => {
                         expanded,
                         onExpand: (_, info) => setExpanded(info.expanded),
                     }}
-                        >{description}</Typography.Paragraph>
+                    >{description}</Typography.Paragraph>
 
                 </Popover>
             ),
@@ -317,7 +317,7 @@ const GroupsList: React.FC = () => {
                 <Pagination
                     current={pagination.page}
                     pageSize={pagination.pageSize}
-                    total={data?.total || 0} 
+                    total={data?.total || 0}
                     onChange={handleTableChange}
                     showSizeChanger
                 />
@@ -333,7 +333,7 @@ const GroupsList: React.FC = () => {
 
             <Table
                 columns={columns}
-                dataSource={data?.data || []} 
+                dataSource={data?.data || []}
                 rowKey="id"
                 loading={isLoading || deleteMutation.isPending}
                 scroll={{ x: 'max-content' }}

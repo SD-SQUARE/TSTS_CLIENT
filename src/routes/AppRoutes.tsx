@@ -13,13 +13,13 @@ export const AppRoutes = () => {
             <Routes>
                 <Route index path={PAGES_ROUTES_PATHS[PATH_NAMES.LOGIN]} element={<LoginPage />} />
                 {/* forget password, etc */}
-                <Route path="/forgot-password" element={<ForgotPasswordForm />} />
-                <Route path="/groups" element={<GroupsList />} />
-                <Route path="/groups/:id" element={<GroupViewPage />} />
-                <Route path="/users/technicians" element={<UserList role={'technicians'} />} />
-                <Route path="/users/requesters" element={<UserList role={'requesters'} />} />
-                <Route path="/users/admins" element={<UserList role={'admins'} />} />
-                <Route path="/users/:role/:id" element={<UserViewPage />} />
+                <Route path="auth/forgot-password" element={<ForgotPasswordForm />} />
+                <Route path="identities/groups" element={<GroupsList />} />
+                <Route path="identities/groups/:id" element={<GroupViewPage />} />
+                <Route path="identities/users/technicians" element={<UserList role={'technicians'} />} />
+                <Route path="identities/users/requesters" element={<UserList role={'requesters'} />} />
+                <Route path="identities/users/admins" element={<UserList role={'admins'} />} />
+                <Route path="identities/users/:role/:id" element={<UserViewPage />} />
             </Routes>
         </BrowserRouter>
     );

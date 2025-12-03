@@ -122,7 +122,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
 
     const handleAdd = () => { setEditingUser(undefined); setIsModalVisible(true); };
     const handleView = (id: string) => {
-        navigate(`/users/${role}/${id}`);
+        navigate(`/identities/users/${role}/${id}`);
     };
     const handleEdit = (user: UserListItem) => { setEditingUser(user); setIsModalVisible(true); };
     const handleDelete = async (id: string) => {
