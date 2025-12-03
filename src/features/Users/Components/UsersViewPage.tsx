@@ -9,6 +9,7 @@ import AvatarDisplay from '../../../components/AvatarDisplay';
 
 const { Text, Title } = Typography;
 
+
 const renderLookupList = (items: Lookup[] | undefined, currentLanguage: string) => {
     if (!items || items.length === 0) {
         return <Text disabled>-</Text>;
@@ -61,23 +62,24 @@ const renderDepartmentList = (department: Lookup[] | undefined, currentLanguage:
                     <Tag
                         key={item.id || index}
                         icon={<HomeOutlined />}
-                        
+
                     >
                         {localizedName}
-                        </Tag>
+                    </Tag>
                 );
             })}
         </Space>
     );
-    // return (
-    //     <Space size="small" wrap>
-    //         {department.filter(c => c.trim() !== '').map((dept, index) => (
-    //             <Tag key={index} icon={<HomeOutlined />}>
-    //                 {dept}
-    //             </Tag>
-    //         ))}
-    //     </Space>
-    // );
+};
+
+const getInitials = (fullName: string) => {
+    const names = fullName.split(' ').filter(n => n.length > 0);
+    if (names.length === 0) return 'U'; 
+
+    const firstInitial = names[0][0];
+    const lastInitial = names.length > 1 ? names[names.length - 1][0] : '';
+
+    return `${firstInitial}${lastInitial}`.toUpperCase();
 };
 
 const UserViewPage: React.FC = () => {
@@ -121,6 +123,8 @@ const UserViewPage: React.FC = () => {
     const fullName = `${user[`first_name_${currentLanguage}`]} ${user[`mid_name_${currentLanguage}`] || ''} ${user[`last_name_${currentLanguage}`]}`;
     const jobTitle = user[`job_${currentLanguage}`] || '-';
 
+    const initials = getInitials(fullName);
+
     const allItems = [
         { key: 'full_name', label: t('user_list.full_name'), children: fullName, span: 2 },
         { key: 'email', label: t('user_list.email'), children: <Tag icon={<MailOutlined />}>{user.email}</Tag> },
@@ -141,6 +145,9 @@ const UserViewPage: React.FC = () => {
         // { key: 'permission_profile', label: t('user_list.perm_prof'), children: user.permission_profile?.name ?? '-' },
     ];
     const items = allItems.filter(item => item.condition === undefined || item.condition);
+
+    const hasImage = user.image && user.image.trim() !== '';
+
     return (
         <Card
             title={
@@ -160,7 +167,13 @@ const UserViewPage: React.FC = () => {
         >
             <Space direction="vertical" style={{ width: '100%' }} size="large">
                 <Card bordered={false} style={{ textAlign: 'center' }}>
-                    <Avatar size={100} src={user.image} icon={<IdcardOutlined />} />
+                    <Avatar
+                        size={100}
+                        src={hasImage ? user.image : undefined}
+                        icon={!hasImage ? <IdcardOutlined /> : undefined}
+                    >
+                        {!hasImage ? initials : null}
+                    </Avatar>
                     <Title level={3} style={{ margin: '10px 0 0' }}>{fullName}</Title>
                     <Text type="secondary">{jobTitle}</Text>
                 </Card>

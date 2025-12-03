@@ -1,30 +1,32 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Space, Typography, Spin, Button, Transfer, message } from 'antd';
+import { Space, Typography, Spin, Button, Transfer, message, Tag, Avatar } from 'antd'; 
 import { UserOutlined } from '@ant-design/icons';
 
 import type { TransferProps } from 'antd';
 
 
-import { useTechnicians, useAssignUsers, formatFullName, type User } from '../Hooks/useGroupForm';
+import {  useAssignUsers, useAssignees, type Assignees, formatFullNameAssignee } from '../Hooks/useGroupForm';
 import type { NamedObject } from '../Types/groups';
+import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 
 
 
 
-interface UserListItem extends User {
+interface UserListItem extends Assignees {
     key: string;
 }
 
 
 interface AssignTabProps { groupId: string; initialMembers: NamedObject[] | undefined; t: (key: string) => string; }
 const AssignTab: React.FC<AssignTabProps> = ({ groupId, initialMembers, t }) => {
-    const { data: technicians, isLoading: isLoadingTech } = useTechnicians();
+    const { data: technicians, isLoading: isLoadingTech } = useAssignees();
     const [targetKeys, setTargetKeys] = useState<string[]>([]);
     const assignmentMutation = useAssignUsers(groupId);
+    const { i18n } = useTranslation();
 
 
     useEffect(() => {
@@ -59,20 +61,25 @@ const AssignTab: React.FC<AssignTabProps> = ({ groupId, initialMembers, t }) => 
     };
 
     const filterByFullName = (inputValue: string, item: UserListItem) => {
-        const fullName = formatFullName(item).toLowerCase();
+        const fullName = formatFullNameAssignee(item).toLowerCase();
         return fullName.includes(inputValue.toLowerCase());
     };
 
     const renderItem = (item: UserListItem) => {
-        const fullName = formatFullName(item);
-
+        const fullName = formatFullNameAssignee(item);
+        console.log(item);
+        const jobTitle = item[`job_${i18n.language}`] || t('translation.no_job_title'); 
+        const hasImage = item.image && item.image.trim() !== '';
 
         const customLabel = (
-            <Space>
-                <UserOutlined style={{ color: '#007bff' }} />
+            <Space size={8}> 
+                {/* <UserOutlined style={{ color: '#007bff' }} /> */}
+                <Avatar size="small" src={hasImage ? item.image : undefined}
+                        icon={!hasImage ? <UserOutlined /> : undefined} />
                 <Text>{fullName}</Text>
-                { }
-                { }
+                {jobTitle !== t('translation.no_job_title') && (
+                    <Tag color="blue">{jobTitle}</Tag> 
+                )}
             </Space>
         );
 

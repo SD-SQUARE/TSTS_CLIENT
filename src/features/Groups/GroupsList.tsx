@@ -166,7 +166,7 @@ const GroupsList: React.FC = () => {
                             key={spec.id || index}
                             title={t('translation.specialization_detail')}
                             content={<div style={{ maxWidth: 300, whiteSpace: 'normal' }}>{spec.name}</div>}
-                            trigger="click"
+                            trigger="hover"
                             placement="topLeft"
                         >
                             <Tag 
@@ -217,7 +217,7 @@ const GroupsList: React.FC = () => {
                 <Popover
                     title={t('translation.description_ar')}
                     content={<div style={{ maxWidth: 400 }}>{description}</div>} 
-                    trigger="click" 
+                    trigger="hover" 
                     placement="topLeft"
                 >
                     <Typography.Paragraph ellipsis={{
@@ -240,7 +240,7 @@ const GroupsList: React.FC = () => {
                 <Popover
                     title={t('translation.description_en')}
                     content={<div style={{ maxWidth: 400 }}>{description}</div>} 
-                    trigger="click" 
+                    trigger="hover" 
                     placement="topLeft"
                 >
                     <Typography.Paragraph ellipsis={{

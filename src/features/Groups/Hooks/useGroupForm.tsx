@@ -3,6 +3,8 @@
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import type { GroupFormData } from '../Types/groups';
 import api from '../../../api/http';
+import i18n from '../../../i18n';
+
 
 
 
@@ -18,12 +20,35 @@ export interface User {
   status: string;
 }
 
+export interface Assignees{
+  id: string;
+  image: string;
+  email: string;
+  first_name_en: string;
+  first_name_ar: string;
+  mid_name_en: string;
+  mid_name_ar: string;
+  last_name_en: string;
+  last_name_ar: string;
+  user_type: string;
+  status: string;
+  job_en: string;
+  job_ar: string;
+}
+
+
+interface AssigneesApiResponse {
+  users: Assignees[];
+}
 interface UserApiResponse {
   users: User[];
 }
 
 export const formatFullName = (user: User) => {
   return `${user.first_name} ${user.mid_name || ''} ${user.last_name}`.trim();
+};
+export const formatFullNameAssignee = (user: Assignees) => {
+  return `${user[`first_name_${i18n.language}`]} ${user[`mid_name_${i18n.language}`] || ''} ${user[`last_name_${i18n.language}`]}`.trim();
 };
 
 
@@ -64,7 +89,31 @@ export const useTechnicians = () => {
     staleTime: Infinity,
   });
 };
+export const useAssignees = () => {
+  return useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const response = await api.get<AssigneesApiResponse>('/users/technicians/');
 
+      return response.data.users;
+    },
+    staleTime: Infinity,
+  });
+};
+
+// export const useAssignees = () => {
+//   return useQuery({
+//       queryKey: ['technicians'],
+//       queryFn: async () => {
+//           const response = await api.get<Assignees>('/users/technicians/');
+//           if (response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
+//               return [response.data];
+//           }
+//           return [];
+//       },
+//       staleTime: Infinity,
+//   });
+// };
 
 
 export const useSpecializations = () => {
@@ -83,14 +132,14 @@ export const useSpecializations = () => {
 export const useAssignUsers = (groupId: string | undefined) => {
   const queryClient = useQueryClient();
   return useMutation({
-      mutationFn: (userIds: string[]) => {
-          if (!groupId) throw new Error("Group ID is missing for assignment.");
-          return api.post(`/groups/${groupId}/assign`, { userIds });
-      },
-      onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ['groupDetail', groupId] });
-          queryClient.invalidateQueries({ queryKey: ['groups'] });
-      },
+    mutationFn: (userIds: string[]) => {
+      if (!groupId) throw new Error("Group ID is missing for assignment.");
+      return api.post(`/groups/${groupId}/assign`, { userIds });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['groupDetail', groupId] });
+      queryClient.invalidateQueries({ queryKey: ['groups'] });
+    },
   });
 };
 

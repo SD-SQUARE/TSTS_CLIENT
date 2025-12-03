@@ -154,7 +154,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                     <Popover
                         content={popoverContent}
                         title={t(titleKey)}
-                        trigger="click"
+                        trigger="hover"
                         placement="right"
                     >
                         <Tag
@@ -162,7 +162,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                             style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                         >
                             +{remainingCount}
-                            <DownOutlined style={{ fontSize: '10px', marginLeft: 4 }} />
+                            {/* <DownOutlined style={{ fontSize: '10px', marginLeft: 4 }} /> */}
                         </Tag>
                     </Popover>
                 )}
