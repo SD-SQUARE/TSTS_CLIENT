@@ -94,7 +94,7 @@ const UserViewPage: React.FC = () => {
     const currentLanguage = i18n.language;
 
     const handleBack = () => {
-        navigate(`/users/${role}`);
+        navigate(-1);
     };
 
     if (!role || !userId) {

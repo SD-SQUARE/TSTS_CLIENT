@@ -24,7 +24,7 @@ const GroupViewPage: React.FC = () => {
     const { data: group, isLoading, isError } = useGroupDetail(groupId);
     const currentLanguage = i18n.language;
 
-    const handleBack = () => { navigate('/groups'); };
+    const handleBack = () => { navigate(-1); };
 
     if (!groupId) {
         return <Result status="404" title="404" subTitle={t('translation.group_id_missing')} />;

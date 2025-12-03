@@ -2,20 +2,20 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useRef, useState } from "react";
 import { Table, Button, Space, Popconfirm, message, Pagination, Tooltip, Badge, Tag, Popover, Input } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined, DownOutlined, SearchOutlined } from "@ant-design/icons"; 
+import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined, DownOutlined, SearchOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
-import type { ColumnsType } from "antd/es/table"; 
-import type { InputRef, TableColumnType } from 'antd'; 
-import type { FilterDropdownProps } from 'antd/es/table/interface'; 
-import Highlighter from 'react-highlight-words'; 
+import type { ColumnsType } from "antd/es/table";
+import type { InputRef, TableColumnType } from 'antd';
+import type { FilterDropdownProps } from 'antd/es/table/interface';
+import Highlighter from 'react-highlight-words';
 
-import type { UserListItem } from "../Types/users"; 
+import type { UserListItem } from "../Types/users";
 import { useDeleteUser, useUsers } from "../Hooks/useUsers";
 import AvatarDisplay from "../../../components/AvatarDisplay";
 import UserFormModal from "./UsersFormModal";
 import { useNavigate } from "react-router-dom";
 
-type SearchableDataIndex = `first_name_${string}` | `mid_name_${string}` | `last_name_${string}` | 'ssn' | 'email';
+type SearchableDataIndex = `first_name` | `mid_name` | `last_name` | 'ssn';
 
 
 export const UserList: React.FC<{ role: string }> = ({ role }) => {
@@ -62,7 +62,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
     };
 
     const getColumnSearchProps = (dataIndex: SearchableDataIndex, titleKey: string): TableColumnType<UserListItem> => ({
-        
+
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
             <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
                 <Input
@@ -187,29 +187,29 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
             width: 60,
         },
 
-        { 
-            title: t("user_list.fname"), 
-            dataIndex: `first_name_${currentLanguage}`, 
-            key: "first_name", 
-            ...getColumnSearchProps(`first_name_${currentLanguage}`, "user_list.fname") 
+        {
+            title: t("user_list.fname"),
+            dataIndex: `first_name_${currentLanguage}`,
+            key: "first_name",
+            ...getColumnSearchProps(`first_name`, "user_list.fname")
         },
-        { 
-            title: t("user_list.mname"), 
-            dataIndex: `mid_name_${currentLanguage}`, 
+        {
+            title: t("user_list.mname"),
+            dataIndex: `mid_name_${currentLanguage}`,
             key: "mid_name",
-            ...getColumnSearchProps(`mid_name_${currentLanguage}`, "user_list.mname") 
+            ...getColumnSearchProps(`mid_name`, "user_list.mname")
         },
-        { 
-            title: t("user_list.lname"), 
-            dataIndex: `last_name_${currentLanguage}`, 
+        {
+            title: t("user_list.lname"),
+            dataIndex: `last_name_${currentLanguage}`,
             key: "last_name",
-            ...getColumnSearchProps(`last_name_${currentLanguage}`, "user_list.lname") 
+            ...getColumnSearchProps(`last_name`, "user_list.lname")
         },
-        { 
-            title: t("user_list.ssn"), 
-            dataIndex: "ssn", 
+        {
+            title: t("user_list.ssn"),
+            dataIndex: "ssn",
             key: "ssn",
-            ...getColumnSearchProps('ssn', "user_list.ssn") 
+            ...getColumnSearchProps('ssn', "user_list.ssn")
         },
 
         {
@@ -291,11 +291,10 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
         //       key: "permission_profile",
         //       render: (profile: any) => profile ? <AvatarDisplay member={profile} /> : "-",
         // },
-        { 
-            title: t("user_list.email"), 
-            dataIndex: "email", 
+        {
+            title: t("user_list.email"),
+            dataIndex: "email",
             key: "email",
-            ...getColumnSearchProps('email', "user_list.email") 
         },
         {
             title: t("user_list.operations"),

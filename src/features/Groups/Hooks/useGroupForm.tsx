@@ -93,7 +93,7 @@ export const useAssignees = () => {
   return useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      const response = await api.get<AssigneesApiResponse>('/users/technicians/');
+      const response = await api.get<AssigneesApiResponse>('/users/technicians/',{params:{page:1,page_size:100}});
 
       return response.data.users;
     },
@@ -101,19 +101,6 @@ export const useAssignees = () => {
   });
 };
 
-// export const useAssignees = () => {
-//   return useQuery({
-//       queryKey: ['technicians'],
-//       queryFn: async () => {
-//           const response = await api.get<Assignees>('/users/technicians/');
-//           if (response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
-//               return [response.data];
-//           }
-//           return [];
-//       },
-//       staleTime: Infinity,
-//   });
-// };
 
 
 export const useSpecializations = () => {

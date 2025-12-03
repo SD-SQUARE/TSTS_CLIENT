@@ -67,7 +67,7 @@ const AssignTab: React.FC<AssignTabProps> = ({ groupId, initialMembers, t }) => 
 
     const renderItem = (item: UserListItem) => {
         const fullName = formatFullNameAssignee(item);
-        console.log(item);
+        // console.log(item);
         const jobTitle = item[`job_${i18n.language}`] || t('translation.no_job_title'); 
         const hasImage = item.image && item.image.trim() !== '';
 

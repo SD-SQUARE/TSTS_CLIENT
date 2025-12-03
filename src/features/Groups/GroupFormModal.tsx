@@ -176,11 +176,14 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
         } catch (error: any) {
             if (error.response && error.response.data && Array.isArray(error.response.data.errors)) {
                 const nameErrors = error.response.data.errors.filter((err: any) => 
-                    err.field === 'name_ar' || err.field === 'name_en'
+                    err.msgKey === 'name_ar' || err.msgKey === 'name_en'
                 );
                 
                 if (nameErrors.length > 0) {
-                    setApiErrors(nameErrors);
+                    setApiErrors(nameErrors.map((err: any) => ({
+                        field: err.msgKey, 
+                        message: err.message 
+                    })));
                     setCurrent(0);
                     return; 
                 }

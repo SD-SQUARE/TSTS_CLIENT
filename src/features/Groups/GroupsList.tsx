@@ -14,7 +14,7 @@ import { useDeleteGroup, useGroups } from './Hooks/useGroups';
 import { useNavigate } from 'react-router-dom';
 
 
-type SearchableDataIndex = 'name_en' | 'name_ar' | 'description_en' | 'description_ar';
+type SearchableDataIndex = 'name';
 
 const GroupsList: React.FC = () => {
     const { t } = useTranslation();
@@ -199,20 +199,19 @@ const GroupsList: React.FC = () => {
             title: t('translation.name_ar'), 
             dataIndex: 'name_ar', 
             key: 'nameArabic',
-            ...getColumnSearchProps('name_ar'), 
+            ...getColumnSearchProps('name'), 
         },
         { 
             title: t('translation.name_en'), 
             dataIndex: 'name_en', 
             key: 'nameEnglish',
-            ...getColumnSearchProps('name_en'), 
+            ...getColumnSearchProps('name'), 
         },
         {
             title: t('translation.description_ar'), 
             dataIndex: 'description_ar', 
             key: 'descriptionArabic', 
             width: 200,
-            ...getColumnSearchProps('description_ar'),
             render: (description: string) => (
                 <Popover
                     title={t('translation.description_ar')}
@@ -235,7 +234,6 @@ const GroupsList: React.FC = () => {
             dataIndex: 'description_en', 
             key: 'descriptionEnglish', 
             width: 200,
-            ...getColumnSearchProps('description_en'), 
             render: (description: string) => (
                 <Popover
                     title={t('translation.description_en')}
