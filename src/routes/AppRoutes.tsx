@@ -8,7 +8,13 @@ import NotAllowed from './../components/utils/NotAllowed';
 import GroupsList from "../features/Groups/GroupsList.tsx";
 import UserList from "../features/Users/Components/UsersList.tsx";
 import ForgotPasswordForm from "../features/ForgotPasswordForm/ForgotPasswordForm.tsx";
-
+import MainLayout from "../components/MainLayout";
+import UniversitiesPage from "../features/universities/components/Universities";
+import DomainsPage from "../features/domains/components/Domains";
+import DepartmentsPage from "../features/departments/components/Departments";
+import SpecializationsPage from "../features/specializations/components/Specializations";
+import WorkHoursPage from "../features/work-hours/components/WorkHours";
+import PermissionsPage from "../features/permissions/components/Permissions";
 
 export const AppRoutes = () => {
 
@@ -31,6 +37,22 @@ export const AppRoutes = () => {
                 <Route path="users/technicians" element={<UserList role={'technicians'} />} />
                 <Route path="users/requesters" element={<UserList role={'requesters'} />} />
                 <Route path="users/admins" element={<UserList role={'admins'} />} />
+            </Route>
+            {/* Routes that use MainLayout */}
+            <Route path="/settings" element={<MainLayout />}>
+
+                <Route path="work-hours" element={<WorkHoursPage />} />
+
+                <Route path="universities" element={<UniversitiesPage />} />
+
+                <Route path="domains" element={<DomainsPage />} />
+
+                <Route path="departments" element={<DepartmentsPage />} />
+
+                <Route path="specializations" element={<SpecializationsPage />} />
+
+                <Route path="permissions" element={<PermissionsPage />} />
+
             </Route>
             
             {/* Complmentary Paths */}

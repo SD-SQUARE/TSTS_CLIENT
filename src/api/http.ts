@@ -13,7 +13,8 @@ const api = axios.create({
 // Attach token from session storage (simple approach)
 api.interceptors.request.use((config) => {
     const token = sessionStorage.getItem('token')
-    if (token && config.headers) config.headers.Authorization = `Bearer ${token}`
+    if (token && config.headers) 
+        config.headers.Authorization = `Bearer ${token}`
     return config
 })
 

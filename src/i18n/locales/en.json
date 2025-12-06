@@ -151,5 +151,15 @@
     "perm_title": "Permissions",
     "access_title": "Access",
     "image": "Image"
-  }
+  },
+  "name_en": "Name (English)",
+  "name_ar": "Name (Arabic)",
+  "description_en": "Description (English)",
+  "description_ar": "Description (Arabic)",
+  "required": "This field is required",
+  "universities": "Universities",
+  "english_only": "English characters only",
+  "arabic_only": "Arabic characters only"
 }
+
+  

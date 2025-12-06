@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.10.1",
-    "@tanstack/react-query": "^5.90.10",
+    "@tanstack/react-query": "^5.90.11",
     "antd": "^6.0.0",
     "axios": "^1.13.2",
     "i18next": "^25.6.3",

@@ -11,7 +11,6 @@ export const useLogin = () => {
         mutationFn: (data: LoginDto) => loginApi(data),
 
         onSuccess: (data) => {
-            // data = { user, accessToken }
             dispatch(
                 loginSuccess({
                     user: data.user,
