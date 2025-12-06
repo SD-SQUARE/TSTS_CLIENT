@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useCallback, useEffect } from "react";
-import { Modal, Steps, Button, Space, message } from "antd";
+import { Modal, Steps, Button, Space, message, Spin } from "antd";
 import { useTranslation } from "react-i18next";
 
 import StepInfo from "./UsersFormSteps/StepInfo";
@@ -10,7 +10,7 @@ import StepPermissions from "./UsersFormSteps/StepPermissions";
 import StepAccess from "./UsersFormSteps/StepAccess";
 import { t } from "i18next";
 import type { UserFormData, UserListItem, UserPayload } from "../Types/users";
-import { useAddOrEditUser } from "../Hooks/useUsers";
+import { useAddOrEditUser, useUserDetail } from "../Hooks/useUsers";
 
 
 
@@ -24,12 +24,16 @@ const steps = [
 
 const initialFormData: UserFormData = {
     image: null,
-    first_name: "",
-    mid_name: "",
-    last_name: "",
+    first_name_en: "",
+    first_name_ar: "",
+    mid_name_en: "",
+    mid_name_ar: "",
+    last_name_en: "",
+    last_name_ar: "",
     ssn: "",
     contacts: { phones: [""], mobiles: [""] },
-    job: "",
+    job_ar: "",
+    job_en: "",
     university: null,
     domain: null,
     departments: [],
@@ -49,41 +53,57 @@ const UserFormModal: React.FC<{
     const { t } = useTranslation();
     const [current, setCurrent] = useState(0);
     const [formData, setFormData] = useState<UserFormData>(initialFormData);
-    const [stepSubmitTrigger, setStepSubmitTrigger] = useState<(() => void) | null>(null);
+    // const [stepSubmitTrigger, setStepSubmitTrigger] = useState<(() => void) | null>(null);
 
+    const { data: fetchedUserDetail, isLoading: isFetchingDetail } = useUserDetail(role, userData?.id);
+    const isModalLoading = isFetchingDetail; 
     useEffect(() => {
-        if (userData && isVisible) {
-            //FIXME : fix this Render warning properly
+
+        if(!isVisible){
             // eslint-disable-next-line react-hooks/set-state-in-effect
-            setFormData({
-                image: userData.image,
-                first_name: userData.first_name,
-                mid_name: userData.mid_name,
-                last_name: userData.last_name,
-                ssn: userData.ssn,
-                contacts: { phones: userData.contacts.phones, mobiles: userData.contacts.mobiles },
-                job: userData.job,
-                university: userData.university ?? null,
-                domain: userData.domain ?? null,
-                departments: userData.departments ?? [],
-                permission_profile: userData.permission_profile ?? null,
-                specializations: userData.specializations ?? [],
-                email: userData.email,
-                password: "",
-                status: userData.status,
-            });
-        } else if (!userData && isVisible) {
+            setCurrent(0);
             setFormData(initialFormData);
+            return;
         }
-        if (isVisible) setCurrent(0);
-    }, [userData, isVisible]);
+        if (userData) {
+            //FIXME : fix this Render warning properly
+            if(fetchedUserDetail) {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
+                setFormData({
+                    image: fetchedUserDetail.image,
+                    first_name_en: fetchedUserDetail.first_name_en,
+                    first_name_ar: fetchedUserDetail.first_name_ar,
+                    mid_name_en: fetchedUserDetail.mid_name_en,
+                    mid_name_ar: fetchedUserDetail.mid_name_ar,
+                    last_name_en: fetchedUserDetail.last_name_en,
+                    last_name_ar: fetchedUserDetail.last_name_ar,
+                    ssn: fetchedUserDetail.ssn,
+                    contacts: { phones: fetchedUserDetail.contacts.phones, mobiles: fetchedUserDetail.contacts.mobiles },
+                    job_en: fetchedUserDetail.job_en,
+                    job_ar: fetchedUserDetail.job_ar,
+                    university: fetchedUserDetail.university ?? null,
+                    domain: fetchedUserDetail.domain ?? null,
+                    departments: fetchedUserDetail.departments ?? [],
+                    permission_profile: fetchedUserDetail.permission_profile ?? null,
+                    specializations: fetchedUserDetail.specializations ?? [],
+                    email: fetchedUserDetail.email,
+                    password: "",
+                    status: fetchedUserDetail.status,
+                });
+                setCurrent(0);
+            }
+        } else{
+            setFormData(initialFormData);
+            setCurrent(0);
+        }
+    }, [userData, isVisible, fetchedUserDetail]);
 
     const addOrEditMutation = useAddOrEditUser(role, userData?.id);
 
     const resetModalState = () => {
         setCurrent(0);
         setFormData(initialFormData);
-        setStepSubmitTrigger(null);
+        // setStepSubmitTrigger(null);
         onClose();
     };
 
@@ -96,11 +116,15 @@ const UserFormModal: React.FC<{
     const cleanPayload = (data: UserFormData) => {
 
         const payload: Partial<UserPayload> = {
-            first_name: data.first_name,
-            mid_name: data.mid_name,
-            last_name: data.last_name,
+            first_name_en: data.first_name_en,
+            first_name_ar: data.first_name_ar,
+            mid_name_en: data.mid_name_en,
+            mid_name_ar: data.mid_name_ar,
+            last_name_en: data.last_name_en,
+            last_name_ar: data.last_name_ar,
             ssn: data.ssn,
-            job: data.job,
+            job_en: data.job_en,
+            job_ar: data.job_ar,
             email: data.email,
             password: data.password,
             status: data.status,
@@ -150,7 +174,7 @@ const UserFormModal: React.FC<{
             });
 
             try {
-                console.log(cleanedPayload);
+                // console.log(cleanedPayload);
                 await addOrEditMutation.mutateAsync(formPayload);
                 message.success(t(userData ? "user_list.edit_success" : "user_list.add_success"));
                 resetModalState();
@@ -166,10 +190,9 @@ const UserFormModal: React.FC<{
     const CurrentStepComponent = steps[current].component;
     const isLastStep = current === steps.length - 1;
 
-    const handleTriggerSubmit = useCallback((trigger: () => void) => setStepSubmitTrigger(() => trigger), []);
+    // const handleTriggerSubmit = useCallback((trigger: () => void) => setStepSubmitTrigger(() => trigger), []);
 
 
-    // console.log(formData);
 
     return (
         <Modal
@@ -180,6 +203,7 @@ const UserFormModal: React.FC<{
             width={750}
             destroyOnHidden
         >
+            <Spin spinning={isModalLoading}>
             <Steps current={current} style={{ marginBottom: 24 }}>
                 {steps.map(item => (
                     <Steps.Step key={item.title} title={t(item.title)} />
@@ -192,7 +216,7 @@ const UserFormModal: React.FC<{
                     onNext={next}
                     onSubmit={handleSubmit}
                     isSubmitting={addOrEditMutation.isPending}
-                    onTriggerSubmit={handleTriggerSubmit}
+                    // onTriggerSubmit={handleTriggerSubmit}
                 />
             </div>
 
@@ -207,15 +231,17 @@ const UserFormModal: React.FC<{
                         </Button>
                     )}
                     {isLastStep && (
-                        <Button type="primary" loading={addOrEditMutation.isPending}
-                            onClick={() => {
-                                if (stepSubmitTrigger) stepSubmitTrigger();
-                            }}>
+                        <Button form="step-form" htmlType="submit" type="primary" loading={addOrEditMutation.isPending}
+                            // onClick={() => {
+                            //     if (stepSubmitTrigger) stepSubmitTrigger();
+                            // }}
+                            >
                             {t("user_list.submit")}
                         </Button>
                     )}
                 </Space>
             </div>
+            </Spin>
         </Modal>
     );
 };

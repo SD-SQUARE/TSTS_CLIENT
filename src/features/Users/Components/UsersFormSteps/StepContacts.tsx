@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// src/components/UserFormSteps/StepContacts.tsx
+
 import React, { useEffect, useRef } from "react";
 import { Form, Card, Flex, Input, Button } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { Controller, useForm, useFieldArray } from "react-hook-form";
 
-import { t } from "i18next"; // Assuming t is correctly imported from i18next
+import { t } from "i18next";
 import type { UserFormData } from "../../Types/users";
 import RequiredTag from "../../../../components/RequiredTag";
 
@@ -14,13 +14,10 @@ interface Props { initialData: UserFormData; onNext: (data: Partial<UserFormData
 
 const StepContacts: React.FC<Props> = ({ initialData, onNext }) => {
 
-    // 1. DEFINE isInitialLoad HERE
     const isInitialLoad = useRef(true);
-    // console.log(initialData);
 
     const { handleSubmit, control, formState: { errors }, reset } =
         useForm<UserFormData>({
-            // Ensure all initial data fields are spread, safely defaulting arrays
             defaultValues: {
                 ...initialData,
                 contacts: { phones: initialData.contacts?.phones ?? [], mobiles: initialData.contacts?.mobiles ?? [] },
@@ -28,7 +25,6 @@ const StepContacts: React.FC<Props> = ({ initialData, onNext }) => {
             mode: "onChange"
         });
 
-    // 2. KEEP ONE useEffect for RHF reset when initialData changes (Edit Mode)
     useEffect(() => {
         reset({
             ...initialData,
@@ -44,11 +40,8 @@ const StepContacts: React.FC<Props> = ({ initialData, onNext }) => {
     const phonesField = useFieldArray<UserFormData, any>({ control, name: "contacts.phones" });
     const mobilesField = useFieldArray<UserFormData, any>({ control, name: "contacts.mobiles" });
 
-    // 3. INITIAL FIELD SAFETY CHECK (Add Mode)
-    // This runs once per mount to ensure an initial input field exists.
     useEffect(() => {
         if (isInitialLoad.current) {
-            // Check the length of the actual array field in RHF state
             if (phonesField.fields.length === 0) {
                 phonesField.append("");
             }
@@ -57,7 +50,6 @@ const StepContacts: React.FC<Props> = ({ initialData, onNext }) => {
             }
             isInitialLoad.current = false;
         }
-        // Dependency arrays rely on the field array instances only for the initial append
     }, [phonesField, mobilesField]);
 
 
@@ -72,9 +64,8 @@ const StepContacts: React.FC<Props> = ({ initialData, onNext }) => {
         <Card title={t('user_list.contact_info')}>
             <Form layout="vertical" onFinish={handleSubmit(onSubmit)} id="step-form" requiredMark={false}>
 
-                {/* Phones Section */}
                 <Form.Item label={<Flex gap="small"><span>{t('user_list.phone')}</span><RequiredTag /></Flex>}>
-                    {/* Map Phone Fields */}
+
                     {phonesField.fields.map((field, idx) => (
                         <Flex gap="small" key={field.id} style={{ marginBottom: 8, alignItems: 'start' }}>
                             <Form.Item
@@ -93,16 +84,15 @@ const StepContacts: React.FC<Props> = ({ initialData, onNext }) => {
                                 />
                             </Form.Item>
 
-                            {/* Remove Button */}
-                            <MinusCircleOutlined
+                            {phonesField.fields.length > 1 && <MinusCircleOutlined
                                 onClick={() => phonesField.remove(idx)}
                                 style={{ cursor: 'pointer', marginTop: 10 }}
                                 disabled={phonesField.fields.length === 1}
-                            />
+                            />}
+                            
                         </Flex>
                     ))}
 
-                    {/* Add Phone Button */}
                     <Button
                         type="dashed"
                         onClick={() => phonesField.append("")}
@@ -115,9 +105,7 @@ const StepContacts: React.FC<Props> = ({ initialData, onNext }) => {
                 </Form.Item>
 
 
-                {/* Mobiles Section */}
                 <Form.Item label={<Flex gap="small"><span>{t('user_list.mobile')}</span><RequiredTag /></Flex>}>
-                    {/* Map Mobile Fields */}
                     {mobilesField.fields.map((field, idx) => (
                         <Flex gap="small" key={field.id} style={{ marginBottom: 8, alignItems: 'start' }}>
                             <Form.Item
@@ -134,15 +122,16 @@ const StepContacts: React.FC<Props> = ({ initialData, onNext }) => {
                                     )}
                                 />
                             </Form.Item>
-                            <MinusCircleOutlined
+
+                            {mobilesField.fields.length > 1  && <MinusCircleOutlined
                                 onClick={() => mobilesField.remove(idx)}
                                 style={{ cursor: 'pointer', marginTop: 10 }}
                                 disabled={mobilesField.fields.length === 1}
-                            />
+                            />}
+                            
                         </Flex>
                     ))}
 
-                    {/* Add Mobile Button */}
                     <Button
                         type="dashed"
                         onClick={() => mobilesField.append("")}

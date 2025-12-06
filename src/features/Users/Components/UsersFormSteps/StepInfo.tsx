@@ -1,11 +1,13 @@
 import React, { useEffect } from "react";
 import { Form, Input, Card, Flex, Upload, Avatar } from "antd";
 import { Controller, useForm } from "react-hook-form";
-
+import {CameraOutlined} from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import type { UserFormData } from "../../Types/users";
 import RequiredTag from "../../../../components/RequiredTag";
 
+const ENGLISH_REGEX = /^[A-Za-z\s.,!?'"()@&$-]+$/;
+const ARABIC_REGEX = /^[\u0600-\u06FF\s\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF.,!?'"()@&$-]+$/u;
 
 interface Props { initialData: UserFormData; onNext: (data: Partial<UserFormData>) => void; }
 
@@ -16,7 +18,6 @@ const StepInfo: React.FC<Props> = ({ initialData, onNext }) => {
     useEffect(() => { reset(initialData); }, [initialData, reset]);
     const { t } = useTranslation();
     
-    // console.log(initialData);
     
     const imageFile = watch("image");
     const getImageSrc = () => {
@@ -26,11 +27,38 @@ const StepInfo: React.FC<Props> = ({ initialData, onNext }) => {
     };
 
     const onSubmit = (data: UserFormData) => {
-        onNext({ image: data.image, first_name: data.first_name, mid_name: data.mid_name, last_name: data.last_name, ssn: data.ssn });
+        onNext({ image: data.image, first_name_en: data.first_name_en, first_name_ar: data.first_name_ar, mid_name_en: data.mid_name_en, mid_name_ar: data.mid_name_ar, last_name_en: data.last_name_en, last_name_ar: data.last_name_ar, ssn: data.ssn });
     };
+
+    const hoverStyles = `
+        .avatar-wrapper {
+            position: relative;
+            border-radius: 50%;
+            display: inline-block;
+            cursor: pointer; /* Set cursor to pointer */
+        }
+        .avatar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5); /* Darker background */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .avatar-wrapper:hover .avatar-overlay {
+            opacity: 1; /* Show overlay on hover */
+        }
+    `;
 
     return (
         <Card title = {t("user_list.personal_info")}>
+            <style>{hoverStyles}</style>
             <Form layout="vertical" onFinish={handleSubmit(onSubmit)} id="step-form" requiredMark={false}>
                 <Form.Item style={{width: "100%", display: "flex", justifyContent: "center", textAlign: "center"}} >
                     <Controller
@@ -43,28 +71,70 @@ const StepInfo: React.FC<Props> = ({ initialData, onNext }) => {
                                 showUploadList={false}
                                 beforeUpload={file => { setValue("image", file); return false; }}
                             >
-                                <Avatar src={getImageSrc()} size={70} />
+                                <div className="avatar-wrapper" style={{ width: 70, height: 70 }}>
+                                    <Avatar src={getImageSrc()} size={70} />
+
+                                    <div className="avatar-overlay">
+                                        <CameraOutlined style={{ fontSize: '24px', color: '#fff' }} />
+                                    </div>
+                                </div>
                                 <div style={{ marginTop: 8 }}><a>{t("user_list.upload_image")}</a></div>
                             </Upload>
                         )}
                     />
                 </Form.Item>
-                <Form.Item label={<Flex gap="small"><span>{t("user_list.fname")}</span><RequiredTag /></Flex>}
-                    validateStatus={errors.first_name ? "error" : ""} help={errors.first_name?.message} required>
-                    <Controller name="first_name" control={control}
-                        rules={{ required: "Required" }}
+                <Form.Item label={<Flex gap="small"><span>{t("user_list.fname_en")}</span><RequiredTag /></Flex>}
+                    validateStatus={errors.first_name_en ? "error" : ""} help={errors.first_name_en?.message} required>
+                    <Controller name="first_name_en" control={control}
+                        rules={{ required: t("required"), pattern: {
+                            value: ENGLISH_REGEX,
+                            message: t("english_only"),
+                        } }}
                         render={({ field }) => <Input {...field} />} />
                 </Form.Item>
-                <Form.Item label={<Flex gap="small"><span>{t("user_list.mname")}</span><RequiredTag /></Flex>}
-                    validateStatus={errors.mid_name ? "error" : ""} help={errors.mid_name?.message} required>
-                    <Controller name="mid_name" control={control}
-                        rules={{ required: "Required" }}
+                <Form.Item label={<Flex gap="small"><span>{t("user_list.fname_ar")}</span><RequiredTag /></Flex>}
+                    validateStatus={errors.first_name_ar ? "error" : ""} help={errors.first_name_ar?.message} required>
+                    <Controller name="first_name_ar" control={control}
+                        rules={{ required: t("required"), pattern: {
+                            value: ARABIC_REGEX,
+                            message: t("arabic_only"),
+                        } }}
                         render={({ field }) => <Input {...field} />} />
                 </Form.Item>
-                <Form.Item label={<Flex gap="small"><span>{t("user_list.lname")}</span><RequiredTag /></Flex>}
-                    validateStatus={errors.last_name ? "error" : ""} help={errors.last_name?.message} required>
-                    <Controller name="last_name" control={control}
-                        rules={{ required: "Required" }}
+                <Form.Item label={<Flex gap="small"><span>{t("user_list.mname_en")}</span><RequiredTag /></Flex>}
+                    validateStatus={errors.mid_name_en ? "error" : ""} help={errors.mid_name_en?.message} required>
+                    <Controller name="mid_name_en" control={control}
+                        rules={{ required: t("required"), pattern: {
+                            value: ENGLISH_REGEX,
+                            message: t("english_only"),
+                        } }}
+                        render={({ field }) => <Input {...field} />} />
+                </Form.Item>
+                <Form.Item label={<Flex gap="small"><span>{t("user_list.mname_ar")}</span><RequiredTag /></Flex>}
+                    validateStatus={errors.mid_name_ar ? "error" : ""} help={errors.mid_name_ar?.message} required>
+                    <Controller name="mid_name_ar" control={control}
+                        rules={{ required: t("required"), pattern: {
+                            value: ARABIC_REGEX,
+                            message: t("arabic_only"),
+                        } }}
+                        render={({ field }) => <Input {...field} />} />
+                </Form.Item>
+                <Form.Item label={<Flex gap="small"><span>{t("user_list.lname_en")}</span><RequiredTag /></Flex>}
+                    validateStatus={errors.last_name_en ? "error" : ""} help={errors.last_name_en?.message} required>
+                    <Controller name="last_name_en" control={control}
+                        rules={{ required: t("required"), pattern: {
+                            value: ENGLISH_REGEX,
+                            message: t("english_only"),
+                        } }}
+                        render={({ field }) => <Input {...field} />} />
+                </Form.Item>
+                <Form.Item label={<Flex gap="small"><span>{t("user_list.lname_ar")}</span><RequiredTag /></Flex>}
+                    validateStatus={errors.last_name_ar ? "error" : ""} help={errors.last_name_ar?.message} required>
+                    <Controller name="last_name_ar" control={control}
+                        rules={{ required: t("required"), pattern: {
+                            value: ARABIC_REGEX,
+                            message: t("arabic_only"),
+                        } }}
                         render={({ field }) => <Input {...field} />} />
                 </Form.Item>
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.ssn")}</span><RequiredTag /></Flex>}

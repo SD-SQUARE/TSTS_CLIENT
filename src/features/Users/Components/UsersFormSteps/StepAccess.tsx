@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, {  useEffect } from "react";
 import { Form, Card, Flex, Input } from "antd";
 import { Controller, useForm } from "react-hook-form";
 
@@ -12,36 +12,38 @@ interface Props {
     initialData: UserFormData;
     onSubmit: (data: Partial<UserFormData>) => void;
     isSubmitting: boolean;
-    onTriggerSubmit: (submitTrigger: () => void) => void;
+    // onTriggerSubmit: (submitTrigger: () => void) => void;
 }
 
 const StepAccess: React.FC<Props> = ({
     initialData,
     onSubmit,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     isSubmitting,
-    onTriggerSubmit,
+    // onTriggerSubmit,
 }) => {
     const { handleSubmit, control, formState: { errors }, reset } =
         useForm<UserFormData>({ defaultValues: initialData, mode: "onChange" });
 
     useEffect(() => { reset(initialData); }, [initialData, reset]);
 
-    // For Modal trigger logic (see your modal)
-    const submitTrigger = useCallback(() => {
-        handleSubmit((data) => {
-            // console.log(data);
-            return onSubmit(data);
-        })();
-    }, [handleSubmit, onSubmit]);
+    // const submitTrigger = useCallback(() => {
+    //     handleSubmit((data) => {
+    //         return onSubmit(data);
+    //     })();
+    // }, [handleSubmit, onSubmit]);
 
 
-    React.useEffect(() => {
-        onTriggerSubmit(submitTrigger);
-    }, [submitTrigger, onTriggerSubmit]);
+    // React.useEffect(() => {
+    //     onTriggerSubmit(submitTrigger);
+    // }, [submitTrigger, onTriggerSubmit]);
+
+    const localHandleSubmit = () => {
+        handleSubmit((data) => onSubmit(data))();
+    }
+
     return (
         <Card title={t("user_list.user_access")}>
-            <Form layout="vertical" id="step-form" requiredMark={false}>
+            <Form layout="vertical" id="step-form" requiredMark={false} onFinish={localHandleSubmit}>
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.email")}</span><RequiredTag /></Flex>}
                     validateStatus={errors.email ? "error" : ""} help={errors.email?.message} required>
                     <Controller name="email" control={control}
@@ -53,11 +55,19 @@ const StepAccess: React.FC<Props> = ({
                 </Form.Item>
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.password")}</span><RequiredTag /></Flex>}
                     validateStatus={errors.password ? "error" : ""} help={errors.password?.message} required>
-                    <Controller name="password" control={control}
+                    <Controller name="password" control={control} disabled={isSubmitting}
                         rules={{
-                            required: "Required",
-                            minLength: { value: 6, message: "At least 6 chars" },
-                            validate: v => /[A-Z]/.test(v) && /[0-9]/.test(v) || "Must use A-Z and 0-9",
+                            required: t("required"),
+                            minLength: {
+                                value: 8,
+                                message: t("password_8_chars"),
+                            },
+                            validate: {
+                                hasUpperCase: (v) => /[A-Z]/.test(v) || t("password_uppercase"),
+                                hasNumber: (v) => /[0-9]/.test(v) || t("password_number"),
+                                hasSpecialChar: (v) => /[^A-Za-z0-9\s]/.test(v) || t("password_special"),
+                                hasLowerCase: (v) => /[a-z]/.test(v) || t("password_lowercase"),
+                            },
                         }}
                         render={({ field }) => <Input.Password {...field} />} />
                 </Form.Item>

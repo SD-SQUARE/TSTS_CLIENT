@@ -9,11 +9,14 @@ interface AvatarDisplayProps {
   maxInitials?: number;
 }
 
+const default_color = "#87d068"
 const AvatarDisplay: React.FC<AvatarDisplayProps> = ({ member }) => {
 
   if (!member || !member.name) {
     return null;
   }
+
+  const avatar_color = member.color || default_color;
 
   const getInitials = (name: string): string => {
     return name
@@ -27,7 +30,7 @@ const AvatarDisplay: React.FC<AvatarDisplayProps> = ({ member }) => {
   return (
     <Tooltip title={member.name}>
       <Avatar
-        style={{ backgroundColor: '#87d068', marginInlineEnd: 2 }}
+        style={{ backgroundColor: avatar_color, marginInlineEnd: -6 }}
         size="small"
       >
         {getInitials(member.name)}

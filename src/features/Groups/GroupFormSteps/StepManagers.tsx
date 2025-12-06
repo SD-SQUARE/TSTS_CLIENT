@@ -47,7 +47,6 @@ const StepManagers: React.FC<StepProps> = ({ initialData, onNext }) => {
     const technicianOptions = useMemo(() => mapUsersToAntdOptions(technicians), [technicians]);
 
 
-    // At the top of your component after useForm()
 const { handleSubmit, control, formState: { errors }, reset } = useForm<GroupFormData>({
     defaultValues: initialData,
     mode: 'onChange',
@@ -58,7 +57,11 @@ useEffect(() => {
 }, [initialData, reset]);
 
 
-
+const filterOption = (input: string, option: { value: string; label: string } | undefined) => {
+    if (!option || !option.label) return false;
+    
+    return option.label.toLowerCase().includes(input.toLowerCase());
+};
 
 
 
@@ -66,14 +69,9 @@ useEffect(() => {
 
         onNext({
             heads: data.heads,
-            teamLeaders: data.teamLeaders,
+            team_leader: data.team_leader,
         });
     };
-
-
-
-
-
 
     return (
         <Card title={t('group_form.step_managers_card_title')}>
@@ -106,6 +104,9 @@ useEffect(() => {
                                 loading={isLoadingAdmins}
                                 options={adminOptions}
 
+                                showSearch
+                                filterOption={filterOption}
+
                                 value={field.value ? field.value.map(h => h.id) : []}
 
                                 onChange={(selectedIds: string[]) => {
@@ -123,12 +124,12 @@ useEffect(() => {
                         <span>{t('translation.team_leader')}</span>
                         <RequiredTag />
                     </Flex>}
-                    validateStatus={errors.teamLeaders ? 'error' : ''}
-                    help={errors.teamLeaders?.message}
+                    validateStatus={errors.team_leader ? 'error' : ''}
+                    help={errors.team_leader?.message}
                     required
                 >
                     <Controller
-                        name="teamLeaders"
+                        name="team_leader"
                         control={control}
                         rules={{ required: t('required') }}
                         render={({ field }) => (
@@ -136,6 +137,8 @@ useEffect(() => {
                                 placeholder={t('group_form.team_leader_placeholder')}
                                 loading={isLoadingTechnicians}
                                 options={technicianOptions}
+                                showSearch
+                                filterOption={filterOption}
                                 value={field.value?.id || undefined}
                                 onChange={(selectedId: string) => {
 

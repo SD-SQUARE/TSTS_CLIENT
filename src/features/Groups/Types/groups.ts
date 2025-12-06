@@ -15,7 +15,6 @@ export interface NamedObject {
     heads: NamedObject[]; 
     team_leader: NamedObject; 
     specializations: NamedObject[]; 
-    
   }
   
   
@@ -23,27 +22,29 @@ export interface NamedObject {
   export interface DisplayMember {
       id: string;
       name: string;
+      color?: string;
   }
 
 export interface GroupFormData {
   
-  nameArabic: string;
-  nameEnglish: string;
-  descriptionArabic: string;
-  descriptionEnglish: string;
+  name_ar: string;
+  name_en: string;
+  description_ar: string;
+  description_en: string;
   color: string;
   heads: NamedObject[]; 
-  teamLeaders: NamedObject | null; 
-  specializations: NamedObject[];
+  team_leader: NamedObject; 
+  specializations: NamedObject[]; 
+  members?: NamedObject[];
 }
 
 export interface UserPayload {
-  nameArabic: string;
-  nameEnglish: string;
-  descriptionArabic: string;
-  descriptionEnglish: string;
+  name_ar: string;
+  name_en: string;
+  description_ar: string;
+  description_en: string;
   color: string;
   heads: string[];
-  teamLeaders: string | null;
+  team_leader: string | null;
   specializations: string[];
 }
