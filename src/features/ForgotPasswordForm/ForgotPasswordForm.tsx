@@ -5,6 +5,7 @@ import StepEmail from './ForgotPasswordSteps/StepEmail';
 import StepOtp from './ForgotPasswordSteps/StepOtp';
 import StepResetPassword from './ForgotPasswordSteps/StepResetPassword';
 import { useTranslation } from 'react-i18next';
+import Body from '../../components/layouts/Body';
 
 
 const ForgotPasswordForm = () => {
@@ -21,20 +22,29 @@ const ForgotPasswordForm = () => {
     const [token, setToken] = useState('');
 
     const steps = [
-        { title: t('forgotPassword.steps.email'), icon: <MailOutlined />, content: <StepEmail {...{ setStep, setEmail, setUid }} /> },
-        { title: t('forgotPassword.steps.otp'), icon: <SafetyOutlined />, content: <StepOtp {...{ setStep, email, setOtp, setToken }} /> },
-        { title: t('forgotPassword.steps.reset'), icon: <LockOutlined />, content: <StepResetPassword {...{ setStep, email, otp, token }} /> },
+        { title: t('forgotPassword.steps.email'), icon: <MailOutlined />,  },
+        { title: t('forgotPassword.steps.otp'), icon: <SafetyOutlined />, },
+        { title: t('forgotPassword.steps.reset'), icon: <LockOutlined />, },
+    ];
+    const stepsForm = [
+        { content: <StepEmail {...{ setStep, setEmail, setUid }} /> },
+        { content: <StepOtp {...{ setStep, email, setOtp, setToken, uid , setUid}} /> },
+        { content: <StepResetPassword {...{ setStep, email, otp, token }} /> },
     ];
 
 
     return (
-        <Card
-            title={t('forgotPassword.title')}
-            style={{ maxWidth: 480, margin: '50px auto', borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', textAlign: isArabic? 'right' : 'left' }}
-        >
-            <Steps current={step} items={steps} size="small" style={{ marginBottom: 30 }} />
-            {steps[step].content}
-        </Card>
+        <Body>
+            <div style={{display: 'flex',justifyContent:'center', alignItems:"center", height: '100%'}}>
+                <Card
+                    title={t('forgotPassword.title')} 
+                    style={{ width: "50%",height: "auto" , borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', textAlign: isArabic? 'right' : 'left' }}
+                >
+                    <Steps current={step} items={steps} size="default" style={{ marginBottom: 30 }} />
+                    {stepsForm[step].content}
+                </Card>
+            </div>
+        </Body>
     );
 };
 

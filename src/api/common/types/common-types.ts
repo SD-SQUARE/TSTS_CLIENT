@@ -8,3 +8,12 @@ export interface BaseEntity {
     description_ar?: string;
   }
   
+
+export interface PaginatedResponse<T> {
+    data: T[];
+    meta: {
+        total: number;
+        page_index: number;
+        page_size: number;
+    };
+}

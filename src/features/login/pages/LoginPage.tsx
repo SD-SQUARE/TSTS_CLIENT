@@ -1,10 +1,13 @@
-import React from 'react';
+
+import Body from "../../../components/layouts/Body";
 import LoginForm from "../components/LoginForm";
 
 export const LoginPage = () => {
     return (
-            <div style={{ width: '100%', maxWidth: '950px' }}>
-                <LoginForm />
-            </div>
+            <Body>
+                <div style={{ width: '100%', marginTop: 40,}}>
+                    <LoginForm />
+                </div>
+            </Body>
     );
 };

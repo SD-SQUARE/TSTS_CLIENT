@@ -42,6 +42,7 @@ const initialFormData: UserFormData = {
     email: "",
     password: "",
     status: "Active",
+    user_type: "",
 };
 
 const UserFormModal: React.FC<{
@@ -70,6 +71,7 @@ const UserFormModal: React.FC<{
             if(fetchedUserDetail) {
                 // eslint-disable-next-line react-hooks/set-state-in-effect
                 setFormData({
+                    user_type: role,
                     image: fetchedUserDetail.image,
                     first_name_en: fetchedUserDetail.first_name_en,
                     first_name_ar: fetchedUserDetail.first_name_ar,
@@ -129,7 +131,7 @@ const UserFormModal: React.FC<{
             password: data.password,
             status: data.status,
             image: data.image,
-
+            user_type: role,
             contacts: data.contacts,
 
             university: data.university?.id || null,

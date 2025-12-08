@@ -1,29 +1,28 @@
 
 import { Layout } from "antd"
-import Body from "./components/layouts/Body"
 import NavBar from "./components/layouts/Nav/NavBar"
-import AppFooter from "./components/layouts/AppFooter"
 import NavItem from "./components/layouts/Nav/components/NavItem"
 import { BrowserRouter } from "react-router-dom"
 import { AppRoutes } from "./routes/AppRoutes"
+import { APP_BASE_PATH } from "./app/config"
+import { useTranslation } from "react-i18next"
 
 function App() {
-    
+    const { t } = useTranslation();
+
     return (
         <BrowserRouter>
             <Layout style={{ width: '100%', height: '100vh' }} className="white-bg">
                 {/* Navigation bar */}
                 <NavBar>
-                    <NavItem to="/">Home</NavItem>
-                    <NavItem to="/about">About</NavItem>
+                    <NavItem to={`${APP_BASE_PATH}/`}>{t('HOME')}</NavItem>
+                    <NavItem to={`${APP_BASE_PATH}/settings/domains`}>{'domains'}</NavItem>
+                    <NavItem to={`${APP_BASE_PATH}/identities/groups`}>{'Entity'}</NavItem>
                 </NavBar>
 
                 {/* Pages Content */}
-                <Body>
-                    <AppRoutes />
-                </Body>
-                {/* Footer */}
-                <AppFooter />
+                <AppRoutes />
+
             </Layout>
         </BrowserRouter>
     )

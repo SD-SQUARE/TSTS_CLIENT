@@ -5,6 +5,9 @@ import { loginSchema } from "../schema/LoginSchema";
 import { loginSuccess } from "../store/authSlice";
 import loginImage from "../../../assets/HU-bg-clear.png"
 import axios from "axios";
+import NavItem from "../../../components/layouts/Nav/components/NavItem";
+import { APP_BASE_PATH } from "../../../app/config";
+import { NavLink } from "react-router-dom";
 const { Title } = Typography;
 
 const LoginForm = () => {
@@ -133,7 +136,9 @@ const LoginForm = () => {
 
 
           <div className="forgot-password">
-            <a href="#">Forget password?</a>
+                      <NavLink to={`${APP_BASE_PATH}/auth/forgot-password`}> 
+                            Forget password?
+                      </NavLink>
           </div>
 
           <Form.Item>

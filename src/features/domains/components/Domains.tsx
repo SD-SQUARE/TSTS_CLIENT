@@ -4,67 +4,11 @@ import { GenericCrudPage } from "../../../components/GenericCrudPage";
 import { useGenericCrud } from "../../../api/common/hooks/common-hooks";
 import type { Domain, CreateDomainDto, UpdateDomainDto } from "../types/types";
 import { useTranslation } from "react-i18next";
+import { domainApi } from "../services/domainsApi";
+import type { CreateUniversityDto, University, UpdateUniversityDto } from "../../universities/types/types";
+import { universityApi } from "../../universities/services/universityApi";
 
-const MOCK_UNIVERSITIES = [
-  { label_en: "Cairo University", label_ar: "جامعة القاهرة", value: 1 },
-  { label_en: "Ain Shams University", label_ar: "جامعة عين شمس", value: 2 },
-  { label_en: "Helwan University", label_ar: "جامعة حلوان", value: 3 },
-];
 
-const STATIC_DOMAINS: Domain[] = [
-  {
-    id: 10,
-    name_en: "Engineering",
-    name_ar: "الهندسة",
-    description_en: "Faculty of Engineering",
-    description_ar: "كلية الهندسة",
-    universityId: 1,
-  },
-  {
-    id: 11,
-    name_en: "Medicine",
-    name_ar: "الطب",
-    description_en: "Faculty of Medicine",
-    description_ar: "كلية الطب",
-    universityId: 1,
-  },
-  {
-    id: 20,
-    name_en: "Business & Commerce",
-    name_ar: "الأعمال والتجارة",
-    description_en: "Faculty of Commerce",
-    description_ar: "كلية التجارة",
-    universityId: 2,
-  },
-  {
-    id: 30,
-    name_en: "Fine Arts",
-    name_ar: "الفنون الجميلة",
-    description_en: "Faculty of Fine Arts",
-    description_ar: "كلية الفنون الجميلة",
-    universityId: 3,
-  },
-];
-
-const mockDomainService = {
-  getAll: async (): Promise<Domain[]> => {
-    return new Promise((resolve) => setTimeout(() => resolve(STATIC_DOMAINS), 500));
-  },
-  create: async (data: CreateDomainDto): Promise<Domain> => {
-    console.log("Mock Create Domain:", data);
-    const newDomain = { ...data, id: Date.now() } as Domain;
-    return Promise.resolve(newDomain);
-  },
-  update: async (id: string | number, data: UpdateDomainDto): Promise<Domain> => {
-    console.log("Mock Update Domain:", id, data);
-    const updated = { ...data, id } as Domain;
-    return Promise.resolve(updated);
-  },
-  delete: async (id: string | number): Promise<void> => {
-    console.log("Mock Delete Domain:", id);
-    return Promise.resolve();
-  },
-};
 
 const DomainsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -78,16 +22,30 @@ const DomainsPage: React.FC = () => {
     deleteMutation,
   } = useGenericCrud<Domain, CreateDomainDto, UpdateDomainDto>({
     queryKey: ['domains'],
-    fetchFn: mockDomainService.getAll,
-    createFn: mockDomainService.create,
-    updateFn: ({ id, data }) => mockDomainService.update(id, data),
-    deleteFn: mockDomainService.delete,
+    fetchFn: () => domainApi.getAll(),
+    createFn: (data) => domainApi.create(data),
+    updateFn: ({ id, data }) => domainApi.update(id, data),
+    deleteFn: (id) => domainApi.delete(id),
   });
 
-  const uniOptions = MOCK_UNIVERSITIES.map((u) => ({
-    label: i18n.language === "ar" ? u.label_ar : u.label_en,
-    value: u.value,
-  }));
+  const {
+      data: universities,
+      isLoading: _uniLoading,
+      createMutation: _createUni,
+      updateMutation: _updateUni,
+      deleteMutation : _deleteUni,
+    } = useGenericCrud<University, CreateUniversityDto, UpdateUniversityDto>({
+      queryKey: ['universities'],
+      fetchFn: () => universityApi.getAll(),
+      createFn: (data) => universityApi.create(data),
+      updateFn: ({ id, data }) => universityApi.update(id, data),
+      deleteFn:  (id) => universityApi.delete(id),
+    });
+
+  const uniOptions = universities?.map((u) => ({
+    label: i18n.language === "ar" ? u.name_ar : u.name_en,
+    value: u.id,
+  })) ?? [];
 
   const columns = [
     { title: t("name_en"), dataIndex: "name_en", key: "name_en" },
@@ -139,11 +97,12 @@ const DomainsPage: React.FC = () => {
 
     {
       title: t("university"),
-      dataIndex: "universityId",
+    dataIndex: "university",
       key: "university",
-      render: (id: number) => {
-        const uni = MOCK_UNIVERSITIES.find((u) => u.value === id);
-        return uni ? (i18n.language === "ar" ? uni.label_ar : uni.label_en) : id;
+        render: (_: number, record) => {
+            const university = record.university;
+            const universityName = i18n.language === "ar" ? university.name.ar : university.name.en;
+            return universityName;
       },
     },
   ];
@@ -193,7 +152,7 @@ const DomainsPage: React.FC = () => {
       </Form.Item>
 
       <Form.Item
-        name="universityId"
+        name="university"
         label={t("university")}
         rules={[{ required: true, message: t("required") }]}
       >
@@ -206,6 +165,12 @@ const DomainsPage: React.FC = () => {
     </>
   );
 
+    const nestedFieldMappers = {
+        university: (record: Domain) => record.university?.id ?? null,
+        // if you have more nested fields:
+        // category: (record: Product) => record.category?.id ?? null,
+        // author: (record: Book) => record.author?.id ?? null,
+    };
   return (
     <GenericCrudPage<Domain>
       title={t("domains")}
@@ -216,6 +181,7 @@ const DomainsPage: React.FC = () => {
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}
+      nestedFieldMappers={nestedFieldMappers}    
     />
   );
 };

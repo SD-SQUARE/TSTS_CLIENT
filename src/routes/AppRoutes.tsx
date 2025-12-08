@@ -18,22 +18,72 @@ import SpecializationsPage from "../features/specializations/components/Speciali
 import WorkHoursPage from "../features/work-hours/components/WorkHours";
 import PermissionsPage from "../features/permissions/components/Permissions";
 
+import {
+    ClockCircleOutlined,
+    BankOutlined,
+    ApartmentOutlined,
+    ProjectOutlined,
+    ExperimentOutlined,
+    SafetyOutlined,
+    TeamOutlined,
+    UserOutlined,
+    ToolOutlined,
+    IdcardOutlined
+} from '@ant-design/icons';
+
 export const AppRoutes = () => {
 
+    const IdentitiesMenuItems = [
+        {
+            key: "/identities/groups",
+            label: 'Groups',
+            icon: <TeamOutlined />,
+        },
+        {
+            key: "/identities/users",
+            label: 'Users',
+            icon: <UserOutlined />,
+            children: [
+                {
+                    key: "/identities/users/admins",
+                    label: 'Admins',
+                    icon: <SafetyOutlined />,
+                },
+                {
+                    key: "/identities/users/technicians",
+                    label: 'Technicians',
+                    icon: <ToolOutlined />,
+                },
+                {
+                    key: "/identities/users/requesters",
+                    label: 'Requesters',
+                    icon: <IdcardOutlined />,
+                },
+            ],
+        },
+    ];
+    const SettingsMenuItems = [
+        { key: "/settings/work-hours", label: 'Work Hours', icon: <ClockCircleOutlined /> },
+        { key: "/settings/universities", label: 'Universities', icon: <BankOutlined /> },
+        { key: "/settings/domains", label: 'Domains', icon: <ProjectOutlined /> },
+        { key: "/settings/departments", label: 'Departments', icon: <ApartmentOutlined /> },
+        { key: "/settings/specializations", label: 'Specializations', icon: <ExperimentOutlined /> },
+        { key: "/settings/permissions", label: 'Permissions', icon: <SafetyOutlined /> },
+    ];
     return (
         <Routes>
+            
+            <Route index path={`${APP_BASE_PATH}/`} element={<Home/>} />
+
             <Route path={`${APP_BASE_PATH}/auth`}>
                 <Route index element={<LoginPage />} />
                 <Route path="login" element={<LoginPage />} />
                 <Route path="forgot-password" element={<ForgotPasswordForm />} />
             </Route>
-            
-            <Route index path={`${APP_BASE_PATH}/`} element={<Home/>} />
-            <Route path={`${APP_BASE_PATH}/about`} element={<h1>About page</h1>} />
 
             {/* Super/admin routes */}
             {/* TODO: Add Protection */}
-            <Route path={`${APP_BASE_PATH}/identities`}>
+            <Route path={`${APP_BASE_PATH}/identities`} element={<MainLayout menuItems={IdentitiesMenuItems}  />}>
                 <Route index path="groups" element={<GroupsList />} />
                 <Route path="groups" element={<GroupsList />} />
                 <Route path="groups/:id" element={<GroupViewPage />} />
@@ -45,7 +95,7 @@ export const AppRoutes = () => {
 
             </Route>
             {/* Routes that use MainLayout */}
-            <Route path="/settings" element={<MainLayout />}>
+            <Route path={`${APP_BASE_PATH}/settings`} element={<MainLayout menuItems={SettingsMenuItems}  />}>
 
                 <Route path="work-hours" element={<WorkHoursPage />} />
                 <Route path="universities" element={<UniversitiesPage />} />

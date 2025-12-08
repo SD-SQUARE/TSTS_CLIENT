@@ -12,6 +12,7 @@ import {
 } from "antd";
 import { EditOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
+import { mapRecordToFormValues, type FieldMapper } from "../utils/mapper";
 
 interface GenericCrudProps<T> {
   title: string;
@@ -25,7 +26,8 @@ interface GenericCrudProps<T> {
   updateMutation: any;
   deleteMutation: any;
   
-  disableAdd?: boolean;
+    disableAdd?: boolean;
+    nestedFieldMappers?: FieldMapper<T>;
 }
 
 export const GenericCrudPage = <T extends { id: string | number }>({
@@ -37,7 +39,8 @@ export const GenericCrudPage = <T extends { id: string | number }>({
   createMutation,
   updateMutation,
   deleteMutation,
-  disableAdd = false,
+disableAdd = false,
+nestedFieldMappers = {},
 }: GenericCrudProps<T>) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<T | null>(null);
@@ -91,7 +94,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
 
   const openEditModal = (record: T) => {
     setEditingItem(record);
-    form.setFieldsValue(record);
+    form.setFieldsValue(mapRecordToFormValues(record, nestedFieldMappers));
     setIsModalOpen(true);
   };
 
@@ -186,7 +189,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
             isLoading
               ? false
               : {
-                  position: ["bottomRight"],
+                  placement: ["bottomRight"],
                   pageSize: 10,
                   showSizeChanger: true,
                   showTotal: (total) => `Total ${total} items`,

@@ -1,4 +1,7 @@
+// src/api/common/services/common-services.ts
+
 import api from "../../http"; 
+import type { PaginatedResponse } from "../types/common-types";
 
 export class BaseCrudService<T> {
   protected listUrl: string;
@@ -9,9 +12,11 @@ export class BaseCrudService<T> {
     this.detailUrl = detailUrl;
   }
 
-  async getAll(params?: Record<string, any>): Promise<T[]> {
-    const response = await api.get<T[]>(this.listUrl, { params });
-    return response.data;
+  async getAll(params?: Record<string, any>): Promise<PaginatedResponse<T>> {
+      console.log(this.listUrl);
+      const response = await api.get<PaginatedResponse<T>>(this.listUrl, { params });
+      console.log("API RESPONSE:", response.data);
+      return response.data;
   }
 
   async getById(id: string | number): Promise<T> {
@@ -21,6 +26,8 @@ export class BaseCrudService<T> {
   }
 
   async create(data: Partial<T>): Promise<T> {
+    console.log(this.listUrl);
+    
     const response = await api.post<T>(this.listUrl, data);
     return response.data;
   }

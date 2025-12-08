@@ -192,6 +192,7 @@ const UserViewPage: React.FC = () => {
                     ))}
                 </Descriptions>
             </Space>
+            
         </Card>
     );
 };

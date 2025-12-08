@@ -17,9 +17,9 @@ export const useUsers = (
         queryKey: ["users", role, page, pageSize, activeSearch],
         
         queryFn: async () => {
-            const res = await api.get(`/users/${role}/`, {
+            const res = await api.get(`v1/users/${role}/`, {
                 params: { 
-                    page, 
+                    page_index: page, 
                     page_size: pageSize, 
                     ...activeSearch,
                 },
@@ -38,7 +38,7 @@ export const useUserDetail = (role: string, id?: string) => {
         queryKey: ["userDetail", role, id],
         queryFn: async () => {
             if (!id) return null;
-            const res = await api.get(`/users/${role}/${id}`);
+            const res = await api.get(`v1/users/${role}/${id}`);
             return res.data as UserListItem;
         },
         enabled: !!id, 
@@ -49,7 +49,7 @@ export const useUserDetail = (role: string, id?: string) => {
 export const useDeleteUser = (role: string) => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (id: string) => api.delete(`/users/${role}/${id}`),
+        mutationFn: (id: string) => api.delete(`v1/users/${role}/${id}`),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users", role] }),
     });
 };
@@ -59,8 +59,8 @@ export const useAddOrEditUser = (role: string, userId?: string) => {
     return useMutation({
         mutationFn: (data: FormData) =>
             userId
-                ? api.put(`/users/${role}/${userId}`, data)
-                : api.post(`/users/${role}`, data),
+                ? api.put(`v1/users/${role}/${userId}`, data)
+                : api.post(`v1/users/${role}`, data),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users", role] })
         ,
     });
@@ -70,7 +70,7 @@ export const useUniversities = () =>
     useQuery({
         queryKey: ["universities"],
         queryFn: async () =>
-            (await api.get("/lockups/universities/")).data.universities as Lookup[],
+            (await api.get("v1/lockups/universities/")).data.universities as Lookup[],
         staleTime: Infinity,
     });
 
@@ -79,7 +79,7 @@ export const useDomains = (universityId?: string) =>
         queryKey: ["domains", universityId],
         queryFn: async () => {
             if (!universityId) return [];
-            const url = `/lockups/universities/${universityId}/domains`;
+            const url = `v1/lockups/universities/${universityId}/domains`;
             const res = await api.get(url);
             return res.data.domains as Lookup[];
         },
@@ -92,7 +92,7 @@ export const useDepartments = (domainId?: string) =>
         queryKey: ["departments", domainId],
         queryFn: async () => {
             if (!domainId) return [];
-            const url = `/lockups/domains/${domainId}/departments`;
+            const url = `v1/lockups/domains/${domainId}/departments`;
             const res = await api.get(url);
             return res.data.departments as Lookup[];
         },
@@ -103,7 +103,7 @@ export const useDepartments = (domainId?: string) =>
 export const usePermissionProfiles = () =>
     useQuery({
         queryKey: ["permissionProfiles"],
-        queryFn: async () => (await api.get("/permissions/profile")).data.profiles as ProfileLookup[],
+        queryFn: async () => (await api.get("v1/permissions/profile")).data.profiles as ProfileLookup[],
         staleTime: Infinity,
     });
 
@@ -111,6 +111,6 @@ export const usePermissionProfiles = () =>
 export const useSpecializations = () =>
     useQuery({
         queryKey: ["specializations"],
-        queryFn: async () => (await api.get("/lockups/specializations/")).data.specializations as Lookup[],
+        queryFn: async () => (await api.get("v1/lockups/specializations/")).data.specializations as Lookup[],
         staleTime: Infinity,
     });

@@ -25,9 +25,9 @@
         last_name_en: string;
         last_name_ar: string;
         ssn: string;
-        university?: Lookup;
-        domain?: Lookup;
-        departments: Lookup[];
+        university?: any;
+        domain?: any;
+        departments: any[];
         contacts: { phones: string[]; mobiles: string[] };
         status: "Active" | "InActive";
         job_en: string;
@@ -57,6 +57,7 @@
         email: string;
         password: string;
         status: "Active" | "InActive";
+        user_type?: string;
     }
     
     
@@ -76,7 +77,7 @@
         email: string;
         password: string;
         status: "Active" | "InActive";
-        
+        user_type?: string;
         departments: string[];
         university: string | null;
         domain: string | null;

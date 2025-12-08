@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import api from '../../../api/http';
 import RequiredTag from '../../../components/RequiredTag';
+import { useNavigate } from 'react-router-dom';
+import { APP_BASE_PATH } from '../../../app/config';
 
 
 interface StepResetPasswordProps {
@@ -17,20 +19,21 @@ interface StepResetPasswordProps {
 const StepResetPassword: React.FC<StepResetPasswordProps> = ({ setStep, email, token }) => {
     const [form] = Form.useForm();
     const { t } = useTranslation();
-
+    const navigate = useNavigate();
     const resetPasswordMutation = useMutation({
         mutationFn: async (payload: { password: string }) => {
             //TODO: Change endpoint
-            const response = await api.post('http://127.0.0.1:3658/m2/1104043-1094166-default/23135085', {
+            console.log(token)
+            const response = await api.post('v1/auth/forget-password/reset-password', {
                 email,
-                token,
+                reset_token: token,
                 password: payload.password,
             });
             return response.data;
         },
         onSuccess: (data) => {
             message.success(data.message || t('forgotPassword.resetSuccess'));
-            setStep(0);
+            navigate(`${APP_BASE_PATH}/auth/login`)
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {

@@ -333,7 +333,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
     ];
 
     return (
-        <div>
+        <div >
             <Space style={{ marginBottom: 16, width: "100%", justifyContent: "space-between" }}>
                 <Pagination
                     current={pagination.page}
@@ -350,8 +350,9 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                 dataSource={data?.data || []}
                 rowKey="id"
                 loading={isLoading || deleteMutation.isPending}
-                scroll={{ x: "max-content" }}
+                scroll={{ x: "max-content", y: "calc(100vh - 300px)" }}
                 pagination={false}
+                
             />
 
 

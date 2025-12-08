@@ -6,13 +6,14 @@ import { Descriptions, Space, Typography, Tag } from 'antd';
 
 import { useGroupDetail } from '../Hooks/useGroupForm';
 import type { NamedObject } from '../Types/groups';
+import i18n from '../../../i18n';
 
 
 
 const { Text } = Typography;
 
 
-const renderMembers = (members: NamedObject[] | undefined) => {
+const renderMembers = (members: any ,t = undefined) => {
     if (!members || members.length === 0) {
         return <Text disabled>-</Text>;
     }
@@ -21,7 +22,8 @@ const renderMembers = (members: NamedObject[] | undefined) => {
             {members.map(member => (
 
                 <Tag key={member.id} color="blue" style={{ margin: '4px 0' }}>
-                    {member.name}
+                    {t == undefined ?
+                        `${member.name}` : i18n.language === "en" ? `${member.firstName.en}` : `${member.firstName.ar}`}
                 </Tag>
             ))}
         </Space>
@@ -29,12 +31,16 @@ const renderMembers = (members: NamedObject[] | undefined) => {
 };
 
 
-const renderTeamLeader = (leader: NamedObject | undefined) => {
+const renderTeamLeader = (leader: any) => {
     if (!leader) {
         return <Text disabled>-</Text>;
     }
 
-    return <Tag color="green">{leader.name}</Tag>;
+    return <Tag color="green">{
+        i18n.language === "en" ?
+            leader.firstName.en
+            : leader.firstName.ar
+    }</Tag>;
 };
 
 interface InfoTabProps { group: NonNullable<ReturnType<typeof useGroupDetail>['data']>; currentLanguage: string; t: (key: string) => string; }
@@ -63,7 +69,7 @@ const InfoTab: React.FC<InfoTabProps> = ({ group, t }) => {
         { key: 'color', label: t('translation.color'), children: colorDescription },
 
 
-        { key: 'heads', label: t('translation.heads'), children: renderMembers(group.heads) },
+        { key: 'heads', label: t('translation.heads'), children: renderMembers(group.heads,t) },
 
 
         { key: 'team_leader', label: t('translation.team_leader'), children: renderTeamLeader(group.team_leader) },

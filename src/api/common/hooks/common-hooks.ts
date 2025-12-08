@@ -1,97 +1,109 @@
-// import { useState, useCallback } from 'react';
 import { message } from 'antd';
-import {  useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type {QueryKey} from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { QueryKey } from '@tanstack/react-query';
 
-interface UseGenericCrudProps<T, CreateDto, UpdateDto> {
-  queryKey: QueryKey;
-  fetchFn: () => Promise<T[]>;
-  createFn: (data: CreateDto) => Promise<T>;
-  updateFn: (params: { id: string | number; data: UpdateDto }) => Promise<T>;
-  deleteFn: (id: string | number) => Promise<void>;
-  onSuccess?: (operation: 'create' | 'update' | 'delete') => void;
-  onError?: (error: any, operation: 'create' | 'update' | 'delete') => void;
+function extractArray<T>(result: any): T[] {
+    if (!result) return [];
+    if (Array.isArray(result)) return result;
+
+    // Try known keys
+    const likelyKeys = ['items', 'data', 'result', 'rows', 'universities','users','domains','departments','specializations'];
+
+    for (const key of likelyKeys) {
+        if (Array.isArray(result[key])) return result[key];
+    }
+
+    // Fallback — find first array in object
+    for (const key of Object.keys(result)) {
+        if (Array.isArray(result[key])) return result[key];
+    }
+
+    return [];
 }
 
-export const useGenericCrud = <T extends { id: string | number }, CreateDto, UpdateDto>({
-  queryKey,
-  fetchFn,
-  createFn,
-  updateFn,
-  deleteFn,
-  onSuccess,
-  onError,
-}: UseGenericCrudProps<T, CreateDto, UpdateDto>) => {
-  const queryClient = useQueryClient();
+interface UseGenericCrudProps<T, CreateDto, UpdateDto> {
+    queryKey: QueryKey;
+    fetchFn: () => Promise<any>;               // CHANGED
+    createFn: (data: CreateDto) => Promise<T>;
+    updateFn: (params: { id: string | number; data: UpdateDto }) => Promise<T>;
+    deleteFn: (id: string | number) => Promise<void>;
+    onSuccess?: (operation: 'create' | 'update' | 'delete') => void;
+    onError?: (error: any, operation: 'create' | 'update' | 'delete') => void;
+}
 
-  // Fetch all data
-  const {
-    data = [],
-    isLoading,
-    error: fetchError,
-    refetch,
-  } = useQuery({
+export const useGenericCrud = <
+    T extends { id: string | number },
+    CreateDto,
+    UpdateDto
+>({
     queryKey,
-    queryFn: fetchFn,
-  });
+    fetchFn,
+    createFn,
+    updateFn,
+    deleteFn,
+    onSuccess,
+    onError,
+}: UseGenericCrudProps<T, CreateDto, UpdateDto>) => {
+    const queryClient = useQueryClient();
 
-  // Create mutation
-  const createMutation = useMutation({
-    mutationFn: createFn,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey });
-      message.success('Item created successfully');
-      onSuccess?.('create');
-    },
-    onError: (error: any) => {
-      message.error('Failed to create item');
-      onError?.(error, 'create');
-    },
-  });
+    const {
+        data = [],
+        isLoading,
+        error: fetchError,
+    } = useQuery({
+        queryKey,
+        queryFn: fetchFn,
+        select: (res) => extractArray<T>(res),  
+    });
 
-  const updateMutation = useMutation({
-    mutationFn: updateFn,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey });
-      message.success('Item updated successfully');
-      onSuccess?.('update');
-    },
-    onError: (error: any) => {
-      message.error('Failed to update item');
-      onError?.(error, 'update');
-    },
-  });
+    const createMutation = useMutation({
+        mutationFn: createFn,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey });
+            message.success('Item created successfully');
+            onSuccess?.('create');
+        },
+        onError: (error) => {
+            message.error('Failed to create item');
+            onError?.(error, 'create');
+        },
+    });
 
-  const deleteMutation = useMutation({
-    mutationFn: deleteFn,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey });
-      message.success('Item deleted successfully');
-      onSuccess?.('delete');
-    },
-    onError: (error: any) => {
-      message.error('Failed to delete item');
-      onError?.(error, 'delete');
-    },
-  });
+    const updateMutation = useMutation({
+        mutationFn: updateFn,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey });
+            message.success('Item updated successfully');
+            onSuccess?.('update');
+        },
+        onError: (error) => {
+            message.error('Failed to update item');
+            onError?.(error, 'update');
+        },
+    });
 
-  // const refresh = useCallback(() => {
-  //   refetch();
-  // }, [refetch]);
+    const deleteMutation = useMutation({
+        mutationFn: deleteFn,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey });
+            message.success('Item deleted successfully');
+            onSuccess?.('delete');
+        },
+        onError: (error) => {
+            message.error('Failed to delete item');
+            onError?.(error, 'delete');
+        },
+    });
 
-  return {
-    data,
-    isLoading,
-    fetchError,
-    
-    createMutation,
-    updateMutation,
-    deleteMutation,
-    
-    // refresh,
-    
-    isCreating: createMutation.isPending,
-    isUpdating: updateMutation.isPending,
-    isDeleting: deleteMutation.isPending,
-  };
+    return {
+        data,
+        isLoading,
+        fetchError,
+        createMutation,
+        updateMutation,
+        deleteMutation,
+        isCreating: createMutation.isPending,
+        isUpdating: updateMutation.isPending,
+        isDeleting: deleteMutation.isPending,
+    };
 };

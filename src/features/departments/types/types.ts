@@ -1,8 +1,8 @@
 import type { BaseEntity } from "../../../api/common/types/common-types";
 
 export interface Department extends BaseEntity {
-  universityId: string | number;
-  domainId: string | number;
+  university: any;
+  domain: any;
 }
 
 export type CreateDepartmentDto = Omit<Department, 'id'>;

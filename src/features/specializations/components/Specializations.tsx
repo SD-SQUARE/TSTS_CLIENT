@@ -10,23 +10,6 @@ import { useTranslation } from "react-i18next";
 
 const SpecializationsPage: React.FC = () => {
   const { t } = useTranslation();
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [loadingDepts, setLoadingDepts] = useState(false);
-
-  useEffect(() => {
-    const fetchDepartments = async () => {
-      setLoadingDepts(true);
-      try {
-        const data = await departmentApi.getAll();
-        setDepartments(data);
-      } catch (error) {
-        message.error('Failed to load departments');
-      } finally {
-        setLoadingDepts(false);
-      }
-    };
-    fetchDepartments();
-  }, []);
 
   const {
     data,
@@ -36,10 +19,10 @@ const SpecializationsPage: React.FC = () => {
     deleteMutation,
   } = useGenericCrud<Specialization, CreateSpecializationDto, UpdateSpecializationDto>({
     queryKey: ['specializations'],
-    fetchFn: specializationApi.getAll,
-    createFn: specializationApi.create,
+    fetchFn: () => specializationApi.getAll(),
+    createFn: (data) => specializationApi.create(data),
     updateFn: ({ id, data }) => specializationApi.update(id, data),
-    deleteFn: specializationApi.delete,
+    deleteFn: (id) => specializationApi.delete(id),
   });
 
   const columns = [
@@ -68,16 +51,7 @@ const SpecializationsPage: React.FC = () => {
           </div>
         </Tooltip>
       ),
-    },
-    {
-      title: t("department"),
-      dataIndex: "departmentId",
-      key: "department",
-      render: (id: number) => {
-        const dept = departments.find((d) => d.id === id);
-        return dept ? <span>{dept.name_en}</span> : id;
-      },
-    },
+    }
   ];
 
   const formItems = (
@@ -113,12 +87,6 @@ const SpecializationsPage: React.FC = () => {
         ]}
       >
         <Input.TextArea rows={4} style={{ direction: "rtl" }} />
-      </Form.Item>
-      <Form.Item name="departmentId" label={t("department")} rules={[{ required: true }]}>
-        <Select
-          loading={loadingDepts}
-          options={departments.map((d) => ({ label: d.name_en, value: d.id }))}
-        />
       </Form.Item>
     </>
   );

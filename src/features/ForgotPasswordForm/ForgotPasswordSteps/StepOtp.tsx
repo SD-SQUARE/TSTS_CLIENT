@@ -13,8 +13,10 @@ const { Paragraph } = Typography;
 interface StepOtpProps {
     setStep: React.Dispatch<React.SetStateAction<number>>;
     email: string;
+    setUid: React.Dispatch<React.SetStateAction<string>>;
     setOtp: React.Dispatch<React.SetStateAction<string>>;
     setToken: React.Dispatch<React.SetStateAction<string>>;
+    uid: string;
 }
 
 const maskEmail = (email: string): string => {
@@ -26,7 +28,7 @@ const maskEmail = (email: string): string => {
     return `${maskedName}@${maskedDomain}.${domainExt}`;
 };
 
-const StepOtp: React.FC<StepOtpProps> = ({ setStep, email, setOtp, setToken }) => {
+const StepOtp: React.FC<StepOtpProps> = ({ setStep, email, setOtp, setToken, uid, setUid }) => {
     const [countdown, setCountdown] = useState(30);
     const [form] = Form.useForm();
     const { t } = useTranslation();
@@ -39,13 +41,15 @@ const StepOtp: React.FC<StepOtpProps> = ({ setStep, email, setOtp, setToken }) =
 
     const verifyOtpMutation = useMutation({
         mutationFn: async (otp: string) => {
-            const response = await api.post('/verifiyotp', { email, otp });
+            console.log(uid)
+            const response = await api.post('v1/auth/forget-password/verify-otp', { oid: uid, otp });
             return response.data; 
         },
         onSuccess: (data) => {
             message.success(data.message || t('forgotPassword.otpVerified'));
+            console.log(data)
             setOtp(data.otp);
-            setToken(data.token);
+            setToken(data.reset_token);
             setTimeout(() => setStep(2), 600);
         },
         onError: (error: any) => {
@@ -62,11 +66,12 @@ const StepOtp: React.FC<StepOtpProps> = ({ setStep, email, setOtp, setToken }) =
 
     const resendOtpMutation = useMutation({
         mutationFn: async () => {
-            const response = await api.put('/resendotp', { email });
+            const response = await api.post('v1/auth/forget-password/', { email });
             return response.data;
         },
         onSuccess: (data) => {
             message.success(data?.message || t('forgotPassword.otpResend'));
+            setUid(data.oid);
             setCountdown(30);
         },
         onError: (error: any) => {
@@ -107,6 +112,7 @@ const StepOtp: React.FC<StepOtpProps> = ({ setStep, email, setOtp, setToken }) =
                     <Flex justify="center">
                         <Flex justify="center" style={{ width: '350px', marginTop: 20 }}>
                             <Input.OTP
+                                className="custom-otp"
                                 style={{ direction: 'ltr' }} // ✅ enforce LTR always
                                 inputMode="numeric"
                                 separator={<span style={{ color: '#0f0f0f8a' }}>—</span>}

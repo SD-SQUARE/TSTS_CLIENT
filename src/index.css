@@ -185,9 +185,12 @@ html {
 .welcome-text {
   font-size: 18px;
   margin-bottom: 20px;
-  color: black;
+  color: black !important;
 }
-
+.get-started-btn:hover{
+    color: white !important;
+    border-color: white !important;
+}
 .get-started-btn {
   background: #0f274e !important;
   border: none;
@@ -334,4 +337,14 @@ html {
   }
 }
 
+/* Increase OTP box size */
+.custom-otp .ant-input {
+    height: 52px !important;
+    width: 52px !important;
+    font-size: 24px;
+}
 
+.custom-otp .ant-input-otp-group {
+    gap: 12px !important;
+    /* space between boxes */
+}

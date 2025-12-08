@@ -17,11 +17,11 @@ const StepManagers: React.FC<StepProps> = ({ initialData, onNext }) => {
     const { t } = useTranslation();
 
 
-    const { data: admins, isLoading: isLoadingAdmins } = useAdmins();
+    const { data: admins, isLoading: isLoadingAdmins } = useAdmins();   
     const { data: technicians, isLoading: isLoadingTechnicians } = useTechnicians();
 
 
-    const mapUsersToAntdOptions = (users: User[] | undefined) => {
+    const mapUsersToAntdOptions = (users: any) => {
         if (!users) return [];
         return users.map(user => ({
             value: user.id,

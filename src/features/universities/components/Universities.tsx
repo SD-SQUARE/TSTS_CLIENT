@@ -5,9 +5,14 @@ import { useGenericCrud } from '../../../api/common/hooks/common-hooks';
 import { universityApi } from '../services/universityApi';
 import type { University, CreateUniversityDto, UpdateUniversityDto } from '../types/types';
 import { useTranslation } from "react-i18next";
+// import { BaseCrudService } from '../../../api/common/services/common-services';
 
 const UniversitiesPage: React.FC = () => {
   const { t } = useTranslation();
+//   const universityApi = new BaseCrudService<University>(
+//     "v1/universities",
+//     "v1/universities/:id"
+//   );
   
   const {
     data,
@@ -17,10 +22,10 @@ const UniversitiesPage: React.FC = () => {
     deleteMutation,
   } = useGenericCrud<University, CreateUniversityDto, UpdateUniversityDto>({
     queryKey: ['universities'],
-    fetchFn: universityApi.getAll,
-    createFn: universityApi.create,
+    fetchFn: () => universityApi.getAll(),
+    createFn: (data) => universityApi.create(data),
     updateFn: ({ id, data }) => universityApi.update(id, data),
-    deleteFn: universityApi.delete,
+    deleteFn:  (id) => universityApi.delete(id),
   });
 
   const columns = [

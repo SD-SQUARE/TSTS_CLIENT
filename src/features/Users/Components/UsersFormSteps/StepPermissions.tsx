@@ -15,12 +15,12 @@ const StepPermissions: React.FC<Props> = ({ initialData, onNext }) => {
         useForm<UserFormData>({ defaultValues: initialData, mode: "onChange" });
     useEffect(() => { reset(initialData); }, [initialData, reset]);
 
-    const { data: profiles, isLoading: profilesLoading } = usePermissionProfiles();
+    // const { data: profiles, isLoading: profilesLoading } = usePermissionProfiles();
     const { data: specializations, isLoading: specsLoading } = useSpecializations();
 
     const onSubmit = (data: UserFormData) => {
         onNext({
-            permission_profile: data.permission_profile,
+            // permission_profile: data.permission_profile,
             specializations: data.specializations,
         });
     };
@@ -33,7 +33,7 @@ const StepPermissions: React.FC<Props> = ({ initialData, onNext }) => {
     return (
         <Card title= {t("user_list.perms")}>
             <Form layout="vertical" onFinish={handleSubmit(onSubmit)} id="step-form" requiredMark={false}>
-                <Form.Item label={<Flex gap="small"><span>{t("user_list.perm_prof")}</span><RequiredTag /></Flex>}
+                {/* <Form.Item label={<Flex gap="small"><span>{t("user_list.perm_prof")}</span><RequiredTag /></Flex>}
                     validateStatus={errors.permission_profile ? "error" : ""} help={errors.permission_profile?.message} required>
                     <Controller name="permission_profile" control={control}
                         rules={{ required: "Required" }}
@@ -54,7 +54,7 @@ const StepPermissions: React.FC<Props> = ({ initialData, onNext }) => {
                             />
                         )}
                     />
-                </Form.Item>
+                </Form.Item> */}
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.specializations")}</span><RequiredTag /></Flex>}
                     validateStatus={errors.specializations ? "error" : ""} help={errors.specializations?.message} required>
                     <Controller name="specializations" control={control}

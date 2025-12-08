@@ -20,12 +20,12 @@ const StepEmail: React.FC<StepEmailProps> = ({ setStep, setEmail, setUid }) => {
 
     const sendOtpMutation = useMutation({
         mutationFn: async (email: string) => {
-            const response = await api.post('/forgetpassword', { email });
+            const response = await api.post('v1/auth/forget-password', { email });
             return response.data; 
         },
         onSuccess: (data) => {
             message.success(data.message || t('forgotPassword.otpSent'));
-            setUid(data.uid); 
+            setUid(data.oid); 
             setStep(1);
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

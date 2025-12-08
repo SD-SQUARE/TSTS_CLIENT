@@ -8,7 +8,6 @@ import i18n from '../../../i18n';
 
 
 
-
 export interface User {
   id: string;
   image: string;
@@ -44,8 +43,10 @@ interface UserApiResponse {
   users: User[];
 }
 
-export const formatFullName = (user: User) => {
-  return `${user.first_name} ${user.mid_name || ''} ${user.last_name}`.trim();
+export const formatFullName = (user: any) => {
+    const name = `${user.first_name} ${user.mid_name || ''} ${user.last_name}`.trim();
+    // console.log(name);
+    return name;
 };
 export const formatFullNameAssignee = (user: Assignees) => {
   return `${user[`first_name_${i18n.language}`]} ${user[`mid_name_${i18n.language}`] || ''} ${user[`last_name_${i18n.language}`]}`.trim();
@@ -56,35 +57,51 @@ export const useAdmins = () => {
   return useQuery({
     queryKey: ['admins'],
     queryFn: async () => {
-      const response = await api.get<UserApiResponse>('/lockups/admins');
-
-      return response.data.users;
+      const response = await api.get('v1/lockups/admins');
+    console.log(response.data);
+      return response.data;
     },
     staleTime: Infinity,
   });
 };
 
 export const useGroupDetail = (id?: string) => {
-  return useQuery({
-    queryKey: ['groupDetail', id],
-    queryFn: async () => {
-      if (!id) return null;
-      const response = await api.get<GroupFormData>(`/groups/${id}`);
-      return response.data;
-    },
-    enabled: !!id,
-    staleTime: Infinity,
-  })
-}
+    return useQuery({
+        queryKey: ['groupDetail', id],
+        queryFn: async () => {
+            if (!id) return null;
+
+            // Fetch both endpoints in parallel
+            const [groupRes, usersRes] = await Promise.all([
+                api.get<GroupFormData>(`v1/groups/${id}`),
+                api.get<{ team_leader: any; heads: any[]; technicians: any[] }>(`v1/groups/${id}/users`),
+            ]);
+
+            const groupData = groupRes.data;
+            const usersData = usersRes.data;
+
+            // Merge them as needed
+            return {
+                team_leader: usersData.team_leader,
+                heads: usersData.heads,
+                ...groupData,
+                members: usersData.technicians,
+            };
+        },
+        enabled: !!id,
+        staleTime: Infinity,
+    });
+};
+
 
 
 export const useTechnicians = () => {
   return useQuery({
     queryKey: ['technicians'],
     queryFn: async () => {
-      const response = await api.get<UserApiResponse>('/lockups/technicians/');
+      const response = await api.get('v1/lockups/technicians/');
 
-      return response.data.users;
+      return response.data;
     },
     staleTime: Infinity,
   });
@@ -93,7 +110,7 @@ export const useAssignees = () => {
   return useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      const response = await api.get<AssigneesApiResponse>('/users/technicians/',{params:{page:1,page_size:100}});
+      const response = await api.get<AssigneesApiResponse>('v1/users/technicians/',{params:{page:1,page_size:100}});
 
       return response.data.users;
     },
@@ -108,7 +125,7 @@ export const useSpecializations = () => {
     queryKey: ['specializations'],
     queryFn: async () => {
 
-      const response = await api.get<GroupFormData>('/lockups/specializations/');
+      const response = await api.get<GroupFormData>('v1/lockups/specializations/');
       return response.data.specializations;
     },
 
@@ -121,7 +138,7 @@ export const useAssignUsers = (groupId: string | undefined) => {
   return useMutation({
     mutationFn: (userIds: string[]) => {
       if (!groupId) throw new Error("Group ID is missing for assignment.");
-      return api.post(`/groups/${groupId}/assign`, { userIds });
+      return api.post(`v1/groups/${groupId}/assign`, { users:userIds });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groupDetail', groupId] });
@@ -133,7 +150,7 @@ export const useAssignUsers = (groupId: string | undefined) => {
 export const useAddGroup = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: GroupFormData) => api.post('/groups/', data),
+    mutationFn: (data: GroupFormData) => api.post('v1/groups/', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
     },
@@ -149,7 +166,7 @@ export const useEditGroup = (groupId: string) => {
       if (groupId === 'dummy-id-for-add-mode') {
         throw new Error("Attempted to edit a group without a valid ID.");
       }
-      return api.put(`/groups/${groupId}`, data);
+      return api.put(`v1/groups/${groupId}`, data);
     }, onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
     },
