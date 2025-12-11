@@ -5,33 +5,14 @@ import { useGenericCrud } from '../../../api/common/hooks/common-hooks';
 import type { WorkHour, CreateWorkHourDto, UpdateWorkHourDto } from '../types/types';
 import { useTranslation } from "react-i18next";
 import dayjs from 'dayjs';
-
-const STATIC_DATA: WorkHour[] = [
-  {
-    id: 1,
-    name_en: 'Morning Shift',
-    startTime: '08:00',
-    endTime: '16:00',
-    isActive: true,
-    daysOfWeek: [0, 1, 2, 3, 4], 
-  },
-  {
-    id: 2,
-    name_en: 'Evening Shift',
-    startTime: '16:00',
-    endTime: '00:00',
-    isActive: true,
-    daysOfWeek: [0, 1, 2, 3, 4],
-  },
-  {
-    id: 3,
-    name_en: 'Weekend Shift',
-    startTime: '10:00',
-    endTime: '15:00',
-    isActive: false,
-    daysOfWeek: [5, 6], 
-  },
-];
+const STATIC_DATA: WorkHour[] = Array.from({length: 40}, (_, i) => ({
+  id: i + 1,
+  name_en: `Shift ${i + 1}`,
+  startTime: `${Math.floor(Math.random() * 24)}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
+  endTime: `${Math.floor(Math.random() * 24)}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
+  isActive: Math.random() < 0.5,
+  daysOfWeek: Array.from({length: Math.floor(Math.random() * 7)}, (_, j) => j),
+}));
 
 const formatTime = (time: any) => {
   if (!time) return '00:00';

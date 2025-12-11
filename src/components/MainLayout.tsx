@@ -13,7 +13,7 @@ const MainLayout = ({ menuItems }) => {
 
     return (
         <Body>
-            <Layout>
+            <Layout style={{ minHeight: '100%' }}>
                 {/* Desktop Sider */}
                 <Sider
                     width={220}
@@ -57,8 +57,8 @@ const MainLayout = ({ menuItems }) => {
                 </Drawer>
 
                 {/* Main Layout */}
-                <Layout style={{ padding: '0 16px 24px', background: '#f5f6fa', overflow: 'auto' }}>
-                    <Content style={{ padding: '24px 0', margin: 0, minHeight: 280 }}>
+                <Layout style={{ padding: '0 16px 24px', background: '#f5f6fa', overflow: 'auto', }}>
+                    <Content style={{ padding: '24px 0', margin: 0 }}>
                         <Outlet />
                     </Content>
                 </Layout>
