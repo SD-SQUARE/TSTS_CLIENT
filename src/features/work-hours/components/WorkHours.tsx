@@ -4,7 +4,7 @@ import { GenericCrudPage } from '../../../components/GenericCrudPage';
 import { useGenericCrud } from '../../../api/common/hooks/common-hooks';
 import type { WorkHour, CreateWorkHourDto, UpdateWorkHourDto } from '../types/types';
 import { useTranslation } from "react-i18next";
-
+import dayjs from 'dayjs';
 
 const STATIC_DATA: WorkHour[] = [
   {
@@ -13,7 +13,7 @@ const STATIC_DATA: WorkHour[] = [
     startTime: '08:00',
     endTime: '16:00',
     isActive: true,
-    daysOfWeek: [0, 1, 2, 3, 4], // Sun, Mon, Tue, Wed, Thu
+    daysOfWeek: [0, 1, 2, 3, 4], 
   },
   {
     id: 2,
@@ -29,32 +29,61 @@ const STATIC_DATA: WorkHour[] = [
     startTime: '10:00',
     endTime: '15:00',
     isActive: false,
-    daysOfWeek: [5, 6], // Fri, Sat
+    daysOfWeek: [5, 6], 
   },
 ];
 
+const formatTime = (time: any) => {
+  if (!time) return '00:00';
+  return dayjs.isDayjs(time) ? time.format('HH:mm') : time;
+};
+
 const mockWorkHourService = {
   getAll: async (): Promise<WorkHour[]> => {
-    return new Promise((resolve) => setTimeout(() => resolve(STATIC_DATA), 500));
+    return new Promise((resolve) => setTimeout(() => resolve([...STATIC_DATA]), 500));
   },
+  
   create: async (data: CreateWorkHourDto): Promise<WorkHour> => {
-    console.log('Mock Create WorkHour:', data);
-    const newWorkHour = { ...data, id: Date.now() } as WorkHour;
+    const newWorkHour = { 
+      ...data, 
+      id: Date.now(),
+      startTime: formatTime(data.startTime), 
+      endTime: formatTime(data.endTime)
+    } as WorkHour;
+    
+    STATIC_DATA.push(newWorkHour);
     return Promise.resolve(newWorkHour);
   },
+
   update: async (id: string | number, data: UpdateWorkHourDto): Promise<WorkHour> => {
-    console.log('Mock Update WorkHour:', id, data);
-    const updated = { ...data, id } as WorkHour;
-    return Promise.resolve(updated);
+    const index = STATIC_DATA.findIndex(item => item.id === id);
+    
+    if (index > -1) {
+      const updated = { 
+        ...STATIC_DATA[index], 
+        ...data,               
+        startTime: formatTime(data.startTime), 
+        endTime: formatTime(data.endTime)
+      } as WorkHour;
+      
+      STATIC_DATA[index] = updated; 
+      return Promise.resolve(updated);
+    }
+    return Promise.reject(new Error("Item not found"));
   },
+
   delete: async (id: string | number): Promise<void> => {
-    console.log('Mock Delete WorkHour:', id);
+    const index = STATIC_DATA.findIndex(item => item.id === id);
+    if (index > -1) {
+      STATIC_DATA.splice(index, 1);
+    }
     return Promise.resolve();
   },
 };
 
 const WorkHoursPage: React.FC = () => {
   const { t } = useTranslation();
+  
   const daysOptions = [
     { label: 'Sun', value: 0 },
     { label: 'Mon', value: 1 },
@@ -111,7 +140,7 @@ const WorkHoursPage: React.FC = () => {
       dataIndex: 'isActive', 
       key: 'isActive',
       render: (active: boolean) => (
-        <Tag color={active ? 'green' : 'red'}>
+        <Tag color={active ? 'green' : 'red'} bordered={false}>
           {active ? 'Active' : 'Inactive'}
         </Tag>
       )
@@ -123,8 +152,10 @@ const WorkHoursPage: React.FC = () => {
       <Form.Item 
         name="name_en" 
         label="Shift Name" 
-        rules={[{ required: true, message: 'Please enter a name' },
-        { pattern: /^[A-Za-z0-9\s.,-]*$/, message: t("english_only") }]}
+        rules={[
+          { required: true, message: 'Please enter a name' },
+          { pattern: /^[A-Za-z0-9\s.,-]*$/, message: t("english_only") }
+        ]}
       >
         <Input placeholder="e.g. Morning Shift" />
       </Form.Item>
@@ -163,6 +194,11 @@ const WorkHoursPage: React.FC = () => {
     </>
   );
 
+  const nestedFieldMappers = {
+    startTime: (record: WorkHour) => record.startTime ? dayjs(record.startTime, 'HH:mm') : null,
+    endTime: (record: WorkHour) => record.endTime ? dayjs(record.endTime, 'HH:mm') : null,
+  };
+
   return (
     <GenericCrudPage<WorkHour>
       title="Work Hours (Test Mode)"
@@ -173,7 +209,9 @@ const WorkHoursPage: React.FC = () => {
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}
-      disableAdd={true}
+      nestedFieldMappers={nestedFieldMappers}
+      disableAdd={true} 
+      tableSize="small"
     />
   );
 };

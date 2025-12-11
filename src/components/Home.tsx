@@ -1,160 +1,166 @@
-import { Button, Typography, Carousel, Card, Row, Col } from "antd";
-import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { Button, Typography, Row, Col, Card, Avatar } from "antd";
+import { 
+  ArrowRightOutlined, 
+  ArrowLeftOutlined,
+  TeamOutlined, 
+  AreaChartOutlined, 
+  CustomerServiceOutlined,
+  PhoneOutlined, 
+  MailOutlined
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { useRef } from "react";
-import img1 from "../assets/gam3a.jpg";
-import img2 from "../assets/secureAccess.jpg";
-import img3 from "../assets/manage.webp";
-import UserManagement from "../assets/UserManagement.webp"
-import Analytics from "../assets/Analytics-Dashboard.webp"
-import SupportCenter from "../assets/support-center.jpg"
+import { useTranslation } from "react-i18next";
 import Body from "./layouts/Body";
 
 
-const { Title, Paragraph } = Typography;
 
+import AnalyticsImg from "../assets/Analytics-Dashboard.webp";
+import UserMgmtImg from "../assets/UserManagement.webp";
+import SupportImg from "../assets/support-center.jpg";
 
-
-const services = [
-  {
-    title: "User Management",
-    desc: "Add, edit, and control user accounts.",
-    img: UserManagement,
-  },
-  {
-    title: "Analytics Dashboard",
-    desc: "View insights and real-time stats.",
-    img: Analytics,
-  },
-  {
-    title: "Support Center",
-    desc: "Get quick help and assistance.",
-    img: SupportCenter,
-  },
-];
-
-const phones = ["+20 111 222 333", "+20 222 333 444", "+20 333 444 555"];
-const emails = ["support@system.com", "info@system.com", "help@system.com"];
-
+const { Title, Paragraph, Text } = Typography;
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const carouselRef = useRef(null);
+  
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === 'ar';
 
-  const handleGetStarted = () => {
-    navigate("auth/login");
-  };
+  const services = [
+    {
+      title: t('home.service_user_title'),
+      desc: t('home.service_user_desc'),
+      icon: <TeamOutlined />,
+      image: UserMgmtImg,
+    },
+    {
+      title: t('home.service_analytics_title'),
+      desc: t('home.service_analytics_desc'),
+      icon: <AreaChartOutlined />,
+      image: AnalyticsImg,
+    },
+    {
+      title: t('home.service_support_title'),
+      desc: t('home.service_support_desc'),
+      icon: <CustomerServiceOutlined />,
+      image: SupportImg,
+    },
+  ];
 
-    return (
-      <Body>
-        <div className="home-layout">
+  const phones = ["+20 111 222 333", "+20 222 333 444"];
+  const emails = ["support@helwan.edu.eg", "help@helwan.edu.eg"];
 
-        <section className="welcome-section" style={{ position: "relative" }}>
-            <button
-            className="carousel-arrow left-arrow"
-            onClick={() => carouselRef.current?.prev()}
-            >
-            <LeftOutlined />
-            </button>
-
-            <Carousel autoplay dots ref={carouselRef} className="welcome-carousel">
-    
-    {[img1, img2, img3].map((image, index) => (
-        <div key={index}>
-        <div
-            className="welcome-slide"
-            style={{
-            backgroundImage: `url(${image})`,
-            }}
-        >
-            <div className="welcome-content">
-            <Title level={1} className="welcome-title">Welcome to the System</Title>
-            <Paragraph className="welcome-text">
-                Access your tools, manage information, and explore features easily.
-            </Paragraph>
-            <Button className="get-started-btn" onClick={handleGetStarted}>
-                Get Started
-            </Button>
-            </div>
-        </div>
-        </div>
-    ))}
-
-    </Carousel>
-
-            <button
-            className="carousel-arrow right-arrow"
-            onClick={() => carouselRef.current?.next()}
-            >
-            <RightOutlined />
-            </button>
-        </section>
-
-
-        <section className="services-section" style={{ padding: "50px 0" }}>
-            <Title level={2} style={{ textAlign: "center", marginBottom: "40px" }}>
-            Our Services
-            </Title>
-
-            <Row gutter={[24, 24]} justify="center">
-            {services.map((srv, idx) => (
-                <Col xs={24} sm={12} md={8} key={idx}>
-                <Card
-                    bordered={false}
-                    hoverable
-                    style={{ textAlign: "center" }}
-                    cover={
-                    <img
-                        src={srv.img}
-                        alt={srv.title}
-                        style={{
-                        width: "100%",
-                        height: "200px",
-                        objectFit: "cover",
-                        }}
-                    />
-                    }
+  return (
+    <Body>
+      <div className="corporate-home" dir={isArabic ? "rtl" : "ltr"}>
+        
+        <section className="hero-section">
+          <div className="container">
+            <Row align="middle" gutter={[48, 48]}>
+              <Col xs={24} md={12} className="hero-text-col">
+                <div className="accent-bar"></div>
+                <Title level={1} className="hero-title">
+                  {t('home.hero_title')} <br />
+                  <span className="gold-text">{t('home.hero_subtitle')}</span>
+                </Title>
+                <Paragraph className="hero-desc">
+                  {t('home.hero_desc')}
+                </Paragraph>
+                <Button 
+                  type="primary" 
+                  size="large" 
+                  className="hero-btn"
+                  onClick={() => navigate("auth/login")}
                 >
-                    <h3>{srv.title}</h3>
-                    <p>{srv.desc}</p>
-                </Card>
-                </Col>
-            ))}
+                  {t('home.get_started')}
+                </Button>
+              </Col>
+              
+              <Col xs={24} md={12} className="hero-visual-col">
+                <div className="stack-container">
+                    <img src={AnalyticsImg} alt="Dashboard" className="img-back" />
+                    <img src={SupportImg} alt="Support" className="img-front" />
+                </div>
+              </Col>
             </Row>
+          </div>
         </section>
 
-
-        <section className="contact-section" style={{ padding: "50px 0" }}>
-            <Title level={2} style={{ textAlign: "center", marginBottom: "40px" }}>
-            Contact Us
-            </Title>
-
-            <div
-            className="contact-box"
-            style={{
-                display: "flex",
-                justifyContent: "center",
-                gap: "100px",
-                flexWrap: "wrap",
-            }}
-            >
-            <div style={{ minWidth: "200px" }}>
-                <Title level={4}>Phone</Title>
-                {phones.map((phone, idx) => (
-                <p key={idx}>{phone}</p>
-                ))}
-            </div>
-
-            <div style={{ minWidth: "200px" }}>
-                <Title level={4}>Email</Title>
-                {emails.map((email, idx) => (
-                <p key={idx}>{email}</p>
-                ))}
-            </div>
-            </div>
+        <section className="services-overlap">
+          <div className="container">
+            <Row gutter={[24, 24]} justify="center">
+              {services.map((srv, index) => (
+                <Col xs={24} sm={12} lg={8} key={index}>
+                  <Card className="service-card" bordered={false}>
+                    <div className="card-header">
+                        <Avatar 
+                            shape="square" 
+                            size={48} 
+                            icon={srv.icon} 
+                            className="card-icon" 
+                        />
+                        <Title level={4} className="card-title">{srv.title}</Title>
+                    </div>
+                    <div className="card-img-wrapper">
+                        <img src={srv.image} alt={srv.title} />
+                    </div>
+                    <Paragraph className="card-text">
+                        {srv.desc}
+                    </Paragraph>
+                    <div className="card-link-wrapper">
+                        <a href="#" className="card-link">
+                            {t('home.learn_more')} 
+                            {isArabic ? <ArrowLeftOutlined style={{ marginRight: 8 }} /> : <ArrowRightOutlined style={{ marginLeft: 8 }} />}
+                        </a>
+                    </div>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          </div>
         </section>
-        </div>
-      </Body>
+
+        <section className="contact-strip">
+          <div className="strip-container">
+            <Row align="middle" justify="space-between" gutter={[24, 24]}>
+              
+              <Col xs={24} md={8}>
+                <Title level={4} className="white-text strip-title">
+                  {t('home.need_help')}
+                </Title>
+                <Text className="blue-grey-text">
+                  {t('home.reach_team')}
+                </Text>
+              </Col>
+
+              <div className="divider-vertical desktop-only"></div>
+
+              <Col xs={24} md={7} className="contact-col">
+                <div className="icon-box">
+                    <PhoneOutlined />
+                </div>
+                <div className="contact-details">
+                    <Text strong className="white-text">{t('user_list.phone')}</Text>
+                    {phones.map((p, i) => <div key={i} className="light-text">{p}</div>)}
+                </div>
+              </Col>
+
+              <Col xs={24} md={7} className="contact-col">
+                <div className="icon-box gold-box">
+                    <MailOutlined />
+                </div>
+                <div className="contact-details">
+                    <Text strong className="white-text">{t('user_list.email')}</Text>
+                    {emails.map((e, i) => <div key={i} className="light-text">{e}</div>)}
+                </div>
+              </Col>
+
+            </Row>
+          </div>
+        </section>
+
+      </div>
+    </Body>
   );
 };
 

@@ -1,18 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   Button,
   Modal,
   Form,
   Space,
-  Popconfirm,
   message,
   Input,
   Skeleton,
+  Descriptions,
+  Card,
+  Typography,
 } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  ArrowLeftOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { mapRecordToFormValues, type FieldMapper } from "../utils/mapper";
+
+const { Text } = Typography;
 
 interface GenericCrudProps<T> {
   title: string;
@@ -26,8 +37,9 @@ interface GenericCrudProps<T> {
   updateMutation: any;
   deleteMutation: any;
   
-    disableAdd?: boolean;
-    nestedFieldMappers?: FieldMapper<T>;
+  disableAdd?: boolean;
+  nestedFieldMappers?: FieldMapper<T>;
+  tableSize?: "small" | "middle" | "large";
 }
 
 export const GenericCrudPage = <T extends { id: string | number }>({
@@ -39,15 +51,30 @@ export const GenericCrudPage = <T extends { id: string | number }>({
   createMutation,
   updateMutation,
   deleteMutation,
-disableAdd = false,
-nestedFieldMappers = {},
+  disableAdd = false,
+  nestedFieldMappers = {},
+  tableSize = "middle",
 }: GenericCrudProps<T>) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<T | null>(null);
-  const [searchText, setSearchText] = useState("");
-  const [form] = Form.useForm();
+  const [viewingItem, setViewingItem] = useState<T | null>(null);
 
-  // --------------- API ERROR HANDLING ----------------
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<T | null>(null);
+  const [form] = Form.useForm();
+  const [searchText, setSearchText] = useState("");
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteInput, setDeleteInput] = useState("");
+
+  useEffect(() => {
+    if (viewingItem) {
+      const updatedItem = data.find((d) => d.id === viewingItem.id);
+      if (updatedItem) {
+        setViewingItem(updatedItem);
+      }
+    }
+  }, [data]);
+
+
   const handleApiErrors = (error: any) => {
     if (error.response?.data?.errors) {
       error.response.data.errors.forEach((err: any) => {
@@ -58,8 +85,7 @@ nestedFieldMappers = {},
     }
   };
 
-  // --------------- MODAL HANDLERS ----------------
-  const handleOk = async () => {
+  const handleEditOk = async () => {
     try {
       const values = await form.validateFields();
 
@@ -71,7 +97,7 @@ nestedFieldMappers = {},
         message.success(`${title} created successfully`);
       }
 
-      setIsModalOpen(false);
+      setIsEditModalOpen(false);
       form.resetFields();
       setEditingItem(null);
     } catch (err: any) {
@@ -79,53 +105,168 @@ nestedFieldMappers = {},
     }
   };
 
-  const handleDelete = (id: string | number) => {
+  const executeDelete = (id: string | number) => {
     deleteMutation.mutate(id, {
-      onSuccess: () => message.success(`${title} deleted successfully`),
+      onSuccess: () => {
+        message.success(`${title} deleted successfully`);
+        setViewingItem(null);
+      },
       onError: () => message.error("Delete failed"),
     });
+  };
+
+
+  const openDeletePrompt = () => {
+    setDeleteInput(""); 
+    setIsDeleteModalOpen(true);
+  };
+
+  const verifyDeleteInput = () => {
+    if (deleteInput !== "delete") {
+      message.error('You must type "delete" exactly to proceed.');
+      return;
+    }
+
+    setIsDeleteModalOpen(false);
+
+    Modal.confirm({
+      title: 'Are you sure you want to delete this?',
+      icon: <ExclamationCircleOutlined />,
+      content: `This action cannot be undone.`,
+      okText: 'Yes, Delete',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        if (viewingItem) {
+          executeDelete(viewingItem.id);
+        }
+      },
+    });
+  };
+
+
+  const handleRowClick = (record: T) => {
+    setViewingItem(record);
+    window.scrollTo(0, 0);
+  };
+
+  const handleBackToTable = () => {
+    setViewingItem(null);
   };
 
   const openAddModal = () => {
     setEditingItem(null);
     form.resetFields();
-    setIsModalOpen(true);
+    setIsEditModalOpen(true);
   };
 
   const openEditModal = (record: T) => {
     setEditingItem(record);
     form.setFieldsValue(mapRecordToFormValues(record, nestedFieldMappers));
-    setIsModalOpen(true);
+    setIsEditModalOpen(true);
   };
 
-  // --------------- TABLE SETUP ----------------
-  const tableColumns: ColumnsType<T> = [
-    ...columns,
-    {
-      title: "Operations",
-      key: "actions",
-      width: 120,
-      fixed: "right",
-      render: (_, record) => (
-        <Space>
-          <Button
-            type="text"
-            icon={<EditOutlined style={{ color: "#faad14" }} />}
-            onClick={() => openEditModal(record)}
-          />
-          <Popconfirm
-            title="Are you sure you want to delete this?"
-            onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button type="text" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
+  if (viewingItem) {
+    return (
+      <div className="fade-in-animation">
+        <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Space>
+            <h2 style={{ margin: 0 }}>{title} Details</h2>
+          </Space>
+          
+          <Space>
+            <Button
+              type="primary"
+              icon={<EditOutlined />}
+              onClick={() => openEditModal(viewingItem)}
+              style={{ backgroundColor: "#faad14", borderColor: "#faad14" }}
+            >
+              Edit
+            </Button>
+            
+            <Button 
+              type="primary" 
+              danger 
+              icon={<DeleteOutlined />}
+              onClick={openDeletePrompt}
+            >
+              Delete
+            </Button>
+          </Space>
+        </div>
 
+        <Card bordered={false} className="admin-card">
+          <Descriptions 
+            bordered 
+            column={{ xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }} 
+            size="middle"
+            labelStyle={{ width: '200px', fontWeight: 'bold', backgroundColor: '#fafafa' }}
+          >
+            {columns.map((col: any) => {
+              const value = viewingItem[col.dataIndex as keyof T];
+              const renderedValue = col.render 
+                ? col.render(value, viewingItem, 0) 
+                : value;
+                
+              return (
+                <Descriptions.Item key={col.key || col.dataIndex} label={col.title}>
+                  {renderedValue}
+                </Descriptions.Item>
+              );
+            })}
+          </Descriptions>
+        </Card>
+        <Button 
+              icon={<ArrowLeftOutlined />} 
+              onClick={handleBackToTable} 
+              type="text"
+              style={{marginTop:'2rem' ,fontSize: '16px', backgroundColor:'#cad8ec' }}
+            >
+              Back to List
+        </Button>
+
+        <Modal
+          title={`Edit ${title}`}
+          open={isEditModalOpen}
+          onOk={handleEditOk}
+          onCancel={() => setIsEditModalOpen(false)}
+          okText="Save Changes"
+          cancelText="Cancel"
+          width="90%"
+          style={{ maxWidth: 600 }}
+          centered
+        >
+          <Form form={form} layout="vertical" style={{ marginTop: 20 }}>
+            {formItems}
+          </Form>
+        </Modal>
+
+        <Modal
+          title="Security Check"
+          open={isDeleteModalOpen}
+          onOk={verifyDeleteInput}
+          onCancel={() => setIsDeleteModalOpen(false)}
+          okText="Delete"
+          okButtonProps={{ danger: true }}
+          cancelText="Cancel"
+          centered
+        >
+          <div style={{ paddingTop: 10, paddingBottom: 10 }}>
+            <Text>To confirm deletion, please type <strong>"delete"</strong> below:</Text>
+            <Input 
+              style={{ marginTop: 15 }} 
+              placeholder='Type "delete"'
+              value={deleteInput}
+              onChange={(e) => setDeleteInput(e.target.value)}
+              onPressEnter={verifyDeleteInput}
+            />
+          </div>
+        </Modal>
+      </div>
+    );
+  }
+
+  
   const filteredData = data.filter((item) =>
     Object.values(item).some(
       (value) =>
@@ -134,10 +275,11 @@ nestedFieldMappers = {},
     )
   );
 
-  // --------------- SKELETON LOADING ----------------
   const skeletonRows = Array.from({ length: 6 }, (_, idx) => ({ 
     id: `loading-${idx}` 
-  })) as T[];  const skeletonColumns = tableColumns.map((col) => ({
+  })) as T[];
+  
+  const skeletonColumns = columns.map((col) => ({
     ...col,
     render: () => <Skeleton.Input style={{ width: "100%", height: 12 }} active />,
   }));
@@ -154,7 +296,7 @@ nestedFieldMappers = {},
           marginBottom: 20,
         }}
       >
-        <h2 className="page-title">{title}</h2>
+        <h2 className="page-title">{title} List</h2>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
           <Input
@@ -179,17 +321,23 @@ nestedFieldMappers = {},
         </div>
       </div>
 
-      <div className="admin-card">
+      <div className="admin-card compact-table-wrapper">
         <Table
-          columns={isLoading ? skeletonColumns : tableColumns}
+          className="super-compact-table"
+          size={tableSize}
+          columns={isLoading ? skeletonColumns : columns}
           dataSource={isLoading ? skeletonRows : filteredData}
           rowKey="id"
           scroll={{ x: 800 }}
+          onRow={(record) => ({
+            onClick: () => !isLoading && handleRowClick(record),
+            style: { cursor: isLoading ? "default" : "pointer" },
+          })}
           pagination={
             isLoading
               ? false
               : {
-                  placement: ["bottomRight"],
+                  position: ["bottomRight"],
                   pageSize: 10,
                   showSizeChanger: true,
                   showTotal: (total) => `Total ${total} items`,
@@ -199,11 +347,11 @@ nestedFieldMappers = {},
       </div>
 
       <Modal
-        title={editingItem ? `Edit ${title}` : `Add ${title}`}
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={() => setIsModalOpen(false)}
-        okText={editingItem ? "Save Changes" : "Create"}
+        title={`Add ${title}`}
+        open={isEditModalOpen}
+        onOk={handleEditOk}
+        onCancel={() => setIsEditModalOpen(false)}
+        okText="Create"
         cancelText="Cancel"
         width="90%"
         style={{ maxWidth: 600 }}

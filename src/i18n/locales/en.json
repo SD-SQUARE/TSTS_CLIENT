@@ -196,7 +196,23 @@
   "description_en": "Description (English)",
   "description_ar": "Description (Arabic)",
   "required": "This field is required",
-  "universities": "Universities"
+  "universities": "Universities",
+
+  "home": {
+    "hero_title": "Resolve Tickets.",
+    "hero_subtitle": "Retain Customers.",
+    "hero_desc": "A powerful ticketing system built for modern IT teams. Experience seamless user management and real-time analytics in one secure platform.",
+    "get_started": "Get Started Now",
+    "learn_more": "Learn more",
+    "service_user_title": "User Management",
+    "service_user_desc": "Centralized control for admin and agents.",
+    "service_analytics_title": "Data Analytics",
+    "service_analytics_desc": "Deep insights into support performance.",
+    "service_support_title": "Support Hub",
+    "service_support_desc": "Unified interface for ticket resolution.",
+    "need_help": "Need assistance?",
+    "reach_team": "Reach our technical support team directly."
+  }
 }
 
   
