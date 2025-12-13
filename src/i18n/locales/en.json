@@ -122,7 +122,11 @@
     "select_heads_placeholder": "Select one or more group heads",
     "view_title": "Group Details",
     "tab_info": "Info",
-    "tab_assign": "Assign"
+    "tab_assign": "Assign",
+    "confirm_cancel_title": "Confirm Cancel",
+    "confirm_cancel_content": "Are you sure you want to cancel?",
+    "confirm_cancel_ok": "Yes",
+    "confirm_cancel_abort": "No"
   },
   "password_8_chars": "Password must be at least 8 characters long",
   "password_lowercase": "Password must contain at least one lowercase letter",

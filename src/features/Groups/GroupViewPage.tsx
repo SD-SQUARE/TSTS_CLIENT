@@ -9,7 +9,6 @@ import type { TabsProps } from 'antd';
 
 
 import { useGroupDetail } from './Hooks/useGroupForm';
-import type { NamedObject } from './Types/groups';
 import InfoTab from './GroupViewTabs/InfoTab';
 import AssignTab from './GroupViewTabs/AssignTab';
 
@@ -60,7 +59,7 @@ const GroupViewPage: React.FC = () => {
         {
             key: 'assign',
             label: t('group_form.tab_assign') || 'Assign Users',
-            children: <AssignTab groupId={groupId} initialMembers={group.members as NamedObject[]} t={t} />,
+            children: <AssignTab groupId={groupId} t={t} />,
         },
     ];
 
