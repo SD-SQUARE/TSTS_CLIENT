@@ -5,7 +5,6 @@ import { Descriptions, Space, Typography, Tag, Tooltip, Button } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
 
 import { useGroupDetail } from '../Hooks/useGroupForm';
-import i18n from '../../../i18n';
 
 
 
@@ -23,9 +22,8 @@ const renderMembers = (members: any ,t = undefined) => {
 
                 <Tag key={member.id} color="blue" style={{ marginInlineEnd: '4px' }}>
                     {t == undefined ?
-                        `${member.name}` : i18n.language === "en"
-                        ? `${member.firstName?.en || member.name}` 
-                        : `${member.firstName?.ar || member.name}`}
+                        member.first_name + ' ' + member.last_name
+                        : t(member.first_name + ' ' + member.last_name)}
                 </Tag>
             ))}
         </Space>
@@ -40,9 +38,7 @@ const renderTeamLeader = (leader: any) => {
     }
 
     return <Tag color="green">{
-        i18n.language === "en" ?
-            leader.firstName?.en || leader.firstName
-            : leader.firstName?.ar || leader.firstName
+        leader.first_name + ' ' + leader.last_name
     }</Tag>;
 };
 
