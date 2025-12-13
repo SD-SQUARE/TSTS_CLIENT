@@ -21,6 +21,7 @@ const StepManagers: React.FC<StepProps> = ({ initialData, onNext }) => {
     const { data: technicians, isLoading: isLoadingTechnicians } = useTechnicians();
 
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mapUsersToAntdOptions = (users: any) => {
         if (!users) return [];
         return users.map(user => ({

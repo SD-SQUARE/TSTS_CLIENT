@@ -200,7 +200,10 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
     // const handleTriggerSubmit = useCallback((trigger: () => void) => {
     //     setStepSubmitTrigger(() => trigger);
     // }, []);
-
+    const stepItems = useMemo(() => steps.map(item => ({
+        key: item.title,
+        title: t(`group_form.step_${item.title}`),
+    })), [t]);
 
     return (
         <Modal
@@ -211,12 +214,9 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
             footer={null}
             width={700}
         >
+            
             <Spin spinning={isModalLoading}>
-            <Steps current={current} style={{ marginBottom: 24 }}>
-                {steps.map(item => (
-                    <Steps.Step key={item.title} title={t(`group_form.step_${item.title}`)} />
-                ))}
-            </Steps>
+            <Steps current={current} style={{ marginBottom: 24 }} items={stepItems}/>
 
             <div className="steps-content">
                 <CurrentStepComponent

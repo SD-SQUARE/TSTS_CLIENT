@@ -5,7 +5,6 @@ import { Descriptions, Space, Typography, Tag } from 'antd';
 
 
 import { useGroupDetail } from '../Hooks/useGroupForm';
-import type { NamedObject } from '../Types/groups';
 import i18n from '../../../i18n';
 
 
@@ -13,6 +12,7 @@ import i18n from '../../../i18n';
 const { Text } = Typography;
 
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderMembers = (members: any ,t = undefined) => {
     if (!members || members.length === 0) {
         return <Text disabled>-</Text>;
@@ -23,7 +23,9 @@ const renderMembers = (members: any ,t = undefined) => {
 
                 <Tag key={member.id} color="blue" style={{ margin: '4px 0' }}>
                     {t == undefined ?
-                        `${member.name}` : i18n.language === "en" ? `${member.firstName.en}` : `${member.firstName.ar}`}
+                        `${member.name}` : i18n.language === "en"
+                        ? `${member.firstName?.en || member.name}` 
+                        : `${member.firstName?.ar || member.name}`}
                 </Tag>
             ))}
         </Space>
@@ -31,6 +33,7 @@ const renderMembers = (members: any ,t = undefined) => {
 };
 
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderTeamLeader = (leader: any) => {
     if (!leader) {
         return <Text disabled>-</Text>;
@@ -38,8 +41,8 @@ const renderTeamLeader = (leader: any) => {
 
     return <Tag color="green">{
         i18n.language === "en" ?
-            leader.firstName.en
-            : leader.firstName.ar
+            leader.firstName?.en || leader.firstName
+            : leader.firstName?.ar || leader.firstName
     }</Tag>;
 };
 
