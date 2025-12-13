@@ -3,7 +3,6 @@
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import type { GroupFormData } from '../Types/groups';
 import api from '../../../api/http';
-import i18n from '../../../i18n';
 
 
 
@@ -51,7 +50,7 @@ export const formatFullName = (user: any) => {
   return name;
 };
 export const formatFullNameAssignee = (user: Assignees) => {
-  return `${user[`first_name_${i18n.language}`]} ${user[`mid_name_${i18n.language}`] || ''} ${user[`last_name_${i18n.language}`]}`.trim();
+  return `${user[`first_name`]} ${user[`mid_name`] || ''} ${user[`last_name`]}`.trim();
 };
 
 
@@ -115,8 +114,8 @@ export const useAssignees = (groupId: string | undefined) => {
     queryFn: async () => {
       if (!groupId) return [];
       const response = await api.get<AssigneesApiResponse>(`/lockups/groups/${groupId}/non-members-technicians`, { params: { page: 1, page_size: 100 } });
-
-      return response.data.groups;
+      console.log(response.data);
+      return response.data;
     },
     enabled: !!groupId,
     staleTime: Infinity,
@@ -134,8 +133,8 @@ export const useGroupTechnicians = (groupId: string | undefined) => {
         `/lockups/groups/${groupId}/technicians`,
         { params: { page: 1, page_size: 100 } },
       );
-
-      return response.data.groups;
+      console.log(response.data);
+      return response.data;
     },
     enabled: !!groupId,
     staleTime: Infinity,

@@ -1,14 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Space, Typography, Spin, Button, Transfer, message, Tag, Avatar } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import { Space, Typography, Spin, Button, Transfer, message, Tag } from 'antd';
 
 import type { TransferProps } from 'antd';
 
 
 import { useAssignUsers, useAssignees, useGroupTechnicians, type Assignees, formatFullNameAssignee } from '../Hooks/useGroupForm';
-import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 
@@ -26,21 +24,21 @@ const AssignTab: React.FC<AssignTabProps> = ({ groupId, t }) => {
     const { data: assignedMembers, isLoading: isLoadingMembers } = useGroupTechnicians(groupId);
     const [targetKeys, setTargetKeys] = useState<string[]>([]);
     const assignmentMutation = useAssignUsers(groupId);
-    const { i18n } = useTranslation();
 
 
     useEffect(() => {
-        if (assignedMembers && assignedMembers.length > 0) {
+        if (Array.isArray(assignedMembers)) { 
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setTargetKeys(assignedMembers.map(m => m.id));
-        } else if (assignedMembers && assignedMembers.length === 0) {
-            setTargetKeys([]);
         }
     }, [assignedMembers]);
 
 
     const transferData: UserListItem[] = useMemo(() => {
-        const allUsers = [...(technicians || []), ...(assignedMembers || [])];
+        const techniciansArray = Array.isArray(technicians) ? technicians : [];
+        const assignedArray = Array.isArray(assignedMembers) ? assignedMembers : [];
+        
+        const allUsers = [...techniciansArray, ...assignedArray];
         return allUsers.map(tech => ({
             ...tech,
             key: tech.id,
@@ -70,14 +68,14 @@ const AssignTab: React.FC<AssignTabProps> = ({ groupId, t }) => {
     const renderItem = (item: UserListItem) => {
         const fullName = formatFullNameAssignee(item);
         // console.log(item);
-        const jobTitle = item[`job_${i18n.language}`] || t('translation.no_job_title');
-        const hasImage = item.image && item.image.trim() !== '';
+        const jobTitle = item[`job_title`] || t('translation.no_job_title');
+        // const hasImage = item.image && item.image.trim() !== '';
 
         const customLabel = (
             <Space size={8}>
                 {/* <UserOutlined style={{ color: '#007bff' }} /> */}
-                <Avatar size="small" src={hasImage ? item.image : undefined}
-                    icon={!hasImage ? <UserOutlined /> : undefined} />
+                {/* <Avatar size="small" src={hasImage ? item.image : undefined}
+                    icon={!hasImage ? <UserOutlined /> : undefined} /> */}
                 <Text>{fullName}</Text>
                 {jobTitle !== t('translation.no_job_title') && (
                     <Tag color="blue">{jobTitle}</Tag>
