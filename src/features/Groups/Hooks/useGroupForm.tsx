@@ -58,7 +58,7 @@ export const useAdmins = () => {
   return useQuery({
     queryKey: ['admins'],
     queryFn: async () => {
-      const response = await api.get('/lockups/admins');
+      const response = await api.get('v1/lockups/admins');
       console.log(response.data);
       return response.data.users;
     },
@@ -74,9 +74,9 @@ export const useGroupDetail = (id?: string) => {
 
       // Fetch both endpoints in parallel
       const [groupRes, usersRes] = await Promise.all([
-        api.get<GroupFormData>(`/groups/${id}`),
+        api.get<GroupFormData>(`v1/groups/${id}`),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        api.get<{ team_leader: any; heads: any[]; technicians: any[] }>(`/groups/${id}/users`),
+        api.get<{ team_leader: any; heads: any[]; technicians: any[] }>(`v1/groups/${id}/users`),
       ]);
 
       const groupData = groupRes.data;
@@ -101,7 +101,7 @@ export const useTechnicians = () => {
   return useQuery({
     queryKey: ['technicians'],
     queryFn: async () => {
-      const response = await api.get('/lockups/technicians/');
+      const response = await api.get('v1/lockups/technicians/');
 
       return response.data.users;
     },
@@ -113,7 +113,7 @@ export const useAssignees = (groupId: string | undefined) => {
     queryKey: ['nonMembers', groupId],
     queryFn: async () => {
       if (!groupId) return [];
-      const response = await api.get<AssigneesApiResponse>(`/lockups/groups/${groupId}/non-members-technicians`, { params: { page: 1, page_size: 100 } });
+      const response = await api.get<AssigneesApiResponse>(`v1/lockups/groups/${groupId}/non-members-technicians`, { params: { page: 1, page_size: 100 } });
       console.log(response.data);
       return response.data;
     },
@@ -130,7 +130,7 @@ export const useGroupTechnicians = (groupId: string | undefined) => {
       if (!groupId) return [];
 
       const response = await api.get<AssigneesApiResponse>(
-        `/lockups/groups/${groupId}/technicians`,
+        `v1/lockups/groups/${groupId}/technicians`,
         { params: { page: 1, page_size: 100 } },
       );
       console.log(response.data);
@@ -147,7 +147,7 @@ export const useSpecializations = () => {
     queryKey: ['specializations'],
     queryFn: async () => {
 
-      const response = await api.get<GroupFormData>('/lockups/specializations/');
+      const response = await api.get<GroupFormData>('v1/lockups/specializations/');
       return response.data.specializations;
     },
 
@@ -161,7 +161,7 @@ export const useAssignUsers = (groupId: string | undefined) => {
     mutationFn: (userIds: string[]) => {
       if (!groupId) throw new Error("Group ID is missing for assignment.");
       console.log(userIds);
-      return api.post(`/groups/${groupId}/assign`, { users: userIds });
+      return api.post(`v1/groups/${groupId}/assign`, { users: userIds });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groupDetail', groupId] });
@@ -173,7 +173,7 @@ export const useAssignUsers = (groupId: string | undefined) => {
 export const useAddGroup = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: GroupFormData) => api.post('/groups/', data),
+    mutationFn: (data: GroupFormData) => api.post('v1/groups/', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
     },
@@ -189,7 +189,7 @@ export const useEditGroup = (groupId: string) => {
       if (groupId === 'dummy-id-for-add-mode') {
         throw new Error("Attempted to edit a group without a valid ID.");
       }
-      return api.put(`/groups/${groupId}`, data);
+      return api.put(`v1/groups/${groupId}`, data);
     }, onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
     },
