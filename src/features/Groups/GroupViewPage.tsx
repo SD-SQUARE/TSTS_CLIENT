@@ -12,6 +12,7 @@ import { useGroupDetail } from './Hooks/useGroupForm';
 import InfoTab from './GroupViewTabs/InfoTab';
 import AssignTab from './GroupViewTabs/AssignTab';
 import { useDeleteGroup } from './Hooks/useGroups';
+import GroupFormModal from './GroupFormModal';
 
 const { Title } = Typography;
 
@@ -21,11 +22,12 @@ const GroupViewPage: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const groupId = id;
-    const { data: group, isLoading, isError } = useGroupDetail(groupId);
+    const { data: group, isLoading, isError, refetch } = useGroupDetail(groupId);
     const currentLanguage = i18n.language;
     const deleteMutation = useDeleteGroup();
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
     const [confirmName, setConfirmName] = useState('');
+    const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 
     const handleBack = () => { navigate(-1); };
 
@@ -60,7 +62,14 @@ const GroupViewPage: React.FC = () => {
     const isNameMatch = confirmName.trim() === requiredName.trim();
     const isDeleteLoading = deleteMutation.isPending;
 
+const handleOpenEditModal = () => {
+        setIsEditModalVisible(true);
+    };
 
+    const handleCloseEditModal = () => {
+        setIsEditModalVisible(false);
+        refetch();
+    };
 
     if (!groupId) {
         return <Result status="404" title="404" subTitle={t('translation.group_id_missing')} />;
@@ -91,7 +100,7 @@ const GroupViewPage: React.FC = () => {
         {
             key: 'info',
             label: t('group_form.tab_info') || 'Group Info',
-            children: <InfoTab group={group} currentLanguage={currentLanguage} t={t} />,
+            children: <InfoTab group={group} currentLanguage={currentLanguage} t={t} onEdit={handleOpenEditModal}/>,
         },
         {
             key: 'assign',
@@ -180,6 +189,11 @@ const GroupViewPage: React.FC = () => {
                 </Typography.Text>
             )}
         </Modal>
+        <GroupFormModal
+                isVisible={isEditModalVisible}
+                onClose={handleCloseEditModal}
+                groupData={group} 
+            />
         </>
     );
 };

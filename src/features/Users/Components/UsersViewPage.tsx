@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Card, Descriptions, Space, Typography, Spin, Button, Result, Tag, Avatar, message, Tooltip, Modal, Input } from 'antd';
-import { ArrowLeftOutlined, MailOutlined, IdcardOutlined, PhoneOutlined, HomeOutlined, DeleteOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, MailOutlined, IdcardOutlined, PhoneOutlined, HomeOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDeleteUser, useUserDetail } from '../Hooks/useUsers';
 import type { Lookup } from '../Types/users';
 import AvatarDisplay from '../../../components/AvatarDisplay';
+import UserFormModal from './UsersFormModal';
 
 const { Text, Title } = Typography;
 
@@ -89,12 +90,13 @@ const UserViewPage: React.FC = () => {
     const { role, id } = useParams<{ role: string; id: string }>();
     const userId = id;
 
-    const { data: user, isLoading, isError } = useUserDetail(role!, userId);
+    const { data: user, isLoading, isError, refetch } = useUserDetail(role!, userId);
 
     const currentLanguage = i18n.language;
     const deleteMutation = useDeleteUser(role!);
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
     const [confirmName, setConfirmName] = useState('');
+    const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 
     const handleBack = () => {
         navigate(-1);
@@ -138,6 +140,16 @@ const UserViewPage: React.FC = () => {
             }
         });
     };
+
+    const handleOpenEditModal = () => {
+        setIsEditModalVisible(true);
+    };
+
+    const handleCloseEditModal = () => {
+        setIsEditModalVisible(false);
+        refetch();
+    };
+
     if (!role || !userId) {
         return <Result status="404" title="404" subTitle={t('translation.user_id_or_role_missing')} />;
     }
@@ -203,6 +215,13 @@ const UserViewPage: React.FC = () => {
                 }
                 extra={
                     <Space>
+                        <Tooltip title={t('translation.edit')} placement="bottom">
+                            <Button 
+                                icon={<EditOutlined />} 
+                                onClick={handleOpenEditModal} 
+                                loading={isActionLoading} 
+                            />
+                        </Tooltip>
                         <Tooltip title={t('translation.delete')} placement="bottom">
                             <Button
                                 icon={<DeleteOutlined />}
@@ -280,6 +299,12 @@ const UserViewPage: React.FC = () => {
                     </Typography.Text>
                 )}
             </Modal>
+            <UserFormModal
+                isVisible={isEditModalVisible}
+                onClose={handleCloseEditModal}
+                userData={user} 
+                role={role}
+            />
         </>
     );
 };

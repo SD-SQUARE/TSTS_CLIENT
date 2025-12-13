@@ -46,6 +46,7 @@ const steps = [
 
 
 const initialFormData: GroupFormData = {
+    id: '',
     name_ar: '',
     name_en: '',
     description_ar: '',
@@ -156,6 +157,7 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
 
                 // eslint-disable-next-line react-hooks/set-state-in-effect
                 setFormData({
+                    id: fetchedGroupDetail.id,
                     name_ar: fetchedGroupDetail.name_ar,
                     name_en: fetchedGroupDetail.name_en,
                     description_ar: fetchedGroupDetail.description_ar,

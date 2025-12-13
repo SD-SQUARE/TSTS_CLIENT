@@ -26,7 +26,7 @@ export interface NamedObject {
   }
 
 export interface GroupFormData {
-  
+  id: string;
   name_ar: string;
   name_en: string;
   description_ar: string;

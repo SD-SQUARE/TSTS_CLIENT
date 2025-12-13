@@ -1,8 +1,8 @@
 
 
 import React from 'react';
-import { Descriptions, Space, Typography, Tag } from 'antd';
-
+import { Descriptions, Space, Typography, Tag, Tooltip, Button } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
 
 import { useGroupDetail } from '../Hooks/useGroupForm';
 import i18n from '../../../i18n';
@@ -46,10 +46,10 @@ const renderTeamLeader = (leader: any) => {
     }</Tag>;
 };
 
-interface InfoTabProps { group: NonNullable<ReturnType<typeof useGroupDetail>['data']>; currentLanguage: string; t: (key: string) => string; }
+interface InfoTabProps { group: NonNullable<ReturnType<typeof useGroupDetail>['data']>; currentLanguage: string; t: (key: string) => string; onEdit: () => void }
 
 
-const InfoTab: React.FC<InfoTabProps> = ({ group, t }) => {
+const InfoTab: React.FC<InfoTabProps> = ({ group, t, onEdit }) => {
 
     const colorDescription = group.color ? (
         <Space>
@@ -87,6 +87,14 @@ const InfoTab: React.FC<InfoTabProps> = ({ group, t }) => {
             column={{ xxl: 2, xl: 2, lg: 2, md: 1, sm: 1, xs: 1 }}
             size="middle"
             layout="vertical"
+            extra={
+                <Tooltip title={t('translation.edit')} placement='bottom'>
+                    <Button 
+                        icon={<EditOutlined />}
+                        onClick={onEdit} 
+                    />
+                </Tooltip>
+            }
         >
             {items.map(item => (
                 <Descriptions.Item key={item.key} label={item.label}>
