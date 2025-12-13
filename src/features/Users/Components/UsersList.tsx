@@ -307,40 +307,40 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
             dataIndex: "email",
             key: "email",
         },
-        {
-            title: t("user_list.operations"),
-            key: "operations",
-            fixed: "right",
-            width: 125,
-            render: (_, record) => (
+        // {
+        //     title: t("user_list.operations"),
+        //     key: "operations",
+        //     fixed: "right",
+        //     width: 125,
+        //     render: (_, record) => (
 
-                <Space size={4}>
-                    <Tooltip title={t('translation.edit')} placement="topLeft">
-                        <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-
-
-                    </Tooltip>
-                    <Tooltip title={t('translation.view')} placement="topLeft">
-                        <Button icon={<EyeOutlined />} onClick={() => handleView(record.id)} />
-                    </Tooltip>
-
-                    <Popconfirm
-                        title={t('translation.confirm_delete')}
-                        onConfirm={() => handleDelete(record.id)}
-                        okText={t('translation.yes')}
-                        cancelText={t('translation.no')}
-
-                        disabled={deleteMutation.isPending}
-                    >
-                        <Tooltip title={t('translation.delete')} placement="topLeft">
-                            <Button icon={<DeleteOutlined />} danger loading={deleteMutation.isPending} />
+        //         <Space size={4}>
+        //             <Tooltip title={t('translation.edit')} placement="topLeft">
+        //                 <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
 
 
-                        </Tooltip>
-                    </Popconfirm>
-                </Space>
-            ),
-        }
+        //             </Tooltip>
+        //             <Tooltip title={t('translation.view')} placement="topLeft">
+        //                 <Button icon={<EyeOutlined />} onClick={() => handleView(record.id)} />
+        //             </Tooltip>
+
+        //             <Popconfirm
+        //                 title={t('translation.confirm_delete')}
+        //                 onConfirm={() => handleDelete(record.id)}
+        //                 okText={t('translation.yes')}
+        //                 cancelText={t('translation.no')}
+
+        //                 disabled={deleteMutation.isPending}
+        //             >
+        //                 <Tooltip title={t('translation.delete')} placement="topLeft">
+        //                     <Button icon={<DeleteOutlined />} danger loading={deleteMutation.isPending} />
+
+
+        //                 </Tooltip>
+        //             </Popconfirm>
+        //         </Space>
+        //     ),
+        // }
     ];
 
     return (
