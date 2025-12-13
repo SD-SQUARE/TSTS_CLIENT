@@ -124,6 +124,19 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
     const handleView = (id: string) => {
         navigate(`/identities/users/${role}/${id}`);
     };
+    const handleRowClick = (record: UserListItem) => {
+        return {
+            onClick: (event: React.MouseEvent<HTMLElement>) => {
+                const target = event.target as HTMLElement;
+                const isInteractive = target.closest('button, a, .ant-popconfirm, .ant-popover-open, .ant-tooltip-open');
+    
+                if (!isInteractive) {
+                    handleView(record.id);
+                }
+            },
+            style: { cursor: 'pointer' }, 
+        };
+    };
     const handleEdit = (user: UserListItem) => { setEditingUser(user); setIsModalVisible(true); };
     const handleDelete = async (id: string) => {
         try { await deleteMutation.mutateAsync(id); message.success(t("translation.user_deleted_success")); }
@@ -350,7 +363,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                 loading={isLoading || deleteMutation.isPending}
                 scroll={{ x: "max-content", y: "calc(100vh - 300px)" }}
                 pagination={false}
-                
+                onRow={handleRowClick}
             />
 
 

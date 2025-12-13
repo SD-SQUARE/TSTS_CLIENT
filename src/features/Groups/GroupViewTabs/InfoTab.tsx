@@ -21,7 +21,7 @@ const renderMembers = (members: any ,t = undefined) => {
         <Space size={[0, 8]} wrap>
             {members.map(member => (
 
-                <Tag key={member.id} color="blue" style={{ margin: '4px 0' }}>
+                <Tag key={member.id} color="blue" style={{ marginInlineEnd: '4px 0' }}>
                     {t == undefined ?
                         `${member.name}` : i18n.language === "en"
                         ? `${member.firstName?.en || member.name}` 

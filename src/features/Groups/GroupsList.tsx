@@ -132,6 +132,20 @@ const GroupsList: React.FC = () => {
         navigate(`/identities/groups/${id}`);
     };
 
+    const handleRowClick = (record: Group) => {
+        return {
+            onClick: (event: React.MouseEvent<HTMLElement>) => {
+                const target = event.target as HTMLElement;
+                const isInteractive = target.closest('button, a, .ant-popover-open, .ant-tooltip-open');
+    
+                if (!isInteractive) {
+                    handleView(record.id);
+                }
+            },
+            style: { cursor: 'pointer' }, 
+        };
+    };
+
     const handleDelete = async (id: string) => {
         try {
             await deleteMutation.mutateAsync(id);
@@ -171,7 +185,7 @@ const GroupsList: React.FC = () => {
                         >
                             <Tag
                                 color="blue"
-                                style={{ cursor: 'pointer', maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis' }}
+                                style={{ cursor: 'pointer', maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', marginInlineEnd:4 }}
                             >
                                 {spec.name.substring(0, 15)}...
                             </Tag>
@@ -338,6 +352,7 @@ const GroupsList: React.FC = () => {
                 loading={isLoading || deleteMutation.isPending}
                 scroll={{ x: 'max-content' }}
                 pagination={false}
+                onRow={handleRowClick}
             />
 
             <Pagination
