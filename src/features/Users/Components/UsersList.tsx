@@ -176,15 +176,13 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
             title: t("translation.id"),
             dataIndex: "rowIndex",
             key: "rowIndex",
-            render: (_: any, record: UserListItem, index: number) => (
-                <Badge
-                    offset={[-12, 6]}
-                    status={record.status === "Active" ? "success" : "warning"}
-                    text={(pagination.page - 1) * pagination.pageSize + index + 1}
-                />
-            ),
             fixed: "left",
             width: 60,
+            render: (_, __, index) => {
+                return (
+                    (pagination.page - 1) * pagination.pageSize + index + 1
+                );
+            },
         },
 
         {
