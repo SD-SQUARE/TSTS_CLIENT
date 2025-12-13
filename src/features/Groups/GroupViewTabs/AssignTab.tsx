@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Space, Typography, Spin, Button, Transfer, message, Tag, Avatar } from 'antd'; 
+import { Space, Typography, Spin, Button, Transfer, message, Tag, Avatar } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 
 import type { TransferProps } from 'antd';
 
 
-import {  useAssignUsers, useAssignees, type Assignees, formatFullNameAssignee } from '../Hooks/useGroupForm';
-import type { NamedObject } from '../Types/groups';
+import { useAssignUsers, useAssignees, useGroupTechnicians, type Assignees, formatFullNameAssignee } from '../Hooks/useGroupForm';
 import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
@@ -21,29 +20,32 @@ interface UserListItem extends Assignees {
 }
 
 
-interface AssignTabProps { groupId: string; initialMembers: NamedObject[] | undefined; t: (key: string) => string; }
-const AssignTab: React.FC<AssignTabProps> = ({ groupId, initialMembers, t }) => {
-    const { data: technicians, isLoading: isLoadingTech } = useAssignees();
+interface AssignTabProps { groupId: string; t: (key: string) => string; }
+const AssignTab: React.FC<AssignTabProps> = ({ groupId, t }) => {
+    const { data: technicians, isLoading: isLoadingNonMembers } = useAssignees(groupId);
+    const { data: assignedMembers, isLoading: isLoadingMembers } = useGroupTechnicians(groupId);
     const [targetKeys, setTargetKeys] = useState<string[]>([]);
     const assignmentMutation = useAssignUsers(groupId);
     const { i18n } = useTranslation();
 
 
     useEffect(() => {
-        if (initialMembers) {
-
+        if (assignedMembers && assignedMembers.length > 0) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
-            setTargetKeys(initialMembers.map(m => m.id));
+            setTargetKeys(assignedMembers.map(m => m.id));
+        } else if (assignedMembers && assignedMembers.length === 0) {
+            setTargetKeys([]);
         }
-    }, [initialMembers]);
+    }, [assignedMembers]);
 
 
     const transferData: UserListItem[] = useMemo(() => {
-        return technicians?.map(tech => ({
+        const allUsers = [...(technicians || []), ...(assignedMembers || [])];
+        return allUsers.map(tech => ({
             ...tech,
             key: tech.id,
         })) || [];
-    }, [technicians]);
+    }, [technicians, assignedMembers]);
 
     const handleTransferChange: TransferProps<UserListItem>['onChange'] = (newTargetKeys) => {
         setTargetKeys(newTargetKeys as string[]);
@@ -68,17 +70,17 @@ const AssignTab: React.FC<AssignTabProps> = ({ groupId, initialMembers, t }) => 
     const renderItem = (item: UserListItem) => {
         const fullName = formatFullNameAssignee(item);
         // console.log(item);
-        const jobTitle = item[`job_${i18n.language}`] || t('translation.no_job_title'); 
+        const jobTitle = item[`job_${i18n.language}`] || t('translation.no_job_title');
         const hasImage = item.image && item.image.trim() !== '';
 
         const customLabel = (
-            <Space size={8}> 
+            <Space size={8}>
                 {/* <UserOutlined style={{ color: '#007bff' }} /> */}
                 <Avatar size="small" src={hasImage ? item.image : undefined}
-                        icon={!hasImage ? <UserOutlined /> : undefined} />
+                    icon={!hasImage ? <UserOutlined /> : undefined} />
                 <Text>{fullName}</Text>
                 {jobTitle !== t('translation.no_job_title') && (
-                    <Tag color="blue">{jobTitle}</Tag> 
+                    <Tag color="blue">{jobTitle}</Tag>
                 )}
             </Space>
         );
@@ -90,7 +92,7 @@ const AssignTab: React.FC<AssignTabProps> = ({ groupId, initialMembers, t }) => 
         };
     };
 
-    if (isLoadingTech) {
+    if (isLoadingNonMembers || isLoadingMembers) {
         return <Spin size="large" style={{ display: 'flex', justifyContent: 'center', padding: '50px 0' }} />;
     }
 

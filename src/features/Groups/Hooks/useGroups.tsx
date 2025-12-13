@@ -17,7 +17,7 @@ export const useGroups = (page: number, pageSize: number, searchQuery: {[key: st
 export const useDeleteGroup = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => api.delete(`v1/groups/${id}`),
+    mutationFn: (id: string) => api.delete(`/groups/${id}`),
     onSuccess: () => {
 
       queryClient.invalidateQueries({ queryKey: ['groups'] });
@@ -43,7 +43,7 @@ interface GroupApiResponse {
 export const fetchGroups = async (page: number, pageSize: number, searchQuery: {[key: string]: string}): Promise<{ data: Group[], total: number }> => {
 
   const query = Object.entries(searchQuery).filter(([,value]) => value).reduce((acc, [key, value]) => ({...acc, [key]: value}), {});
-  const response = await api.get<GroupApiResponse>(`v1/groups/`, {
+  const response = await api.get<GroupApiResponse>(`/groups/`, {
     params: { page, page_size: pageSize, ...query },
   });
 
