@@ -97,7 +97,11 @@
     "assigned_technicians" : "المهندسين المعينين",
     "save_assignments" : "حفظ التعيينات",
     "assignment_success" : "تم تعيين المهندسين بنجاح!",
-    "assignment_failed" : "فشل في تعيين المهندسين."
+    "assignment_failed" : "فشل في تعيين المهندسين.",
+    "confirm_delete_group_title": "حذف المجموعة",
+    "cancel": "الغاء",
+    "delete_prompt": "هل تريد حذف هذه المجموعة؟",
+    "delete_name_mismatch_warning": "تحذير: الاسم المدخل للمجموعة لا يتطابق مع اسم المجموعة المحددة. هل تريد المتابعة؟"
 },
 "group_form": {
     "add_title": "اضافة مجموعة جديدة",

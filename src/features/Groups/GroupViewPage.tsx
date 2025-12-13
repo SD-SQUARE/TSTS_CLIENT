@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React from 'react';
-import { Card, Space, Typography, Spin, Button, Result, Tabs } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Card, Space, Typography, Spin, Button, Result, Tabs, message, Tooltip, Input, Modal } from 'antd';
+import { ArrowLeftOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TabsProps } from 'antd';
@@ -11,6 +11,7 @@ import type { TabsProps } from 'antd';
 import { useGroupDetail } from './Hooks/useGroupForm';
 import InfoTab from './GroupViewTabs/InfoTab';
 import AssignTab from './GroupViewTabs/AssignTab';
+import { useDeleteGroup } from './Hooks/useGroups';
 
 const { Title } = Typography;
 
@@ -22,8 +23,44 @@ const GroupViewPage: React.FC = () => {
     const groupId = id;
     const { data: group, isLoading, isError } = useGroupDetail(groupId);
     const currentLanguage = i18n.language;
+    const deleteMutation = useDeleteGroup();
+    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+    const [confirmName, setConfirmName] = useState('');
 
     const handleBack = () => { navigate(-1); };
+
+    const handleConfirmDelete = () => {
+        setIsDeleteModalVisible(true);
+        setConfirmName(''); 
+    };
+
+    const handleDeleteSubmit = () => {
+        if (!group) return;
+
+        const actualGroupName = group[`name_${currentLanguage}`] || group.name_en || '';
+        
+        if (confirmName.trim() !== actualGroupName.trim()) {
+            message.error(t('translation.delete_name_mismatch_warning_group'));
+            return;
+        }
+
+        deleteMutation.mutate(groupId!, {
+            onSuccess: () => {
+                setIsDeleteModalVisible(false);
+                message.success(t('translation.group_deleted_success'));
+                navigate(-1); 
+            },
+            onError: () => {
+                message.error(t('translation.group_deleted_error'));
+            }
+        });
+    };
+    
+    const requiredName = group ? (group[`name_${currentLanguage}`] || group.name_en || '') : '';
+    const isNameMatch = confirmName.trim() === requiredName.trim();
+    const isDeleteLoading = deleteMutation.isPending;
+
+
 
     if (!groupId) {
         return <Result status="404" title="404" subTitle={t('translation.group_id_missing')} />;
@@ -64,7 +101,9 @@ const GroupViewPage: React.FC = () => {
     ];
 
     return (
+        <>
         <Card
+        
             title={
                 <Space>
                     <Button
@@ -81,6 +120,18 @@ const GroupViewPage: React.FC = () => {
                     </Title>
                 </Space>
             }
+            extra={
+                <Space>
+                    <Tooltip title={t('translation.delete')} placement="bottom">
+                        <Button 
+                            icon={<DeleteOutlined />} 
+                            danger 
+                            onClick={handleConfirmDelete}
+                            loading={isDeleteLoading}
+                        />
+                    </Tooltip>
+                </Space>
+            }
             style={{ margin: 20 }}
 
             bodyStyle={{ padding: 0 }}
@@ -93,6 +144,43 @@ const GroupViewPage: React.FC = () => {
                 style={{ padding: '0 24px 24px 24px' }}
             />
         </Card>
+        <Modal
+            title={t('translation.confirm_delete_group_title')}
+            open={isDeleteModalVisible}
+            onCancel={() => setIsDeleteModalVisible(false)}
+            footer={[
+                <Button key="back" onClick={() => setIsDeleteModalVisible(false)}>
+                    {t('translation.cancel')}
+                </Button>,
+                <Button 
+                    key="submit" 
+                    type="primary" 
+                    danger 
+                    onClick={handleDeleteSubmit}
+                    disabled={!isNameMatch || isDeleteLoading}
+                    loading={isDeleteLoading}
+                >
+                    {t('translation.delete')}
+                </Button>,
+            ]}
+        >
+            <Typography.Paragraph>
+                {t('translation.delete_prompt_group', { name: requiredName })}
+            </Typography.Paragraph>
+            <Input
+                placeholder={requiredName}
+                value={confirmName}
+                onChange={(e) => setConfirmName(e.target.value)}
+                onPressEnter={handleDeleteSubmit}
+                style={{ marginTop: 10 }}
+            />
+            {!isNameMatch && confirmName.length > 0 && (
+                <Typography.Text type="danger">
+                    {t('translation.delete_name_mismatch_warning_group')}
+                </Typography.Text>
+            )}
+        </Modal>
+        </>
     );
 };
 

@@ -94,6 +94,8 @@ const AssignTab: React.FC<AssignTabProps> = ({ groupId, t }) => {
         return <Spin size="large" style={{ display: 'flex', justifyContent: 'center', padding: '50px 0' }} />;
     }
 
+    
+
     return (
         <Space direction="vertical" style={{ width: '100%' }} size="large">
             <Transfer
@@ -102,9 +104,10 @@ const AssignTab: React.FC<AssignTabProps> = ({ groupId, t }) => {
                 onChange={handleTransferChange}
                 filterOption={filterByFullName}
                 render={renderItem as any}
+                style={{justifyContent: 'center'}}
                 listStyle={{
-                    width: '100%',
-                    height: 500,
+                    width: '45%',
+                    minHeight: 400,
                 }}
                 locale={{
                     itemUnit: t('translation.users'),
