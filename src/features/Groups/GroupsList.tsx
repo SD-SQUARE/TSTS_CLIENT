@@ -12,6 +12,7 @@ import type { Group, NamedObject } from './Types/groups';
 import AvatarDisplay from '../../components/AvatarDisplay';
 import { useDeleteGroup, useGroups } from './Hooks/useGroups';
 import { useNavigate } from 'react-router-dom';
+import EllipsisComponent from '../../components/EllipsisComponent';
 
 
 type SearchableDataIndex = 'name';
@@ -20,7 +21,6 @@ const GroupsList: React.FC = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [pagination, setPagination] = useState({ page: 1, pageSize: 10 });
-    const [expanded, setExpanded] = useState(false);
 
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState<SearchableDataIndex | ''>('');
@@ -233,15 +233,7 @@ const GroupsList: React.FC = () => {
                     trigger="hover"
                     placement="topLeft"
                 >
-                    <Typography.Paragraph
-                    style={{ margin: 0 }}
-                    ellipsis={{
-                        rows: 1,
-                        expandable: 'collapsible',
-                        expanded,
-                        onExpand: (_,info) => setExpanded(info.expanded)
-                    }}
-                    >{description}</Typography.Paragraph>
+                    <EllipsisComponent content={description} />
                 </Popover>
             ),
         },
@@ -257,15 +249,7 @@ const GroupsList: React.FC = () => {
                     trigger="hover"
                     placement="topLeft"
                 >
-                    <Typography.Paragraph 
-                    style={{ margin: 0 }}
-                    ellipsis={{
-                        rows: 1,
-                        expandable: 'collapsible',
-                        expanded,
-                        onExpand: (_,info) => setExpanded(info.expanded),
-                    }}
-                    >{description}</Typography.Paragraph>
+                    <EllipsisComponent content={description} />
 
                 </Popover>
             )
