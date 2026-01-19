@@ -25,10 +25,10 @@ const StepJobLocation: React.FC<Props> = ({ initialData, onNext }) => {
 
     const selectedUniversity = watch('university');
     const selectedDomain = watch('domain');
-    
+
     const universityId = selectedUniversity?.id;
     const domainId = selectedDomain?.id;
-    
+
     const { data: universities, isLoading: uniLoading } = useUniversities();
     const { data: domains, isLoading: domainLoading } = useDomains(universityId);
     const { data: departments, isLoading: depLoading } = useDepartments(domainId);
@@ -66,24 +66,28 @@ const StepJobLocation: React.FC<Props> = ({ initialData, onNext }) => {
     };
 
     return (
-        <Card title= {t("user_list.job_location")}>
+        <Card title={t("user_list.job_location")}>
             <Form layout="vertical" onFinish={handleSubmit(onSubmit)} id="step-form" requiredMark={false}>
-                <Form.Item label={<Flex gap="small"><span>{t("user_list.job_title_en")}</span><RequiredTag /></Flex>}
-                    validateStatus={errors.job_en ? "error" : ""} help={errors.job_en?.message} required>
-                    <Controller name="job_en" control={control}
-                        rules={{ required: t("required"), pattern: {
-                            value: ENGLISH_REGEX,
-                            message: t("english_only"),
-                        } }}
-                        render={({ field }) => <Input {...field} className="ant-input" />} />
-                </Form.Item>
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.job_title_ar")}</span><RequiredTag /></Flex>}
                     validateStatus={errors.job_ar ? "error" : ""} help={errors.job_ar?.message} required>
                     <Controller name="job_ar" control={control}
-                        rules={{ required: t("required"), pattern: {
-                            value: ARABIC_REGEX,
-                            message: t("arabic_only"),
-                        } }}
+                        rules={{
+                            required: t("required"), pattern: {
+                                value: ARABIC_REGEX,
+                                message: t("arabic_only"),
+                            }
+                        }}
+                        render={({ field }) => <Input {...field} className="ant-input" />} />
+                </Form.Item>
+                <Form.Item label={<Flex gap="small"><span>{t("user_list.job_title_en")}</span><RequiredTag /></Flex>}
+                    validateStatus={errors.job_en ? "error" : ""} help={errors.job_en?.message} required>
+                    <Controller name="job_en" control={control}
+                        rules={{
+                            required: t("required"), pattern: {
+                                value: ENGLISH_REGEX,
+                                message: t("english_only"),
+                            }
+                        }}
                         render={({ field }) => <Input {...field} className="ant-input" />} />
                 </Form.Item>
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.university")}</span><RequiredTag /></Flex>}

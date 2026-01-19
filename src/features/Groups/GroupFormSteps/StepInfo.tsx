@@ -38,10 +38,10 @@ const StepInfo: React.FC<StepProps> = ({ initialData, onNext, apiErrors }) => {
         if (apiErrors && apiErrors.length > 0) {
             apiErrors.forEach(err => {
                 setError(
-                    err.field as keyof GroupFormData, 
-                    { 
-                        type: 'server', 
-                        message: err.message 
+                    err.field as keyof GroupFormData,
+                    {
+                        type: 'server',
+                        message: err.message
                     },
                     { shouldFocus: true }
                 );
@@ -70,10 +70,12 @@ const StepInfo: React.FC<StepProps> = ({ initialData, onNext, apiErrors }) => {
                     <Controller
                         name="name_ar"
                         control={control}
-                        rules={{ required: t("required"), pattern: {
-                            value: ARABIC_REGEX,
-                            message: t("arabic_only"),
-                        } }}
+                        rules={{
+                            required: t("required"), pattern: {
+                                value: ARABIC_REGEX,
+                                message: t("arabic_only"),
+                            }
+                        }}
                         render={({ field }) => (
 
                             <Input {...field} />
@@ -81,31 +83,36 @@ const StepInfo: React.FC<StepProps> = ({ initialData, onNext, apiErrors }) => {
                     />
                 </Form.Item>
                 <Form.Item label={<Flex align="start" gap="small">
-                    <span>{t('translation.name_en')}</span>
-                    <RequiredTag />
-                </Flex>} validateStatus={errors.name_en ? 'error' : ''} help={errors.name_en?.message} required>
-                    <Controller
-                        name="name_en"
-                        control={control}
-                        rules={{ required: t("required"), pattern: {
-                            value: ENGLISH_REGEX,
-                            message: t("english_only"),
-                        } }}
-                        render={({ field }) => <Input {...field} />}
-                    />                </Form.Item>
-                <Form.Item label={<Flex align="start" gap="small">
                     <span>{t('translation.description_ar')}</span>
                     <RequiredTag />
                 </Flex>} validateStatus={errors.description_ar ? 'error' : ''} help={errors.description_ar?.message} required>
                     <Controller
                         name="description_ar"
                         control={control}
-                        rules={{ required: t("required"), pattern: {
-                            value: ARABIC_REGEX,
-                            message: t("arabic_only"),
-                        } }}
+                        rules={{
+                            required: t("required"), pattern: {
+                                value: ARABIC_REGEX,
+                                message: t("arabic_only"),
+                            }
+                        }}
                         render={({ field }) => <Input.TextArea rows={4} {...field} />}
                     />                </Form.Item>
+                <Form.Item label={<Flex align="start" gap="small">
+                    <span>{t('translation.name_en')}</span>
+                    <RequiredTag />
+                </Flex>} validateStatus={errors.name_en ? 'error' : ''} help={errors.name_en?.message} required>
+                    <Controller
+                        name="name_en"
+                        control={control}
+                        rules={{
+                            required: t("required"), pattern: {
+                                value: ENGLISH_REGEX,
+                                message: t("english_only"),
+                            }
+                        }}
+                        render={({ field }) => <Input {...field} />}
+                    />                </Form.Item>
+
                 <Form.Item label={<Flex align="start" gap="small">
                     <span>{t('translation.description_en')}</span>
                     <RequiredTag />
@@ -113,10 +120,12 @@ const StepInfo: React.FC<StepProps> = ({ initialData, onNext, apiErrors }) => {
                     <Controller
                         name="description_en"
                         control={control}
-                        rules={{ required: t("required"), pattern: {
-                            value: ENGLISH_REGEX,
-                            message: t("english_only"),
-                        } }}
+                        rules={{
+                            required: t("required"), pattern: {
+                                value: ENGLISH_REGEX,
+                                message: t("english_only"),
+                            }
+                        }}
                         render={({ field }) => <Input.TextArea rows={4} {...field} />}
                     />                </Form.Item>
             </Form>

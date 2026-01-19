@@ -1,18 +1,17 @@
 
 
 import React from 'react';
-import { Descriptions, Space, Typography, Tag } from 'antd';
-
+import { Descriptions, Space, Typography, Tag, Tooltip, Button } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
 
 import { useGroupDetail } from '../Hooks/useGroupForm';
-import type { NamedObject } from '../Types/groups';
-import i18n from '../../../i18n';
 
 
 
 const { Text } = Typography;
 
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderMembers = (members: any ,t = undefined) => {
     if (!members || members.length === 0) {
         return <Text disabled>-</Text>;
@@ -21,9 +20,10 @@ const renderMembers = (members: any ,t = undefined) => {
         <Space size={[0, 8]} wrap>
             {members.map(member => (
 
-                <Tag key={member.id} color="blue" style={{ margin: '4px 0' }}>
+                <Tag key={member.id} color="blue" style={{ marginInlineEnd: '4px' }}>
                     {t == undefined ?
-                        `${member.name}` : i18n.language === "en" ? `${member.firstName.en}` : `${member.firstName.ar}`}
+                        member.first_name + ' ' + member.last_name
+                        : t(member.first_name + ' ' + member.last_name)}
                 </Tag>
             ))}
         </Space>
@@ -31,22 +31,21 @@ const renderMembers = (members: any ,t = undefined) => {
 };
 
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderTeamLeader = (leader: any) => {
     if (!leader) {
         return <Text disabled>-</Text>;
     }
 
     return <Tag color="green">{
-        i18n.language === "en" ?
-            leader.firstName.en
-            : leader.firstName.ar
+        leader.first_name + ' ' + leader.last_name
     }</Tag>;
 };
 
-interface InfoTabProps { group: NonNullable<ReturnType<typeof useGroupDetail>['data']>; currentLanguage: string; t: (key: string) => string; }
+interface InfoTabProps { group: NonNullable<ReturnType<typeof useGroupDetail>['data']>; currentLanguage: string; t: (key: string) => string; onEdit: () => void }
 
 
-const InfoTab: React.FC<InfoTabProps> = ({ group, t }) => {
+const InfoTab: React.FC<InfoTabProps> = ({ group, t, onEdit }) => {
 
     const colorDescription = group.color ? (
         <Space>
@@ -84,6 +83,14 @@ const InfoTab: React.FC<InfoTabProps> = ({ group, t }) => {
             column={{ xxl: 2, xl: 2, lg: 2, md: 1, sm: 1, xs: 1 }}
             size="middle"
             layout="vertical"
+            extra={
+                <Tooltip title={t('translation.edit')} placement='bottom'>
+                    <Button 
+                        icon={<EditOutlined />}
+                        onClick={onEdit} 
+                    />
+                </Tooltip>
+            }
         >
             {items.map(item => (
                 <Descriptions.Item key={item.key} label={item.label}>

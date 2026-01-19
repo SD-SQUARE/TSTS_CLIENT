@@ -377,3 +377,11 @@ html {
 .compact-table-wrapper .ant-table-thead .ant-table-cell {
   padding: 6px 8px !important;
 }
+
+
+.ant-table-tbody > tr > td {
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+
+

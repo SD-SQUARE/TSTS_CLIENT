@@ -1,11 +1,12 @@
-import React from 'react';
-import { Card, Descriptions, Space, Typography, Spin, Button, Result, Tag, Avatar } from 'antd';
-import { ArrowLeftOutlined, MailOutlined, IdcardOutlined, PhoneOutlined, HomeOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Card, Descriptions, Space, Typography, Spin, Button, Result, Tag, Avatar, message, Tooltip, Modal, Input } from 'antd';
+import { ArrowLeftOutlined, MailOutlined, IdcardOutlined, PhoneOutlined, HomeOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useUserDetail } from '../Hooks/useUsers';
+import { useDeleteUser, useUserDetail } from '../Hooks/useUsers';
 import type { Lookup } from '../Types/users';
 import AvatarDisplay from '../../../components/AvatarDisplay';
+import UserFormModal from './UsersFormModal';
 
 const { Text, Title } = Typography;
 
@@ -74,7 +75,7 @@ const renderDepartmentList = (department: Lookup[] | undefined, currentLanguage:
 
 const getInitials = (fullName: string) => {
     const names = fullName.split(' ').filter(n => n.length > 0);
-    if (names.length === 0) return 'U'; 
+    if (names.length === 0) return 'U';
 
     const firstInitial = names[0][0];
     const lastInitial = names.length > 1 ? names[names.length - 1][0] : '';
@@ -89,12 +90,64 @@ const UserViewPage: React.FC = () => {
     const { role, id } = useParams<{ role: string; id: string }>();
     const userId = id;
 
-    const { data: user, isLoading, isError } = useUserDetail(role!, userId);
+    const { data: user, isLoading, isError, refetch } = useUserDetail(role!, userId);
 
     const currentLanguage = i18n.language;
+    const deleteMutation = useDeleteUser(role!);
+    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+    const [confirmName, setConfirmName] = useState('');
+    const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 
     const handleBack = () => {
         navigate(-1);
+    };
+
+    const firstName = user?.[`first_name_${currentLanguage}`] || '';
+    const midName = user?.[`mid_name_${currentLanguage}`] || '';
+    const lastName = user?.[`last_name_${currentLanguage}`] || '';
+
+    const fullName = `${firstName} ${midName} ${lastName}`.trim();
+    const jobTitle = user?.[`job_${currentLanguage}`] || '-';
+
+    const initials = getInitials(fullName);
+
+    const requiredName = fullName.trim();
+    const isNameMatch = confirmName.trim().toLowerCase() === requiredName.toLowerCase();
+    const isActionLoading = deleteMutation.isPending;
+    
+    const handleOpenConfirmDelete = () => {
+        setIsDeleteModalVisible(true);
+        setConfirmName('');
+    };
+
+    const handleDeleteSubmit = () => {
+        if (!user) return;
+
+
+        if (confirmName.trim() !== requiredName) {
+            message.error(t('translation.delete_name_mismatch_warning_user'));
+            return;
+        }
+
+        deleteMutation.mutate(userId!, {
+            onSuccess: () => {
+                setIsDeleteModalVisible(false);
+                message.success(t('translation.user_deleted_success'));
+                navigate(-1);
+            },
+            onError: () => {
+                message.error(t('translation.user_deleted_error'));
+            }
+        });
+    };
+
+    const handleOpenEditModal = () => {
+        setIsEditModalVisible(true);
+    };
+
+    const handleCloseEditModal = () => {
+        setIsEditModalVisible(false);
+        refetch();
     };
 
     if (!role || !userId) {
@@ -120,10 +173,6 @@ const UserViewPage: React.FC = () => {
         );
     }
 
-    const fullName = `${user[`first_name_${currentLanguage}`]} ${user[`mid_name_${currentLanguage}`] || ''} ${user[`last_name_${currentLanguage}`]}`;
-    const jobTitle = user[`job_${currentLanguage}`] || '-';
-
-    const initials = getInitials(fullName);
 
     const allItems = [
         { key: 'full_name', label: t('user_list.full_name'), children: fullName, span: 2 },
@@ -149,51 +198,114 @@ const UserViewPage: React.FC = () => {
     const hasImage = user.image && user.image.trim() !== '';
 
     return (
-        <Card
-            title={
-                <Space>
-                    <Button
-                        icon={<ArrowLeftOutlined />}
-                        onClick={handleBack}
-                        size="small"
-                        type="default"
-                    />
-                    <Title level={4} style={{ margin: 0 }}>
-                        {t('user_list.view_user_title')}
-                    </Title>
-                </Space>
-            }
-            style={{ margin: 20 }}
-        >
-            <Space direction="vertical" style={{ width: '100%' }} size="large">
-                <Card bordered={false} style={{ textAlign: 'center' }}>
-                    <Avatar
-                        size={100}
-                        src={hasImage ? user.image : undefined}
-                        icon={!hasImage ? <IdcardOutlined /> : undefined}
-                    >
-                        {!hasImage ? initials : null}
-                    </Avatar>
-                    <Title level={3} style={{ margin: '10px 0 0' }}>{fullName}</Title>
-                    <Text type="secondary">{jobTitle}</Text>
-                </Card>
+        <>
+            <Card
+                title={
+                    <Space>
+                        <Button
+                            icon={<ArrowLeftOutlined />}
+                            onClick={handleBack}
+                            size="small"
+                            type="default"
+                        />
+                        <Title level={4} style={{ margin: 0 }}>
+                            {t('user_list.view_user_title')}
+                        </Title>
+                    </Space>
+                }
+                extra={
+                    <Space>
+                        <Tooltip title={t('translation.edit')} placement="bottom">
+                            <Button 
+                                icon={<EditOutlined />} 
+                                onClick={handleOpenEditModal} 
+                                loading={isActionLoading} 
+                            />
+                        </Tooltip>
+                        <Tooltip title={t('translation.delete')} placement="bottom">
+                            <Button
+                                icon={<DeleteOutlined />}
+                                danger
+                                onClick={handleOpenConfirmDelete}
+                                loading={isActionLoading}
+                            />
+                        </Tooltip>
+                    </Space>
+                }
+                style={{ margin: 20 }}
+            >
+                <Space direction="vertical" style={{ width: '100%' }} size="large">
+                    <Card bordered={false} style={{ textAlign: 'center' }}>
+                        <Avatar
+                            size={100}
+                            src={hasImage ? user.image : undefined}
+                            icon={!hasImage ? <IdcardOutlined /> : undefined}
+                        >
+                            {!hasImage ? initials : null}
+                        </Avatar>
+                        <Typography.Title copyable level={3} style={{ margin: '10px 0 0' }}>{fullName}</Typography.Title>
+                        <Text type="secondary">{jobTitle}</Text>
+                    </Card>
 
-                <Descriptions
-                    title={t('user_list.details')}
-                    bordered
-                    column={{ xxl: 2, xl: 2, lg: 2, md: 1, sm: 1, xs: 1 }}
-                    size="middle"
-                    layout="vertical"
-                >
-                    {items.map(item => (
-                        <Descriptions.Item key={item.key} label={item.label} span={item.span || 1}>
-                            {item.children}
-                        </Descriptions.Item>
-                    ))}
-                </Descriptions>
-            </Space>
-            
-        </Card>
+                    <Descriptions
+                        title={t('user_list.details')}
+                        bordered
+                        column={{ xxl: 2, xl: 2, lg: 2, md: 1, sm: 1, xs: 1 }}
+                        size="middle"
+                        layout="vertical"
+                    >
+                        {items.map(item => (
+                            <Descriptions.Item key={item.key} label={item.label} span={item.span || 1}>
+                                {item.children}
+                            </Descriptions.Item>
+                        ))}
+                    </Descriptions>
+                </Space>
+
+            </Card>
+            <Modal
+                title={t('translation.confirm_delete_user_title')}
+                open={isDeleteModalVisible}
+                onCancel={() => setIsDeleteModalVisible(false)}
+                footer={[
+                    <Button key="back" onClick={() => setIsDeleteModalVisible(false)}>
+                        {t('translation.cancel')}
+                    </Button>,
+                    <Button
+                        key="submit"
+                        type="primary"
+                        danger
+                        onClick={handleDeleteSubmit}
+                        disabled={!isNameMatch || isActionLoading}
+                        loading={isActionLoading}
+                    >
+                        {t('translation.delete')}
+                    </Button>,
+                ]}
+            >
+                <Typography.Paragraph>
+                    {t('translation.delete_prompt_user', { name: requiredName })}
+                </Typography.Paragraph>
+                <Input
+                    placeholder={requiredName}
+                    value={confirmName}
+                    onChange={(e) => setConfirmName(e.target.value)}
+                    onPressEnter={handleDeleteSubmit}
+                    style={{ marginTop: 10 }}
+                />
+                {!isNameMatch && confirmName.length > 0 && (
+                    <Typography.Text type="danger">
+                        {t('translation.delete_name_mismatch_warning_user')}
+                    </Typography.Text>
+                )}
+            </Modal>
+            <UserFormModal
+                isVisible={isEditModalVisible}
+                onClose={handleCloseEditModal}
+                userData={user} 
+                role={role}
+            />
+        </>
     );
 };
 

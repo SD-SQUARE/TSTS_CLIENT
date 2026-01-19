@@ -97,7 +97,11 @@
     "assigned_technicians" : "المهندسين المعينين",
     "save_assignments" : "حفظ التعيينات",
     "assignment_success" : "تم تعيين المهندسين بنجاح!",
-    "assignment_failed" : "فشل في تعيين المهندسين."
+    "assignment_failed" : "فشل في تعيين المهندسين.",
+    "confirm_delete_group_title": "حذف المجموعة",
+    "cancel": "الغاء",
+    "delete_prompt": "هل تريد حذف هذه المجموعة؟",
+    "delete_name_mismatch_warning": "تحذير: الاسم المدخل للمجموعة لا يتطابق مع اسم المجموعة المحددة. هل تريد المتابعة؟"
 },
 "group_form": {
     "add_title": "اضافة مجموعة جديدة",
@@ -122,7 +126,11 @@
     "select_heads_placeholder": "اختر واحد او اكثر من المستخدمين",
     "view_title": "تفاصيل المجموعة",
     "tab_info": "معلومات",
-    "tab_assign": "تعيين"
+    "tab_assign": "تعيين",
+    "confirm_cancel_title": "تاكيد الغاء",
+    "confirm_cancel_content": "هل تريد الغاء التعديلات؟",
+    "confirm_cancel_ok": "نعم",
+    "confirm_cancel_abort": "لا"
 },
     "password_8_chars": "كلمة المرور يجب ان تكون على الاقل 8 حروف",
     "password_lowercase": "كلمة المرور يجب ان تحتوي على حرف صغير",
