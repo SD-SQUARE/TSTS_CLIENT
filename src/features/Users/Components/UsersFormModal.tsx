@@ -196,16 +196,18 @@ const UserFormModal: React.FC<{
             const formPayload = new FormData();
 
             Object.entries(cleanedPayload).forEach(([key, val]) => {
-                if (key === "image" && finalData.image instanceof File) {
-                    formPayload.append(key, finalData.image);
+                if (key === "image") {
+                    if (typeof val === "string") {
+                        formPayload.append(key, "");
+                    }else if (val instanceof File) {
+                        formPayload.append(key, finalData.image);
+                    }
                 }
                 else if (key === "contacts") {
-                    if (typeof val === "object" && val !== null && "phones" in val) {
-                        formPayload.append("phones", JSON.stringify(val.phones));
-                    }
-                    if (typeof val === "object" && val !== null && "mobiles" in val) {
-                        formPayload.append("mobiles", JSON.stringify(val.mobiles));
-                    }
+                    formPayload.append("contacts", JSON.stringify(val));
+                }
+                else if (key === "specializations") {
+                    formPayload.append("allowed_specializations", JSON.stringify(val));
                 }
                 else if (Array.isArray(val)) {
                     formPayload.append(key, JSON.stringify(val));
@@ -216,7 +218,7 @@ const UserFormModal: React.FC<{
             });
 
             try {
-                // console.log(cleanedPayload);
+                console.log(formPayload);
                 await addOrEditMutation.mutateAsync(formPayload);
                 message.success(t(userData ? "user_list.edit_success" : "user_list.add_success"));
                 resetModalState();

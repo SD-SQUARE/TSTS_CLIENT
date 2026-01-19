@@ -59,8 +59,8 @@ export const useAddOrEditUser = (role: string, userId?: string) => {
     return useMutation({
         mutationFn: (data: FormData) =>
             userId
-                ? api.put(`v1/users/${role}/${userId}`, data)
-                : api.post(`v1/users/${role}`, data),
+                ? api.put(`v1/users/${role}/${userId}`, data, { headers: { "Content-Type": "multipart/form-data" } })
+                : api.post(`v1/users/${role}`, data, { headers: { "Content-Type": "multipart/form-data" } }),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users", role] })
         ,
     });
