@@ -1,0 +1,249 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
+
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Form, Input, Select, Button, Upload, Tag, Dropdown, Space, Typography, message, Flex, Card, Steps, Badge } from 'antd';
+import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import { useSpecializations, useTechnicians, useTicketDetails, useTicketMutations } from '../Hooks/useTicketForm';
+import RequiredTag from '../../../components/RequiredTag';
+
+const { TextArea } = Input;
+
+const TicketForm: React.FC = () => {
+    const { t } = useTranslation();
+    const { id, role } = useParams();
+    const navigate = useNavigate();
+    const [form] = Form.useForm();
+
+    const isEdit = !!id;
+    const isRequester = role === 'requester';
+
+    const { data: specs } = useSpecializations();
+    const { data: techs } = useTechnicians();
+    const { data: ticketData, isLoading } = useTicketDetails(id);
+    const { createMutation, updateMutation, coordinateMutation } = useTicketMutations(id);
+
+    const [selectedSpecs, setSelectedSpecs] = useState<any[]>([]);
+    const [fileList, setFileList] = useState<any[]>([]);
+
+
+    const currentStatus = Form.useWatch('status', form);
+    const currentPriority = Form.useWatch('priority', form);
+
+    const statusSteps = ['open', 'in-progress', 'closed', 'pending', 'out-of-service'];
+    const currentStep = statusSteps.indexOf(currentStatus);
+
+    const getPriorityColor = (prio: string) => {
+        switch (prio) {
+            case 'important/urgent': return 'volcano';
+            case 'important': return 'orange';
+            case 'urgent': return 'red';
+            case 'NA': return 'cyan';
+            default: return 'blue';
+        }
+    };
+
+    useEffect(() => {
+        if (ticketData) {
+            form.setFieldsValue({
+                ...ticketData,
+                assignee: ticketData.assignee?.map((a: any) => a.id),
+            });
+            if (ticketData.specialization) {
+                const incoming = Array.isArray(ticketData.specialization) ? ticketData.specialization : [ticketData.specialization];
+
+                setSelectedSpecs(incoming);
+            }
+        }
+    }, [ticketData, form]);
+
+    const onFinish = async (values: any) => {
+        const formData = new FormData();
+        formData.append('title', values.title);
+        formData.append('description', values.description);
+
+        const specId = isRequester ? selectedSpecs[0]?.id : JSON.stringify(selectedSpecs.map(s => s.id));
+        if (specId) formData.append('specialization_id', specId);
+
+        fileList.forEach((file) => {
+            formData.append('attachments[]', file.originFileObj);
+        });
+
+        if (!isRequester && isEdit) {
+            formData.append('priority', values.priority);
+            formData.append('status', values.status);
+            formData.append('assignee', JSON.stringify(values.assignee));
+        }
+
+        try {
+            if (!isEdit) {
+                await createMutation.mutateAsync(formData);
+            } else {
+                if (!isRequester) {
+                    await coordinateMutation.mutateAsync(formData);
+                } else {
+                    await updateMutation.mutateAsync(formData);
+                }
+            }
+            message.success(t('success.saved'));
+            navigate(`/${role}/tickets`);
+        } catch (err) {
+            message.error(t('errors.submitFailed'));
+        }
+    };
+
+    const handleSpecSelect = (spec: any) => {
+        if (isRequester) setSelectedSpecs([spec]);
+        else if (!selectedSpecs.find(s => s.id === spec.id)) setSelectedSpecs([...selectedSpecs, spec]);
+    };
+
+    const handleRemoveSpec = (id: string) => {
+        if (!isRequester) setSelectedSpecs(selectedSpecs.filter(s => s.id !== id));
+    };
+
+    const specMenu = {
+        items: specs?.map((s: any) => ({
+            key: s.id,
+            label: s.name,
+            onClick: () => handleSpecSelect(s)
+        }))
+    };
+
+    if (isEdit && isLoading) return <Card loading={true} />;
+
+    return (
+        <div style={{ width: '100%', padding: '24px', boxSizing: 'border-box' }}>
+            <Badge.Ribbon
+                text={!isRequester && currentPriority ? t(`priority.${currentPriority}`) : ''}
+                color={getPriorityColor(currentPriority)}
+                style={{
+                    display: !isRequester && currentPriority ? 'block' : 'none',
+                    top: -10
+                }}
+            >
+                <Card bordered={false}>
+                    { }
+                    {!isRequester && isEdit && (
+                        <div style={{ marginBottom: 48, marginTop: 12, padding: '0 40px' }}>
+                            <Steps
+                                size="small"
+                                current={currentStep}
+                                items={statusSteps.map(s => ({ title: t(`status.${s}`) }))}
+                            />
+                        </div>
+                    )}
+
+                    <Typography.Title level={3} style={{ marginBottom: 24 }}>
+                        {isEdit ? t('tickets.editTicket') : t('tickets.newTicket')}
+                    </Typography.Title>
+
+                    <Form form={form} layout="vertical" onFinish={onFinish} requiredMark={false} style={{ width: '100%' }}>
+
+                        { }
+                        <Form.Item style={{ marginBottom: 24 }} label={
+                            <Flex align="center" gap="middle" wrap="wrap" style={{ marginBottom: 8 }}>
+                                <span>{t('tickets.problemType')}</span>
+                                <Space size={8} wrap align="center">
+                                    {selectedSpecs.length > 0 ? selectedSpecs.map(spec => (
+                                        <Tag key={spec.id} color="blue" variant='outlined' closable={!isRequester} onClose={() => handleRemoveSpec(spec.id)} style={{ marginInlineEnd: 0 }}>
+                                            {spec.name}
+                                        </Tag>
+                                    )) : (
+                                        <Tag color="red" variant='outlined' style={{ marginInlineEnd: 0 }}>{t('tickets.autoAssignPlaceholder')}</Tag>
+                                    )}
+                                    <Dropdown menu={specMenu} trigger={['click']}>
+                                        <Button type="dashed" shape="circle" size="small" icon={<PlusOutlined />} style={{ marginLeft: 4 }} />
+                                    </Dropdown>
+                                </Space>
+                            </Flex>
+                        } />
+
+                        { }
+                        {!isRequester && isEdit && (
+                            <div style={{ marginBottom: 24, borderRadius: '8px' }}>
+                                <Flex gap="middle" wrap="wrap">
+                                    <Form.Item name="priority" label={t('tickets.priority')} style={{ flex: 1, minWidth: '200px' }}>
+                                        <Select options={[
+                                            { value: 'important/urgent', label: t('priority.important/urgent') },
+                                            { value: 'important', label: t('priority.important') },
+                                            { value: 'urgent', label: t('priority.urgent') },
+                                            { value: 'NA', label: t('priority.NA') }
+                                        ]} />
+                                    </Form.Item>
+                                    <Form.Item name="status" label={t('tickets.status')} style={{ flex: 1, minWidth: '200px' }}>
+                                        <Select options={[
+                                            { value: 'open', label: t('status.open') },
+                                            { value: 'in-progress', label: t('status.in-progress') },
+                                            { value: 'closed', label: t('status.closed') },
+                                            { value: 'pending', label: t('status.pending') },
+                                            { value: 'out-of-service', label: t('status.out-of-service') }
+                                        ]} />
+                                    </Form.Item>
+                                </Flex>
+                                <Form.Item name="assignee" label={t('tickets.assignee')} style={{ marginBottom: 0 }}>
+                                    <Select mode="multiple" placeholder={t('tickets.selectTechs')}>
+                                        {techs?.map((tech: any) => (
+                                            <Select.Option key={tech.id} value={tech.id}>{tech.first_name} {tech.last_name}</Select.Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
+                            </div>
+                        )}
+
+                        { }
+                        <Form.Item name="title" label={<Flex align="center" gap="small"><span>{t('tickets.title')}</span><RequiredTag /></Flex>} rules={[{ required: true }]}>
+                            <Input style={{ width: '100%' }} showCount maxLength={255} />
+                        </Form.Item>
+
+                        { }
+                        <Form.Item name="description" label={<Flex align="center" gap="small"><span>{t('tickets.description')}</span><RequiredTag /></Flex>} rules={[{ required: true }]}>
+                            <TextArea style={{ width: '100%' }} showCount maxLength={20000} rows={6} />
+                        </Form.Item>
+
+                        { }
+                        <Form.Item label={
+                            <Flex align="center" gap="middle">
+                                <span>{t('tickets.attachments')}</span>
+                                <Upload
+                                    multiple
+                                    fileList={fileList}
+                                    beforeUpload={() => false}
+                                    onChange={({ fileList }) => setFileList(fileList)}
+                                    showUploadList={false}
+                                >
+                                    <Button type="dashed" shape="circle" size="small" icon={<PlusOutlined />} />
+                                </Upload>
+                            </Flex>
+                        }>
+                            <Upload
+                                listType="picture"
+                                fileList={fileList}
+                                onRemove={(file) => {
+                                    const index = fileList.indexOf(file);
+                                    const newFileList = fileList.slice();
+                                    newFileList.splice(index, 1);
+                                    setFileList(newFileList);
+                                }}
+                            />
+                        </Form.Item>
+
+                        <Form.Item style={{ marginTop: 32 }}>
+                            <Flex justify="flex-end" gap="middle">
+                                <Button size="large" onClick={() => form.resetFields()}>{t('common.reset')}</Button>
+                                <Button size="large" type="primary" htmlType="submit" loading={createMutation.isPending || updateMutation.isPending || coordinateMutation.isPending}>
+                                    {isEdit ? t('common.save') : t('common.create')}
+                                </Button>
+                            </Flex>
+                        </Form.Item>
+                    </Form>
+                </Card>
+            </Badge.Ribbon>
+        </div>
+    );
+};
+
+export default TicketForm;
