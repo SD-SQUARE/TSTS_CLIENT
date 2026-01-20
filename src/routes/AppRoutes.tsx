@@ -1,4 +1,4 @@
-import {  Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { LoginPage } from "../features/login/pages/LoginPage";
 import { APP_BASE_PATH } from "../app/config.ts";
 import NotFound from "../components/utils/NotFound.tsx";
@@ -30,6 +30,9 @@ import {
     ToolOutlined,
     IdcardOutlined
 } from '@ant-design/icons';
+import TicketList from "../features/tickets/Components/ticketsList.tsx";
+import TicketForm from "../features/tickets/Components/ticketForm.tsx";
+import TicketView from "../features/tickets/Components/ticketDetails.tsx";
 
 export const AppRoutes = () => {
 
@@ -72,8 +75,8 @@ export const AppRoutes = () => {
     ];
     return (
         <Routes>
-            
-            <Route index path={`${APP_BASE_PATH}/`} element={<Home/>} />
+
+            <Route index path={`${APP_BASE_PATH}/`} element={<Home />} />
 
             <Route path={`${APP_BASE_PATH}/auth`}>
                 <Route index element={<LoginPage />} />
@@ -81,9 +84,10 @@ export const AppRoutes = () => {
                 <Route path="forgot-password" element={<ForgotPasswordForm />} />
             </Route>
 
+
             {/* Super/admin routes */}
             {/* TODO: Add Protection */}
-            <Route path={`${APP_BASE_PATH}/identities`} element={<MainLayout menuItems={IdentitiesMenuItems}  />}>
+            <Route path={`${APP_BASE_PATH}/identities`} element={<MainLayout menuItems={IdentitiesMenuItems} />}>
                 <Route index path="groups" element={<GroupsList />} />
                 <Route path="groups" element={<GroupsList />} />
                 <Route path="groups/:id" element={<GroupViewPage />} />
@@ -95,7 +99,7 @@ export const AppRoutes = () => {
 
             </Route>
             {/* Routes that use MainLayout */}
-            <Route path={`${APP_BASE_PATH}/settings`} element={<MainLayout menuItems={SettingsMenuItems}  />}>
+            <Route path={`${APP_BASE_PATH}/settings`} element={<MainLayout menuItems={SettingsMenuItems} />}>
 
                 <Route path="work-hours" element={<WorkHoursPage />} />
                 <Route path="universities" element={<UniversitiesPage />} />
@@ -105,7 +109,14 @@ export const AppRoutes = () => {
                 <Route path="permissions" element={<PermissionsPage />} />
 
             </Route>
-            
+            {/* Tickets routes */}
+            <Route path={`${APP_BASE_PATH}/:role/tickets`}>
+                <Route index element={<TicketList />} />
+                <Route path="new-ticket" element={<TicketForm />} />
+                <Route path=":id/*" element={<TicketView />} />
+                <Route path=":id/edit" element={<TicketForm />} />
+            </Route>
+
             {/* Complmentary Paths */}
             <Route path={`${APP_BASE_PATH}/server-error`} element={<ServerError />} />
             <Route path={`${APP_BASE_PATH}/not-allowed`} element={<NotAllowed />} />
