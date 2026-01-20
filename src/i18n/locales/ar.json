@@ -212,6 +212,74 @@
     "service_support_desc": "واجهة موحدة لحل التذاكر.",
     "need_help": "تحتاج مساعدة؟",
     "reach_team": "تواصل مع فريق الدعم الفني مباشرة."
+  },
+  "tickets": {
+    "listTitle": "عرض التذاكر",
+    "id": "الرقم التسلسلي",
+    "title": "العنوان",
+    "problemType": "نوع المشكلة",
+    "requester": "صاحب الطلب",
+    "noType": "لا نوع",
+    "new_ticket": "تذكرة جديدة",
+    "newTicket": "إنشاء تذكرة جديدة",
+    "editTicket": "تعديل التذكرة",
+    "autoAssignPlaceholder": "اتركه فارغاً للتعيين التلقائي",
+    "titlePlaceholder": "ملخص قصير للمشكلة",
+    "description": "الوصف",
+    "descriptionPlaceholder": "يرجى تقديم معلومات مفصلة...",
+    "attachments": "المرفقات",
+    "upload": "رفع ملفات",
+    "coordinationSection": "تنسيق التذكرة (للاستخدام الداخلي فقط)",
+    "priority": "الأولوية",
+    "status": "حالة التذكرة",
+    "assignee": "تعيين الفنيين",
+    "selectTechs": "ابحث واختر الفنيين",
+    "ticketDetails": "تفاصيل التذكرة",
+    "tabInfo": "المعلومات",
+    "tabMedia": "الوسائط",
+    "tabChat": "المحادثة",
+    "tabHistory": "التاريخ",
+    "assignedTo": "تم التكليف لـ",
+    "unassigned": "غير معين لفني بعد"
+  },
+  "priority": {
+    "important": "مهمة",
+    "urgent": "ضرورية",
+    "important/urgent": "مهمة/ضرورية",
+    "NA" : "غير محدد"
+  },
+  "status": {
+    "open": "مفتوحة",
+    "in-progress": "قيد المعالجة",
+    "closed": "مغلقة",
+    "pending": "قيد الانتظار",
+    "outOfService": "خارج الخدمة"
+  },
+  "common": {
+    "reset": "إعادة تعيين",
+    "create": "إنشاء التذكرة",
+    "save": "حفظ التغييرات",
+    "edit": "تعديل التذكرة",
+    "download": "تحميل",
+    "noMedia": "لا توجد ملفات وسائط مرتبطة بهذه التذكرة"
+  },
+  "success": {
+    "created": "تم إنشاء التذكرة بنجاح",
+    "updated": "تم تحديث التذكرة بنجاح",
+    "saved": "تم حفظ التذكرة بنجاح"
+  },
+  "validation": {
+    "required": "هذا الحقل مطلوب"
+  },
+  "chat": {
+    "placeholder": "اكتب رسالة..."
+  },
+  "errors": {
+    "fetchFailed": "خطأ في تحميل البيانات",
+    "unknown": "حدث خطأ غير متوقع أثناء جلب التذاكر.",
+    "submitFailed": "فشل الإرسال. يرجى المحاولة مرة أخرى.",
+    "downloadFailed": "فشل التحميل. يرجى المحاولة مرة أخرى.",
+    "uploadFailed": "فشل رفع الملفات. يرجى المحاولة مرة أخرى."
   }
   
 }
