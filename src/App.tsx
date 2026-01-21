@@ -18,6 +18,7 @@ function App() {
                     <NavItem to={`${APP_BASE_PATH}/`}>{t('HOME')}</NavItem>
                     <NavItem to={`${APP_BASE_PATH}/settings/domains`}>{'domains'}</NavItem>
                     <NavItem to={`${APP_BASE_PATH}/identities/groups`}>{'Entity'}</NavItem>
+                    <NavItem to={`${APP_BASE_PATH}/knowledge-base`}>Knowledge Base</NavItem>
                 </NavBar>
 
                 {/* Pages Content */}
