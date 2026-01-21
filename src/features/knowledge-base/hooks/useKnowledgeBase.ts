@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Form, message, Modal } from 'antd';
 import mammoth from 'mammoth';
 import { useGenericCrud } from '../../../api/common/hooks/common-hooks';
@@ -8,7 +8,9 @@ import type { KnowledgeBaseItem, CreateKnowledgeBaseDto, UpdateKnowledgeBaseDto 
 export const useKnowledgeBase = () => {
   const [form] = Form.useForm();
 
-  const [searchText, setSearchText] = useState("");
+    const [searchText, setSearchText] = useState("");
+
+    const [debouncedSearch, setDebouncedSearch] = useState(searchText);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [editingId, setEditingId] = useState<string | number | null>(null);
@@ -21,8 +23,8 @@ export const useKnowledgeBase = () => {
     updateMutation,
     deleteMutation,
   } = useGenericCrud<KnowledgeBaseItem, CreateKnowledgeBaseDto, UpdateKnowledgeBaseDto>({
-    queryKey: ['knowledgeBase'],
-    fetchFn: () => knowledgeBaseApi.getAll(),
+    queryKey: ['knowledgeBase', debouncedSearch],
+    fetchFn: () => knowledgeBaseApi.getAll({search : debouncedSearch}),
     createFn: (data) => knowledgeBaseApi.create(data),
     updateFn: ({ id, data }) => knowledgeBaseApi.update(id, data),
     deleteFn: (id) => knowledgeBaseApi.delete(id),
@@ -38,7 +40,7 @@ export const useKnowledgeBase = () => {
         const currentContent = form.getFieldValue('content') || '';
         form.setFieldValue('content', currentContent + result.value);
         message.success('Word document imported successfully!');
-      }
+        } 
     } catch (error) {
       console.error(error);
       message.error('Failed to parse Word document.');
@@ -103,12 +105,14 @@ export const useKnowledgeBase = () => {
   const closeViewModal = () => {
     setViewingItem(null);
   };
+  
+    useEffect(() => {
+        const timeout = setTimeout(() => setDebouncedSearch(searchText), 500); // 300ms debounce
+        return () => clearTimeout(timeout);
+    }, [searchText]);
 
-
-  const filteredData = data?.filter(item =>
-    (item.title?.toLowerCase() || "").includes(searchText.toLowerCase()) ||
-    (item.specialization?.toLowerCase() || "").includes(searchText.toLowerCase())
-  ) || [];
+    const filteredData: any[] = data;
+    
 
   return {
     form,
