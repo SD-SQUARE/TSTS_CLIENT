@@ -1,11 +1,13 @@
 // LanguageSwitcher
-import { Dropdown, Space } from "antd";
+import { Avatar, Dropdown, Space } from "antd";
 import i18n from "../../../../i18n";
 import { useState } from "react";
+import egFlag from '../../../../assets/lang/eg-flag.svg';
+import ukFlag from '../../../../assets/lang/uk-flag.svg';
 
 const languages = {
-    en: { label: "English", flag: "🇬🇧" },
-    ar: { label: "العربية", flag: "🇪🇬" },
+    en: { label: "English", flag: ukFlag },
+    ar: { label: "العربية", flag: egFlag },
 };
 
 // single language dropdown item
@@ -13,7 +15,7 @@ const items = Object.entries(languages).map(([key, val]) => ({
     key,
     label: (
         <Space>
-            <span style={{ fontSize: 20 }}>{val.flag}</span>
+            <Avatar shape="square"  size={"small"} src={val.flag} />
             {val.label}
         </Space>
     ),
@@ -39,7 +41,9 @@ const LanguageSwitcher = () => {
             arrow
         >
             <Space style={{ cursor: "pointer", userSelect: "none" }}>
-                <span style={{ fontSize: 28 }}>{languages[lang].flag}</span>
+                
+                    <Avatar shape="square"  src={languages[lang].flag} />
+                
             </Space>
         </Dropdown>
     );

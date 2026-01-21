@@ -24,9 +24,6 @@ const Body = ({ children }) => {
             <Content
                 ref={contentRef}
                 style={{
-                    overflow: "auto",
-                    display: "flex",
-                    flexDirection: "column",
                     height: "100%",
                 }}
             >
