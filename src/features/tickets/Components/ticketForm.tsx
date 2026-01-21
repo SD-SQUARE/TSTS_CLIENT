@@ -34,8 +34,30 @@ const TicketForm: React.FC = () => {
     const currentStatus = Form.useWatch('status', form);
     const currentPriority = Form.useWatch('priority', form);
 
-    const statusSteps = ['open', 'in-progress', 'closed', 'pending', 'out-of-service'];
-    const currentStep = statusSteps.indexOf(currentStatus);
+    const getStepperData = () => {
+        // Default middle state if none is selected or if 'open' is selected
+        const middleStates = ['in-progress', 'pending', 'out-of-service'];
+        const activeMiddleState = middleStates.includes(currentStatus) ? currentStatus : 'in-progress';
+
+        const steps = [
+            { key: 'open', title: t('status.open') },
+            { key: 'middle', title: t(`status.${activeMiddleState}`) },
+            { key: 'closed', title: t('status.closed') }
+        ];
+
+        let currentStepIndex = 0;
+        if (currentStatus === 'closed') {
+            currentStepIndex = 2;
+        } else if (middleStates.includes(currentStatus)) {
+            currentStepIndex = 1;
+        } else {
+            currentStepIndex = 0; // 'open'
+        }
+
+        return { steps, currentStepIndex };
+    };
+
+    const { steps, currentStepIndex } = getStepperData();
 
     const getPriorityColor = (prio: string) => {
         switch (prio) {
@@ -131,8 +153,8 @@ const TicketForm: React.FC = () => {
                         <div style={{ marginBottom: 48, marginTop: 12, padding: '0 40px' }}>
                             <Steps
                                 size="small"
-                                current={currentStep}
-                                items={statusSteps.map(s => ({ title: t(`status.${s}`) }))}
+                                current={currentStepIndex}
+                                items={steps}
                             />
                         </div>
                     )}
@@ -178,9 +200,9 @@ const TicketForm: React.FC = () => {
                                         <Select options={[
                                             { value: 'open', label: t('status.open') },
                                             { value: 'in-progress', label: t('status.in-progress') },
-                                            { value: 'closed', label: t('status.closed') },
                                             { value: 'pending', label: t('status.pending') },
-                                            { value: 'out-of-service', label: t('status.out-of-service') }
+                                            { value: 'out-of-service', label: t('status.out-of-service') },
+                                            { value: 'closed', label: t('status.closed') }
                                         ]} />
                                     </Form.Item>
                                 </Flex>
