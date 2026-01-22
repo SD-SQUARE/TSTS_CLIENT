@@ -30,6 +30,7 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
     const handleSend = async () => {
         if (!text.trim() || isSending) return;
         try {
+            // Fix: add uploaded media ids 
             await sendMessage({ ticketId: ticketId!, message: text }).unwrap();
             setText('');
         } catch (error) {
@@ -40,7 +41,8 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
     const handleFileUpload = async (options: any) => {
         const { file } = options;
         const formData = new FormData();
-        formData.append('media', file);
+        formData.append('files', file);
+        console.log(formData);
         try {
             await uploadMedia({ ticketId: ticketId!, formData }).unwrap();
         } catch (error) {

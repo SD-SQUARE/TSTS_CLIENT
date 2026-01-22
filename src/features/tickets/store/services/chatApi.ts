@@ -22,10 +22,10 @@ export interface ChatMessage {
 
 export const chatApi = createApi({
     reducerPath: 'chatApi',
-    baseQuery: async ({ url, method, data, params }) => {
+    baseQuery: async ({ url, method, data, params, headers }) => {
         
         try {
-            const result = await api({ url, method, data, params });
+            const result = await api({ url, method, data, params, headers });
             return { data: result.data };
         } catch (axiosError: any) {
             const err = axiosError;
@@ -79,6 +79,9 @@ export const chatApi = createApi({
                 url: `/api/v1/tickets/${ticketId}/chat/media`,
                 method: 'POST',
                 data: formData, 
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             }),
         }),
     }),
