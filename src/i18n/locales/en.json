@@ -261,7 +261,8 @@
     "save": "Save Changes",
     "edit": "Edit Ticket",
     "download": "Download",
-    "noMedia": "No media files associated with this ticket"
+    "noMedia": "No media files associated with this ticket",
+    "me": "Me"
   },
   "success": {
     "created": "Ticket created successfully",
