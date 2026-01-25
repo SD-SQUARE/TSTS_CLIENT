@@ -1,21 +1,21 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { use, useState } from "react";
 import { Form, Input, Button, Typography, Alert ,Image} from "antd";
 import { loginSchema } from "../schema/LoginSchema";
-import { loginSuccess } from "../store/authSlice";
 import loginImage from "../../../assets/HU-bg-clear.png"
-import axios from "axios";
-import NavItem from "../../../components/layouts/Nav/components/NavItem";
 import { APP_BASE_PATH } from "../../../app/config";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useLogin } from "../hooks/useLogin";
+import { useTranslation } from "react-i18next";
 const { Title } = Typography;
 
 const LoginForm = () => {
-  const dispatch = useDispatch();
-  const [form] = Form.useForm();
-  const [isHovered, setIsHovered] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+    const {t} = useTranslation();
+    const [form] = Form.useForm();
+    const [isHovered, setIsHovered] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate();
+    const { mutate: login } = useLogin();
 
   
   const validateForm = (values: any) => {
@@ -52,18 +52,13 @@ const LoginForm = () => {
     setIsLoading(true);
     setError(null);
 
-    try {
-      const response = await axios.post("/auth/login", values);
-      const { user, accessToken } = response.data;
+      try {
+        // TODO: use the login hook instead of hardcoded API call
+          login(values);
 
-    
-      sessionStorage.setItem("token", accessToken);
-
-      dispatch(loginSuccess({ user  , token: accessToken,}));
-
-      window.location.href = "/profile";
+          navigate("/");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Login failed");
+      setError(err.response?.data?.message || t("Login_Failed"));
     } finally {
       setIsLoading(false);
     }
@@ -110,8 +105,8 @@ const LoginForm = () => {
           validateDebounce={400}
           validateFirst
           rules={[
-            { required: true, message: "Email is required" },
-            { type: "email", message: "Invalid email address format" },
+            { required: true, message: t("Email_IS_Required") },
+            { type: "email", message: t("Invalid_email_address_format") },
           ]}
         >
           <Input placeholder="example@mail.com" className="login-input" />
@@ -124,11 +119,11 @@ const LoginForm = () => {
           validateDebounce={400}
           validateFirst
           rules={[
-            { required: true, message: "Password is required" },
-            { min: 6, message: "Must be at least 6 characters" },
-            { pattern: /[A-Z]/, message: "Must contain an uppercase letter" },
-            { pattern: /[0-9]/, message: "Must contain a number" },
-            { pattern: /[^A-Za-z0-9]/, message: "Must contain a special character" },
+            { required: true, message: t("Password_is_required") },
+            { min: 8, message: t("Must_be_at_least_8_characters") },
+            { pattern: /[A-Z]/, message: t("Must_contain_an_uppercase_letter") },
+            { pattern: /[0-9]/, message: t("Must_contain_a_number") },
+            { pattern: /[^A-Za-z0-9]/, message: t("Must_contain_a_special_character") },
           ]}
         >
           <Input.Password placeholder="********" className="login-input" />
