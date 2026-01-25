@@ -1,0 +1,14 @@
+
+.authBTN{
+    color: var(--color-black) !important;
+    background-color: var(--color-white) !important;
+    border-radius: 8px !important;
+    border-color: var(--color-white) !important;
+}
+
+.authBTN:hover{
+    color: var(--color-primary) !important;
+    background-color: var(--color-secondary) !important;
+    border-color: var(--color-secondary) !important;
+}
+

@@ -1,4 +1,4 @@
-import { use, useState } from "react";
+import {  useState } from "react";
 import { Form, Input, Button, Typography, Alert ,Image} from "antd";
 import { loginSchema } from "../schema/LoginSchema";
 import loginImage from "../../../assets/HU-bg-clear.png"
@@ -6,6 +6,7 @@ import { APP_BASE_PATH } from "../../../app/config";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useLogin } from "../hooks/useLogin";
 import { useTranslation } from "react-i18next";
+import i18next from "i18next";
 const { Title } = Typography;
 
 const LoginForm = () => {
@@ -15,9 +16,12 @@ const LoginForm = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
-    const { mutate: login } = useLogin();
-
-  
+    
+    const gotoMainPage = () => {
+        navigate(`${APP_BASE_PATH}/`);
+    }
+    const { mutateAsync: login } = useLogin(gotoMainPage);
+    
   const validateForm = (values: any) => {
     const result = loginSchema.safeParse(values);
   
@@ -53,10 +57,7 @@ const LoginForm = () => {
     setError(null);
 
       try {
-        // TODO: use the login hook instead of hardcoded API call
-          login(values);
-
-          navigate("/");
+          await login(values);
     } catch (err: any) {
       setError(err.response?.data?.message || t("Login_Failed"));
     } finally {
@@ -68,6 +69,7 @@ const LoginForm = () => {
     validateForm(allValues);
   };
 
+    
   return (
     <div
       className={`login-card ${isHovered ? "hovered" : ""}`}
@@ -79,7 +81,7 @@ const LoginForm = () => {
         </div>
 
       <div className="login-right">
-        <Title className="login-title">Login</Title>
+        <Title className="login-title">{t("Login")}</Title>
 
         {error && (
           <Alert
@@ -97,10 +99,11 @@ const LoginForm = () => {
           onValuesChange={onValuesChange}
           requiredMark={false}
           validateTrigger="onChange"
+          dir={i18next.language === "ar" ? "rtl" : "ltr"}
         >
         <Form.Item
           name="email"
-          label="Email"
+          label={t("Email")}
           validateTrigger="onChange"
           validateDebounce={400}
           validateFirst
@@ -114,7 +117,7 @@ const LoginForm = () => {
 
         <Form.Item
           name="password"
-          label="Password"
+          label={t("Password")}
           validateTrigger="onChange"
           validateDebounce={400}
           validateFirst
@@ -132,7 +135,7 @@ const LoginForm = () => {
 
           <div className="forgot-password">
                       <NavLink to={`${APP_BASE_PATH}/auth/forgot-password`}> 
-                            Forget password?
+                            {t("Forgot_Password")}?
                       </NavLink>
           </div>
 
@@ -144,7 +147,7 @@ const LoginForm = () => {
               block
               className="login-button"
             >
-              Login
+              {t("Login")}
             </Button>
           </Form.Item>
         </Form>

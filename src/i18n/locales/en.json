@@ -285,5 +285,10 @@
     "Must_be_at_least_8_characters": "Password must be at least 8 characters",
     "Must_contain_an_uppercase_letter": "Password must contain an uppercase letter",
     "Must_contain_a_number": "Password must contain a number",
-    "Must_contain_a_special_character": "Password must contain a special character: !, @, #, $"
+    "Must_contain_a_special_character": "Password must contain a special character: !, @, #, $",
+    "Login": "Login",
+    "Logout": "Logout",
+    "Email": "Email",
+    "Password": "Password",
+    "Forgot_Password": "Forgot Password"
 }

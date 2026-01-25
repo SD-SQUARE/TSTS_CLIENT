@@ -285,5 +285,10 @@
     "Must_be_at_least_8_characters": "كلمة المرور يجب أن تحتوي على الأقل 8 حروف على الأقل",
     "Must_contain_an_uppercase_letter": "كلمة المرور يجب أن تحتوي على حرف كبير",
     "Must_contain_a_number": "كلمة المرور يجب أن تحتوي على رقم",
-    "Must_contain_a_special_character": "!, @, #, $ : كلمة المرور يجب أن تحتوي على حرف خاص"
+    "Must_contain_a_special_character": "!, @, #, $ : كلمة المرور يجب أن تحتوي على حرف خاص",
+    "Login": "تسجيل الدخول",
+    "Logout": "تسجيل الخروج",
+    "Email": "البريد الإلكتروني",
+    "Password": "كلمة المرور",
+    "Forgot_Password": "نسيت كلمة المرور"
 }
