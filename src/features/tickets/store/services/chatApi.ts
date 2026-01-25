@@ -62,19 +62,23 @@ export const chatApi = createApi({
                 }
 
                 await cacheEntryRemoved;
-                ws.close();
+                if (ws.readyState <= WebSocket.OPEN) {
+                    ws.close();
+                }
             },
         }),
 
-        sendMessage: builder.mutation<ChatMessage, { ticketId: string; message: string }>({
-            query: ({ ticketId, message }) => ({
+        sendMessage: builder.mutation<ChatMessage, { ticketId: string; message: string; mediaIds?: string[] }>({
+            query: ({ ticketId, message, mediaIds }) => ({
                 url: `/api/v1/tickets/${ticketId}/chat`,
                 method: 'POST',
-                data: { message },
+                data: { message,
+                    media_ids: mediaIds
+                },
             }),
         }),
         
-        uploadChatMedia: builder.mutation<void, { ticketId: string; formData: FormData }>({
+        uploadChatMedia: builder.mutation<any[], { ticketId: string; formData: FormData }>({
             query: ({ ticketId, formData }) => ({
                 url: `/api/v1/tickets/${ticketId}/chat/media`,
                 method: 'POST',
