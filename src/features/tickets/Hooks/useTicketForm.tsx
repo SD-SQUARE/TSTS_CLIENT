@@ -15,6 +15,10 @@ export const useTechnicians = () =>
   useQuery({
     queryKey: ['technicians'], queryFn: () =>
       api.get('v1/lockups/technicians/').then(res => res.data.users)
+export const useAdmins = () =>
+  useQuery({
+    queryKey: ['admins'], queryFn: () =>
+      api.get('v1/lockups/admins').then(res => res.data.users)
   });
 
 

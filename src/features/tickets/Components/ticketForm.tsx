@@ -8,7 +8,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Input, Select, Button, Upload, Tag, Dropdown, Space, Typography, message, Flex, Card, Steps, Badge } from 'antd';
 import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useSpecializations, useTechnicians, useTicketDetails, useTicketMutations } from '../Hooks/useTicketForm';
+import { useAdmins, useSpecializations, useTechnicians, useTicketDetails, useTicketMutations } from '../Hooks/useTicketForm';
 import RequiredTag from '../../../components/RequiredTag';
 import { useSelector } from 'react-redux';
 
@@ -26,6 +26,7 @@ const TicketForm: React.FC = () => {
 
     const { data: specs } = useSpecializations();
     const { data: techs } = useTechnicians();
+    const { data: admins } = useAdmins();
     const { data: ticketData, isLoading } = useTicketDetails(id);
     const { createMutation, updateMutation, coordinateMutation } = useTicketMutations(id);
 
@@ -75,15 +76,26 @@ const TicketForm: React.FC = () => {
         if (ticketData) {
             form.setFieldsValue({
                 ...ticketData,
-                assignee: ticketData.assignee?.map((a: any) => a.id),
+                assignee: ticketData.assignee?.map((a: any) => ({
+                    value: a.id,
+                    label: `${a.first_name} ${a.last_name}`,
+                })),
             });
             if (ticketData.specialization) {
                 const incoming = Array.isArray(ticketData.specialization) ? ticketData.specialization : [ticketData.specialization];
-
                 setSelectedSpecs(incoming);
             }
         }
     }, [ticketData, form]);
+
+    const allPossibleAssignees = [
+        ...(techs || []),
+        ...(admins || [])
+    ].map((user: any) => ({
+        value: user.id,
+        label: user.name || `${user.first_name} ${user.last_name}`,
+        group: techs?.find((t: any) => t.id === user.id) ? 'Technician' : 'Admin'
+    }));
 
     const onFinish = async (values: any) => {
         const formData = new FormData();
@@ -128,9 +140,6 @@ const TicketForm: React.FC = () => {
         setSelectedSpecs([spec]);
     };
 
-    const handleRemoveSpec = (id: string) => {
-        if (!isRequester) setSelectedSpecs(selectedSpecs.filter(s => s.id !== id));
-    };
 
     const specMenu = {
         items: specs?.map((s: any) => ({
@@ -175,7 +184,7 @@ const TicketForm: React.FC = () => {
                             <Flex align="center" gap="middle" wrap="wrap" style={{ marginBottom: 8 }}>
                                 <span>{t('tickets.problemType')}</span>
                                 <Space size={8} wrap align="center">
-                                    {selectedSpecs.length > 0 ?  (
+                                    {selectedSpecs.length > 0 ? (
                                         <Tag color="blue" variant='outlined' style={{ marginInlineEnd: 0 }}>
                                             {selectedSpecs[0].name}
                                         </Tag>
@@ -212,11 +221,14 @@ const TicketForm: React.FC = () => {
                                     </Form.Item>
                                 </Flex>
                                 <Form.Item name="assignee" label={t('tickets.assignee')} style={{ marginBottom: 0 }}>
-                                    <Select mode="multiple" placeholder={t('tickets.selectTechs')}>
-                                        {techs?.map((tech: any) => (
-                                            <Select.Option key={tech.id} value={tech.id}>{tech.first_name} {tech.last_name}</Select.Option>
-                                        ))}
-                                    </Select>
+                                    <Select mode="multiple" labelInValue placeholder={t('tickets.selectTechs')} options={allPossibleAssignees} optionRender={(option) => (
+                                        <Flex justify="space-between">
+                                            <span>{option.label}</span>
+                                            <Typography.Text type="secondary" style={{ fontSize: '10px' }}>
+                                                {option.data.group}
+                                            </Typography.Text>
+                                        </Flex>
+                                    )} />
                                 </Form.Item>
                             </div>
                         )}
