@@ -33,6 +33,7 @@ import {
 import TicketList from "../features/tickets/Components/ticketsList.tsx";
 import TicketForm from "../features/tickets/Components/ticketForm.tsx";
 import TicketView from "../features/tickets/Components/ticketDetails.tsx";
+import GuardedRoute from "./GuardedRoute.tsx";
 
 export const AppRoutes = () => {
 
@@ -84,29 +85,84 @@ export const AppRoutes = () => {
                 <Route path="forgot-password" element={<ForgotPasswordForm />} />
             </Route>
 
+                {/* Super/admin routes */}
+                {/* TODO: Add Protection */}
+            <Route path={`${APP_BASE_PATH}/identities`} element={
+                <GuardedRoute roles={["superadmin", "admin"]}>
+                    <MainLayout menuItems={IdentitiesMenuItems} />
+                </GuardedRoute>
+            }>
+                <Route index path="groups" element={
+                    <GuardedRoute roles={["superadmin", "admin"]}>
+                        <GroupsList />
+                    </GuardedRoute>
+                } />
+                
+                <Route path="groups" element={
+                    <GuardedRoute roles={["superadmin", "admin"]}>
+                        <GroupsList />
+                    </GuardedRoute>
+                } />
+                <Route path="groups/:id" element={
+                    <GuardedRoute roles={["superadmin", "admin"]}>
+                        <GroupViewPage />
+                    </GuardedRoute>
+                } />
 
-            {/* Super/admin routes */}
-            {/* TODO: Add Protection */}
-            <Route path={`${APP_BASE_PATH}/identities`} element={<MainLayout menuItems={IdentitiesMenuItems} />}>
-                <Route index path="groups" element={<GroupsList />} />
-                <Route path="groups" element={<GroupsList />} />
-                <Route path="groups/:id" element={<GroupViewPage />} />
+                <Route path="users/technicians" element={
+                    <GuardedRoute roles={["superadmin", "admin"]}>
+                        <UserList role={'technicians'} />
+                    </GuardedRoute>
+                } />
+                <Route path="users/requesters" element={
+                    <GuardedRoute roles={["superadmin", "admin"]}>
+                        <UserList role={'requesters'} />
+                    </GuardedRoute>
+                } />
+                <Route path="users/admins" element={
+                    <GuardedRoute roles={["superadmin", "admin"]}>
+                        <UserList role={'admins'} />
+                    </GuardedRoute>
+                } />
+                <Route path="users/:role/:id" element={
+                    <GuardedRoute roles={["superadmin", "admin"]}>
+                        <UserViewPage />
+                    </GuardedRoute>
+                } />
 
-                <Route path="users/technicians" element={<UserList role={'technicians'} />} />
-                <Route path="users/requesters" element={<UserList role={'requesters'} />} />
-                <Route path="users/admins" element={<UserList role={'admins'} />} />
-                <Route path="users/:role/:id" element={<UserViewPage />} />
-
-            </Route>
+                </Route>
             {/* Routes that use MainLayout */}
-            <Route path={`${APP_BASE_PATH}/settings`} element={<MainLayout menuItems={SettingsMenuItems} />}>
+            <Route path={`${APP_BASE_PATH}/settings`} element={
+                <GuardedRoute roles={["superadmin", "admin"]}>
+                    <MainLayout menuItems={SettingsMenuItems} />
+                </GuardedRoute>
+                }>
 
-                <Route path="work-hours" element={<WorkHoursPage />} />
-                <Route path="universities" element={<UniversitiesPage />} />
-                <Route path="domains" element={<DomainsPage />} />
-                <Route path="departments" element={<DepartmentsPage />} />
-                <Route path="specializations" element={<SpecializationsPage />} />
-                <Route path="permissions" element={<PermissionsPage />} />
+                <Route path="universities" element={
+                    <GuardedRoute roles={["superadmin", "admin"]}>
+                    <UniversitiesPage />
+                    </GuardedRoute>
+                } />
+                
+                <Route path="domains" element={
+                    <GuardedRoute roles={["superadmin", "admin"]}>
+                        <DomainsPage />
+                    </GuardedRoute>
+                } />
+                <Route path="departments" element={
+                    <GuardedRoute roles={["superadmin", "admin"]}>
+                        <DepartmentsPage />
+                    </GuardedRoute>
+                } />
+                <Route path="specializations" element={
+                    <GuardedRoute roles={["superadmin", "admin"]}>
+                        <SpecializationsPage />
+                    </GuardedRoute>
+                } />
+
+                {/* TODO:connect pages later */}
+                {/* <Route path="permissions" element={<PermissionsPage />} /> */}
+                {/* <Route path="work-hours" element={<WorkHoursPage />} /> */}
 
             </Route>
             {/* Tickets routes */}

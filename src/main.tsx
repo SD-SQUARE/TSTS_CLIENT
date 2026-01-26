@@ -6,11 +6,15 @@ import { queryClient } from "./app/queryClient";
 import "./index.css";
 import App from './App';
 import "./i18n"
+import { ConfigProvider } from "antd";
+import i18n from "./i18n";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
     <Provider store={store}>
         <QueryClientProvider client={queryClient}>
-            <App />
+            <ConfigProvider direction={i18n.language === "ar" ? "rtl" : "ltr"}>
+                <App />
+            </ConfigProvider>
         </QueryClientProvider>
     </Provider>
 );

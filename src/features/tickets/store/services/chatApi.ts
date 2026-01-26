@@ -43,29 +43,30 @@ export const chatApi = createApi({
                 url: `/api/v1/tickets/${ticketId}/chat`,
                 method: 'GET',
             }),
-            async onCacheEntryAdded(ticketId, { updateCachedData, cacheDataLoaded, cacheEntryRemoved }) {
-                const ws = new WebSocket(`ws://localhost:3000/ws/tickets/${ticketId}`);
+            // TODO: Use Socket.IO with chat 
+            // async onCacheEntryAdded(ticketId, { updateCachedData, cacheDataLoaded, cacheEntryRemoved }) {
+            //     const ws = new WebSocket(`ws://localhost:5000/ws/tickets/${ticketId}`);
                 
-                try {
-                    await cacheDataLoaded;
-                    const listener = (event: MessageEvent) => {
-                        const data = JSON.parse(event.data);
-                        updateCachedData((draft) => {
-                            if (!draft.find(msg => msg.id === data.id)) {
-                                draft.push(data);
-                            }
-                        });
-                    };
-                    ws.addEventListener('message', listener);
-                } catch {
-                    console.error("WebSocket connection failed");
-                }
+            //     try {
+            //         await cacheDataLoaded;
+            //         const listener = (event: MessageEvent) => {
+            //             const data = JSON.parse(event.data);
+            //             updateCachedData((draft) => {
+            //                 if (!draft.find(msg => msg.id === data.id)) {
+            //                     draft.push(data);
+            //                 }
+            //             });
+            //         };
+            //         ws.addEventListener('message', listener);
+            //     } catch {
+            //         console.error("WebSocket connection failed");
+            //     }
 
-                await cacheEntryRemoved;
-                if (ws.readyState <= WebSocket.OPEN) {
-                    ws.close();
-                }
-            },
+            //     await cacheEntryRemoved;
+            //     if (ws.readyState <= WebSocket.OPEN) {
+            //         ws.close();
+            //     }
+            // },
         }),
 
         sendMessage: builder.mutation<ChatMessage, { ticketId: string; message: string; mediaIds?: string[] }>({

@@ -290,5 +290,13 @@
     "Logout": "تسجيل الخروج",
     "Email": "البريد الإلكتروني",
     "Password": "كلمة المرور",
-    "Forgot_Password": "نسيت كلمة المرور"
+    "Forgot_Password": "نسيت كلمة المرور",
+    "auth": {
+        "loginRequired": "تسجيل الدخول مطلوب",
+        "loginDescription": "الرجاء تسجيل الدخول للوصول لهذه الصفحة",
+        "unauthorized": "الوصول غير مصرح",
+        "unauthorizedDescription": "ليس لديك صلاحية لوصول هذه الصفحة"
+    },
+    "Settings": "الاعدادات",
+    "Personnel": "قسم الموظفين"
 }

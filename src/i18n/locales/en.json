@@ -290,5 +290,13 @@
     "Logout": "Logout",
     "Email": "Email",
     "Password": "Password",
-    "Forgot_Password": "Forgot Password"
+    "Forgot_Password": "Forgot Password",
+    "auth":{
+        "loginRequired": "Login is required",
+        "loginDescription": "Please login to access this page",
+        "unauthorized": "Unauthorized access",
+        "unauthorizedDescription": "You are not authorized to access this page"
+    },
+    "Settings": "Settings",
+    "Personnel": "Personnel"
 }
