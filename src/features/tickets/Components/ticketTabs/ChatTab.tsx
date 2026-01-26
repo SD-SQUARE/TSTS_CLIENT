@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { useGetChatMessagesQuery, useSendMessageMutation, useUploadChatMediaMutation } from '../../store/services/chatApi';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 
 const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) => {
     const { t } = useTranslation();
@@ -17,9 +18,8 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
     const [text, setText] = useState('');
     const [pendingMediaIds, setPendingMediaIds] = useState<string[]>([]);
     const [tempFiles, setTempFiles] = useState<{ id: string, name: string }[]>([]);
+    const {user} = useSelector((state: any) => state.auth);
 
-
-    const currentUserId = sessionStorage.getItem('userId');
 
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -33,7 +33,7 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
         if (!text.trim() && pendingMediaIds.length === 0) return;
         // console.log('Sending message:', {text, pendingMediaIds});
         try {
-            await sendMessage({ ticketId: ticketId!, message: text, mediaIds: pendingMediaIds }).unwrap();
+            await sendMessage({ ticketId: ticketId!, message: text, mediaIds: pendingMediaIds, userID: user.id }).unwrap();
             setText('');
             setPendingMediaIds([]);
             setTempFiles([]);
@@ -96,7 +96,7 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
                     dataSource={messages}
                     renderItem={(item) => {
 
-                        const isMe = String(item.sender.id) === String(currentUserId);
+                        const isMe = String(item.sender.id) === String(user.id);
 
                         return (
                             <List.Item style={{

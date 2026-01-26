@@ -34,6 +34,7 @@ import TicketList from "../features/tickets/Components/ticketsList.tsx";
 import TicketForm from "../features/tickets/Components/ticketForm.tsx";
 import TicketView from "../features/tickets/Components/ticketDetails.tsx";
 import GuardedRoute from "./GuardedRoute.tsx";
+import PageLayout from "../components/PageLayout.tsx";
 
 export const AppRoutes = () => {
 
@@ -167,10 +168,10 @@ export const AppRoutes = () => {
             </Route>
             {/* Tickets routes */}
             <Route path={`${APP_BASE_PATH}/:role/tickets`}>
-                <Route index element={<TicketList />} />
-                <Route path="new-ticket" element={<TicketForm />} />
-                <Route path=":id/*" element={<TicketView />} />
-                <Route path=":id/edit" element={<TicketForm />} />
+                <Route index element={<PageLayout ><TicketList /></PageLayout>} />
+                <Route path="new-ticket" element={<PageLayout><TicketForm /></PageLayout>} />
+                <Route path=":id/*" element={<PageLayout><TicketView /></PageLayout>} />
+                <Route path=":id/edit" element={<PageLayout><TicketForm /></PageLayout>} />
             </Route>
 
             {/* Complmentary Paths */}

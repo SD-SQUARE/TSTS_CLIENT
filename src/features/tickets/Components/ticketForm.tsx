@@ -10,6 +10,7 @@ import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useSpecializations, useTechnicians, useTicketDetails, useTicketMutations } from '../Hooks/useTicketForm';
 import RequiredTag from '../../../components/RequiredTag';
+import { useSelector } from 'react-redux';
 
 const { TextArea } = Input;
 
@@ -18,6 +19,7 @@ const TicketForm: React.FC = () => {
     const { id, role } = useParams();
     const navigate = useNavigate();
     const [form] = Form.useForm();
+    const { user } = useSelector((state: any) => state.auth);
 
     const isEdit = !!id;
     const isRequester = role === 'requester';
@@ -87,13 +89,17 @@ const TicketForm: React.FC = () => {
         const formData = new FormData();
         formData.append('title', values.title);
         formData.append('description', values.description);
+        formData.append('requester', user.id);
 
         const specId = isRequester ? selectedSpecs[0]?.id : JSON.stringify(selectedSpecs.map(s => s.id));
         if (specId) formData.append('specialization_id', specId);
 
         fileList.forEach((file) => {
-            formData.append('attachments[]', file.originFileObj);
+            if (file.originFileObj instanceof File) {
+                formData.append("media", file.originFileObj);
+            }
         });
+
 
         if (!isRequester && isEdit) {
             formData.append('priority', values.priority);

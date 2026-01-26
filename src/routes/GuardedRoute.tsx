@@ -10,12 +10,14 @@ import { BrokenSecurityShieldIcon, SecurityShieldIcon } from "../assets/icons";
 interface GuardedRouteProps {
     roles?: string[];
     permissions?: string[];
+    allowNavigation?: boolean;
     children: React.ReactNode;
 }
 
 export default function GuardedRoute({
     roles = [],
     permissions = [],
+    allowNavigation = true,
     children,
 }: GuardedRouteProps) {
     const { t } = useTranslation();
@@ -23,68 +25,41 @@ export default function GuardedRoute({
     const { user } = useSelector((state: any) => state.auth);
     const location = useLocation();
 
+    if (location.pathname === `${APP_BASE_PATH}/auth/login` || location.pathname === `${APP_BASE_PATH}/not-allowed`)
+        return children;
+    
+    console.log(user);
+    console.log(roles);
     const role = user?.role?.toLowerCase();
     const userPermissions = user?.permissions || [];
 
-    const hasNotified = useRef(false);
-
-    const isRoleAllowed = () =>
-        roles.length === 0 || roles.includes(role) || role === "*";
+    const isRoleAllowed = () => roles.includes("*") || roles.includes(role) ;
 
     const isPermissionsAllowed = () =>
         permissions.length === 0 ||
         permissions.every(p => userPermissions.includes(p));
 
-    useEffect(() => {
-        if (!role && !hasNotified.current) {
-            notification.warning({
-                title: t("auth.loginRequired"),
-                description: t("auth.loginDescription"),
-                placement: notificationDirection,
-                showProgress: true,
-                pauseOnHover: true,
-                icon: <SecurityShieldIcon/>,
-                styles: {
-                    title: {
-                        direction: i18next.language === "ar" ? "rtl" : "ltr",
-                    },
-                    description: {
-                        direction: i18next.language === "ar" ? "rtl" : "ltr",
-                    },
-
-                }
-            });
-            hasNotified.current = true;
-        }
-
-        if (
-            role &&
-            (!isRoleAllowed() || !isPermissionsAllowed()) &&
-            !hasNotified.current
-        ) {
-            notification.error({
-                title: t("auth.unauthorized"),
-                description: t("auth.unauthorizedDescription"),
-                placement: notificationDirection,
-                showProgress: true,
-                pauseOnHover: true,
-                icon: <BrokenSecurityShieldIcon />,
-                styles: {
-                    title: {
-                        direction: i18next.language === "ar" ? "rtl" : "ltr",
-                    },
-                    description: {
-                        direction: i18next.language === "ar" ? "rtl" : "ltr",
-                    },
-                    
-                }
-            });
-            hasNotified.current = true;
-        }
-    }, [role]);
-
+    console.log(isRoleAllowed());
+    console.log(isPermissionsAllowed());
     // 🚫 Not logged in
-    if (!role) {
+    if (!role && allowNavigation) {
+        notification.warning({
+            title: t("auth.loginRequired"),
+            description: t("auth.loginDescription"),
+            placement: notificationDirection,
+            showProgress: true,
+            pauseOnHover: true,
+            icon: <SecurityShieldIcon />,
+            styles: {
+                title: {
+                    direction: i18next.language === "ar" ? "rtl" : "ltr",
+                },
+                description: {
+                    direction: i18next.language === "ar" ? "rtl" : "ltr",
+                },
+
+            }
+        });
         return (
             <Navigate
                 to={`${APP_BASE_PATH}/auth/login`}
@@ -93,11 +68,31 @@ export default function GuardedRoute({
             />
         );
     }
-
     // 🚫 Logged in but unauthorized
-    if (!isRoleAllowed() || !isPermissionsAllowed()) {
+    else if ((!isRoleAllowed() || !isPermissionsAllowed()) && allowNavigation) {
+        notification.error({
+            title: t("auth.unauthorized"),
+            description: t("auth.unauthorizedDescription"),
+            placement: notificationDirection,
+            showProgress: true,
+            pauseOnHover: true,
+            icon: <BrokenSecurityShieldIcon />,
+            styles: {
+                title: {
+                    direction: i18next.language === "ar" ? "rtl" : "ltr",
+                },
+                description: {
+                    direction: i18next.language === "ar" ? "rtl" : "ltr",
+                },
+
+            }
+        });
         return <Navigate to={`${APP_BASE_PATH}/not-allowed`} replace />;
     }
+    else if (!allowNavigation && (!isRoleAllowed() || !isPermissionsAllowed())) {
+        return null;
+    }
 
+    
     return children;
 }

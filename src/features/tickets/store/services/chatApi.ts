@@ -40,7 +40,7 @@ export const chatApi = createApi({
     endpoints: (builder) => ({
         getChatMessages: builder.query<ChatMessage[], string>({
             query: (ticketId) => ({
-                url: `/api/v1/tickets/${ticketId}/chat`,
+                url: `/v1/tickets/${ticketId}/chat`,
                 method: 'GET',
             }),
             // TODO: Use Socket.IO with chat 
@@ -69,19 +69,22 @@ export const chatApi = createApi({
             // },
         }),
 
-        sendMessage: builder.mutation<ChatMessage, { ticketId: string; message: string; mediaIds?: string[] }>({
-            query: ({ ticketId, message, mediaIds }) => ({
-                url: `/api/v1/tickets/${ticketId}/chat`,
+        sendMessage: builder.mutation<ChatMessage, { ticketId: string; message: string; mediaIds?: string[], userID?: string }>({
+            query: ({ ticketId, message, mediaIds, userID }) => ({
+                url: `/v1/tickets/${ticketId}/chat`,
                 method: 'POST',
-                data: { message,
-                    media_ids: mediaIds
+                data: {
+                    message,
+                    mediaIds: mediaIds,
+                    senderId: userID
                 },
+                
             }),
         }),
         
         uploadChatMedia: builder.mutation<any[], { ticketId: string; formData: FormData }>({
             query: ({ ticketId, formData }) => ({
-                url: `/api/v1/tickets/${ticketId}/chat/media`,
+                url: `/v1/tickets/${ticketId}/chat/media`,
                 method: 'POST',
                 data: formData, 
                 headers: {

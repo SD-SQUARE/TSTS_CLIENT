@@ -7,7 +7,7 @@ import { useState } from 'react';
 const fetchTickets = async (page: number, pageSize: number, searchQuery: { [key: string]: string }): Promise<{ data: Ticket[], total: number }> => {
 
     const query = Object.entries(searchQuery).filter(([, value]) => value).reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
-    const response = await api.get<TicketsResponse>(`/api/v1/tickets/`, {
+    const response = await api.get<TicketsResponse>(`/v1/tickets/`, {
         params: { page, page_size: pageSize, ...query },
     });
 
@@ -32,7 +32,7 @@ export const useTicketMedia = (id?: string) => {
     return useQuery({
         queryKey: ['ticketMedia', id],
         queryFn: async () => {
-            const { data } = await api.get(`/api/v1/tickets/${id}/media/`);
+            const { data } = await api.get(`/v1/tickets/${id}/media/`);
             return data;
         },
         enabled: !!id,
@@ -55,7 +55,7 @@ export const useTicketActivities = (ticketId: string | undefined) => {
         queryKey: ['ticketActivities', ticketId],
         queryFn: async () => {
             if (!ticketId) return [];
-            const response = await api.get(`/api/v1/tickets/${ticketId}/activities`);
+            const response = await api.get(`/v1/tickets/${ticketId}/activities`);
             return response.data;
         },
         enabled: !!ticketId,
