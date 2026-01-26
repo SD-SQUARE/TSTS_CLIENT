@@ -12,7 +12,7 @@ import { useSelector } from 'react-redux';
 const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) => {
     const { t } = useTranslation();
     const { id: ticketId } = useParams();
-    const { data: messages, isLoading } = useGetChatMessagesQuery(ticketId!);
+    const { data: messages, isLoading, refetch } = useGetChatMessagesQuery(ticketId!);
     const [uploadMedia, { isLoading: isUploading }] = useUploadChatMediaMutation();
     const [sendMessage, { isLoading: isSending }] = useSendMessageMutation();
     const [text, setText] = useState('');
@@ -20,6 +20,9 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
     const [tempFiles, setTempFiles] = useState<{ id: string, name: string }[]>([]);
     const {user} = useSelector((state: any) => state.auth);
 
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
 
     const scrollRef = useRef<HTMLDivElement>(null);
 

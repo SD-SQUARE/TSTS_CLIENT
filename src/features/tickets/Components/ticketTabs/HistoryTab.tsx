@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Timeline, Typography, Card, Empty, Spin, Button, Space, FloatButton } from 'antd';
 import {
     ClockCircleOutlined, CheckCircleOutlined, SyncOutlined,
@@ -18,7 +18,11 @@ const TicketHistoryTab: React.FC = () => {
 
 
     const { zoom, handleZoomIn, handleZoomOut, handleResetZoom } = useTimelineZoom(1);
-    const { data: activities, isLoading } = useTicketActivities(ticketId);
+    const { data: activities, isLoading, refetch } = useTicketActivities(ticketId);
+
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
 
     const getActivityIcon = (type: string) => {
         const iconSize = 16 * zoom;

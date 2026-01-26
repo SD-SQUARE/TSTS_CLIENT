@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Tabs, Typography, Spin } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useTicketDetails } from '../Hooks/useTicketForm';
-import { useTicketMedia } from '../Hooks/useTicket';
+import { useTicketActivities, useTicketMedia } from '../Hooks/useTicket';
 import TicketInfoTab from './ticketTabs/InfoTab';
 import TicketMediaTab from './ticketTabs/MediaTab';
 import TicketHistoryTab from './ticketTabs/HistoryTab';
 import TicketChatTab from './ticketTabs/ChatTab';
+import { useGetChatMessagesQuery } from '../store/services/chatApi';
 
 const TicketView: React.FC = () => {
     const { t } = useTranslation();
@@ -16,12 +17,29 @@ const TicketView: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const { data: ticket, isLoading: infoLoading } = useTicketDetails(id);
-    const { data: media, isLoading: mediaLoading } = useTicketMedia(id);
+    const { data: ticket, isLoading: infoLoading, refetch : refetchInfo } = useTicketDetails(id);
+    const { data: media, isLoading: mediaLoading, refetch : refetchMedia } = useTicketMedia(id);
+    const { refetch : refetchHistory } = useTicketActivities(id);
+    const { refetch : refetchChat } = useGetChatMessagesQuery(id);
 
     const pathParts = location.pathname.split('/');
     const lastPart = pathParts[pathParts.length - 1];
     const activeKey = ['media', 'chat', 'history'].includes(lastPart) ? lastPart : 'info';
+
+    useEffect(() => {
+        if (activeKey === 'info') {
+            refetchInfo();
+        } else if (activeKey === 'media') {
+            refetchMedia();
+        }
+        else if (activeKey === 'chat') {
+            refetchChat();
+        }
+        else if (activeKey === 'history') {
+            refetchHistory();
+        }
+        // ChatTab handles its own refetch because it's an RTK Query hook
+    }, [activeKey, refetchInfo, refetchMedia, refetchChat, refetchHistory]);
 
     const assigneeNames = ticket?.assignee
 

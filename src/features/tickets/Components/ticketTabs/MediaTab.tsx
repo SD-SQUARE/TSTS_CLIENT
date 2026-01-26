@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, Flex, Empty, Spin, Typography, message } from 'antd';
 import {
     FileOutlined, FilePdfOutlined, AudioOutlined,
@@ -10,17 +10,23 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import api from '../../../../api/http';
+import { useTicketMedia } from '../../Hooks/useTicket';
 
 interface TicketMediaTabProps {
     media: any[] | undefined;
     isLoading: boolean;
 }
 
-const TicketMediaTab: React.FC<TicketMediaTabProps> = ({ media, isLoading }) => {
+const TicketMediaTab: React.FC<TicketMediaTabProps> = () => {
     const { t } = useTranslation();
     const { id: ticketId } = useParams();
+    const { data: media, isLoading, refetch } = useTicketMedia(ticketId);
 
     const isImage = (mime: string) => mime?.startsWith('image/');
+
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
 
 
     const getMimeIcon = (mime: string, fontSize = '24px') => {
