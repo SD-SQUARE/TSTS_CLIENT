@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Tabs, Typography, Spin } from 'antd';
+import { Tabs, Typography, Spin, Flex, Button } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useTicketDetails } from '../Hooks/useTicketForm';
 import { useTicketActivities, useTicketMedia } from '../Hooks/useTicket';
@@ -38,7 +39,6 @@ const TicketView: React.FC = () => {
         else if (activeKey === 'history') {
             refetchHistory();
         }
-        // ChatTab handles its own refetch because it's an RTK Query hook
     }, [activeKey, refetchInfo, refetchMedia, refetchChat, refetchHistory]);
 
     const assigneeNames = ticket?.assignee
@@ -56,6 +56,10 @@ const TicketView: React.FC = () => {
 
     const handleEdit = () => {
         navigate(`/${role}/tickets/${id}/edit`);
+    };
+
+    const handleBack = () => {
+        navigate(`/${role}/tickets`);
     };
 
     if (infoLoading) return <Spin size="large" style={{ display: 'block', margin: '50px auto' }} />;
@@ -85,8 +89,17 @@ const TicketView: React.FC = () => {
 
     return (
         <div style={{ padding: '24px', paddingBottom: 0, backgroundColor: '#fff', borderRadius: '8px' }}>
-            <Typography.Title level={2}>{t('tickets.ticketDetails')}</Typography.Title>
-            <Tabs  activeKey={activeKey} onChange={handleTabChange} items={tabItems} />
+<Flex align="center" gap="middle" style={{ marginBottom: 24 }}>
+                <Button 
+                    type="text" 
+                    icon={<ArrowLeftOutlined />} 
+                    onClick={handleBack}
+                    style={{ fontSize: '18px' }}
+                />
+                <Typography.Title level={2} style={{ margin: 0 }}>
+                    {t('tickets.ticketDetails')}
+                </Typography.Title>
+            </Flex>            <Tabs  activeKey={activeKey} onChange={handleTabChange} items={tabItems} />
         </div>
     );
 };
