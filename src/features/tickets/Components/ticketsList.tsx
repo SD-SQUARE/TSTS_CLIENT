@@ -229,17 +229,36 @@ const TicketList: React.FC = () => {
             title: t('tickets.assignee'),
             dataIndex: 'assignee',
             key: 'assignee',
-            width: 250,
+            width: 300,
 
-            render: (assignees: any[]) => (
-                <Space wrap>
-                    {assignees?.length > 0 ? (
-                        assignees.map((a) => <Tag key={a.id} color="cyan">{a.name || `${a.first_name} ${a.last_name}`}</Tag>)
-                    ) : (
-                        <Typography.Text type="secondary" italic>{t('tickets.unassigned')}</Typography.Text>
-                    )}
-                </Space>
-            ),
+            render: (assignees: any[]) => {
+                if (!assignees || assignees.length === 0) {
+                    return <Typography.Text type="secondary" italic>{t('tickets.unassigned')}</Typography.Text>;
+                }
+            
+                const tagElements = assignees.map((a) => (
+                    <Tag 
+                        key={a.id} 
+                        color="cyan" 
+                        style={{ display: 'inline-block', margin: '2px' }}
+                    >
+                        {a.name || `${a.first_name} ${a.last_name}`}
+                    </Tag>
+                ));
+            
+                return (
+                    <Popover
+                        title={t('tickets.assignee')}
+                        content={<div style={{ maxWidth: 300 }}>{tagElements}</div>}
+                        trigger="hover"
+                        placement="topLeft"
+                    >
+                        <div className="assignee-ellipsis-wrapper">
+                            <EllipsisComponent content={tagElements} />
+                        </div>
+                    </Popover>
+                );
+            }
         },
     ];
 
