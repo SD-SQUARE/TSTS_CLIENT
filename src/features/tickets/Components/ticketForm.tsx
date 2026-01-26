@@ -91,7 +91,7 @@ const TicketForm: React.FC = () => {
         formData.append('description', values.description);
         formData.append('requester', user.id);
 
-        const specId = isRequester ? selectedSpecs[0]?.id : JSON.stringify(selectedSpecs.map(s => s.id));
+        const specId = selectedSpecs[0]?.id;
         if (specId) formData.append('specialization_id', specId);
 
         fileList.forEach((file) => {
@@ -125,8 +125,7 @@ const TicketForm: React.FC = () => {
     };
 
     const handleSpecSelect = (spec: any) => {
-        if (isRequester) setSelectedSpecs([spec]);
-        else if (!selectedSpecs.find(s => s.id === spec.id)) setSelectedSpecs([...selectedSpecs, spec]);
+        setSelectedSpecs([spec]);
     };
 
     const handleRemoveSpec = (id: string) => {
@@ -176,11 +175,11 @@ const TicketForm: React.FC = () => {
                             <Flex align="center" gap="middle" wrap="wrap" style={{ marginBottom: 8 }}>
                                 <span>{t('tickets.problemType')}</span>
                                 <Space size={8} wrap align="center">
-                                    {selectedSpecs.length > 0 ? selectedSpecs.map(spec => (
-                                        <Tag key={spec.id} color="blue" variant='outlined' closable={!isRequester} onClose={() => handleRemoveSpec(spec.id)} style={{ marginInlineEnd: 0 }}>
-                                            {spec.name}
+                                    {selectedSpecs.length > 0 ?  (
+                                        <Tag color="blue" variant='outlined' style={{ marginInlineEnd: 0 }}>
+                                            {selectedSpecs[0].name}
                                         </Tag>
-                                    )) : (
+                                    ) : (
                                         <Tag color="red" variant='outlined' style={{ marginInlineEnd: 0 }}>{t('tickets.autoAssignPlaceholder')}</Tag>
                                     )}
                                     <Dropdown menu={specMenu} trigger={['click']}>
