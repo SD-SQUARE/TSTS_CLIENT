@@ -29,12 +29,15 @@ const TicketList: React.FC = () => {
 
     const { data, isLoading, isError, error } = useTickets(pagination.page, pagination.pageSize, apiSearchQuery);
 
+
+    const isRequester = role === 'requester';
+
     const handleTableChange = (page: number, pageSize: number) => {
         setPagination({ page, pageSize });
     };
 
     const handleAdd = () => {
-        navigate(`/${role}/tickets/new-ticket`);
+        navigate(`/requester/tickets/new-ticket`);
     };
 
     const handleView = (id: string) => {
@@ -287,14 +290,16 @@ const TicketList: React.FC = () => {
                     onChange={handleTableChange}
                     showSizeChanger
                 />
-                <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={handleAdd}
-                    size="large"
-                >
-                    {t('tickets.new_ticket')}
-                </Button>
+                {isRequester && 
+                    <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        onClick={handleAdd}
+                        size="large"
+                    >
+                        {t('tickets.new_ticket')}
+                    </Button>
+                }
             </Flex>
 
             <Table
