@@ -39,8 +39,8 @@ const TicketForm: React.FC = () => {
 
     const getStepperData = () => {
         // Default middle state if none is selected or if 'open' is selected
-        const middleStates = ['in-progress', 'pending', 'out-of-service'];
-        const activeMiddleState = middleStates.includes(currentStatus) ? currentStatus : 'in-progress';
+        const middleStates = ['in_progress', 'pending', 'out_of_service'];
+        const activeMiddleState = middleStates.includes(currentStatus) ? currentStatus : 'in_progress';
 
         const steps = [
             { key: 'open', title: t('status.open') },
@@ -76,10 +76,7 @@ const TicketForm: React.FC = () => {
         if (ticketData) {
             form.setFieldsValue({
                 ...ticketData,
-                assignee: ticketData.assignee?.map((a: any) => ({
-                    value: a.id,
-                    label: `${a.first_name} ${a.last_name}`,
-                })),
+                assignee: ticketData.assignee?.map((a: any) => a.id),
             });
             if (ticketData.specialization) {
                 const incoming = Array.isArray(ticketData.specialization) ? ticketData.specialization : [ticketData.specialization];
@@ -93,8 +90,8 @@ const TicketForm: React.FC = () => {
         ...(admins || [])
     ].map((user: any) => ({
         value: user.id,
-        label: user.name || `${user.first_name} ${user.last_name}`,
-        group: techs?.find((t: any) => t.id === user.id) ? 'Technician' : 'Admin'
+        label: `${user.first_name} ${user.last_name}`,
+        group: user.user_type
     }));
 
     const onFinish = async (values: any) => {
@@ -104,7 +101,7 @@ const TicketForm: React.FC = () => {
         formData.append('requester', user.id);
 
         const specId = selectedSpecs[0]?.id;
-        if (specId) formData.append('specialization_id', specId);
+        if (specId) formData.append('specialization', specId);
 
         fileList.forEach((file) => {
             if (file.originFileObj instanceof File) {
@@ -116,7 +113,7 @@ const TicketForm: React.FC = () => {
         if (!isRequester && isEdit) {
             formData.append('priority', values.priority);
             formData.append('status', values.status);
-            formData.append('assignee', JSON.stringify(values.assignee));
+            formData.append('assigneeList', JSON.stringify(values.assignee));
         }
 
         try {
@@ -151,6 +148,10 @@ const TicketForm: React.FC = () => {
 
     if (isEdit && isLoading) return <Card loading={true} />;
 
+    const handleBack = () => {
+        navigate(-1);
+    };
+
     return (
         <div style={{ width: '100%', padding: '24px', boxSizing: 'border-box' }}>
             <Badge.Ribbon
@@ -179,7 +180,6 @@ const TicketForm: React.FC = () => {
 
                     <Form form={form} layout="vertical" onFinish={onFinish} requiredMark={false} style={{ width: '100%' }}>
 
-                        { }
                         <Form.Item style={{ marginBottom: 24 }} label={
                             <Flex align="center" gap="middle" wrap="wrap" style={{ marginBottom: 8 }}>
                                 <span>{t('tickets.problemType')}</span>
@@ -198,7 +198,7 @@ const TicketForm: React.FC = () => {
                             </Flex>
                         } />
 
-                        { }
+                        
                         {!isRequester && isEdit && (
                             <div style={{ marginBottom: 24, borderRadius: '8px' }}>
                                 <Flex gap="middle" wrap="wrap">
@@ -213,15 +213,15 @@ const TicketForm: React.FC = () => {
                                     <Form.Item name="status" label={t('tickets.status')} style={{ flex: 1, minWidth: '200px' }}>
                                         <Select options={[
                                             { value: 'open', label: t('status.open') },
-                                            { value: 'in-progress', label: t('status.in-progress') },
+                                            { value: 'in_progress', label: t('status.in_progress') },
                                             { value: 'pending', label: t('status.pending') },
-                                            { value: 'out-of-service', label: t('status.out-of-service') },
+                                            { value: 'out_of_service', label: t('status.out_of_service') },
                                             { value: 'closed', label: t('status.closed') }
                                         ]} />
                                     </Form.Item>
                                 </Flex>
                                 <Form.Item name="assignee" label={t('tickets.assignee')} style={{ marginBottom: 0 }}>
-                                    <Select mode="multiple" labelInValue placeholder={t('tickets.selectTechs')} options={allPossibleAssignees} optionRender={(option) => (
+                                    <Select mode="multiple"  placeholder={t('tickets.selectTechs')} options={allPossibleAssignees} optionRender={(option) => (
                                         <Flex justify="space-between">
                                             <span>{option.label}</span>
                                             <Typography.Text type="secondary" style={{ fontSize: '10px' }}>
@@ -233,17 +233,17 @@ const TicketForm: React.FC = () => {
                             </div>
                         )}
 
-                        { }
+                        
                         <Form.Item name="title" label={<Flex align="center" gap="small"><span>{t('tickets.title')}</span><RequiredTag /></Flex>} rules={[{ required: true }]}>
                             <Input style={{ width: '100%' }} showCount maxLength={255} />
                         </Form.Item>
 
-                        { }
+                        
                         <Form.Item name="description" label={<Flex align="center" gap="small"><span>{t('tickets.description')}</span><RequiredTag /></Flex>} rules={[{ required: true }]}>
                             <TextArea style={{ width: '100%' }} showCount maxLength={20000} rows={6} />
                         </Form.Item>
 
-                        { }
+                        
                         <Form.Item label={
                             <Flex align="center" gap="middle">
                                 <span>{t('tickets.attachments')}</span>
@@ -272,6 +272,8 @@ const TicketForm: React.FC = () => {
 
                         <Form.Item style={{ marginTop: 32 }}>
                             <Flex justify="flex-end" gap="middle">
+                                <Button size="large"
+                                        onClick={handleBack}>{t('common.back')}</Button>
                                 <Button size="large" onClick={() => form.resetFields()}>{t('common.reset')}</Button>
                                 <Button size="large" type="primary" htmlType="submit" loading={createMutation.isPending || updateMutation.isPending || coordinateMutation.isPending}>
                                     {isEdit ? t('common.save') : t('common.create')}

@@ -143,7 +143,7 @@ const TicketList: React.FC = () => {
 
     const columns: ColumnsType<Ticket> = [
         {
-            title: t('tickets.id'),
+            title: "#",
             dataIndex: 'id',
             key: 'id',
             width: 60,

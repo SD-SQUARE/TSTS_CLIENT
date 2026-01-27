@@ -61,19 +61,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                     </Typography.Paragraph>
                 </Descriptions.Item>
 
-                <Descriptions.Item label={t('tickets.attachments')} span={2}>
-                    <List
-                        size="small"
-                        dataSource={ticket?.attachments || []}
-                        renderItem={(item: any) => (
-                            <List.Item>
-                                <Typography.Link href={item.url} target="_blank">
-                                    <FileOutlined /> {item.name || 'File'}
-                                </Typography.Link>
-                            </List.Item>
-                        )}
-                    />
-                </Descriptions.Item>
+                
             </Descriptions>
 
             <Flex justify="flex-end" style={{ marginTop: 24 }}>

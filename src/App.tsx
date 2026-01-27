@@ -29,7 +29,7 @@ function App() {
 
     return (
         <BrowserRouter>
-            <Layout style={{ width: '100%', height: '100vh' }} className="white-bg" dir={i18n.language === "ar" ? "rtl" : "ltr"}>
+            <Layout style={{ width: '100%', minHeight: '100vh' }} className="white-bg" dir={i18n.language === "ar" ? "rtl" : "ltr"}>
                 {/* Navigation bar */}
                 <NavBar>
                     {!user ?

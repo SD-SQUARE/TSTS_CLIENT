@@ -248,10 +248,10 @@
     },
     "status": {
         "open": "مفتوحة",
-        "in-progress": "قيد المعالجة",
+        "in_progress": "قيد المعالجة",
         "closed": "مغلقة",
         "pending": "قيد الانتظار",
-        "outOfService": "خارج الخدمة"
+        "out_of_service": "خارج الخدمة"
     },
     "common": {
         "reset": "إعادة تعيين",
@@ -262,7 +262,8 @@
         "noMedia": "لا توجد ملفات وسائط مرتبطة بهذه التذكرة",
         "collapse": "اغلاق",
         "expand": "توسيع",
-        "me" : "أنا"
+        "me" : "أنا",
+        "back" : "رجوع"
     },
     "success": {
         "created": "تم إنشاء التذكرة بنجاح",
@@ -300,6 +301,7 @@
         "unauthorized": "الوصول غير مصرح",
         "unauthorizedDescription": "ليس لديك صلاحية لوصول هذه الصفحة"
     },
+    "Tickets": "التذاكر",
     "Settings": "الاعدادات",
     "Personnel": "قسم الموظفين"
 }
