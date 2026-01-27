@@ -301,6 +301,7 @@
         "unauthorized": "Unauthorized access",
         "unauthorizedDescription": "You are not authorized to access this page"
     },
+    "Tickets": "Tickets",
     "Settings": "Settings",
     "Personnel": "Personnel"
 }
