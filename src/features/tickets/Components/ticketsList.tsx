@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import React, { useRef, useState } from 'react';
-import { Table, Tag, Typography, Spin, Alert, Pagination, Space, Button, Flex, Popover, type InputRef, Input, type TableColumnType } from 'antd';
+import { Table, Tag, Typography, Spin, Alert, Pagination, Space, Button, Flex, Popover, type InputRef, Input, type TableColumnType, Select } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { FilterOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import type { Specialization, Ticket } from '../Types/tickets';
 import { useTickets } from '../Hooks/useTicket';
@@ -12,6 +12,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import EllipsisComponent from '../../../components/EllipsisComponent';
 import Highlighter from 'react-highlight-words';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
+import { useSpecializations } from '../Hooks/useTicketForm';
 
 type SearchableDataIndex = `title` | `specialization` | `status` | 'priority' | 'description';
 
@@ -24,6 +25,7 @@ const TicketList: React.FC = () => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState<SearchableDataIndex | ''>('');
     const searchInput = useRef<InputRef>(null);
+    const { data: specs } = useSpecializations();
 
     const [apiSearchQuery, setApiSearchQuery] = useState<{ [key: string]: string }>({});
 
@@ -100,7 +102,7 @@ const TicketList: React.FC = () => {
             <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
                 <Input
                     ref={searchInput}
-                    placeholder={`Search ${t(titleKey)}`}
+                    placeholder={`${t('common.search')} ${t(titleKey)}`}
                     value={selectedKeys[0]}
                     onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
                     onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
@@ -114,14 +116,14 @@ const TicketList: React.FC = () => {
                         size="small"
                         style={{ width: 90 }}
                     >
-                        Search
+                        {t('common.search')}
                     </Button>
                     <Button
                         onClick={() => clearFilters && handleReset(clearFilters, dataIndex)}
                         size="small"
                         style={{ width: 90 }}
                     >
-                        Reset
+                        {t('common.reset')}
                     </Button>
                     <Button
                         type="link"
@@ -130,7 +132,7 @@ const TicketList: React.FC = () => {
                             close();
                         }}
                     >
-                        Close
+                        {t('common.close')}
                     </Button>
                 </Space>
             </div>
@@ -139,6 +141,44 @@ const TicketList: React.FC = () => {
             const isFilteredByApi = !!apiSearchQuery[dataIndex];
             return <SearchOutlined style={{ color: isFilteredByApi ? '#1677ff' : undefined }} />
         },
+    });
+
+    const getColumnSelectProps = (
+        dataIndex: SearchableDataIndex,
+        titleKey: string,
+        options: { label: string, value: string | number }[]
+    ): TableColumnType<Ticket> => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+            <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+                <Select
+                    style={{ width: 200, marginBottom: 8 }}
+                    placeholder={`${t('common.select')} ${t(titleKey)}`}
+                    value={selectedKeys[0]}
+                    onChange={(value) => setSelectedKeys(value ? [value] : [])}
+                    options={options}
+                />
+                <Flex gap="small">
+                    <Button
+                        type="primary"
+                        onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
+                        size="small"
+                        style={{ flex: 1 }}
+                    >
+                        {t('common.filter')}
+                    </Button>
+                    <Button
+                        onClick={() => clearFilters && handleReset(clearFilters, dataIndex)}
+                        size="small"
+                        style={{ flex: 1 }}
+                    >
+                        {t('common.reset')}
+                    </Button>
+                </Flex>
+            </div>
+        ),
+        filterIcon: (filtered: boolean) => (
+            <FilterOutlined style={{ color: filtered || apiSearchQuery[dataIndex] ? '#1677ff' : undefined }} />
+        ),
     });
 
     const columns: ColumnsType<Ticket> = [
@@ -161,7 +201,13 @@ const TicketList: React.FC = () => {
                     {renderHighlightedText(status, 'status')}
                 </Tag>
             ),
-            ...getColumnSearchProps('status', 'tickets.status'),
+            ...getColumnSelectProps('status', 'tickets.status', [
+                { label: t('status.open'), value: 'open' },
+                { label: t('status.in_progress'), value: 'in_progress' },
+                { label: t('status.pending'), value: 'pending' },
+                { label: t('status.out_of_service'), value: 'out_of_service' },
+                { label: t('status.closed'), value: 'closed' },
+            ]),
         },
         {
             title: t('tickets.priority'),
@@ -174,7 +220,12 @@ const TicketList: React.FC = () => {
                     {renderHighlightedText(priority, 'priority')}
                 </Tag>
             ),
-            ...getColumnSearchProps('priority', 'tickets.priority'),
+            ...getColumnSelectProps('priority', 'tickets.priority', [
+                { label: t('priority.important/urgent'), value: 'important/urgent' },
+                { label: t('priority.important'), value: 'important' },
+                { label: t('priority.urgent'), value: 'urgent' },
+                { label: t('priority.NA'), value: 'NA' },
+            ]),
         },
         {
             title: t('tickets.title'),
@@ -220,7 +271,9 @@ const TicketList: React.FC = () => {
                     {renderHighlightedText(specialization?.name ?? t('tickets.noType'), 'specialization')}
                 </Tag>
             ),
-            ...getColumnSearchProps('specialization', 'tickets.problemType'),
+            ...getColumnSelectProps('specialization', 'tickets.problemType',
+                specs?.map((s: any) => ({ label: s.name, value: s.id })) || []
+            ),
         },
         {
             title: t('tickets.requester'),
@@ -238,17 +291,17 @@ const TicketList: React.FC = () => {
                 if (!assignees || assignees.length === 0) {
                     return <Typography.Text type="secondary" italic>{t('tickets.unassigned')}</Typography.Text>;
                 }
-            
+
                 const tagElements = assignees.map((a) => (
-                    <Tag 
-                        key={a.id} 
-                        color="cyan" 
+                    <Tag
+                        key={a.id}
+                        color="cyan"
                         style={{ display: 'inline-block', margin: '2px' }}
                     >
                         {a.name || `${a.first_name} ${a.last_name}`}
                     </Tag>
                 ));
-            
+
                 return (
                     <Popover
                         title={t('tickets.assignee')}
@@ -290,7 +343,7 @@ const TicketList: React.FC = () => {
                     onChange={handleTableChange}
                     showSizeChanger
                 />
-                {isRequester && 
+                {isRequester &&
                     <Button
                         type="primary"
                         icon={<PlusOutlined />}

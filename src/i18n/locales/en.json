@@ -263,7 +263,11 @@
         "collapse": "Collapse",
         "expand": "Expand",
         "me" : "ME",
-        "back" : "Back"
+        "back" : "Back",
+        "search" : "Search",
+        "close" : "Close",
+        "select" : "Select",
+        "filter" : "Filter"
     },
     "success": {
         "created": "Ticket created successfully",
