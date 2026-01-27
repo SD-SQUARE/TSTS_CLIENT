@@ -23,6 +23,7 @@ const TicketForm: React.FC = () => {
 
     const isEdit = !!id;
     const isRequester = role === 'requester';
+    const canEditAttachments = !isEdit || (isEdit && isRequester);
 
     const { data: specs } = useSpecializations();
     const { data: techs } = useTechnicians();
@@ -81,6 +82,15 @@ const TicketForm: React.FC = () => {
             if (ticketData.specialization) {
                 const incoming = Array.isArray(ticketData.specialization) ? ticketData.specialization : [ticketData.specialization];
                 setSelectedSpecs(incoming);
+            }
+            if (ticketData.attachments && Array.isArray(ticketData.attachments)) {
+                const existingFiles = ticketData.attachments.map((file: any) => ({
+                    uid: file.id,
+                    name: file.fileName || file.name || 'Attachment',
+                    status: 'done',
+                    url: file.url,
+                }));
+                setFileList(existingFiles);
             }
         }
     }, [ticketData, form]);
@@ -198,7 +208,7 @@ const TicketForm: React.FC = () => {
                             </Flex>
                         } />
 
-                        
+
                         {!isRequester && isEdit && (
                             <div style={{ marginBottom: 24, borderRadius: '8px' }}>
                                 <Flex gap="middle" wrap="wrap">
@@ -221,7 +231,7 @@ const TicketForm: React.FC = () => {
                                     </Form.Item>
                                 </Flex>
                                 <Form.Item name="assignee" label={t('tickets.assignee')} style={{ marginBottom: 0 }}>
-                                    <Select mode="multiple"  placeholder={t('tickets.selectTechs')} options={allPossibleAssignees} optionRender={(option) => (
+                                    <Select mode="multiple" placeholder={t('tickets.selectTechs')} options={allPossibleAssignees} optionRender={(option) => (
                                         <Flex justify="space-between">
                                             <span>{option.label}</span>
                                             <Typography.Text type="secondary" style={{ fontSize: '10px' }}>
@@ -233,39 +243,45 @@ const TicketForm: React.FC = () => {
                             </div>
                         )}
 
-                        
+
                         <Form.Item name="title" label={<Flex align="center" gap="small"><span>{t('tickets.title')}</span><RequiredTag /></Flex>} rules={[{ required: true }]}>
                             <Input style={{ width: '100%' }} showCount maxLength={255} />
                         </Form.Item>
 
-                        
+
                         <Form.Item name="description" label={<Flex align="center" gap="small"><span>{t('tickets.description')}</span><RequiredTag /></Flex>} rules={[{ required: true }]}>
                             <TextArea style={{ width: '100%' }} showCount maxLength={20000} rows={6} />
                         </Form.Item>
 
-                        
+
                         <Form.Item label={
                             <Flex align="center" gap="middle">
                                 <span>{t('tickets.attachments')}</span>
-                                <Upload
-                                    multiple
-                                    fileList={fileList}
-                                    beforeUpload={() => false}
-                                    onChange={({ fileList }) => setFileList(fileList)}
-                                    showUploadList={false}
-                                >
-                                    <Button type="dashed" shape="circle" size="small" icon={<PlusOutlined />} />
-                                </Upload>
+                                {canEditAttachments && (
+                                    <Upload
+                                        multiple
+                                        fileList={fileList}
+                                        beforeUpload={() => false}
+                                        onChange={({ fileList }) => setFileList(fileList)}
+                                        showUploadList={false}
+                                    >
+                                        <Button type="dashed" shape="circle" size="small" icon={<PlusOutlined />} />
+                                    </Upload>
+                                )}
                             </Flex>
                         }>
                             <Upload
                                 listType="picture"
                                 fileList={fileList}
                                 onRemove={(file) => {
+                                    if (!canEditAttachments) return false;
                                     const index = fileList.indexOf(file);
                                     const newFileList = fileList.slice();
                                     newFileList.splice(index, 1);
                                     setFileList(newFileList);
+                                }}
+                                showUploadList={{
+                                    showRemoveIcon: canEditAttachments
                                 }}
                             />
                         </Form.Item>
@@ -273,7 +289,7 @@ const TicketForm: React.FC = () => {
                         <Form.Item style={{ marginTop: 32 }}>
                             <Flex justify="flex-end" gap="middle">
                                 <Button size="large"
-                                        onClick={handleBack}>{t('common.back')}</Button>
+                                    onClick={handleBack}>{t('common.back')}</Button>
                                 <Button size="large" onClick={() => form.resetFields()}>{t('common.reset')}</Button>
                                 <Button size="large" type="primary" htmlType="submit" loading={createMutation.isPending || updateMutation.isPending || coordinateMutation.isPending}>
                                     {isEdit ? t('common.save') : t('common.create')}
