@@ -14,7 +14,9 @@ export const useSpecializations = () =>
 export const useTechnicians = () =>
   useQuery({
     queryKey: ['technicians'], queryFn: () =>
-      api.get('v1/lockups/technicians/').then(res => res.data.users)
+          api.get('v1/lockups/technicians/').then(res => res.data.users)
+  });
+  
 export const useAdmins = () =>
   useQuery({
     queryKey: ['admins'], queryFn: () =>
