@@ -16,7 +16,7 @@ export const useTechnicians = () =>
     queryKey: ['technicians'], queryFn: () =>
           api.get('v1/lockups/technicians/').then(res => res.data.users)
   });
-  
+
 export const useAdmins = () =>
   useQuery({
     queryKey: ['admins'], queryFn: () =>
@@ -41,11 +41,11 @@ export const useTicketMutations = (id?: string) => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: (data: any) => api.put(`/v1/tickets/${id}/`, data),
+    mutationFn: (data: any) => api.put(`/v1/tickets/${id}/`, data, { headers: { 'Content-Type': 'multipart/form-data' } }),
   });
 
   const coordinateMutation = useMutation({
-    mutationFn: (data: any) => api.put(`/v1/tickets/${id}/co-ordinate`, data),
+    mutationFn: (data: any) => api.put(`/v1/tickets/${id}/co-ordinate`, data, { headers: { 'Content-Type': 'multipart/form-data' } }),
   });
 
   return { createMutation, updateMutation, coordinateMutation };

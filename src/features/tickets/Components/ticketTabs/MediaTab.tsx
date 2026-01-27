@@ -98,9 +98,9 @@ const TicketMediaTab: React.FC<TicketMediaTabProps> = () => {
                     >
                         <Card.Meta
 
-                            avatar={getMimeIcon(item.mime, '20px')}
-                            title={<Typography.Text ellipsis={{ tooltip: item.name }}>{item.name}</Typography.Text>}
-                            description={<Typography.Text type="secondary" style={{ fontSize: '11px' }}>{item.mime}</Typography.Text>}
+                            avatar={getMimeIcon(item.fileName.split('.').pop(), '20px')}
+                            title={<Typography.Text ellipsis={{ tooltip: item.fileName }}>{item.fileName}</Typography.Text>}
+                            description={<Typography.Text type="secondary" style={{ fontSize: '11px' }}>{item.fileName.split('.').pop()}</Typography.Text>}
                         />
                     </Card>
                 ))}

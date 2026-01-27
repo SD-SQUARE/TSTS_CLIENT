@@ -248,10 +248,10 @@
     },
     "status": {
         "open": "Open",
-        "in-progress": "In Progress",
+        "in_progress": "In Progress",
         "closed": "Closed",
         "pending": "Pending",
-        "out-of-service": "Out of Service"
+        "out_of_service": "Out of Service"
     },
     "common": {
         "reset": "Reset",
@@ -262,7 +262,8 @@
         "noMedia": "No media files associated with this ticket",
         "collapse": "Collapse",
         "expand": "Expand",
-        "me" : "Me"
+        "me" : "ME",
+        "back" : "Back"
     },
     "success": {
         "created": "Ticket created successfully",
