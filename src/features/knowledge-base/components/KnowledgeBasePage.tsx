@@ -49,6 +49,19 @@ const KnowledgeBasePage: React.FC = () => {
     handleDelete
   } = useKnowledgeBase();
 
+//   Quill Editor Option
+  const modules = {
+  toolbar: {
+    container: [
+      [{ header: [1, 2, 3, false] }],
+      ["bold", "italic", "underline"],
+      ["link", "image"],
+      ["clean"],
+    ],
+    
+  },
+};
+
   const stepsConfig = [
     {
       title: 'Details',
@@ -82,7 +95,7 @@ const KnowledgeBasePage: React.FC = () => {
             </Upload>
           </div>
           <Form.Item name="content" rules={[{ required: true, message: 'Content is required' }]} style={{ marginBottom: 0 }}>
-            <ReactQuill theme="snow" style={{ height: 300, marginBottom: 50 }} placeholder="Write content..." />
+            <ReactQuill theme="snow" modules={modules} style={{ height: 300, marginBottom: 50 }} placeholder="Write content..."  />
           </Form.Item>
         </>
       ),
@@ -108,11 +121,11 @@ const KnowledgeBasePage: React.FC = () => {
 
       {/* Search */}
       <div style={{ maxWidth: 800, margin: '-30px auto 40px', padding: '0 24px' }}>
-        <Input size="large" placeholder="Search knowledge base..." prefix={<SearchOutlined style={{ color: '#1890ff', fontSize: 20, marginRight: 8 }} />} allowClear value={searchText} onChange={(e) => setSearchText(e.target.value)} style={{ borderRadius: 8, boxShadow: '0 10px 25px rgba(0,0,0,0.1)', height: 60, border: 'none' }} />
+        <Input size="large" placeholder="Search knowledge base..." prefix={<SearchOutlined style={{ color: '#1890ff', fontSize: 20, marginRight: 8 }} />} allowClear  value={searchText} onChange={(e) => setSearchText(e.target.value)} style={{ borderRadius: 8, boxShadow: '0 10px 25px rgba(0,0,0,0.1)', height: 60, border: 'none' }} />
       </div>
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
-        {isLoading ? <Card loading style={{ borderRadius: 12 }} /> : filteredData.length === 0 ? <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No articles found." /> : (
+        {isLoading ? <Card loading style={{ borderRadius: 12 }} /> : (searchText && searchText.length > 0 && filteredData && filteredData.length === 0) ? <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No articles found." /> : (
           <List
   grid={{ gutter: 24, xs: 1, sm: 1, md: 2, lg: 3, xl: 3, xxl: 3 }}
   dataSource={filteredData}
@@ -126,14 +139,11 @@ const KnowledgeBasePage: React.FC = () => {
           boxShadow: '0 4px 20px rgba(0,0,0,0.03)', 
           height: '100%',       
           display: 'flex',      
-          flexDirection: 'column'
-        }}
-        bodyStyle={{ 
+          flexDirection: 'column',
             padding: 24, 
-            flex: 1,            
-            display: 'flex', 
-            flexDirection: 'column' 
+            flex: 1,   
         }}
+        
       >
         {/* Card Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
@@ -245,7 +255,7 @@ const KnowledgeBasePage: React.FC = () => {
         centered 
         destroyOnClose 
         maskClosable={false} 
-        bodyStyle={{ padding: 0 }}
+        style={{ padding: 0 }}
       >
         <div style={{ padding: '24px 32px', borderBottom: '1px solid #f0f0f0', background: '#fafafa', borderRadius: '8px 8px 0 0' }}>
           <Title level={4} style={{ margin: 0 }}>{editingId ? "Edit Article" : "Draft New Article"}</Title>
@@ -297,7 +307,7 @@ const KnowledgeBasePage: React.FC = () => {
         centered
         destroyOnClose
         title={null}
-        bodyStyle={{ padding: 0 }}
+        style={{ padding: 0 }}
       >
         {viewingItem && (
             <>
