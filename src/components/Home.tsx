@@ -17,12 +17,16 @@ import Body from "./layouts/Body";
 import AnalyticsImg from "../assets/Analytics-Dashboard.webp";
 import UserMgmtImg from "../assets/UserManagement.webp";
 import SupportImg from "../assets/support-center.jpg";
+import { useSelector } from "react-redux";
+import { APP_BASE_PATH } from "../app/config";
 
 const { Title, Paragraph, Text } = Typography;
 
 const HomePage = () => {
   const navigate = useNavigate();
-  
+
+    const { user } = useSelector((state: any) => state.auth);
+
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === 'ar';
 
@@ -67,10 +71,13 @@ const HomePage = () => {
                   {t('home.hero_desc')}
                 </Paragraph>
                 <Button 
-                  type="primary" 
-                  size="large" 
-                  className="hero-btn"
-                  onClick={() => navigate("auth/login")}
+                    type="primary" 
+                    size="large" 
+                    className="hero-btn"
+                    onClick={() => {
+                                    !user ? navigate(`${APP_BASE_PATH}/auth/login`) : navigate(`${APP_BASE_PATH}/knowledge-base`);
+                        }
+                    }
                 >
                   {t('home.get_started')}
                 </Button>

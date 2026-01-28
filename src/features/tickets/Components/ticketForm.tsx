@@ -190,8 +190,8 @@ const TicketForm: React.FC = () => {
 
                     <Form form={form} layout="vertical" onFinish={onFinish} requiredMark={false} style={{ width: '100%' }}>
 
-                        <Form.Item style={{ marginBottom: 24 }} label={
-                            <Flex align="center" gap="middle" wrap="wrap" style={{ marginBottom: 8 }}>
+                        <Form.Item style={{ marginBottom: 24 }} >
+                            <Flex align="center" gap="middle" wrap="wrap" >
                                 <span>{t('tickets.problemType')}</span>
                                 <Space size={8} wrap align="center">
                                     {selectedSpecs.length > 0 ? (
@@ -206,7 +206,7 @@ const TicketForm: React.FC = () => {
                                     </Dropdown>
                                 </Space>
                             </Flex>
-                        } />
+                        </Form.Item>
 
 
                         {!isRequester && isEdit && (
@@ -254,20 +254,21 @@ const TicketForm: React.FC = () => {
                         </Form.Item>
 
 
+                        {canEditAttachments && (
                         <Form.Item label={
                             <Flex align="center" gap="middle">
-                                <span>{t('tickets.attachments')}</span>
-                                {canEditAttachments && (
-                                    <Upload
-                                        multiple
-                                        fileList={fileList}
-                                        beforeUpload={() => false}
-                                        onChange={({ fileList }) => setFileList(fileList)}
-                                        showUploadList={false}
-                                    >
-                                        <Button type="dashed" shape="circle" size="small" icon={<PlusOutlined />} />
-                                    </Upload>
-                                )}
+                                    
+                                        <span>{t('tickets.attachments')}</span>
+                                        <Upload
+                                            multiple
+                                            fileList={fileList}
+                                            beforeUpload={() => false}
+                                            onChange={({ fileList }) => setFileList(fileList)}
+                                            showUploadList={false}
+                                        >
+                                            <Button type="dashed" shape="circle" size="small" icon={<PlusOutlined />} />
+                                        </Upload>
+                                    
                             </Flex>
                         }>
                             <Upload
@@ -283,8 +284,9 @@ const TicketForm: React.FC = () => {
                                 showUploadList={{
                                     showRemoveIcon: canEditAttachments
                                 }}
-                            />
+                                />
                         </Form.Item>
+                        )}
 
                         <Form.Item style={{ marginTop: 32 }}>
                             <Flex justify="flex-end" gap="middle">
