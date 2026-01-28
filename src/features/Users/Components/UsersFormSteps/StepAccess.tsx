@@ -24,6 +24,8 @@ const StepAccess: React.FC<Props> = ({
     const { handleSubmit, control, formState: { errors }, reset } =
         useForm<UserFormData>({ defaultValues: initialData, mode: "onChange" });
 
+        const isEdit = !!initialData?.id;
+
     useEffect(() => { reset(initialData); }, [initialData, reset]);
 
     // const submitTrigger = useCallback(() => {
@@ -44,20 +46,20 @@ const StepAccess: React.FC<Props> = ({
     return (
         <Card title={t("user_list.user_access")}>
             <Form layout="vertical" id="step-form" requiredMark={false} onFinish={localHandleSubmit}>
-                <Form.Item label={<Flex gap="small"><span>{t("user_list.email")}</span><RequiredTag /></Flex>}
-                    validateStatus={errors.email ? "error" : ""} help={errors.email?.message} required>
+                <Form.Item label={<Flex gap="small"><span>{t("user_list.email")}</span>{!isEdit && <RequiredTag />}</Flex>}
+                    validateStatus={errors.email ? "error" : ""} help={errors.email?.message}>
                     <Controller name="email" control={control}
                         rules={{
-                            required: "Required",
+                            required: isEdit ? false : t("required"),
                             pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Invalid email" },
                         }}
                         render={({ field }) => <Input {...field} />} />
                 </Form.Item>
-                <Form.Item label={<Flex gap="small"><span>{t("user_list.password")}</span><RequiredTag /></Flex>}
-                    validateStatus={errors.password ? "error" : ""} help={errors.password?.message} required>
+                <Form.Item label={<Flex gap="small"><span>{t("user_list.password")}</span>{!isEdit && <RequiredTag />}</Flex>}
+                    validateStatus={errors.password ? "error" : ""} help={errors.password?.message} >
                     <Controller name="password" control={control} disabled={isSubmitting}
                         rules={{
-                            required: t("required"),
+                            required:isEdit ? false : t("required"),
                             minLength: {
                                 value: 8,
                                 message: t("password_8_chars"),

@@ -38,6 +38,7 @@
     }
     
     export interface UserFormData {
+        id?: string;
         image: File | string | null;
         first_name_en: string;
         first_name_ar: string;

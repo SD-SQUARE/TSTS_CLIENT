@@ -17,6 +17,8 @@ import DepartmentsPage from "../features/departments/components/Departments";
 import SpecializationsPage from "../features/specializations/components/Specializations";
 import WorkHoursPage from "../features/work-hours/components/WorkHours";
 import PermissionsPage from "../features/permissions/components/Permissions";
+import KnowledgeBasePage from "../features/knowledge-base/components/KnowledgeBasePage.tsx";
+
 
 import {
     ClockCircleOutlined,
@@ -174,10 +176,12 @@ export const AppRoutes = () => {
                 <Route path=":id/edit" element={<PageLayout><TicketForm /></PageLayout>} />
             </Route>
 
+            <Route path="knowledge-base" element={<PageLayout><KnowledgeBasePage /> </PageLayout>} />
+
             {/* Complmentary Paths */}
-            <Route path={`${APP_BASE_PATH}/server-error`} element={<ServerError />} />
-            <Route path={`${APP_BASE_PATH}/not-allowed`} element={<NotAllowed />} />
-            <Route path={`${APP_BASE_PATH}/*`} element={<NotFound />} />
+            <Route path={`${APP_BASE_PATH}/server-error`} element={<PageLayout><ServerError /> </PageLayout>} />
+            <Route path={`${APP_BASE_PATH}/not-allowed`} element={<PageLayout><NotAllowed /> </PageLayout>} />
+            <Route path={`${APP_BASE_PATH}/*`} element={<PageLayout><NotFound /> </PageLayout>} />
         </Routes>
     );
 };
