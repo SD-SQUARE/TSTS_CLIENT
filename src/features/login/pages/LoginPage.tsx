@@ -1,13 +1,13 @@
 
-import Body from "../../../components/layouts/Body";
+import PageLayout from "../../../components/PageLayout";
 import LoginForm from "../components/LoginForm";
 
 export const LoginPage = () => {
     return (
-            <Body>
+            <PageLayout>
                 <div style={{ width: '100%', marginTop: 40,}}>
                     <LoginForm />
                 </div>
-            </Body>
+            </PageLayout>
     );
 };

@@ -37,6 +37,7 @@ import TicketForm from "../features/tickets/Components/ticketForm.tsx";
 import TicketView from "../features/tickets/Components/ticketDetails.tsx";
 import GuardedRoute from "./GuardedRoute.tsx";
 import PageLayout from "../components/PageLayout.tsx";
+import Profile from './../features/profile/Profile.page';
 
 export const AppRoutes = () => {
 
@@ -81,6 +82,15 @@ export const AppRoutes = () => {
         <Routes>
 
             <Route index path={`${APP_BASE_PATH}/`} element={<Home />} />
+            {/* TODO: Add protection  */}
+
+            <Route index path={`${APP_BASE_PATH}/profile`} element={
+
+                <GuardedRoute roles={["*"]}>
+                    <PageLayout> <Profile /></PageLayout>
+                </GuardedRoute>
+                } />
+            
 
             <Route path={`${APP_BASE_PATH}/auth`}>
                 <Route index element={<LoginPage />} />
@@ -89,7 +99,6 @@ export const AppRoutes = () => {
             </Route>
 
                 {/* Super/admin routes */}
-                {/* TODO: Add Protection */}
             <Route path={`${APP_BASE_PATH}/identities`} element={
                 <GuardedRoute roles={["superadmin", "admin"]}>
                     <MainLayout menuItems={IdentitiesMenuItems} />

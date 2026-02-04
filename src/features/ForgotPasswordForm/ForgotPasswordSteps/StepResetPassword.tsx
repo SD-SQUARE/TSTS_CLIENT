@@ -22,7 +22,7 @@ const StepResetPassword: React.FC<StepResetPasswordProps> = ({ setStep, email, t
     const navigate = useNavigate();
     const resetPasswordMutation = useMutation({
         mutationFn: async (payload: { password: string }) => {
-            //TODO: Change endpoint
+            
             console.log(token)
             const response = await api.post('v1/auth/forget-password/reset-password', {
                 email,

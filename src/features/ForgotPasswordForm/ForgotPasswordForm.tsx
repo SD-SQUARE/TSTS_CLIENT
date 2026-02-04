@@ -5,7 +5,7 @@ import StepEmail from './ForgotPasswordSteps/StepEmail';
 import StepOtp from './ForgotPasswordSteps/StepOtp';
 import StepResetPassword from './ForgotPasswordSteps/StepResetPassword';
 import { useTranslation } from 'react-i18next';
-import Body from '../../components/layouts/Body';
+import PageLayout from '../../components/PageLayout';
 
 
 const ForgotPasswordForm = () => {
@@ -34,7 +34,7 @@ const ForgotPasswordForm = () => {
 
 
     return (
-        <Body>
+        <PageLayout>
             <div style={{display: 'flex',justifyContent:'center', alignItems:"center", height: '100%'}}>
                 <Card
                     title={t('forgotPassword.title')} 
@@ -44,7 +44,7 @@ const ForgotPasswordForm = () => {
                     {stepsForm[step].content}
                 </Card>
             </div>
-        </Body>
+        </PageLayout>
     );
 };
 

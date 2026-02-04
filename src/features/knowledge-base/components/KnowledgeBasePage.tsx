@@ -12,6 +12,7 @@ import {
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import { useKnowledgeBase } from '../hooks/useKnowledgeBase'; 
+import { useSelector } from 'react-redux';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -24,7 +25,8 @@ const TagOutlinedIcon = () => (
 const KnowledgeBasePage: React.FC = () => {
   
 
-  const role: string = 'admin';
+    const auth = useSelector((state: any) => state.auth);
+  const role: string = auth.user.role.toLowerCase();
   const isPrivileged = role === 'admin' || role === 'technician';
 
   const {
@@ -105,7 +107,7 @@ const KnowledgeBasePage: React.FC = () => {
   return (
     <div style={{ backgroundColor: '#f5f7fa', minHeight: '100vh', paddingBottom: 40 }}>
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg, #001529 0%, #003a8c 100%)', padding: '40px 50px 80px', color: 'white' }}>
+      <div style={{ background: 'linear-gradient(135deg, #001529 0%, #003a8c 100%)', padding: '40px 50px 80px', color: 'white', borderRadius: 12 }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <Title level={2} style={{ color: 'white', margin: 0 }}>Knowledge Hub</Title>

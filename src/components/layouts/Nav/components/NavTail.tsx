@@ -39,7 +39,6 @@ const NavTail = () => {
             </Col>
 
             {/* User avatars */}
-            {/* TODO: add login and logout */}
             <Col>
                 <Space size={"large"}>
                     {token ?

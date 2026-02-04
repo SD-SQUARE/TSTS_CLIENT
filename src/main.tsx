@@ -9,10 +9,23 @@ import "./i18n"
 import { ConfigProvider } from "antd";
 import i18n from "./i18n";
 
+import { getCssVar } from "./utils/get_css_var";
+
+const TOKENS = {
+    colorPrimary: getCssVar("--color-primary"),           // main brand color
+    colorPrimaryBorderHover: getCssVar("--color-secondary"), // hover border / accent
+    colorText: getCssVar("--text-black"),
+    colorError: getCssVar("--color-red"),
+    colorBorder: getCssVar("--color-gray"),
+    colorWhite: getCssVar("--color-white"),
+    margin: 0,
+};
+
 ReactDOM.createRoot(document.getElementById("root")).render(
     <Provider store={store}>
         <QueryClientProvider client={queryClient}>
-            <ConfigProvider direction={i18n.language === "ar" ? "rtl" : "ltr"}>
+            <ConfigProvider direction={i18n.language === "ar" ? "rtl" : "ltr"}
+                theme={{ token: TOKENS }}>
                 <App />
             </ConfigProvider>
         </QueryClientProvider>
