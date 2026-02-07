@@ -4,12 +4,13 @@ import { LockOutlined, SafetyOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { useResetPassword } from "../hooks/useResetPassword.hook";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;
 
 const ResetPassword = () => {
     const [loading, setLoading] = useState(false);
-    
+    const { t } = useTranslation();
     const auth = useSelector((state: any) => state.auth);
     const userId = auth.user?.id ?? "";
     const resetPassword = useResetPassword(userId);
@@ -25,11 +26,11 @@ const ResetPassword = () => {
         resetPassword.mutate({ password });
 
         // Simulate API call
-        setTimeout(() => {
+        // setTimeout(() => {
             setLoading(false);
-            message.success("Password updated successfully");
+            message.success(t("profile.settings.reset.success"));
             form.resetFields();
-        }, 1200);
+        // }, 1200);
     };
 
     return (
@@ -41,11 +42,11 @@ const ResetPassword = () => {
             }}
         >
             <Title level={5} style={{ marginBottom: 4 }}>
-                Reset Password
+                {t("profile.settings.reset.title")}
             </Title>
 
             <Text type="secondary">
-                Choose a strong password to keep your account secure.
+                {t("profile.settings.reset.description")}
             </Text>
 
             <Form
@@ -55,37 +56,41 @@ const ResetPassword = () => {
                 style={{ marginTop: 24 }}
             >
                 <Form.Item
-                    label="New Password"
+                    label={t("profile.settings.reset.newPassword")}
                     name="password"
                     rules={[
-                        { required: true, message: "Password is required" },
+                        { required: true, message: t("profile.settings.reset.passwordRequired") },
                         {
                             min: 8,
-                            message: "Password must be at least 8 characters",
+                            message: t("profile.settings.reset.passwordMin"),
+                        },
+                        {
+                            pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                            message: t("profile.settings.reset.weakPassword"),
                         },
                     ]}
                     hasFeedback
                 >
                     <Input.Password
                         prefix={<LockOutlined />}
-                        placeholder="Enter new password"
+                        placeholder={t("profile.settings.reset.newPassword")}
                     />
                 </Form.Item>
 
                 <Form.Item
-                    label="Confirm Password"
+                    label={t("profile.settings.reset.confirmPassword")}
                     name="confirm"
                     dependencies={["password"]}
                     hasFeedback
                     rules={[
-                        { required: true, message: "Please confirm password" },
+                        { required: true, message: t("profile.settings.reset.confirmRequired") },
                         ({ getFieldValue }) => ({
                             validator(_, value) {
                                 if (!value || getFieldValue("password") === value) {
                                     return Promise.resolve();
                                 }
                                 return Promise.reject(
-                                    new Error("Passwords do not match")
+                                    new Error(t("profile.settings.reset.passwordMismatch"))
                                 );
                             },
                         }),
@@ -93,12 +98,12 @@ const ResetPassword = () => {
                 >
                     <Input.Password
                         prefix={<SafetyOutlined />}
-                        placeholder="Confirm new password"
+                        placeholder={t("profile.settings.reset.confirmPassword")}
                     />
                 </Form.Item>
 
                 <Text type="secondary" style={{ fontSize: 12 }}>
-                    Password must be at least 8 characters long.
+                    {t("profile.settings.reset.hint")}
                 </Text>
 
                 <Button
@@ -108,7 +113,7 @@ const ResetPassword = () => {
                     block
                     style={{ marginTop: 16 }}
                 >
-                    Reset Password
+                    {t("profile.settings.reset.submit")}
                 </Button>
             </Form>
         </Card>

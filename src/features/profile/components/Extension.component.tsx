@@ -14,6 +14,7 @@ import {
     PlayCircleOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;
 
@@ -21,12 +22,13 @@ const EXTENSION_FILE_URL = "/extension.zip";
 const VIDEO_URL = "/extension-guide.mp4";
 
 const Extension = () => {
+    const {t} = useTranslation();
     const [videoError, setVideoError] = useState(false);
     const [downloading, setDownloading] = useState(false);
 
     const handleDownload = () => {
         if (!EXTENSION_FILE_URL) {
-            message.error("Extension file is not available.");
+            message.error(t('profile.settings.extensionSection.fileMissing'));
             return;
         }
 
@@ -52,19 +54,19 @@ const Extension = () => {
                 >
                     <Space direction="vertical" size={12} style={{ width: "100%" }}>
                         <Title level={5} style={{ marginBottom: 0 }}>
-                            Browser Extension
+                            {t('profile.settings.extensionSection.title')}
                         </Title>
 
                         <Text type="secondary">
-                            Install the official browser extension to enhance your workflow.
+                            {t('profile.settings.extensionSection.description')}
                         </Text>
 
                         <Space direction="vertical" size={8}>
                             <Text>
-                                • Supported browsers: Chrome, Edge
+                                • {t('profile.settings.extensionSection.supportedBrowsers')}
                             </Text>
                             <Text>
-                                • Secure & verified extension
+                                • {t('profile.settings.extensionSection.secure')}
                             </Text>
                         </Space>
 
@@ -76,7 +78,7 @@ const Extension = () => {
                             style={{ marginTop: 16 }}
                             block
                         >
-                            Download Extension
+                            {t('profile.settings.extensionSection.download')}
                         </Button>
                     </Space>
                 </Card>
@@ -91,7 +93,7 @@ const Extension = () => {
                         boxShadow: "0 6px 16px rgba(0,0,0,0.08)",
                     }}
                 >
-                    <Title level={5}>Installation Guide</Title>
+                    <Title level={5}>{t('profile.settings.extensionSection.guide')}</Title>
 
                     {!videoError ? (
                         <video
@@ -109,7 +111,7 @@ const Extension = () => {
                             image={<PlayCircleOutlined style={{ fontSize: 48 }} />}
                             description={
                                 <Text type="secondary">
-                                    Video guide is currently unavailable.
+                                    {t('profile.settings.extensionSection.videoUnavailable')}
                                 </Text>
                             }
                         />

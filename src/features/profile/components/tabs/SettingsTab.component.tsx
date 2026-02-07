@@ -1,65 +1,93 @@
-// tabs/SettingsTab.tsx
-import { Card, Tabs } from "antd";
+import { Card, Tabs, Tour } from "antd";
 import {
     LockOutlined,
     SafetyOutlined,
     AppstoreOutlined,
 } from "@ant-design/icons";
-
+import { useTranslation } from "react-i18next";
 import ResetPassword from "../ResetPassword.component";
 import TrustedDevices from "../TrustedDevices.component";
 import Extension from "../Extension.component";
+import useTrustedDevices from "../../hooks/useTrustedDevices.hook";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
-const SettingsTab = () => {
+const SettingsTab = ({ forceDevices, onTourReady }: any) => {
+    const { t } = useTranslation();
+    const auth = useSelector((state: any) => state.auth);
+    const userId = auth.user?.id ?? "";
+
+    const { devicesQuery } = useTrustedDevices(userId);
+
+    const [activeTab, setActiveTab] = useState("password");
+    const [tourOpen, setTourOpen] = useState(false);
+
+    useEffect(() => {
+        if (forceDevices) {
+            setActiveTab("devices");
+            setTimeout(() => setTourOpen(true), 400);
+        }
+    }, [forceDevices]);
+
     return (
-        <Card
-            bordered={false}
-            style={{
-                borderRadius: 16,
-                boxShadow: "0 12px 32px rgba(0,0,0,0.08)",
-                minHeight: 400,
-            }}
-        >
-            <Tabs
-                tabPlacement="start"
-                size="large"
-                items={[
+        <>
+            <Tour
+                open={tourOpen}
+                onClose={() => {
+                    setTourOpen(false);
+                    onTourReady?.();
+                }}
+                steps={[
                     {
-                        key: "password",
-                        label: (
-                            <span>
-                                <LockOutlined /> Reset Password
-                            </span>
-                        ),
-                        children: <ResetPassword />,
-                    },
-                    {
-                        key: "devices",
-                        label: (
-                            <span>
-                                <SafetyOutlined /> Trusted Devices
-                            </span>
-                        ),
-                        children: <TrustedDevices />,
-                    },
-                    {
-                        key: "extension",
-                        label: (
-                            <span>
-                                <AppstoreOutlined /> Extension
-                            </span>
-                        ),
-                        children: <Extension />,
+                        title: t("tour.secureAccount"),
+                        description: t("tour.addTrustedDevice"),
+                        target: () =>
+                            document.querySelector("#add-trusted-device-card"),
                     },
                 ]}
-                styles={{
-                    content: {
-                        padding: "24px 32px",
-                        minHeight: 320,
-                    },
-                }}
             />
-        </Card>
+
+            <Card bordered={false} style={{ borderRadius: 16 }}>
+                <Tabs
+                    id="settings-tabs"
+                    activeKey={activeTab}
+                    onChange={(key) => {
+                        setActiveTab(key);
+                        if (key === "devices") devicesQuery.refetch();
+                    }}
+                    tabPlacement="start"
+                    items={[
+                        {
+                            key: "password",
+                            label: (
+                                <span>
+                                    <LockOutlined /> {t("profile.settings.password")}
+                                </span>
+                            ),
+                            children: <ResetPassword />,
+                        },
+                        {
+                            key: "devices",
+                            label: (
+                                <span id="trusted-devices-tab">
+                                    <SafetyOutlined /> {t("profile.settings.devices")}
+                                </span>
+                            ),
+                            children: <TrustedDevices />,
+                        },
+                        {
+                            key: "extension",
+                            label: (
+                                <span>
+                                    <AppstoreOutlined /> {t("profile.settings.extension")}
+                                </span>
+                            ),
+                            children: <Extension />,
+                        },
+                    ]}
+                />
+            </Card>
+        </>
     );
 };
 

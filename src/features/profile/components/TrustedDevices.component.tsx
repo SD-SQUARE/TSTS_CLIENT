@@ -6,146 +6,196 @@ import {
     Space,
     Tag,
     Typography,
+    Divider,
 } from "antd";
 import {
     DesktopOutlined,
     MobileOutlined,
+    TabletOutlined,
     PlusOutlined,
+    DeleteOutlined,
 } from "@ant-design/icons";
-import { useTrustedDevices } from "../hooks/useTrustedDevices.hook";
+import { useState } from "react";
+import AddTrustedDeviceDrawer from "./AddTrustedDeviceDrawer.component";
+import { trustedDevicesMock } from "../mockups/trustedDevices.mockup";
 import { useSelector } from "react-redux";
+import useTrustedDevices from "../hooks/useTrustedDevices.hook";
+import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 
 const { Text, Title } = Typography;
 
-const devicesMock = [
-    {
-        id: "1",
-        name: "Chrome - Windows",
-        type: "desktop",
-        lastActive: "Today, 10:32 AM",
-    },
-    {
-        id: "2",
-        name: "iPhone 14 Pro",
-        type: "mobile",
-        lastActive: "Yesterday, 6:20 PM",
-    },
-    {
-        id: "3",
-        name: "Chrome - Windows",
-        type: "desktop",
-        lastActive: "Today, 10:32 AM",
-    },
-    {
-        id: "4",
-        name: "iPhone 14 Pro",
-        type: "mobile",
-        lastActive: "Yesterday, 6:20 PM",
-    },
-];
+const deviceIcon = (type: string) => {
+    if (type === "mobile") return <MobileOutlined />;
+    if (type === "tablet") return <TabletOutlined />;
+    return <DesktopOutlined />;
+};
+
+const deviceLabel = (type: string) => {
+    if (type === "mobile") return "Mobile";
+    if (type === "tablet") return "Tablet";
+    return "Desktop";
+};
 
 const TrustedDevices = () => {
+    
+    const { t } = useTranslation();
     const auth = useSelector((state: any) => state.auth);
-    const userId = auth.user?.id ?? "";
+    const userId = auth.user?.id;
 
-    // TODO: apply api 
-    // const { data: devices, isLoading } = useTrustedDevices(userId);
+    const { devicesQuery, removeDevice } = useTrustedDevices(userId);
+
+    const devices = devicesQuery.data ?? [];
+
+    const [open, setOpen] = useState(false);
 
     return (
-        <Row gutter={[16, 16]} align="stretch">
-            {devicesMock.map(device => (
-                <Col key={device.id} xs={24} sm={12} md={8}>
+        <>
+            <Row gutter={[16, 16]} align="stretch">
+                {devices.map(device => (
+                    <Col key={device.id} xs={24} sm={12} md={8}>
+                        <Card
+                            hoverable
+                            style={{
+                                height: "100%",
+                                borderRadius: 14,
+                                display: "flex",
+                                flexDirection: "column",
+                            }}
+                            bodyStyle={{
+                                flex: 1,
+                                padding: 20,
+                                display: "flex",
+                                flexDirection: "column",
+                            }}
+                        >
+                            {/* Header */}
+                            <Space align="start" size="middle">
+                                <div
+                                    style={{
+                                        width: 44,
+                                        height: 44,
+                                        borderRadius: "50%",
+                                        background: "#e6f4ff",
+                                        color: "#1677ff",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        fontSize: 22,
+                                    }}
+                                >
+                                    {deviceIcon(device.device_type)}
+                                </div>
+
+                                <div>
+                                    <Title level={5} style={{ margin: 0 }}>
+                                        {device.name}
+                                    </Title>
+
+                                    <Space size="small" style={{ marginTop: 4 }}>
+                                        <Tag color="blue">
+                                            {deviceLabel(device.device_type)}
+                                        </Tag>
+                                        <Tag color="green">{t("profile.trustedDevices.trusted") }</Tag>
+                                    </Space>
+                                </div>
+                            </Space>
+
+                            <Divider style={{ margin: "16px 0" }} />
+
+                            {/* Info */}
+                            <Space vertical size={8}   >
+                                <Text type="secondary">{t("profile.trustedDevices.device.browser") }</Text>
+                                <Text>{device.browser}</Text>
+
+                                <Text type="secondary" style={{ marginTop: 8 }}>
+                                    {t("profile.trustedDevices.device.os") }
+                                </Text>
+                                <Text>{device.os}</Text>
+
+                                <Text type="secondary" style={{ marginTop: 8 }}>
+                                    {t("profile.trustedDevices.device.activatedSince") }
+                                </Text>
+                                <Text>{dayjs(device.activatedSince).format("DD/MM/YYYY, hh:mm a")}</Text>
+                            </Space>
+
+                            <div style={{ flex: 1 }} />
+
+                            {/* Footer */}
+                            <Button
+                                danger
+                                icon={<DeleteOutlined />}
+                                block
+                                style={{ marginTop: 16 }}
+                                onClick={() => removeDevice.mutate(device.id)}
+                            >
+                               {t("profile.trustedDevices.remove") }
+                            </Button>
+                        </Card>
+                    </Col>
+                ))}
+
+                {/* ADD DEVICE CARD */}
+                <Col xs={24} sm={12} md={8}>
                     <Card
+
+                        id="add-trusted-device-card"
                         hoverable
+                        onClick={() => setOpen(true)}
                         style={{
                             height: "100%",
-                            borderRadius: 12,
+                            borderRadius: 14,
+                            border: "1px dashed #d9d9d9",
                             display: "flex",
-                            flexDirection: "column",
-                            boxShadow: "0 6px 16px rgba(0,0,0,0.08)",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            textAlign: "center",
                         }}
-                        bodyStyle={{
-                            flex: 1,
-                            display: "flex",
-                            flexDirection: "column",
-                        }}
+                        bodyStyle={{ padding: 24 }}
                     >
-                        {/* Top */}
-                        <Space align="start">
+                        <Space direction="vertical" align="center" size="middle">
                             <div
                                 style={{
-                                    fontSize: 28,
+                                    width: 56,
+                                    height: 56,
+                                    borderRadius: "50%",
+                                    background: "#f0f5ff",
                                     color: "#1677ff",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    fontSize: 28,
                                 }}
                             >
-                                {device.type === "desktop" ? (
-                                    <DesktopOutlined />
-                                ) : (
-                                    <MobileOutlined />
-                                )}
+                                <PlusOutlined />
                             </div>
 
-                            <div>
-                                <Title level={5} style={{ margin: 0 }}>
-                                    {device.name}
-                                </Title>
-                                <Tag color="green">
-                                    Trusted device
-                                </Tag>
-                            </div>
+                            <Title level={5} style={{ margin: 0 }}>
+                                {t("profile.trustedDevices.addTitle") }
+                            </Title>
+
+                            <Text type="secondary" style={{ textAlign: "center" }}>
+                                {t("profile.trustedDevices.motive") }
+                            </Text>
+
+                            <Button type="primary">
+                                {t("profile.trustedDevices.add") }
+                            </Button>
                         </Space>
-
-                        {/* Middle */}
-                        <div style={{ marginTop: 16, marginBottom: 16 }}>
-                            <Text type="secondary">Last active</Text>
-                            <div style={{ fontWeight: 500 }}>
-                                {device.lastActive}
-                            </div>
-                        </div>
-
-                        {/* Spacer */}
-                        <div style={{ flex: 1 }} />
-
-                        {/* Bottom */}
-                        <Button danger block>
-                            Remove Device
-                        </Button>
                     </Card>
                 </Col>
-            ))}
+            </Row>
 
-            {/* ADD DEVICE CARD */}
-            <Col xs={24} sm={12} md={8}>
-                <Card
-                    hoverable
-                    style={{
-                        height: "100%",
-                        borderRadius: 12,
-                        border: "1px dashed #d9d9d9",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                    }}
-                >
-                    <Space direction="vertical" align="center">
-                        <PlusOutlined
-                            style={{
-                                fontSize: 32,
-                                color: "#1677ff",
-                            }}
-                        />
-                        <Text strong>Add Trusted Device</Text>
-                        <Text type="secondary" style={{ textAlign: "center" }}>
-                            Register a new browser or device
-                        </Text>
-                        <Button type="primary">
-                            Add Device
-                        </Button>
-                    </Space>
-                </Card>
-            </Col>
-        </Row>
+            <AddTrustedDeviceDrawer
+                open={open}
+                onClose={() => setOpen(false)}
+                onSubmit={() =>
+                    console.log("✅ Device added successfully")
+                }
+            />
+        </>
     );
 };
 
 export default TrustedDevices;
+

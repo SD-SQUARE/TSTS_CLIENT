@@ -7,7 +7,7 @@ const URL = API_PROTOCOL + '://' + API_HOST + ':' + API_PORT + '/' + API_BASE_PA
 const api = axios.create({
     baseURL: URL,
     headers: { 'Content-Type': 'application/json' },
-    withCredentials: true
+    withCredentials: true,
 })
 
 

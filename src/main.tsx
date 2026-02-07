@@ -9,7 +9,7 @@ import "./i18n"
 import { ConfigProvider } from "antd";
 import i18n from "./i18n";
 
-import { getCssVar } from "./utils/get_css_var";
+import { getCssVar } from "./utils/get_css_var.utils";
 
 const TOKENS = {
     colorPrimary: getCssVar("--color-primary"),           // main brand color

@@ -6,6 +6,7 @@ import PersonalInfo from "../PersonalInfo.component";
 import ProfileHeader from "../ProfileHeader.component";
 import { useUserProfile } from "../../hooks/useUserProfile.hook";
 import { useSelector } from "react-redux";
+import i18next from "i18next";
 
 
 const ProfileTab = () => {
@@ -20,7 +21,7 @@ const ProfileTab = () => {
         <Card
             bordered={false}
             style={{
-                borderRadius: "0 16px 16px 16px",
+                borderRadius: `${i18next.language === "ar" ? '16px 0' : '0 16px'} 16px 16px`,
                 overflow: "hidden",
                 boxShadow: "0 12px 32px rgba(0,0,0,0.1)",
             }}
@@ -51,3 +52,4 @@ const ProfileTab = () => {
 };
 
 export default ProfileTab;
+

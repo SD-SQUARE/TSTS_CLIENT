@@ -2,13 +2,15 @@ import { Col, Row, Tooltip, Typography } from "antd";
 import { MailOutlined, IdcardOutlined } from "@ant-design/icons";
 import InfoItem from "./InfoItem.component";
 import type { User } from "../interfaces/user.interface";
+import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;
 
 const PersonalInfo = ({ user }: { user: User }) => {
+    const { t } = useTranslation();
     return (
         <>
-            <Title level={5}>Personal Information</Title>
+            <Title level={5}>{t("profile.personal.title") }</Title>
 
             <Row gutter={[16, 16]}>
 
@@ -16,7 +18,7 @@ const PersonalInfo = ({ user }: { user: User }) => {
                 <Col xs={24}>
                     <InfoItem
                         icon={<IdcardOutlined />}
-                        label="Arabic Name"
+                        label={t("profile.personal.arabicName")}
                         value={`${user?.first_name_ar} ${user?.mid_name_ar} ${user?.last_name_ar}`}
                     />
                 </Col>
@@ -25,7 +27,7 @@ const PersonalInfo = ({ user }: { user: User }) => {
                 <Col xs={24} sm={12}>
                     <InfoItem
                         icon={<MailOutlined />}
-                        label="Email"
+                        label={t("profile.personal.email")}
                         value={
                             <Tooltip title={user?.email}>
                                 <Text
@@ -46,7 +48,7 @@ const PersonalInfo = ({ user }: { user: User }) => {
                 <Col xs={24} sm={12}>
                     <InfoItem
                         icon={<IdcardOutlined />}
-                        label="SSN"
+                        label={t("profile.personal.ssn")}
                         value={
                             <Tooltip title={user?.ssn}>
                                 <Text

@@ -71,12 +71,12 @@ export const AppRoutes = () => {
         },
     ];
     const SettingsMenuItems = [
-        { key: "/settings/work-hours", label: 'Work Hours', icon: <ClockCircleOutlined /> },
+        // { key: "/settings/work-hours", label: 'Work Hours', icon: <ClockCircleOutlined /> },
         { key: "/settings/universities", label: 'Universities', icon: <BankOutlined /> },
         { key: "/settings/domains", label: 'Domains', icon: <ProjectOutlined /> },
         { key: "/settings/departments", label: 'Departments', icon: <ApartmentOutlined /> },
         { key: "/settings/specializations", label: 'Specializations', icon: <ExperimentOutlined /> },
-        { key: "/settings/permissions", label: 'Permissions', icon: <SafetyOutlined /> },
+        // { key: "/settings/permissions", label: 'Permissions', icon: <SafetyOutlined /> },
     ];
     return (
         <Routes>
@@ -88,7 +88,7 @@ export const AppRoutes = () => {
 
                 <GuardedRoute roles={["*"]}>
                     <PageLayout> <Profile /></PageLayout>
-                </GuardedRoute>
+                </GuardedRoute> 
                 } />
             
 
@@ -104,9 +104,9 @@ export const AppRoutes = () => {
                     <MainLayout menuItems={IdentitiesMenuItems} />
                 </GuardedRoute>
             }>
-                <Route index path="groups" element={
+                <Route index  element={
                     <GuardedRoute roles={["superadmin", "admin"]}>
-                        <GroupsList />
+                       <GroupsList />
                     </GuardedRoute>
                 } />
                 

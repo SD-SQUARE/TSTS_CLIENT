@@ -3,21 +3,21 @@ import { Card, Table, Tag, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useUserGroups } from "../../hooks/useUserGroups.hook";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;
 
 const GroupsTab = () => {
-    
+    const { t } = useTranslation();
     const auth = useSelector((state: any) => state.auth);
     const userId = auth.user?.id ?? "";
     const page = 1;
     const pageSize = 10;
-    const { data : groups, isLoading } = useUserGroups(userId, page, pageSize);
-
+    const { data: groups, isLoading } = useUserGroups(userId, page, pageSize);
 
     const columns: ColumnsType<(typeof groups.groups)[number]> = [
         {
-            title: "Group Name",
+            title: t("profile.groups.columns.name"),
             dataIndex: "name",
             key: "name",
             ellipsis: true,
@@ -26,7 +26,7 @@ const GroupsTab = () => {
             ),
         },
         {
-            title: "Description",
+            title: t("profile.groups.columns.description"),
             dataIndex: "description",
             key: "description",
             ellipsis: true,
@@ -35,7 +35,7 @@ const GroupsTab = () => {
             ),
         },
         {
-            title: "Color",
+            title: t("profile.groups.columns.color"),
             dataIndex: "color",
             key: "color",
             width: 140,
@@ -64,7 +64,7 @@ const GroupsTab = () => {
             }}
         >
             <Title level={5} style={{ marginBottom: 16 }}>
-                User Groups
+                {t("profile.groups.title")}
             </Title>
 
             <Table
@@ -78,7 +78,7 @@ const GroupsTab = () => {
                 }}
                 scroll={{ x: 600 }}
                 locale={{
-                    emptyText: "No groups assigned to this user",
+                    emptyText: t("profile.groups.empty"),
                 }}
             />
         </Card>
@@ -86,3 +86,4 @@ const GroupsTab = () => {
 };
 
 export default GroupsTab;
+

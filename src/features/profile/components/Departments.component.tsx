@@ -1,17 +1,19 @@
 import { Card, Space, Tag, Tooltip, Typography, message } from "antd";
 import type { User } from "../interfaces/user.interface";
+import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
 
 const Departments = ({ user }: { user: User }) => {
+    const { t } = useTranslation();
     const handleCopy = (text: string) => {
         navigator.clipboard.writeText(text);
-        message.success(`Copied "${text}"`);
+        message.success(`${t("profile.departments.copied")} "${text}"`);
     };
 
     return (
         <>
-            <Title level={5}>Departments</Title>
+            <Title level={5}>{t("profile.departments.title")}</Title>
 
             <Card
                 bordered={false}
@@ -26,7 +28,7 @@ const Departments = ({ user }: { user: User }) => {
             >
                 <Space wrap size={[8, 12]}>
                     {user?.departments.map(dep => (
-                        <Tooltip key={dep.id} title="Click to copy">
+                        <Tooltip key={dep.id} title={t("profile.departments.copy")}>
                             <Tag
                                 color="cyan"
                                 style={{

@@ -11,6 +11,7 @@ export default ({ mode }) => {
             'process.env': env // optional
         },
         server: {
+            host: true,
             proxy: {
                 '/api': {
                     target: `${env.VITE_API_PROTOCOL}://${env.VITE_API_HOST}:${env.VITE_API_PORT}`,

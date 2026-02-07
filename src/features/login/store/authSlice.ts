@@ -1,5 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { AuthState } from "../interfaces/AuthState.interface";
+import api from "../../../api/http";
 
 const initialState: AuthState = {
     user: null,
@@ -27,6 +28,7 @@ const authSlice = createSlice({
 
             sessionStorage.removeItem("token");
             sessionStorage.removeItem("user");
+            api.post("v1/auth/logout");
         },
         authInitialized(state) {
             state.initialized = true;
