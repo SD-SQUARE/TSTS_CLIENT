@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
-import { Table, Button, Space, Popconfirm, message, Pagination, Tooltip, Popover, Typography, Tag, Input } from 'antd';
-import { EditOutlined, DeleteOutlined, EyeOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { Table, Button, Space,   Pagination,  Popover, Typography, Tag, Input } from 'antd';
+import {    PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
 import type { InputRef, TableColumnType } from 'antd';
@@ -12,6 +12,7 @@ import type { Group, NamedObject } from './Types/groups';
 import AvatarDisplay from '../../components/AvatarDisplay';
 import { useDeleteGroup, useGroups } from './Hooks/useGroups';
 import { useNavigate } from 'react-router-dom';
+import EllipsisComponent from '../../components/EllipsisComponent';
 
 
 type SearchableDataIndex = 'name';
@@ -20,7 +21,6 @@ const GroupsList: React.FC = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [pagination, setPagination] = useState({ page: 1, pageSize: 10 });
-    const [expanded, setExpanded] = useState(false);
 
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState<SearchableDataIndex | ''>('');
@@ -123,25 +123,39 @@ const GroupsList: React.FC = () => {
         setIsModalVisible(true);
     };
 
-    const handleEdit = (group: Group) => {
-        setEditingGroup(group);
-        setIsModalVisible(true);
-    };
+    // const handleEdit = (group: Group) => {
+    //     setEditingGroup(group);
+    //     setIsModalVisible(true);
+    // };
 
     const handleView = (id: string) => {
         navigate(`/identities/groups/${id}`);
     };
 
-    const handleDelete = async (id: string) => {
-        try {
-            await deleteMutation.mutateAsync(id);
-            message.success(t('translation.group_deleted_success'));
-
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (error) {
-            message.error(t('translation.group_deleted_error'));
-        }
+    const handleRowClick = (record: Group) => {
+        return {
+            onClick: (event: React.MouseEvent<HTMLElement>) => {
+                const target = event.target as HTMLElement;
+                const isInteractive = target.closest('button, a, .ant-popover-open, .ant-tooltip-open');
+    
+                if (!isInteractive) {
+                    handleView(record.id);
+                }
+            },
+            style: { cursor: 'pointer' }, 
+        };
     };
+
+    // const handleDelete = async (id: string) => {
+    //     try {
+    //         await deleteMutation.mutateAsync(id);
+    //         message.success(t('translation.group_deleted_success'));
+
+    //         // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    //     } catch (error) {
+    //         message.error(t('translation.group_deleted_error'));
+    //     }
+    // };
 
     const handleCloseModal = () => {
         setIsModalVisible(false);
@@ -171,7 +185,7 @@ const GroupsList: React.FC = () => {
                         >
                             <Tag
                                 color="blue"
-                                style={{ cursor: 'pointer', maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis' }}
+                                style={{ cursor: 'pointer', maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', marginInlineEnd:4 }}
                             >
                                 {spec.name.substring(0, 15)}...
                             </Tag>
@@ -219,13 +233,7 @@ const GroupsList: React.FC = () => {
                     trigger="hover"
                     placement="topLeft"
                 >
-                    <Typography.Paragraph ellipsis={{
-                        rows: 1,
-                        expandable: 'collapsible',
-                        expanded,
-                        onExpand: (_, info) => setExpanded(info.expanded),
-                    }}
-                    >{description}</Typography.Paragraph>
+                    <EllipsisComponent content={description} />
                 </Popover>
             ),
         },
@@ -234,23 +242,18 @@ const GroupsList: React.FC = () => {
             dataIndex: 'description_en',
             key: 'descriptionEnglish',
             width: 200,
-            render: (description: string) => (
+            render: (description: string) =>(
                 <Popover
                     title={t('translation.description_en')}
                     content={<div style={{ maxWidth: 400 }}>{description}</div>}
                     trigger="hover"
                     placement="topLeft"
                 >
-                    <Typography.Paragraph ellipsis={{
-                        rows: 1,
-                        expandable: 'collapsible',
-                        expanded,
-                        onExpand: (_, info) => setExpanded(info.expanded),
-                    }}
-                    >{description}</Typography.Paragraph>
+                    <EllipsisComponent content={description} />
 
                 </Popover>
-            ),
+            )
+        
         },
         {
             title: t('translation.heads'),
@@ -281,33 +284,33 @@ const GroupsList: React.FC = () => {
             key: 'specializations',
             render: renderSpecializations,
         },
-        {
-            title: t('translation.operations'),
-            key: 'operations',
-            width: 125,
-            fixed: 'right',
-            render: (_, record) => (
-                <Space size={4}>
-                    <Tooltip title={t('translation.edit')} placement="topLeft">
-                        <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-                    </Tooltip>
-                    <Tooltip title={t('translation.view')} placement="topLeft">
-                        <Button icon={<EyeOutlined />} onClick={() => handleView(record.id)} />
-                    </Tooltip>
-                    <Popconfirm
-                        title={t('translation.confirm_delete')}
-                        onConfirm={() => handleDelete(record.id)}
-                        okText={t('translation.yes')}
-                        cancelText={t('translation.no')}
-                        disabled={deleteMutation.isPending}
-                    >
-                        <Tooltip title={t('translation.delete')} placement="topLeft">
-                            <Button icon={<DeleteOutlined />} danger loading={deleteMutation.isPending} />
-                        </Tooltip>
-                    </Popconfirm>
-                </Space>
-            ),
-        },
+        // {
+        //     title: t('translation.operations'),
+        //     key: 'operations',
+        //     width: 125,
+        //     fixed: 'right',
+        //     render: (_, record) => (
+        //         <Space size={4}>
+        //             <Tooltip title={t('translation.edit')} placement="topLeft">
+        //                 <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
+        //             </Tooltip>
+        //             <Tooltip title={t('translation.view')} placement="topLeft">
+        //                 <Button icon={<EyeOutlined />} onClick={() => handleView(record.id)} />
+        //             </Tooltip>
+        //             <Popconfirm
+        //                 title={t('translation.confirm_delete')}
+        //                 onConfirm={() => handleDelete(record.id)}
+        //                 okText={t('translation.yes')}
+        //                 cancelText={t('translation.no')}
+        //                 disabled={deleteMutation.isPending}
+        //             >
+        //                 <Tooltip title={t('translation.delete')} placement="topLeft">
+        //                     <Button icon={<DeleteOutlined />} danger loading={deleteMutation.isPending} />
+        //                 </Tooltip>
+        //             </Popconfirm>
+        //         </Space>
+        //     ),
+        // },
     ];
 
 
@@ -338,6 +341,7 @@ const GroupsList: React.FC = () => {
                 loading={isLoading || deleteMutation.isPending}
                 scroll={{ x: 'max-content' }}
                 pagination={false}
+                onRow={handleRowClick}
             />
 
             <Pagination

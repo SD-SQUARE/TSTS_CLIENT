@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Modal, Steps, Button, Space, message, Spin } from 'antd';
 import { useTranslation } from 'react-i18next';
-
+import { ExclamationCircleFilled } from '@ant-design/icons';
 
 import StepInfo from './GroupFormSteps/StepInfo';
 import StepManagers from './GroupFormSteps/StepManagers';
@@ -26,7 +26,7 @@ interface ApiErrorField {
 
 const generateDarkRandomColor = (): string => {
     const generateHexSegment = () => {
-        const num = Math.floor(Math.random() * 81); 
+        const num = Math.floor(Math.random() * 81);
         return num.toString(16).padStart(2, '0');
     };
 
@@ -46,6 +46,7 @@ const steps = [
 
 
 const initialFormData: GroupFormData = {
+    id: '',
     name_ar: '',
     name_en: '',
     description_ar: '',
@@ -73,8 +74,8 @@ const cleanPayload = (data: GroupFormData) => {
 
     payload.heads = data.heads.map(item => item.id);
     payload.specializations = data.specializations.map(item => item.id);
-    
-    return payload; 
+
+    return payload;
 };
 
 const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, groupData }) => {
@@ -107,10 +108,43 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
         onClose();
     };
 
-    const { data: fetchedGroupDetail, isLoading: isFetchingDetail } = useGroupDetail( groupData?.id);
+    const isFirstStepDirty = () => {
+        return (
+            formData.name_ar !== initialFormData.name_ar ||
+            formData.name_en !== initialFormData.name_en ||
+            formData.description_ar !== initialFormData.description_ar ||
+            formData.description_en !== initialFormData.description_en
+        );
+    };
+
+    const handleConfirmClose = () => {
+
+        const isCleanInAddMode = !groupData && current === 0 && !isFirstStepDirty();
+
+        if (isCleanInAddMode) {
+            resetModalState();
+            return;
+        }
+
+        Modal.confirm({
+            title: t('group_form.confirm_cancel_title'),
+            icon: <ExclamationCircleFilled />,
+            content: t('group_form.confirm_cancel_content'),
+            okText: t('group_form.confirm_cancel_ok'),
+            cancelText: t('group_form.confirm_cancel_abort'),
+            centered: true,
+
+            onOk() {
+                resetModalState();
+            },
+            onCancel() { },
+        });
+    };
+
+    const { data: fetchedGroupDetail, isLoading: isFetchingDetail } = useGroupDetail(groupData?.id);
     const isModalLoading = isEditing && isFetchingDetail;
     useEffect(() => {
-        if(!isVisible){
+        if (!isVisible) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setCurrent(0);
             setFormData(initialFormData);
@@ -119,10 +153,11 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
         }
         if (groupData) {
             //FIXME : fix this Render warning properly
-            if(fetchedGroupDetail) {
-                
+            if (fetchedGroupDetail) {
+
                 // eslint-disable-next-line react-hooks/set-state-in-effect
                 setFormData({
+                    id: fetchedGroupDetail.id,
                     name_ar: fetchedGroupDetail.name_ar,
                     name_en: fetchedGroupDetail.name_en,
                     description_ar: fetchedGroupDetail.description_ar,
@@ -136,7 +171,7 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
                 });
                 setCurrent(0);
             }
-        } else{
+        } else {
             setFormData(initialFormData);
             setCurrent(0);
         }
@@ -166,26 +201,26 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
 
         try {
             if (isEditing && editMutation) {
-                await editMutation.mutateAsync(cleanedPayload); 
+                await editMutation.mutateAsync(cleanedPayload);
                 message.success(t('group_form.edit_success'));
             } else {
-                await addMutation.mutateAsync(cleanedPayload); 
+                await addMutation.mutateAsync(cleanedPayload);
                 message.success(t('group_form.add_success'));
             }
             resetModalState();
         } catch (error: any) {
             if (error.response && error.response.data && Array.isArray(error.response.data.errors)) {
-                const nameErrors = error.response.data.errors.filter((err: any) => 
+                const nameErrors = error.response.data.errors.filter((err: any) =>
                     err.msgKey === 'name_ar' || err.msgKey === 'name_en'
                 );
-                
+
                 if (nameErrors.length > 0) {
                     setApiErrors(nameErrors.map((err: any) => ({
-                        field: err.msgKey, 
-                        message: err.message 
+                        field: err.msgKey,
+                        message: err.message
                     })));
                     setCurrent(0);
-                    return; 
+                    return;
                 }
             }
             const errorMsg = error.response?.data?.message || t('group_form.submit_error');
@@ -200,65 +235,67 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
     // const handleTriggerSubmit = useCallback((trigger: () => void) => {
     //     setStepSubmitTrigger(() => trigger);
     // }, []);
-
+    const stepItems = useMemo(() => steps.map(item => ({
+        key: item.title,
+        title: t(`group_form.step_${item.title}`),
+    })), [t]);
 
     return (
         <Modal
             key={resetKey}
             title={t(isEditing ? 'group_form.edit_title' : 'group_form.add_title')}
             open={isVisible}
-            onCancel={resetModalState}
+            onCancel={handleConfirmClose}
+            maskClosable={false}
             footer={null}
-            width={700}
+            width="85vw"
+            style={{ top: 50 }}
         >
+
             <Spin spinning={isModalLoading}>
-            <Steps current={current} style={{ marginBottom: 24 }}>
-                {steps.map(item => (
-                    <Steps.Step key={item.title} title={t(`group_form.step_${item.title}`)} />
-                ))}
-            </Steps>
+                <Steps current={current} style={{ marginBottom: 24 }} items={stepItems} />
 
-            <div className="steps-content">
-                <CurrentStepComponent
-                    initialData={memoFormData}
-                    onNext={next}
-                    onSubmit={handleSubmit}
+                <div className="steps-content">
+                    <CurrentStepComponent
+                        initialData={memoFormData}
+                        onNext={next}
+                        onSubmit={handleSubmit}
 
-                    isSubmitting={isSubmitting}
-                    // onTriggerSubmit={handleTriggerSubmit}
+                        isSubmitting={isSubmitting}
+                        // onTriggerSubmit={handleTriggerSubmit}
 
-                    apiErrors={apiErrors}
-                />
-            </div>
+                        apiErrors={apiErrors}
+                    />
+                </div>
 
-            <div className="steps-action" style={{ marginTop: 24, textAlign: 'right' }}>
-                <Space>
-                    {current > 0 && (
-                        <Button style={{ margin: '0 8px' }} onClick={prev} disabled={isSubmitting}>
-                            {t('group_form.previous')}
-                        </Button>
-                    )}
-                    {!isLastStep && (
+                <div className="steps-action" style={{ marginTop: 24, textAlign: 'right' }}>
+                    <Space>
+                        {current > 0 && (
+                            <Button style={{ margin: '0 8px' }} onClick={prev} disabled={isSubmitting}>
+                                {t('group_form.previous')}
+                            </Button>
+                        )}
+                        {!isLastStep && (
 
 
-                        <Button form="step-form" type="primary" htmlType="submit" disabled={isSubmitting}>
-                            {t('group_form.next')}
-                        </Button>
-                    )}
-                    {isLastStep && (
-                        <Button
-                            form='step-form'
-                            htmlType='submit'
-                            type="primary"
-                            loading={isSubmitting}
+                            <Button form="step-form" type="primary" htmlType="submit" disabled={isSubmitting}>
+                                {t('group_form.next')}
+                            </Button>
+                        )}
+                        {isLastStep && (
+                            <Button
+                                form='step-form'
+                                htmlType='submit'
+                                type="primary"
+                                loading={isSubmitting}
 
                             // onClick={() => stepSubmitTrigger && stepSubmitTrigger()}
-                        >
-                            {t('group_form.submit')}
-                        </Button>
-                    )}
-                </Space>
-            </div>
+                            >
+                                {t('group_form.submit')}
+                            </Button>
+                        )}
+                    </Space>
+                </div>
             </Spin>
         </Modal>
     );

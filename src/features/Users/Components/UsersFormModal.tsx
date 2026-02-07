@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { Modal, Steps, Button, Space, message, Spin } from "antd";
 import { useTranslation } from "react-i18next";
+import { ExclamationCircleFilled } from '@ant-design/icons';
 
 import StepInfo from "./UsersFormSteps/StepInfo";
 import StepContacts from "./UsersFormSteps/StepContacts";
@@ -56,6 +57,9 @@ const UserFormModal: React.FC<{
     const [formData, setFormData] = useState<UserFormData>(initialFormData);
     // const [stepSubmitTrigger, setStepSubmitTrigger] = useState<(() => void) | null>(null);
 
+    const resetKey = isVisible ? 'visible' : 'hidden';
+
+
     const { data: fetchedUserDetail, isLoading: isFetchingDetail } = useUserDetail(role, userData?.id);
     const isModalLoading = isFetchingDetail; 
     useEffect(() => {
@@ -109,6 +113,42 @@ const UserFormModal: React.FC<{
         onClose();
     };
 
+    const isFirstStepDirty = () => {
+        return (
+            formData.first_name_ar !== initialFormData.first_name_ar ||
+            formData.first_name_en !== initialFormData.first_name_en ||
+            formData.mid_name_ar !== initialFormData.mid_name_ar ||
+            formData.mid_name_en !== initialFormData.mid_name_en ||
+            formData.last_name_ar !== initialFormData.last_name_ar ||
+            formData.last_name_en !== initialFormData.last_name_en ||
+            formData.ssn !== initialFormData.ssn
+        );
+    };
+
+    const handleConfirmClose = () => {
+
+        const isCleanInAddMode = !userData && current === 0 && !isFirstStepDirty();
+
+        if (isCleanInAddMode) {
+            resetModalState();
+            return;
+        }
+
+        Modal.confirm({
+            title: t('group_form.confirm_cancel_title'),
+            icon: <ExclamationCircleFilled />,
+            content: t('group_form.confirm_cancel_content'),
+            okText: t('group_form.confirm_cancel_ok'),
+            cancelText: t('group_form.confirm_cancel_abort'),
+            centered: true,
+
+            onOk() {
+                resetModalState();
+            },
+            onCancel() { },
+        });
+    };
+
     const next = (data: Partial<UserFormData>) => {
         setFormData((prev) => ({ ...prev, ...data }));
         setCurrent(current + 1);
@@ -156,16 +196,18 @@ const UserFormModal: React.FC<{
             const formPayload = new FormData();
 
             Object.entries(cleanedPayload).forEach(([key, val]) => {
-                if (key === "image" && finalData.image instanceof File) {
-                    formPayload.append(key, finalData.image);
+                if (key === "image") {
+                    if (typeof val === "string") {
+                        formPayload.append(key, "");
+                    }else if (val instanceof File) {
+                        formPayload.append(key, finalData.image);
+                    }
                 }
                 else if (key === "contacts") {
-                    if (typeof val === "object" && val !== null && "phones" in val) {
-                        formPayload.append("phones", JSON.stringify(val.phones));
-                    }
-                    if (typeof val === "object" && val !== null && "mobiles" in val) {
-                        formPayload.append("mobiles", JSON.stringify(val.mobiles));
-                    }
+                    formPayload.append("contacts", JSON.stringify(val));
+                }
+                else if (key === "specializations") {
+                    formPayload.append("allowed_specializations", JSON.stringify(val));
                 }
                 else if (Array.isArray(val)) {
                     formPayload.append(key, JSON.stringify(val));
@@ -176,7 +218,7 @@ const UserFormModal: React.FC<{
             });
 
             try {
-                // console.log(cleanedPayload);
+                console.log(formPayload);
                 await addOrEditMutation.mutateAsync(formPayload);
                 message.success(t(userData ? "user_list.edit_success" : "user_list.add_success"));
                 resetModalState();
@@ -194,23 +236,25 @@ const UserFormModal: React.FC<{
 
     // const handleTriggerSubmit = useCallback((trigger: () => void) => setStepSubmitTrigger(() => trigger), []);
 
-
+    const stepItems = useMemo(() => steps.map(item => ({
+        key: item.title,
+        title: item.title,
+    })), [t]);
 
     return (
         <Modal
+            key={resetKey}
             title={t(userData ? "user_list.edit_user" : "user_list.add_user")}
             open={isVisible}
-            onCancel={resetModalState}
+            onCancel={handleConfirmClose}
+            maskClosable={false}
             footer={null}
-            width={750}
-            destroyOnHidden
+            width="85vw"
+            style={{ top: 20 }}
         >
             <Spin spinning={isModalLoading}>
-            <Steps current={current} style={{ marginBottom: 24 }}>
-                {steps.map(item => (
-                    <Steps.Step key={item.title} title={t(item.title)} />
-                ))}
-            </Steps>
+            <Steps current={current} style={{ marginBottom: 24 }} items={stepItems}/>
+        
 
             <div className="steps-content">
                 <CurrentStepComponent
