@@ -353,7 +353,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                     onChange={(page, pageSize) => setPagination({ page, pageSize })}
                     showSizeChanger
                 />
-                <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>{t("Add User")}</Button>
+                <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>{t("Add_User")}</Button>
             </Space>
 
             <Table
@@ -361,20 +361,20 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                 dataSource={data?.data || []}
                 rowKey="id"
                 loading={isLoading || deleteMutation.isPending}
-                scroll={{ x: "max-content", y: "calc(100vh - 300px)" }}
+                scroll={{ x: "max-content", y: "calc(100vh - 200px)" }}
                 pagination={false}
                 onRow={handleRowClick}
             />
 
 
-            <Pagination
+            {/* <Pagination
                 style={{ marginTop: 16, textAlign: "right", justifyContent: "flex-end" }}
                 current={pagination.page}
                 pageSize={pagination.pageSize}
                 total={data?.total || 0}
                 onChange={(page, pageSize) => setPagination({ page, pageSize })}
                 showSizeChanger
-            />
+            /> */}
 
 
             <UserFormModal

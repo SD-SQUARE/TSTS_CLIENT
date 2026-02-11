@@ -8,7 +8,7 @@ const NotAllowed = () => {
     const goBack = useGoBack();
     
     return (
-        <Body>
+        // <Body>
         <Result
         status="403"
         title="403"
@@ -17,7 +17,7 @@ const NotAllowed = () => {
             <Button onClick={goBack} type="primary" className="primary-bg white-color">{t('GO_BACK')}</Button>
         }
         />
-        </Body>
+        // </Body>
     )
 }
 

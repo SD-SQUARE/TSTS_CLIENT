@@ -22,6 +22,7 @@ import {
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { mapRecordToFormValues, type FieldMapper } from "../utils/mapper";
+import i18next from "i18next";
 
 const { Text } = Typography;
 
@@ -171,7 +172,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
       <div className="fade-in-animation">
         <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Space>
-            <h2 style={{ margin: 0 }}>{title} Details</h2>
+                    <h2 style={{ margin: 0 }}> {i18next.language === 'en' ? 'Details' : 'تفاصيل'} </h2>
           </Space>
           
           <Space>
@@ -181,7 +182,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
               onClick={() => openEditModal(viewingItem)}
               style={{ backgroundColor: "#faad14", borderColor: "#faad14" }}
             >
-              Edit
+              {i18next.language === 'en' ? 'Edit' : 'تعديل'}
             </Button>
             
             <Button 
@@ -190,7 +191,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
               icon={<DeleteOutlined />}
               onClick={openDeletePrompt}
             >
-              Delete
+              {i18next.language === 'en' ? 'Delete' : 'حذف'}
             </Button>
           </Space>
         </div>
@@ -222,7 +223,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
               type="text"
               style={{marginTop:'2rem' ,fontSize: '16px', backgroundColor:'#cad8ec' }}
             >
-              Back to List
+              {i18next.language === 'en' ? 'Back to Table' : 'عودة إلى الجدول'}
         </Button>
 
         <Modal
@@ -285,7 +286,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
   }));
 
   return (
-    <div>
+    <div dir={i18next.language === "ar" ? "rtl" : "ltr"}>
       <div
         className="page-header-row"
         style={{
@@ -296,7 +297,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
           marginBottom: 20,
         }}
       >
-        <h2 className="page-title">{title} List</h2>
+              <h2 className="page-title">{title}</h2>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
           <Input
@@ -315,7 +316,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
               size="large"
               onClick={openAddModal}
             >
-              Add {title}
+              {i18next.language === "ar" ? "اضافة" : "Add"} {title}
             </Button>
           )}
         </div>
@@ -337,7 +338,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
             isLoading
               ? false
               : {
-                  position: ["bottomRight"],
+                  position: ["topLeft"],
                   pageSize: 10,
                   showSizeChanger: true,
                   showTotal: (total) => `Total ${total} items`,
@@ -347,7 +348,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
       </div>
 
       <Modal
-        title={`Add ${title}`}
+        title={`${i18next.language === "ar" ? "اضافة" : "Add"} ${title}`}
         open={isEditModalOpen}
         onOk={handleEditOk}
         onCancel={() => setIsEditModalOpen(false)}

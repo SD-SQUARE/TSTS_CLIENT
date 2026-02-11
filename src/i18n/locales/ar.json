@@ -339,10 +339,8 @@
       "title": "تخصصات المستخدم",
       "empty": "لا توجد تخصصات مخصصة لهذا المستخدم",
       "columns": {
-        "nameEn": "الاسم (إنجليزي)",
-        "nameAr": "الاسم (عربي)",
-        "descriptionEn": "الوصف (إنجليزي)",
-        "descriptionAr": "الوصف (عربي)"
+        "name": "الاسم",
+        "description": "الوصف"
       }
     },
 
@@ -457,6 +455,28 @@
   "Back": "رجوع",
   "tour": {
     "secureAccount": "قم بتأمين حسابك",
-    "addTrustedDevice": "أضف جهازًا موثوقًا لتسريع تسجيل الدخول وحماية حسابك."
-  }
+    "addTrustedDevice": "أضف جهازًا موثوقًا لتسريع تسجيل الدخول وحماية حسابك.",
+    "profile": {
+      "trustedDevice": {
+        "title": " يجب التحقق من الجهاز الموثوق",
+        "desc": "قم بتحقق من جهازك الموثوق لتسريع تسجيل الدخول وحماية حسابك."
+      }
+    }
+  },
+  "Groups": "المجموعات",
+  "Users": "المستخدمين",
+  "Admins": "المسؤولين",
+  "Technicians": "الفنيين",
+  "Requesters": "المتقدمين",
+  "Universities": "الجامعات",
+  "Domains": "النطاقات",
+  "Departments": "الأقسام",
+  "Specializations": "التخصصات",
+  "Permissions": "الصلاحيات",
+  "university": "الجامعة",
+  "domain": "النطاقات",
+  "departments": "الأقسام",
+  "specializations": "التخصصات",
+  "permissions": "الصلاحية",
+  "Add_User": "اضافة مستخدم"
 }

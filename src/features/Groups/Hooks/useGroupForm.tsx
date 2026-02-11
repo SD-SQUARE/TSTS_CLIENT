@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import type { GroupFormData } from '../Types/groups';
 import api from '../../../api/http';
+import i18next from 'i18next';
 
 
 
@@ -49,8 +50,12 @@ export const formatFullName = (user: any) => {
   // console.log(name);
   return name;
 };
-export const formatFullNameAssignee = (user: Assignees) => {
-  return `${user[`first_name`]} ${user[`mid_name`] || ''} ${user[`last_name`]}`.trim();
+
+export const formatFullNameAssignee = (user: any) => {
+    if (!user || !user.first_name || !user.last_name || !user.mid_name) return '';
+    
+    const lang = i18next.language;
+    return `${user.first_name[lang]} ${user.mid_name?.[lang] || ''} ${user.last_name?.[lang] || ''}`.trim();
 };
 
 
@@ -62,7 +67,7 @@ export const useAdmins = () => {
       console.log(response.data);
       return response.data.users;
     },
-    staleTime: Infinity,
+    //staleTime: Infinity,
   });
 };
 
@@ -82,6 +87,8 @@ export const useGroupDetail = (id?: string) => {
       const groupData = groupRes.data;
       const usersData = usersRes.data;
 
+        console.log('groupData:', groupData);
+        console.log('usersData:', usersData);
       // Merge them as needed
       return {
         team_leader: usersData.team_leader,
@@ -91,7 +98,7 @@ export const useGroupDetail = (id?: string) => {
       };
     },
     enabled: !!id,
-    staleTime: Infinity,
+    //staleTime: Infinity,
   });
 };
 
@@ -105,40 +112,34 @@ export const useTechnicians = () => {
 
       return response.data.users;
     },
-    staleTime: Infinity,
-  });
-};
-export const useAssignees = (groupId: string | undefined) => {
-  return useQuery({
-    queryKey: ['nonMembers', groupId],
-    queryFn: async () => {
-      if (!groupId) return [];
-      const response = await api.get<AssigneesApiResponse>(`v1/lockups/groups/${groupId}/non-members-technicians`, { params: { page: 1, page_size: 100 } });
-      console.log(response.data);
-      return response.data;
-    },
-    enabled: !!groupId,
-    staleTime: Infinity,
+    //staleTime: Infinity,
   });
 };
 
+export const useAssignees = (groupId: string | undefined) => {
+    return useQuery({
+        queryKey: ['nonMembers', groupId],
+        queryFn: async () => {
+            if (!groupId) return [];
+            const response = await api.get(`v1/lockups/groups/${groupId}/non-members-technicians`);
+            console.log('useAssignees:', response.data.technicians);
+            return response.data.technicians; // <-- return the array
+        },
+        enabled: !!groupId,
+    });
+};
 
 export const useGroupTechnicians = (groupId: string | undefined) => {
-  return useQuery({
-    queryKey: ['groupTechnicians', groupId],
-    queryFn: async () => {
-      if (!groupId) return [];
-
-      const response = await api.get<AssigneesApiResponse>(
-        `v1/lockups/groups/${groupId}/technicians`,
-        { params: { page: 1, page_size: 100 } },
-      );
-      console.log(response.data);
-      return response.data;
-    },
-    enabled: !!groupId,
-    staleTime: Infinity,
-  });
+    return useQuery({
+        queryKey: ['groupTechnicians', groupId],
+        queryFn: async () => {
+            if (!groupId) return [];
+            const response = await api.get(`v1/lockups/groups/${groupId}/technicians`);
+            console.log('useGroupTechnicians:', response.data.technicians);
+            return response.data.technicians; // <-- return the array
+        },
+        enabled: !!groupId,
+    });
 };
 
 
@@ -151,7 +152,7 @@ export const useSpecializations = () => {
       return response.data.specializations;
     },
 
-    staleTime: Infinity,
+    //staleTime: Infinity,
   });
 };
 
@@ -184,7 +185,7 @@ export const useAddGroup = () => {
 export const useEditGroup = (groupId: string) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: GroupFormData) => {
+    mutationFn: (data: any) => {
 
       if (groupId === 'dummy-id-for-add-mode') {
         throw new Error("Attempted to edit a group without a valid ID.");

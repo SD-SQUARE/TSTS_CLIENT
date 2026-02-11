@@ -272,7 +272,10 @@ const TicketList: React.FC = () => {
                 </Tag>
             ),
             ...getColumnSelectProps('specialization', 'tickets.problemType',
-                specs?.map((s: any) => ({ label: s.name, value: s.id })) || []
+                (Array.isArray(specs) ? specs : []).map((s: any) => ({
+                    label: s.name,
+                    value: s.id,
+                }))
             ),
         },
         {

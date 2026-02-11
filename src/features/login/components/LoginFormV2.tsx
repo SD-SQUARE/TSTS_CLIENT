@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Form, Input, Button, Typography, Alert, Image, Space } from "antd";
+import { Form, Input, Button, Typography, Alert, Image, Space, Avatar } from "antd";
 import { loginSchema } from "../schema/LoginSchema";
 import loginImage from "../../../assets/HU-bg-clear.png";
 import { APP_BASE_PATH } from "../../../app/config";
@@ -13,7 +13,6 @@ import { getJWTPayload } from "../../../utils/jwt_payload.utils";
 // v2 hooks
 import { useLoginV2 } from "../hooks/useLoginV2";
 import { useTrustedDeviceAuth } from "../hooks/useTrustedDeviceAuth";
-
 const { Title,Text } = Typography;
 
 const LoginFormV2 = () => {
@@ -141,7 +140,7 @@ const LoginFormV2 = () => {
             onMouseLeave={() => setIsHovered(false)}
         >
             <div className="login-left">
-                <Image src={loginImage} preview={false} />
+                <Avatar src={loginImage} shape="square" size={350} />
             </div>
 
             <div className="login-right">

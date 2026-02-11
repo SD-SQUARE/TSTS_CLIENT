@@ -8,7 +8,7 @@ const NotFound = () => {
     const goBack = useGoBack();
 
     return (
-        <Body>
+        // <Body>
 
             <Result
             status="404"
@@ -18,7 +18,7 @@ const NotFound = () => {
                 <Button type="primary" className="primary-bg white-color" onClick={goBack}>{t('GO_BACK')}</Button>
             }
             />
-        </Body>
+        // {/* </Body> */}
     )
 }
 

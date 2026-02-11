@@ -19,6 +19,7 @@ import UserMgmtImg from "../assets/UserManagement.webp";
 import SupportImg from "../assets/support-center.jpg";
 import { useSelector } from "react-redux";
 import { APP_BASE_PATH } from "../app/config";
+import TrustedDeviceTour from "./TrustedDeviceTour.home.component";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -55,7 +56,8 @@ const HomePage = () => {
   const emails = ["support@helwan.edu.eg", "help@helwan.edu.eg"];
 
   return (
-    <Body>
+      <Body>
+          <TrustedDeviceTour />
       <div className="corporate-home" dir={isArabic ? "rtl" : "ltr"}>
         
         <section className="hero-section">

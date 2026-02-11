@@ -14,60 +14,31 @@ const SpecializationsTab = () => {
     const pageSize = 10;
     const { data: specializations, isLoading } = useUserSpecializations(userId, page, pageSize);
 
-    const columns: ColumnsType<(typeof specializations.data)[number]> = [
+    const columns: ColumnsType<(typeof specializations.specializations)[number]> = [
         {
-            title: t("profile.specializations.columns.nameEn"),
-            dataIndex: "name_en",
-            key: "name_en",
-            ellipsis: {
-                showTitle: false,
-            },
-            render: name => (
+            title: t("profile.specializations.columns.name"),
+            dataIndex: "name",
+            key: "name",
+            ellipsis: { showTitle: false },
+            render: (name: string) => (
                 <Tooltip title={name}>
                     <Text strong>{name}</Text>
                 </Tooltip>
             ),
         },
         {
-            title: t("profile.specializations.columns.nameAr"),
-            dataIndex: "name_ar",
-            key: "name_ar",
-            ellipsis: {
-                showTitle: false,
-            },
-            render: name => (
-                <Tooltip title={name}>
-                    <Text>{name}</Text>
-                </Tooltip>
-            ),
-        },
-        {
-            title: t("profile.specializations.columns.descriptionEn"),
-            dataIndex: "description_en",
-            key: "description_en",
-            ellipsis: {
-                showTitle: false,
-            },
-            render: desc => (
-                <Tooltip title={desc}>
-                    <Text type="secondary">{desc}</Text>
-                </Tooltip>
-            ),
-        },
-        {
-            title: t("profile.specializations.columns.descriptionAr"),
-            dataIndex: "description_ar",
-            key: "description_ar",
-            ellipsis: {
-                showTitle: false,
-            },
-            render: desc => (
+            title: t("profile.specializations.columns.description"),
+            dataIndex: "description",
+            key: "description",
+            ellipsis: { showTitle: false },
+            render: (desc: string) => (
                 <Tooltip title={desc}>
                     <Text type="secondary">{desc}</Text>
                 </Tooltip>
             ),
         },
     ];
+
 
     return (
         <Card
@@ -83,7 +54,7 @@ const SpecializationsTab = () => {
 
             <Table
                 rowKey="id"
-                dataSource={specializations?.data}
+                dataSource={specializations?.specializations}
                 columns={columns}
                 pagination={{
                     total: specializations?.meta_data.total,
@@ -92,7 +63,7 @@ const SpecializationsTab = () => {
                 }}
                 scroll={{ x: 800 }}
                 locale={{
-                    emptyText: t("user.specializations.empty"),
+                    emptyText: t("profile.specializations.empty"),
                 }}
             />
         </Card>

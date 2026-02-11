@@ -8,7 +8,7 @@ const ServerError = () => {
     const goBack = useGoBack();
 
     return (
-        <Body>
+        // <Body>
 
         <Result
         status="500"
@@ -18,7 +18,7 @@ const ServerError = () => {
             <Button onClick={goBack} type="primary" className="primary-bg white-color">{t('GO_BACK')}</Button>
         }
         />
-        </Body>
+        // </Body>
     )
 }
 

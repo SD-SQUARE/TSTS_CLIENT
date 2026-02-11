@@ -7,7 +7,6 @@ import SettingsTab from "./components/tabs/SettingsTab.component";
 import i18next from "i18next";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import TrustedDeviceTour from "./components/TrustedDeviceTour.component";
 
 const Profile = () => {
     const { t } = useTranslation();
@@ -50,9 +49,10 @@ const Profile = () => {
             children: (
                 <SettingsTab
                     forceDevices={forceSettingsDevices}
-                    onTourReady={() =>
-                        localStorage.removeItem("showTrustedDeviceTour")
-                    }
+                    onTourReady={() => {
+                        console.log("onTourReady"); 
+                        localStorage.removeItem("showTrustedDeviceTour");
+                     }}
                 />
             ),
         },
@@ -84,6 +84,7 @@ const Profile = () => {
                 type="card"
                 activeKey={activeMainTab}
                 onChange={setActiveMainTab}
+                destroyOnHidden  
                 items={isRequester ? itemOfRequester : itemOfNoneRequester}
                 styles={{
                     content: {

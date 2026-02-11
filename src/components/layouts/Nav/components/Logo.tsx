@@ -11,11 +11,11 @@ const Logo = ({ onClick }) => {
     const navigate = useNavigate();
 
     const getLogoSize = (screens) => {
-        if (screens.xl) return 70;
-        if (screens.lg) return 64;
-        if (screens.md) return 58;
-        if (screens.sm) return 52;
-        return 48; // default for xs
+        if (screens.xl) return 54;
+        if (screens.lg) return 48;
+        if (screens.md) return 38;
+        if (screens.sm) return 38;
+        return 38; // default for xs
     };
 
 
@@ -27,10 +27,12 @@ const Logo = ({ onClick }) => {
 
     return (
         <Avatar
+            shape="square"
             src={logo}
             size={getLogoSize(screens)}
             onClick={handleClick}
             style={{
+                objectFit: "contain",
                 cursor: "pointer",
                 userSelect: "none",
                 transition: "all 0.3s ease", // smooth resizing

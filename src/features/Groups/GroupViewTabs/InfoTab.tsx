@@ -5,6 +5,7 @@ import { Descriptions, Space, Typography, Tag, Tooltip, Button } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
 
 import { useGroupDetail } from '../Hooks/useGroupForm';
+import i18next from 'i18next';
 
 
 
@@ -24,6 +25,25 @@ const renderMembers = (members: any ,t = undefined) => {
                     {t == undefined ?
                         member.first_name + ' ' + member.last_name
                         : t(member.first_name + ' ' + member.last_name)}
+                </Tag>
+            ))}
+        </Space>
+    );
+};
+
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const renderSpecMembers = (members: any, t = undefined) => {
+    // console.log(members);
+    if (!members || members.length === 0) {
+        return <Text disabled>-</Text>;
+    }
+    return (
+        <Space size={[0, 8]} wrap>
+            {members.map(member => (
+
+                <Tag key={member.id} color="blue" style={{ marginInlineEnd: '4px' }}>
+                    {member.name}
                 </Tag>
             ))}
         </Space>
@@ -74,7 +94,7 @@ const InfoTab: React.FC<InfoTabProps> = ({ group, t, onEdit }) => {
         { key: 'team_leader', label: t('translation.team_leader'), children: renderTeamLeader(group.team_leader) },
 
 
-        { key: 'specializations', label: t('translation.specializations'), children: renderMembers(group.specializations) },
+        { key: 'specializations', label: t('translation.specializations'), children: renderSpecMembers(group.specializations) },
     ];
 
     return (

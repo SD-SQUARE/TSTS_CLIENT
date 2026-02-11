@@ -1,5 +1,6 @@
 import { Avatar, Space, Tag, Typography } from "antd";
 import type { User } from "../interfaces/user.interface";
+import i18next from "i18next";
 
 const { Title, Text } = Typography;
 
@@ -29,12 +30,13 @@ const ProfileHeader = ({ user }: { user: User }) => {
 
                 <div style={{ color: "#fff" }}>
                     <Title level={3} style={{ color: "#fff", margin: 0 }}>
-                        {user?.first_name_en} {user?.mid_name_en}{" "}
-                        {user?.last_name_en}
+                        {i18next.language === "ar"
+                            ? `${user?.first_name_ar} ${user?.mid_name_ar} ${user?.last_name_ar}`
+                            : `${user?.first_name_en} ${user?.mid_name_en} ${user?.last_name_en}`}
                     </Title>
 
                     <Text style={{ color: "#e6f4ff", display: "block" }}>
-                        {user?.job_en}
+                        {i18next.language === "ar" ? user?.job_ar : user?.job_en}
                     </Text>
 
                     <Tag

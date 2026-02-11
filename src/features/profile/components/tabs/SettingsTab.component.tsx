@@ -21,13 +21,45 @@ const SettingsTab = ({ forceDevices, onTourReady }: any) => {
 
     const [activeTab, setActiveTab] = useState("password");
     const [tourOpen, setTourOpen] = useState(false);
+    const [skip, setskip] = useState(false);
 
     useEffect(() => {
-        if (forceDevices) {
-            setActiveTab("devices");
-            setTimeout(() => setTourOpen(true), 400);
+        if (localStorage.getItem("skipTrustedDeviceTour-for-week")) {
+            setskip(true);
         }
+        if (!forceDevices) return;
+
+        setActiveTab("devices");
+
+        const timer = setTimeout(() => {
+            setTourOpen(true);
+        }, 400);
+
+        return () => clearTimeout(timer);
     }, [forceDevices]);
+
+
+    useEffect(() => {
+        if (!tourOpen) return;
+
+        const el = document.querySelector("#add-trusted-device-card");
+        if (!el) return;
+
+        const handleClick = () => {
+            setTourOpen(() => false); // ✅ no stale state
+            onTourReady?.();
+        };
+
+        el.addEventListener("click", handleClick);
+
+        return () => {
+            el.removeEventListener("click", handleClick);
+        };
+    }, [tourOpen]);
+
+    
+
+    if (skip) return null;
 
     return (
         <>
@@ -35,7 +67,9 @@ const SettingsTab = ({ forceDevices, onTourReady }: any) => {
                 open={tourOpen}
                 onClose={() => {
                     setTourOpen(false);
-                    onTourReady?.();
+                    localStorage.removeItem("showTrustedDeviceTour");
+                    setskip(true);
+                    localStorage.setItem("skipTrustedDeviceTour-for-week", "1");
                 }}
                 steps={[
                     {
@@ -43,6 +77,8 @@ const SettingsTab = ({ forceDevices, onTourReady }: any) => {
                         description: t("tour.addTrustedDevice"),
                         target: () =>
                             document.querySelector("#add-trusted-device-card"),
+                        nextButtonProps: { style: { display: "none" } },
+                        prevButtonProps: { style: { display: "none" } },
                     },
                 ]}
             />
@@ -69,7 +105,7 @@ const SettingsTab = ({ forceDevices, onTourReady }: any) => {
                         {
                             key: "devices",
                             label: (
-                                <span id="trusted-devices-tab">
+                                <span >
                                     <SafetyOutlined /> {t("profile.settings.devices")}
                                 </span>
                             ),

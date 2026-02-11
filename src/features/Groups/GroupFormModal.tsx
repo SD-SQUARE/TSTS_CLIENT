@@ -72,8 +72,8 @@ const cleanPayload = (data: GroupFormData) => {
         payload.team_leader_id = null;
     }
 
-    payload.heads = data.heads.map(item => item.id);
-    payload.specializations = data.specializations.map(item => item.id);
+    payload.heads = data.heads.map(item => item.id) || [];
+    payload.specializations = data.specializations.map(item => item.id) || [];
 
     return payload;
 };

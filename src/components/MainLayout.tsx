@@ -13,7 +13,7 @@ const MainLayout = ({ menuItems }) => {
 
     return (
         <Body>
-            <Layout style={{ minHeight: '100%' }}>
+            <Layout style={{ minHeight: '100vh' }}>
                 {/* Desktop Sider */}
                 <Sider
                     width={220}

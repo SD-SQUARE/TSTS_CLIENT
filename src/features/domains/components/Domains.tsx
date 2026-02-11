@@ -173,7 +173,7 @@ const DomainsPage: React.FC = () => {
     };
   return (
     <GenericCrudPage<Domain>
-      title={t("domains")}
+      title={t("Domains")}
       columns={columns}
       formItems={formItems}
       data={data}

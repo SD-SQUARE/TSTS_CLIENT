@@ -342,10 +342,8 @@
       "title": "User Specializations",
       "empty": "No specializations assigned to this user",
       "columns": {
-        "nameEn": "Name (English)",
-        "nameAr": "Name (Arabic)",
-        "descriptionEn": "Description (English)",
-        "descriptionAr": "Description (Arabic)"
+        "name": "Name",
+        "description": "Description"
       }
     },
 
@@ -459,6 +457,28 @@
   "Back": "Back",
   "tour": {
     "secureAccount": "Secure your account",
-    "addTrustedDevice": "Add a trusted device to speed up login and protect your account."
-  }
+    "addTrustedDevice": "Add a trusted device to speed up login and protect your account.",
+    "profile": {
+      "trustedDevice": {
+        "title": "You must verify your trusted device",
+        "desc": "Verify your trusted device to speed up login and protect your account."
+      }
+    }
+  },
+    "Groups": "Groups",
+    "Users": "Users",
+    "Admins": "Admins",
+    "Technicians": "Technicians",
+    "Requesters": "Requesters",
+    "Universities": "Universities",
+    "Domains": "Domains",
+    "Departments": "Departments",
+    "Specializations": "Specializations",
+    "Permissions": "Permissions",
+    "university": "University",
+    "domain": "Domain",
+    "departments": "Departments",
+    "specializations": "Specializations",
+    "permissions": "Permissions",
+    "Add_User": "Add User"
 }

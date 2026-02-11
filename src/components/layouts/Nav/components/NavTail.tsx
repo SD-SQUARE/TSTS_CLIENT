@@ -42,13 +42,15 @@ const NavTail = () => {
             <Col>
                 <Space size={"large"}>
                     {token ?
-                    <Space size={"middle"} >
-                        <Avatar
-                            style={{ cursor: "pointer" }}
-                            shape="circle" size="large"
-                            icon={<UserOutlined />}
-                            onClick={gotoProfile}
-                        />
+                        <Space size={"middle"} >
+                            <div id='profile-trusted-devices'>
+                                <Avatar
+                                style={{ cursor: "pointer" }}
+                                shape="circle" size="large"
+                                icon={<UserOutlined />}
+                                onClick={gotoProfile}
+                            />
+                            </div>
                         <Button className="authBTN logoutBTN" onClick={handleLogout}>{t("Logout")}</Button>
                     </Space>
                     : <Button  className="authBTN" onClick={gotoLogin}>{t("Login")}</Button>

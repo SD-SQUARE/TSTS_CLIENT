@@ -339,19 +339,19 @@ const GroupsList: React.FC = () => {
                 dataSource={data?.data || []}
                 rowKey="id"
                 loading={isLoading || deleteMutation.isPending}
-                scroll={{ x: 'max-content' }}
+                scroll={{ x: 'max-content', y: "calc(100vh - 200px)" }}
                 pagination={false}
                 onRow={handleRowClick}
             />
 
-            <Pagination
+            {/* <Pagination
                 style={{ marginTop: 16, textAlign: 'right', justifyContent: "flex-end" }}
                 current={pagination.page}
                 pageSize={pagination.pageSize}
                 total={data?.total || 0}
                 onChange={handleTableChange}
                 showSizeChanger
-            />
+            /> */}
 
             <GroupFormModal
                 isVisible={isModalVisible}

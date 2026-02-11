@@ -38,45 +38,47 @@ import TicketView from "../features/tickets/Components/ticketDetails.tsx";
 import GuardedRoute from "./GuardedRoute.tsx";
 import PageLayout from "../components/PageLayout.tsx";
 import Profile from './../features/profile/Profile.page';
+import { useTranslation } from "react-i18next";
 
 export const AppRoutes = () => {
+    const { t } = useTranslation();
 
     const IdentitiesMenuItems = [
         {
             key: "/identities/groups",
-            label: 'Groups',
+            label: t('Groups'),
             icon: <TeamOutlined />,
         },
         {
             key: "/identities/users",
-            label: 'Users',
+            label: t('Users'),
             icon: <UserOutlined />,
             children: [
                 {
                     key: "/identities/users/admins",
-                    label: 'Admins',
+                    label: t('Admins'),
                     icon: <SafetyOutlined />,
                 },
                 {
                     key: "/identities/users/technicians",
-                    label: 'Technicians',
+                    label: t('Technicians'),
                     icon: <ToolOutlined />,
                 },
                 {
                     key: "/identities/users/requesters",
-                    label: 'Requesters',
+                    label: t('Requesters'),
                     icon: <IdcardOutlined />,
                 },
             ],
         },
     ];
     const SettingsMenuItems = [
-        // { key: "/settings/work-hours", label: 'Work Hours', icon: <ClockCircleOutlined /> },
-        { key: "/settings/universities", label: 'Universities', icon: <BankOutlined /> },
-        { key: "/settings/domains", label: 'Domains', icon: <ProjectOutlined /> },
-        { key: "/settings/departments", label: 'Departments', icon: <ApartmentOutlined /> },
-        { key: "/settings/specializations", label: 'Specializations', icon: <ExperimentOutlined /> },
-        // { key: "/settings/permissions", label: 'Permissions', icon: <SafetyOutlined /> },
+        // { key: "/settings/work-hours", label: t('Work Hours'), icon: <ClockCircleOutlined /> },
+        { key: "/settings/universities", label: t('Universities'), icon: <BankOutlined /> },
+        { key: "/settings/domains", label: t('Domains'), icon: <ProjectOutlined /> },
+        { key: "/settings/departments", label: t('Departments'), icon: <ApartmentOutlined /> },
+        { key: "/settings/specializations", label: t('Specializations'), icon: <ExperimentOutlined /> },
+        // { key: "/settings/permissions", label: t('Permissions'), icon: <SafetyOutlined /> },
     ];
     return (
         <Routes>

@@ -28,6 +28,7 @@ const GroupViewPage: React.FC = () => {
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
     const [confirmName, setConfirmName] = useState('');
     const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+    const [activeTab, setActiveTab] = useState('info');
 
     const handleBack = () => { navigate(-1); };
 
@@ -100,14 +101,23 @@ const handleOpenEditModal = () => {
         {
             key: 'info',
             label: t('group_form.tab_info') || 'Group Info',
-            children: <InfoTab group={group} currentLanguage={currentLanguage} t={t} onEdit={handleOpenEditModal}/>,
+            children: (
+                <InfoTab
+                    group={group}
+                    currentLanguage={currentLanguage}
+                    t={t}
+                    onEdit={handleOpenEditModal}
+                />
+            ),
         },
         {
             key: 'assign',
             label: t('group_form.tab_assign') || 'Assign Users',
-            children: <AssignTab groupId={groupId} t={t} />,
+            children: <AssignTab groupId={groupId} t={t} />
+                
         },
     ];
+
 
     return (
         <>
@@ -144,14 +154,26 @@ const handleOpenEditModal = () => {
             style={{ margin: 20 }}
 
             bodyStyle={{ padding: 0 }}
-        >
-            <Tabs
-                defaultActiveKey="info"
+            >
+                <Tabs
+                    activeKey={activeTab}
+                    onChange={setActiveTab}
+                    destroyInactiveTabPane
+                    items={tabItems}
+                    size="large"
+                    style={{ padding: '0 24px 24px 24px' }}
+                />
+
+                {/* <Tabs
+                    activeKey={activeTab}
+                    onChange={setActiveTab}
+                    destroyOnHidden 
+                // defaultActiveKey="info"
                 items={tabItems}
                 size="large"
 
                 style={{ padding: '0 24px 24px 24px' }}
-            />
+            /> */}
         </Card>
         <Modal
             title={t('translation.confirm_delete_group_title')}

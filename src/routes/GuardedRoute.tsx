@@ -28,8 +28,8 @@ export default function GuardedRoute({
     if (location.pathname === `${APP_BASE_PATH}/auth/login` || location.pathname === `${APP_BASE_PATH}/not-allowed`)
         return children;
     
-    console.log(user);
-    console.log(roles);
+    // console.log(user);
+    // console.log(roles);
     const role = user?.role?.toLowerCase();
     const userPermissions = user?.permissions || [];
 
@@ -39,8 +39,8 @@ export default function GuardedRoute({
         permissions.length === 0 ||
         permissions.every(p => userPermissions.includes(p));
 
-    console.log(isRoleAllowed());
-    console.log(isPermissionsAllowed());
+    // console.log(isRoleAllowed());
+    // console.log(isPermissionsAllowed());
     // 🚫 Not logged in
     if (!role && allowNavigation) {
         notification.warning({
