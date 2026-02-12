@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { Table, Tag, Typography } from 'antd';
+import { Avatar, Space, Table, Tag, Typography } from 'antd';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import i18n from '../../../../../i18n';
 
 interface Props {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -42,6 +44,36 @@ const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor }) 
             key: 'createdAt',
             width: 200,
             render: (date: string) => dayjs(date).format('YYYY-MM-DD h:mm A'),
+        },
+        {
+            title: t('tickets.user'),
+            dataIndex: 'meta',
+            key: 'user',
+            render: (meta: any) => {
+                if (!meta?.user) return '-'; 
+                
+                const displayName = i18n.language === 'ar' 
+                    ? meta.user.full_name_ar 
+                    : meta.user.full_name_en;
+
+                return (
+                    <Space>
+                        <Avatar size="small" src={meta.user.image} />
+                        <Typography.Text>{displayName || '-'}</Typography.Text>
+                    </Space>
+                );
+            },
+        },
+        {
+            title: t('tickets.ipAddress'),
+            dataIndex: 'meta',
+            key: 'ip',
+            width: 130,
+            render: (meta: any) => (
+                <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
+                    {meta?.ip || '-'}
+                </Typography.Text>
+            ),
         },
     ];
 
