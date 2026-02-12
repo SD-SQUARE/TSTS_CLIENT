@@ -262,7 +262,11 @@
     "resolvedIn": "تم الحل في",
     "hours": "ساعة",
     "rating": "التقييم",
-    "reviewer": "المراجع"
+    "reviewer": "المراجع",
+    "reopenTicket": "إعادة فتح الطلب",
+    "startSolving": "بدء الحل",
+    "markAsResolved": "تعيين كمكتمل",
+    "statusUpdatedSuccess": "تم تحديث حالة الطلب بنجاح"
   },
   "priority": {
     "important": "مهمة",
@@ -312,7 +316,9 @@
     "unknown": "حدث خطأ غير متوقع أثناء جلب التذاكر.",
     "submitFailed": "فشل الإرسال. يرجى المحاولة مرة أخرى.",
     "downloadFailed": "فشل التحميل. يرجى المحاولة مرة أخرى.",
-    "uploadFailed": "فشل رفع الملفات. يرجى المحاولة مرة أخرى."
+    "uploadFailed": "فشل رفع الملفات. يرجى المحاولة مرة أخرى.",
+    "connectionError" : "خطاء في الاتصال. يرجى التحقق من الاتصال بالانترنت.",
+    "updateFailed" : "فشل تحديث التذكرة. يرجى المحاولة مرة اخرى."
   },
   "Email_Is_Required": "البريد الإلكتروني مطلوب",
   "Invalid_email_address_format": "صيغ البريد الإلكتروني غير صالح",

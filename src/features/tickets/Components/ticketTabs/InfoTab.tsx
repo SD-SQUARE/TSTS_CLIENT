@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React from 'react';
-import { Descriptions, Tag, Typography,  Space, Card, Button, Flex } from 'antd';
-import { EditOutlined } from '@ant-design/icons';
+import { Descriptions, Tag, Typography,  Space, Card, Button, Flex, message } from 'antd';
+import { CheckCircleOutlined, EditOutlined, ToolOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import { useChangeTicketStatus } from '../../Hooks/useTicket';
 
 interface TicketInfoTabProps {
     ticket: any;
@@ -12,6 +14,74 @@ interface TicketInfoTabProps {
 
 const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
     const { t } = useTranslation();
+    const { role } = useParams(); 
+    const statusMutation = useChangeTicketStatus(ticket?.id);
+
+    const isRequester = role === 'requester';
+    const status = ticket?.status;
+
+    let actionButton = null;
+
+    const handleStatusChange = async (newStatus: string) => {
+        try {
+            const res = await statusMutation.mutateAsync(newStatus);
+            if (res.is_updated) {
+                message.success(t('tickets.statusUpdatedSuccess'));
+            } else {
+                message.error(res.message || t('errors.updateFailed'));
+            }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (err) {
+            message.error(t('errors.connectionError'));
+        }
+    };
+
+    if (isRequester) {
+        if (status === 'closed') {
+            actionButton = (
+                <Button 
+                    style={{ flex: 1 }} 
+                    size="large"
+                    icon={<ReloadOutlined />} 
+                    onClick={() => handleStatusChange('open')}
+                    loading={statusMutation.isPending}
+                >
+                    {t('tickets.reopenTicket')}
+                </Button>
+            );
+        }
+    } else {
+        if (status === 'open') {
+            actionButton = (
+                <Button 
+                    style={{ flex: 1 }} 
+                    type="primary" 
+                    size="large"
+                    ghost
+                    icon={<ToolOutlined />} 
+                    onClick={() => handleStatusChange('inprogress')}
+                    loading={statusMutation.isPending}
+                >
+                    {t('tickets.startSolving')}
+                </Button>
+            );
+        } else if (status === 'in_progress') {
+            actionButton = (
+                <Button 
+                    style={{ flex: 1 }} 
+                    type="primary" 
+                    size="large"
+                    color="green" 
+                    variant="outlined"
+                    icon={<CheckCircleOutlined />} 
+                    onClick={() => handleStatusChange('closed')}
+                    loading={statusMutation.isPending}
+                >
+                    {t('tickets.markAsResolved')}
+                </Button>
+            );
+        }
+    }
 
     return (
         <Card bordered={false} style={{ background: 'transparent', boxShadow: 'none', paddingBottom: '24px' }} styles={{ body: { padding: 0 } }}>
@@ -66,14 +136,19 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                         {ticket?.description}
                     </Typography.Paragraph>
                 </Descriptions.Item>
-
-                
             </Descriptions>
 
-            <Flex justify="flex-end" style={{ marginTop: 24 }}>
-                <Button type="primary" icon={<EditOutlined />} onClick={onEdit} size="large">
+            <Flex gap = "middle" style={{ marginTop: 24 }}>
+            <Button 
+                    type="primary" 
+                    icon={<EditOutlined />} 
+                    onClick={onEdit} 
+                    size="large" 
+                    style={{ flex: 1 }}
+                >
                     {t('common.edit')}
                 </Button>
+                {actionButton}
             </Flex>
         </Card>
     );

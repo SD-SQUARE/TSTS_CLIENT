@@ -265,7 +265,11 @@
     "resolvedIn": "Resolved in",
     "hours": "hours",
     "rating": "Rating",
-    "reviewer": "Reviewer"
+    "reviewer": "Reviewer",
+    "reopenTicket": "Reopen Ticket",
+    "startSolving": "Start Solving",
+    "markAsResolved": "Mark as Resolved",
+    "statusUpdatedSuccess": "Ticket status updated successfully"
   },
   "priority": {
     "important": "Important",
@@ -315,7 +319,9 @@
     "unknown": "An unexpected error occurred while fetching tickets.",
     "submitFailed": "Failed to submit. Please try again.",
     "downloadFailed": "Failed to download file. Please try again.",
-    "uploadFailed": "Failed to upload file. Please try again."
+    "uploadFailed": "Failed to upload file. Please try again.",
+    "connectionError" : "Connection error. Please check your internet connection.",
+    "updateFailed" : "Failed to update ticket. Please try again."
   },
   "Email_Is_Required": "Email is required",
   "Invalid_email_address_format": "Invalid email address format",

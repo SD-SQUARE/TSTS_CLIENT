@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Ticket, TicketsResponse } from '../Types/tickets';
 import api from '../../../api/http';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
 const fetchTickets = async (page: number, pageSize: number, searchQuery: { [key: string]: string }): Promise<{ data: Ticket[], total: number }> => {
@@ -87,5 +87,20 @@ export const useTicketReviews = (ticketId: string | undefined) => {
             return data;
         },
         enabled: !!ticketId, 
+    });
+};
+
+export const useChangeTicketStatus = (id: string) => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (newStatus: string) => {
+            const { data } = await api.patch(`/v1/tickets/${id}/change-status`, {
+                status: newStatus,
+            });
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['ticket', id] });
+        },
     });
 };
