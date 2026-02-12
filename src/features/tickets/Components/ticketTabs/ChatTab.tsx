@@ -18,11 +18,19 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
     const [text, setText] = useState('');
     const [pendingMediaIds, setPendingMediaIds] = useState<string[]>([]);
     const [tempFiles, setTempFiles] = useState<{ id: string, name: string }[]>([]);
-    const {user} = useSelector((state: any) => state.auth);
+    const { user } = useSelector((state: any) => state.auth);
+    const [optimisticMessages, setOptimisticMessages] = useState<any[]>([]);
 
     useEffect(() => {
         refetch();
     }, [refetch]);
+
+    useEffect(() => {
+        if (messages && messages.length > 0) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setOptimisticMessages([]);
+        }
+    }, [messages]);
 
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -30,17 +38,41 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
-    }, [messages]);
+    }, [messages, optimisticMessages]);
 
     const handleSend = async () => {
         if (!text.trim() && pendingMediaIds.length === 0) return;
         // console.log('Sending message:', {text, pendingMediaIds});
+        const messageContent = text;
+        const mediaIdsToSend = [...pendingMediaIds];
+        const mediaPreviews = [...tempFiles];
+
+        const tempId = `temp-${Date.now()}`;
+    const optimisticMsg = {
+        id: tempId,
+        message: messageContent,
+        createdAt: new Date().toISOString(),
+        sender: {
+            id: user.id,
+            name: user.name || t('common.me'),
+            image: user.image
+        },
+        media: mediaPreviews.map(f => ({ id: f.id, fileName: f.name, url: '#' })),
+        isSending: true 
+    };
+    setOptimisticMessages(prev => [...prev, optimisticMsg]);
+    setText('');
+    setPendingMediaIds([]);
+    setTempFiles([]);
         try {
-            await sendMessage({ ticketId: ticketId!, message: text, mediaIds: pendingMediaIds, userID: user.id }).unwrap();
-            setText('');
-            setPendingMediaIds([]);
-            setTempFiles([]);
+            await sendMessage({ 
+                ticketId: ticketId!, 
+                message: messageContent, 
+                mediaIds: mediaIdsToSend, 
+                userID: user.id 
+            }).unwrap();
         } catch (error) {
+            setOptimisticMessages(prev => prev.filter(m => m.id !== tempId));
             console.error("Failed to send message", error);
         }
         // console.log('Message sent:', text, pendingMediaIds);
@@ -56,7 +88,7 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
                 const newIds = response.map((item: any) => item.id);
                 setPendingMediaIds(prev => [...prev, ...newIds]);
                 setTempFiles(prev => [...prev, { id: newIds[0], name: file.name }]);
-                
+
                 // console.log('Updated Pending IDs:', [...pendingMediaIds, ...newIds]);
             }
         } catch (error) {
@@ -70,6 +102,7 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
     };
 
     if (isLoading) return <Spin style={{ display: 'block', margin: '50px auto' }} />;
+    const allMessages = [...(messages || []), ...optimisticMessages];
 
     return (
         <div style={{
@@ -96,7 +129,7 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
                 }}
             >
                 <List
-                    dataSource={messages}
+                    dataSource={allMessages}
                     renderItem={(item) => {
 
                         const isMe = String(item.sender.id) === String(user.id);
@@ -115,7 +148,7 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
                                             {isMe ? t('common.me') : item.sender.name}
                                         </Typography.Text>
                                         <Typography.Text type="secondary" style={{ fontSize: '10px' }}>
-                                            {dayjs(item.createdAt).format('HH:mm')}
+                                            {dayjs(item.createdAt).format('h:mm A')}
                                         </Typography.Text>
                                     </Space>
 
@@ -127,7 +160,8 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
                                             color: isMe ? '#fff' : 'rgba(0, 0, 0, 0.88)',
                                             padding: '8px 12px',
                                             borderRadius: isMe ? '12px 0 12px 12px' : '0 12px 12px 12px',
-                                            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                                            boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                                            opacity: item.isSending ? 0.6 : 1
                                         }}>
                                             <Typography.Text style={{ color: 'inherit' }}>{item.message}</Typography.Text>
 
@@ -167,9 +201,9 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
                     {tempFiles.length > 0 && (
                         <Flex gap="8px" style={{ marginBottom: 8, padding: '4px' }} wrap="wrap">
                             {tempFiles.map((file) => (
-                                <div key={file.id} style={{ 
-                                    position: 'relative', 
-                                    background: '#f0f5ff', 
+                                <div key={file.id} style={{
+                                    position: 'relative',
+                                    background: '#f0f5ff',
                                     border: '1px solid #adc6ff',
                                     borderRadius: '8px',
                                     padding: '4px 24px 4px 8px',
@@ -177,16 +211,16 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
                                 }}>
                                     <PaperClipOutlined style={{ marginRight: 4 }} />
                                     <Typography.Text ellipsis style={{ maxWidth: 100 }}>{file.name}</Typography.Text>
-                                    <CloseCircleFilled 
+                                    <CloseCircleFilled
                                         onClick={() => removeAttachment(file.id)}
-                                        style={{ 
-                                            position: 'absolute', 
-                                            right: 4, 
-                                            top: '50%', 
-                                            transform: 'translateY(-50%)', 
+                                        style={{
+                                            position: 'absolute',
+                                            right: 4,
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
                                             color: '#ff4d4f',
                                             cursor: 'pointer'
-                                        }} 
+                                        }}
                                     />
                                 </div>
                             ))}

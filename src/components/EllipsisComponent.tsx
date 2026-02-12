@@ -2,7 +2,7 @@ import { Typography } from 'antd';
 import React, { useState } from 'react';
 
 interface EllipsisComponentProps {
-    content: string;
+    content: React.ReactNode;
 }
 
 const EllipsisComponent: React.FC<EllipsisComponentProps> = ({ content }) => {
