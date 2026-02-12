@@ -245,8 +245,13 @@
     "tabMedia": "الوسائط",
     "tabChat": "المحادثة",
     "tabHistory": "التاريخ",
+    "Timeline": "الجدول الزمني",
+    "Table": "جدول",
     "assignedTo": "تم التكليف لـ",
-    "unassigned": "غير معين لفني بعد"
+    "unassigned": "غير معين لفني بعد",
+    "type": "نوع التذكرة",
+    "content": "محتوى التذكرة",
+    "date": "التاريخ"
   },
   "priority": {
     "important": "مهمة",

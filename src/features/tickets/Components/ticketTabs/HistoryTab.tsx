@@ -1,21 +1,25 @@
 
-import React, { useEffect } from 'react';
-import { Timeline, Typography, Card, Empty, Spin, Button, Space, FloatButton } from 'antd';
+import React, { useEffect, useState } from 'react';
+import {  Typography, Card, Empty, Spin, Button, Space, FloatButton,  Segmented } from 'antd';
 import {
     ClockCircleOutlined, CheckCircleOutlined, SyncOutlined,
     ExclamationCircleOutlined, RollbackOutlined, ZoomInOutlined,
-    ZoomOutOutlined, ReloadOutlined
+    ZoomOutOutlined, ReloadOutlined,
+    TableOutlined,
+    HistoryOutlined
 } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import dayjs from 'dayjs';
 import { useTicketActivities, useTimelineZoom } from '../../Hooks/useTicket';
+import TicketHistoryTimeline from './HistoryTabs/TimelineView';
+import TicketHistoryTable from './HistoryTabs/TableView';
 
 
 const TicketHistoryTab: React.FC = () => {
     const { t } = useTranslation();
     const { id: ticketId } = useParams();
 
+    const [viewType, setViewType] = useState<'timeline' | 'table'>('timeline');
 
     const { zoom, handleZoomIn, handleZoomOut, handleResetZoom } = useTimelineZoom(1);
     const { data: activities, isLoading, refetch } = useTicketActivities(ticketId);
@@ -45,50 +49,65 @@ const TicketHistoryTab: React.FC = () => {
         }
     };
 
+    
     if (isLoading) return <Spin style={{ display: 'block', margin: '50px auto' }} />;
     if (!activities || activities.length === 0) return <Empty description={t('common.noHistory')} />;
 
     return (
         <div style={{ padding: '24px', position: 'relative' }}>
-            <div style={{ position: 'sticky', top: 0, zIndex: 10, display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
-                <Card size="small" style={{ borderRadius: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                    <Space>
-                        <Button type="text" icon={<ZoomOutOutlined />} onClick={handleZoomOut} disabled={zoom <= 0.6} />
-                        <Typography.Text strong>{Math.round(zoom * 100)}%</Typography.Text>
-                        <Button type="text" icon={<ZoomInOutlined />} onClick={handleZoomIn} disabled={zoom >= 2} />
-                        <Button type="text" icon={<ReloadOutlined />} onClick={handleResetZoom} />
-                    </Space>
-                </Card>
+            <div style={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 10,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'end',
+                gap: '12px',
+                marginBottom: 20
+            }}>
+                <Space direction='vertical' align='end'>
+                    <Segmented options={[
+                        { value: 'timeline', icon: <HistoryOutlined /> },
+                        { value: 'table', icon: <TableOutlined /> },
+                    ]} value={viewType} onChange={(value) => setViewType(value as 'timeline' | 'table')} />
+                    {viewType === 'timeline' && (
+                        <Card size="small" style={{ borderRadius: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                            <Space>
+                                <Button type="text" icon={<ZoomOutOutlined />} onClick={handleZoomOut} disabled={zoom <= 0.6} />
+                                <Typography.Text strong>{Math.round(zoom * 100)}%</Typography.Text>
+                                <Button type="text" icon={<ZoomInOutlined />} onClick={handleZoomIn} disabled={zoom >= 2} />
+                                <Button type="text" icon={<ReloadOutlined />} onClick={handleResetZoom} />
+                            </Space>
+                        </Card>
+                    )}
+                </Space>
             </div>
 
-            <div style={{ maxWidth: `${800 * zoom}px`, margin: '0 auto', transition: 'all 0.3s ease' }}>
-                <Timeline
-                    mode="alternate"
-                    items={activities.map((item) => ({
-                        color: getActivityColor(item.type),
-                        dot: getActivityIcon(item.type),
-                        children: (
-                            <Card size="small" style={{ textAlign: 'left', fontSize: `${14 * zoom}px` }}>
-                                <Typography.Text strong style={{ display: 'block', fontSize: `${16 * zoom}px` }}>
-                                    {item.title}
-                                </Typography.Text>
-                                <Typography.Paragraph type="secondary" style={{ fontSize: `${12 * zoom}px`, marginBottom: 8 * zoom }}>
-                                    {dayjs(item.createdAt).format('YYYY-MM-DD HH:mm')}
-                                </Typography.Paragraph>
-                                <Typography.Text style={{ fontSize: `${14 * zoom}px` }}>
-                                    {item.content}
-                                </Typography.Text>
-                            </Card>
-                        ),
-                    }))}
+            {viewType === 'timeline' ? (
+
+                <TicketHistoryTimeline 
+                    activities={activities} 
+                    zoom={zoom} 
+                    handlers={{ handleZoomIn, handleZoomOut, handleResetZoom }}
+                    getIcon={getActivityIcon}
+                    getColor={getActivityColor}
                 />
-            </div>
+            ) : (
+                <TicketHistoryTable 
+                    activities={activities} 
+                    getIcon={getActivityIcon}
+                    getColor={getActivityColor}
+                />
+            )
+            }
 
-            <FloatButton.Group shape="circle" style={{ right: 24 }}>
-                <FloatButton icon={<ZoomInOutlined />} onClick={handleZoomIn} />
-                <FloatButton icon={<ZoomOutOutlined />} onClick={handleZoomOut} />
-                <FloatButton icon={<ReloadOutlined />} onClick={handleResetZoom} />
-            </FloatButton.Group>
+            {viewType === 'timeline' && (
+                <FloatButton.Group shape="circle" style={{ right: 24 }}>
+                    <FloatButton icon={<ZoomInOutlined />} onClick={handleZoomIn} />
+                    <FloatButton icon={<ZoomOutOutlined />} onClick={handleZoomOut} />
+                    <FloatButton icon={<ReloadOutlined />} onClick={handleResetZoom} />
+                </FloatButton.Group>
+            )}
         </div>
     );
 };

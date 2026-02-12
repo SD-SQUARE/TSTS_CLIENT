@@ -248,8 +248,13 @@
     "tabMedia": "Media",
     "tabChat": "Chat",
     "tabHistory": "History",
+    "Timeline": "Timeline",
+    "Table": "Table",
     "assignedTo": "Assigned to",
-    "unassigned": "Not Assigned Yet"
+    "unassigned": "Not Assigned Yet",
+    "type": "Type",
+    "content": "Content",
+    "date" : "Date"
   },
   "priority": {
     "important": "Important",
