@@ -5,12 +5,13 @@ import { Tabs, Typography, Spin, Flex, Button } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useTicketDetails } from '../Hooks/useTicketForm';
-import { useTicketActivities, useTicketMedia } from '../Hooks/useTicket';
+import { useTicketActivities, useTicketMedia, useTicketReviews } from '../Hooks/useTicket';
 import TicketInfoTab from './ticketTabs/InfoTab';
 import TicketMediaTab from './ticketTabs/MediaTab';
 import TicketHistoryTab from './ticketTabs/HistoryTab';
 import TicketChatTab from './ticketTabs/ChatTab';
 import { useGetChatMessagesQuery } from '../store/services/chatApi';
+import TicketReviewsTab from './ticketTabs/ReviewTab';
 
 const TicketView: React.FC = () => {
     const { t } = useTranslation();
@@ -22,10 +23,11 @@ const TicketView: React.FC = () => {
     const { data: media, isLoading: mediaLoading, refetch : refetchMedia } = useTicketMedia(id);
     const { refetch : refetchHistory } = useTicketActivities(id);
     const { refetch : refetchChat } = useGetChatMessagesQuery(id);
+    const { data: reviewsData, isLoading: reviewsLoading, refetch : refetchReviews } = useTicketReviews(id);
 
     const pathParts = location.pathname.split('/');
     const lastPart = pathParts[pathParts.length - 1];
-    const activeKey = ['media', 'chat', 'history'].includes(lastPart) ? lastPart : 'info';
+    const activeKey = ['media', 'chat', 'history', 'reviews'].includes(lastPart) ? lastPart : 'info';
 
     useEffect(() => {
         if (activeKey === 'info') {
@@ -39,7 +41,10 @@ const TicketView: React.FC = () => {
         else if (activeKey === 'history') {
             refetchHistory();
         }
-    }, [activeKey, refetchInfo, refetchMedia, refetchChat, refetchHistory]);
+        else if (activeKey === 'reviews') {
+            refetchReviews();
+        }
+    }, [activeKey, refetchInfo, refetchMedia, refetchChat, refetchHistory, refetchReviews]);
 
     const assigneeNames = ticket?.assignee
 
@@ -79,6 +84,11 @@ const TicketView: React.FC = () => {
             key: 'chat',
             label: t('tickets.tabChat'),
             children: <TicketChatTab assigneeName={assigneeNames} />
+        },
+        {
+            key: 'reviews',
+            label: t('tickets.tabReviews'),
+            children: <TicketReviewsTab reviews={reviewsData?.data || []} isLoading={reviewsLoading} />,
         },
         ...(role === 'admin' ? [{
             key: 'history',

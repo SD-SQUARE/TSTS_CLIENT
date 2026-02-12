@@ -253,7 +253,14 @@
     "content": "محتوى التذكرة",
     "date": "التاريخ",
     "user": "المستخدم",
-    "ipAddress": "عنوان IP"
+    "ipAddress": "عنوان IP",
+    "tabReviews": "التقييمات",
+    "noReviews": "لا توجد تقييمات لهذا الطلب.",
+    "noComment": "لا يوجد تعليق مكتوب.",
+    "resolvedIn": "تم الحل في",
+    "hours": "ساعة",
+    "rating": "التقييم",
+    "reviewer": "المراجع"
   },
   "priority": {
     "important": "مهمة",
@@ -284,7 +291,8 @@
     "select": "حدد",
     "filter": "تصفية",
     "startDate": "تاريخ البدء",
-    "endDate": "تاريخ النهاية"
+    "endDate": "تاريخ النهاية",
+    "loading": "جاري التحميل..."
   },
   "success": {
     "created": "تم إنشاء التذكرة بنجاح",

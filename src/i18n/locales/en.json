@@ -256,7 +256,14 @@
     "content": "Content",
     "date" : "Date",
     "user": "User",
-    "ipAddress": "IP Address"
+    "ipAddress": "IP Address",
+    "tabReviews": "Reviews",
+    "noReviews": "No reviews found for this ticket.",
+    "noComment": "No written feedback provided.",
+    "resolvedIn": "Resolved in",
+    "hours": "hours",
+    "rating": "Rating",
+    "reviewer": "Reviewer"
   },
   "priority": {
     "important": "Important",
@@ -287,7 +294,8 @@
     "select": "Select",
     "filter": "Filter",
     "startDate": "Start Date",
-    "endDate": "End Date"
+    "endDate": "End Date",
+    "loading" : "Loading..."
   },
   "success": {
     "created": "Ticket created successfully",

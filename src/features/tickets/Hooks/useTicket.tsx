@@ -77,3 +77,15 @@ export const useTimelineZoom = (initialZoom = 1) => {
         handleResetZoom,
     };
 };
+
+export const useTicketReviews = (ticketId: string | undefined) => {
+    return useQuery({
+        queryKey: ['ticketReviews', ticketId],
+        queryFn: async () => {
+            if (!ticketId) return null;
+            const { data } = await api.get(`/tickets/${ticketId}/reviews`);
+            return data;
+        },
+        enabled: !!ticketId, 
+    });
+};
