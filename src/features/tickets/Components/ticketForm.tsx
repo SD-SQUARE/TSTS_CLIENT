@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -5,12 +6,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Form, Input, Select, Button, Upload, Tag, Dropdown, Space, Typography, message, Flex, Card, Steps, Badge } from 'antd';
+import { Form, Input, Select, Button, Upload, Tag, Dropdown, Space, Typography, message, Flex, Card, Steps, Badge, TreeSelect } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useAdmins, useTechnicians, useTicketDetails, useTicketMutations, useTicketProblems } from '../Hooks/useTicketForm';
+import { fetchAdmins, fetchTechs, useAdmins, useTechnicians, useTicketDetails, useTicketMutations, useTicketProblems } from '../Hooks/useTicketForm';
 import RequiredTag from '../../../components/RequiredTag';
 import { useSelector } from 'react-redux';
+import api from '../../../api/http';
 
 const { TextArea } = Input;
 
@@ -26,18 +28,71 @@ const TicketForm: React.FC = () => {
     const canEditAttachments = !isEdit || (isEdit && isRequester);
 
     const { data: groupedData } = useTicketProblems();
-    const { data: techs } = useTechnicians();
-    const { data: admins } = useAdmins();
     const { data: ticketData, isLoading } = useTicketDetails(id);
     const { createMutation, updateMutation, coordinateMutation } = useTicketMutations(id);
 
     const [fileList, setFileList] = useState<any[]>([]);
 
-    const [selectedProblem, setSelectedProblem] = useState<{id: string, name: string, specId: string} | null>(null);
+    const [selectedProblem, setSelectedProblem] = useState<{ id: string, name: string, specId: string } | null>(null);
+
+    const [treeData, setTreeData] = useState<any[]>([
+        { 
+            id: 'admin_root', 
+            pId: 0, 
+            value: 'admin_root', 
+            title: t('Admins'), 
+            isLeaf: false, 
+            selectable: false 
+        },
+        { 
+            id: 'tech_root', 
+            pId: 0, 
+            value: 'tech_root', 
+            title: t('Technicians'), 
+            isLeaf: false, 
+            selectable: false 
+        },
+    ]);
 
     const currentStatus = Form.useWatch('status', form);
     const currentPriority = Form.useWatch('priority', form);
 
+    const onLoadData = ({ id }: any) => {
+        // eslint-disable-next-line no-async-promise-executor
+        return new Promise<void>(async (resolve) => {
+            if (treeData.some(node => node.pId === id)) {
+                resolve();
+                return;
+            }
+    
+            try {
+                let usersArray = []; 
+                if (id === 'admin_root') {
+                    const response = await fetchAdmins();
+                    usersArray = response.data?.users || response.users || []; 
+                } else if (id === 'tech_root') {
+                    const response = await fetchTechs();
+                    usersArray = response.data?.users || response.users || [];
+                }
+    
+                const newNodes = usersArray.map((u: any) => ({
+                    id: u.id,
+                    pId: id, 
+                    value: u.id,
+                    title: `${u.first_name} ${u.last_name}`,
+                    isLeaf: true,
+                    selectable: true
+                }));
+                console.log(newNodes);
+    
+                setTreeData((prev) => [...prev, ...newNodes]);
+                resolve();
+            } catch (error) {
+                console.error("Load failed", error);
+                resolve();
+            }
+        });
+    };
     const getStepperData = () => {
         // Default middle state if none is selected or if 'open' is selected
         const middleStates = ['in_progress', 'pending', 'out_of_service'];
@@ -99,14 +154,6 @@ const TicketForm: React.FC = () => {
         }
     }, [ticketData, form]);
 
-    const allPossibleAssignees = [
-        ...(techs || []),
-        ...(admins || [])
-    ].map((user: any) => ({
-        value: user.id,
-        label: `${user.first_name} ${user.last_name}`,
-        group: user.user_type
-    }));
 
     const onFinish = async (values: any) => {
         const formData = new FormData();
@@ -152,8 +199,8 @@ const TicketForm: React.FC = () => {
 
     const problemMenuItems = groupedData?.specializations?.map((spec: any) => ({
         key: spec.id,
-        label: spec.name, 
-        type: 'group' as const, 
+        label: spec.name,
+        type: 'group' as const,
         children: spec.problems?.map((prob: any) => ({
             key: prob.id,
             label: prob.name,
@@ -240,14 +287,17 @@ const TicketForm: React.FC = () => {
                                     </Form.Item>
                                 </Flex>
                                 <Form.Item name="assignee" label={t('tickets.assignee')} style={{ marginBottom: 0 }}>
-                                    <Select mode="multiple" placeholder={t('tickets.selectTechs')} options={allPossibleAssignees} optionRender={(option) => (
-                                        <Flex justify="space-between">
-                                            <span>{option.label}</span>
-                                            <Typography.Text type="secondary" style={{ fontSize: '10px' }}>
-                                                {option.data.group}
-                                            </Typography.Text>
-                                        </Flex>
-                                    )} />
+                                    <TreeSelect
+                                        treeDataSimpleMode
+                                        style={{ width: '100%' }}
+                                        dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                                        placeholder={t('tickets.selectTechs')}
+                                        loadData={onLoadData}
+                                        treeData={treeData}
+                                        multiple
+                                        treeCheckable
+                                        showCheckedStrategy={TreeSelect.SHOW_CHILD}
+                                    />
                                 </Form.Item>
                             </div>
                         )}
@@ -264,37 +314,37 @@ const TicketForm: React.FC = () => {
 
 
                         {canEditAttachments && (
-                        <Form.Item label={
-                            <Flex align="center" gap="middle">
-                                    
-                                        <span>{t('tickets.attachments')}</span>
-                                        <Upload
-                                            multiple
-                                            fileList={fileList}
-                                            beforeUpload={() => false}
-                                            onChange={({ fileList }) => setFileList(fileList)}
-                                            showUploadList={false}
-                                        >
-                                            <Button type="dashed" shape="circle" size="small" icon={<PlusOutlined />} />
-                                        </Upload>
-                                    
-                            </Flex>
-                        }>
-                            <Upload
-                                listType="picture"
-                                fileList={fileList}
-                                onRemove={(file) => {
-                                    if (!canEditAttachments) return false;
-                                    const index = fileList.indexOf(file);
-                                    const newFileList = fileList.slice();
-                                    newFileList.splice(index, 1);
-                                    setFileList(newFileList);
-                                }}
-                                showUploadList={{
-                                    showRemoveIcon: canEditAttachments
-                                }}
+                            <Form.Item label={
+                                <Flex align="center" gap="middle">
+
+                                    <span>{t('tickets.attachments')}</span>
+                                    <Upload
+                                        multiple
+                                        fileList={fileList}
+                                        beforeUpload={() => false}
+                                        onChange={({ fileList }) => setFileList(fileList)}
+                                        showUploadList={false}
+                                    >
+                                        <Button type="dashed" shape="circle" size="small" icon={<PlusOutlined />} />
+                                    </Upload>
+
+                                </Flex>
+                            }>
+                                <Upload
+                                    listType="picture"
+                                    fileList={fileList}
+                                    onRemove={(file) => {
+                                        if (!canEditAttachments) return false;
+                                        const index = fileList.indexOf(file);
+                                        const newFileList = fileList.slice();
+                                        newFileList.splice(index, 1);
+                                        setFileList(newFileList);
+                                    }}
+                                    showUploadList={{
+                                        showRemoveIcon: canEditAttachments
+                                    }}
                                 />
-                        </Form.Item>
+                            </Form.Item>
                         )}
 
                         <Form.Item style={{ marginTop: 32 }}>
