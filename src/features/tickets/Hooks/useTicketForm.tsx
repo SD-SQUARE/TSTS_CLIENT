@@ -10,6 +10,15 @@ export const useSpecializations = () =>
       api.get('v1/lockups/specializations/').then(res => res.data.specializations)
   });
 
+  export const useTicketProblems = () => {
+    return useQuery({
+        queryKey: ['ticketGroupedProblems'],
+        queryFn: async () => {
+            const { data } = await api.get('http://127.0.0.1:3658/m1/1197709-1192710-default/lockups/ticket/problems/');
+            return data;
+        },
+    });
+};
 
 export const useTechnicians = () =>
   useQuery({

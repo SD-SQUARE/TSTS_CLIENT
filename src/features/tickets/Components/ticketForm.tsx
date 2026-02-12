@@ -6,9 +6,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Input, Select, Button, Upload, Tag, Dropdown, Space, Typography, message, Flex, Card, Steps, Badge } from 'antd';
-import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useAdmins, useSpecializations, useTechnicians, useTicketDetails, useTicketMutations } from '../Hooks/useTicketForm';
+import { useAdmins, useTechnicians, useTicketDetails, useTicketMutations, useTicketProblems } from '../Hooks/useTicketForm';
 import RequiredTag from '../../../components/RequiredTag';
 import { useSelector } from 'react-redux';
 
@@ -25,15 +25,15 @@ const TicketForm: React.FC = () => {
     const isRequester = role === 'requester';
     const canEditAttachments = !isEdit || (isEdit && isRequester);
 
-    const { data: specs } = useSpecializations();
+    const { data: groupedData } = useTicketProblems();
     const { data: techs } = useTechnicians();
     const { data: admins } = useAdmins();
     const { data: ticketData, isLoading } = useTicketDetails(id);
     const { createMutation, updateMutation, coordinateMutation } = useTicketMutations(id);
 
-    const [selectedSpecs, setSelectedSpecs] = useState<any[]>([]);
     const [fileList, setFileList] = useState<any[]>([]);
 
+    const [selectedProblem, setSelectedProblem] = useState<{id: string, name: string, specId: string} | null>(null);
 
     const currentStatus = Form.useWatch('status', form);
     const currentPriority = Form.useWatch('priority', form);
@@ -78,10 +78,14 @@ const TicketForm: React.FC = () => {
             form.setFieldsValue({
                 ...ticketData,
                 assignee: ticketData.assignee?.map((a: any) => a.id),
+                problem: ticketData.problem?.id
             });
-            if (ticketData.specialization) {
-                const incoming = Array.isArray(ticketData.specialization) ? ticketData.specialization : [ticketData.specialization];
-                setSelectedSpecs(incoming);
+            if (ticketData.problem) {
+                setSelectedProblem({
+                    id: ticketData.problem.id,
+                    name: ticketData.problem.name,
+                    specId: ticketData.specialization?.id
+                });
             }
             if (ticketData.attachments && Array.isArray(ticketData.attachments)) {
                 const existingFiles = ticketData.attachments.map((file: any) => ({
@@ -110,8 +114,10 @@ const TicketForm: React.FC = () => {
         formData.append('description', values.description);
         formData.append('requester', user.id);
 
-        const specId = selectedSpecs[0]?.id;
-        if (specId) formData.append('specialization', specId);
+        if (selectedProblem) {
+            formData.append('problem', selectedProblem.id);
+            formData.append('specialization', selectedProblem.specId);
+        }
 
         fileList.forEach((file) => {
             if (file.originFileObj instanceof File) {
@@ -143,18 +149,21 @@ const TicketForm: React.FC = () => {
         }
     };
 
-    const handleSpecSelect = (spec: any) => {
-        setSelectedSpecs([spec]);
-    };
 
-
-    const specMenu = {
-        items: specs?.map((s: any) => ({
-            key: s.id,
-            label: s.name,
-            onClick: () => handleSpecSelect(s)
+    const problemMenuItems = groupedData?.specializations?.map((spec: any) => ({
+        key: spec.id,
+        label: spec.name, 
+        type: 'group' as const, 
+        children: spec.problems?.map((prob: any) => ({
+            key: prob.id,
+            label: prob.name,
+            onClick: () => {
+                setSelectedProblem({ id: prob.id, name: prob.name, specId: spec.id });
+                form.setFieldValue('problem', prob.id);
+            }
         }))
-    };
+    })) || [];
+
 
     if (isEdit && isLoading) return <Card loading={true} />;
 
@@ -194,14 +203,14 @@ const TicketForm: React.FC = () => {
                             <Flex align="center" gap="middle" wrap="wrap" >
                                 <span>{t('tickets.problemType')}</span>
                                 <Space size={8} wrap align="center">
-                                    {selectedSpecs.length > 0 ? (
+                                    {selectedProblem ? (
                                         <Tag color="blue" variant='outlined' style={{ marginInlineEnd: 0 }}>
-                                            {selectedSpecs[0].name}
+                                            {selectedProblem.name}
                                         </Tag>
                                     ) : (
                                         <Tag color="red" variant='outlined' style={{ marginInlineEnd: 0 }}>{t('tickets.autoAssignPlaceholder')}</Tag>
                                     )}
-                                    <Dropdown menu={specMenu} trigger={['click']}>
+                                    <Dropdown menu={{ items: problemMenuItems }} trigger={['click']}>
                                         <Button type="dashed" shape="circle" size="small" icon={<PlusOutlined />} style={{ marginLeft: 4 }} />
                                     </Dropdown>
                                 </Space>
