@@ -224,6 +224,8 @@
     "id": "الرقم التسلسلي",
     "title": "العنوان",
     "problemType": "نوع المشكلة",
+    "specialization" : "التخصص",
+    "noSpecialization": "لا تخصص",
     "requester": "صاحب الطلب",
     "noType": "لا نوع",
     "new_ticket": "تذكرة جديدة",

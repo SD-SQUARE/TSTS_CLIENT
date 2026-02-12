@@ -227,6 +227,8 @@
     "id": "ID",
     "title": "Title",
     "problemType": "Problem Type",
+    "specialization" : "Specialization",
+    "noSpecialization": "No Specialization",
     "requester": "Requester",
     "noType": "No Type",
     "new_ticket": "New Ticket",

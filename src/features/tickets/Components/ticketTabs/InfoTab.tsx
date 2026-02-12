@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React from 'react';
-import { Descriptions, Tag, Typography, List, Space, Card, Button, Flex } from 'antd';
-import { EditOutlined, FileOutlined } from '@ant-design/icons';
+import { Descriptions, Tag, Typography,  Space, Card, Button, Flex } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
 interface TicketInfoTabProps {
@@ -20,16 +20,22 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                 column={2}
                 labelStyle={{ width: '200px', fontWeight: 'bold' }}
             >
-                { }
-                <Descriptions.Item label={t('tickets.problemType')} span={2}>
+                <Descriptions.Item label={t('tickets.specialization')}>
                     {ticket?.specialization ? (
-                        <Tag color="blue" variant="outlined">{ticket.specialization.name}</Tag>
+                        <Tag color="purple" variant="outlined">{ticket.specialization.name}</Tag>
+                    ) : (
+                        <Tag color="red" variant="outlined">{t('tickets.noSpecialization')}</Tag>
+                    )}
+                </Descriptions.Item>
+
+                <Descriptions.Item label={t('tickets.problemType')} span={2}>
+                    {ticket?.problem ? (
+                        <Tag color="blue" variant="outlined">{ticket.problem.name}</Tag>
                     ) : (
                         <Tag color="red" variant="outlined">{t('tickets.noType')}</Tag>
                     )}
                 </Descriptions.Item>
 
-                { }
                 <Descriptions.Item label={t('tickets.priority')}>
                     <Tag variant='outlined' color={ticket?.priority === 'important/urgent' ? 'volcano' : ticket?.priority === 'important' ? 'orange' : ticket?.priority === 'urgent' ? 'red' : 'geekblue'}>
                         {ticket?.priority}

@@ -12,9 +12,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import EllipsisComponent from '../../../components/EllipsisComponent';
 import Highlighter from 'react-highlight-words';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
-import { useSpecializations } from '../Hooks/useTicketForm';
+import { useProblems, useSpecializations } from '../Hooks/useTicketForm';
 
-type SearchableDataIndex = `title` | `specialization` | `status` | 'priority' | 'description';
+type SearchableDataIndex = `title` | `problem` |`specialization` | `status` | 'priority' | 'description';
 
 const TicketList: React.FC = () => {
     const { t } = useTranslation();
@@ -26,6 +26,7 @@ const TicketList: React.FC = () => {
     const [searchedColumn, setSearchedColumn] = useState<SearchableDataIndex | ''>('');
     const searchInput = useRef<InputRef>(null);
     const { data: specs } = useSpecializations();
+    const { data: problems } = useProblems();
 
     const [apiSearchQuery, setApiSearchQuery] = useState<{ [key: string]: string }>({});
 
@@ -262,19 +263,38 @@ const TicketList: React.FC = () => {
             ...getColumnSearchProps('description', 'tickets.description'),
         },
         {
-            title: t('tickets.problemType'),
+            title: t('tickets.specialization'),
             dataIndex: 'specialization',
             key: 'specialization',
             width: 180,
+            ellipsis: true,
             render: (specialization: Specialization | null) => (
                 <Tag color={specialization?.name ? 'blue' : 'red'} variant="outlined">
-                    {renderHighlightedText(specialization?.name ?? t('tickets.noType'), 'specialization')}
+                    {renderHighlightedText(specialization?.name ?? t('tickets.noSpecialization'), 'specialization')}
                 </Tag>
             ),
-            ...getColumnSelectProps('specialization', 'tickets.problemType',
+            ...getColumnSelectProps('specialization', 'tickets.specialization',
                 (Array.isArray(specs) ? specs : []).map((s: any) => ({
                     label: s.name,
                     value: s.id,
+                }))
+            ),
+        },
+        {
+            title: t('tickets.problemType'),
+            dataIndex: 'problem',
+            key: 'problem',
+            width: 180,
+            ellipsis: true,
+            render: (problem: Specialization | null) => (
+                <Tag color={problem?.name ? 'blue' : 'red'} variant="outlined">
+                    {renderHighlightedText(problem?.name ?? t('tickets.noType'), 'problem')}
+                </Tag>
+            ),
+            ...getColumnSelectProps('problem', 'tickets.problemType',
+                (Array.isArray(problems) ? problems : []).map((p: any) => ({
+                    label: p.name,
+                    value: p.id,
                 }))
             ),
         },
