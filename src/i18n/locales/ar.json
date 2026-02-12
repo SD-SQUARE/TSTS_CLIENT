@@ -251,7 +251,9 @@
     "unassigned": "غير معين لفني بعد",
     "type": "نوع التذكرة",
     "content": "محتوى التذكرة",
-    "date": "التاريخ"
+    "date": "التاريخ",
+    "user": "المستخدم",
+    "ipAddress": "عنوان IP"
   },
   "priority": {
     "important": "مهمة",
@@ -280,7 +282,9 @@
     "search": "بحث",
     "close": "اغلاق",
     "select": "حدد",
-    "filter": "تصفية"
+    "filter": "تصفية",
+    "startDate": "تاريخ البدء",
+    "endDate": "تاريخ النهاية"
   },
   "success": {
     "created": "تم إنشاء التذكرة بنجاح",

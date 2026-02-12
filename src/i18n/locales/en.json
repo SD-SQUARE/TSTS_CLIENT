@@ -254,7 +254,9 @@
     "unassigned": "Not Assigned Yet",
     "type": "Type",
     "content": "Content",
-    "date" : "Date"
+    "date" : "Date",
+    "user": "User",
+    "ipAddress": "IP Address"
   },
   "priority": {
     "important": "Important",
@@ -283,7 +285,9 @@
     "search": "Search",
     "close": "Close",
     "select": "Select",
-    "filter": "Filter"
+    "filter": "Filter",
+    "startDate": "Start Date",
+    "endDate": "End Date"
   },
   "success": {
     "created": "Ticket created successfully",

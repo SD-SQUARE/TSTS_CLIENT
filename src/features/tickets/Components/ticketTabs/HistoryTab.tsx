@@ -1,25 +1,27 @@
 
 import React, { useEffect, useState } from 'react';
-import {  Typography, Card, Empty, Spin, Button, Space, FloatButton,  Segmented } from 'antd';
+import { Typography, Card, Empty, Spin, Button, Space, FloatButton, Segmented,  DatePicker, Flex } from 'antd';
 import {
     ClockCircleOutlined, CheckCircleOutlined, SyncOutlined,
     ExclamationCircleOutlined, RollbackOutlined, ZoomInOutlined,
     ZoomOutOutlined, ReloadOutlined,
     TableOutlined,
-    HistoryOutlined
+    HistoryOutlined,
 } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTicketActivities, useTimelineZoom } from '../../Hooks/useTicket';
 import TicketHistoryTimeline from './HistoryTabs/TimelineView';
 import TicketHistoryTable from './HistoryTabs/TableView';
+import dayjs from 'dayjs';
 
-
+const { RangePicker } = DatePicker;
 const TicketHistoryTab: React.FC = () => {
     const { t } = useTranslation();
     const { id: ticketId } = useParams();
 
-    const [viewType, setViewType] = useState<'timeline' | 'table'>('timeline');
+    const [viewType, setViewType] = useState<'timeline' | 'table'>('table');
+    const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
 
     const { zoom, handleZoomIn, handleZoomOut, handleResetZoom } = useTimelineZoom(1);
     const { data: activities, isLoading, refetch } = useTicketActivities(ticketId);
@@ -49,7 +51,18 @@ const TicketHistoryTab: React.FC = () => {
         }
     };
 
-    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const filteredActivities = activities?.filter((item: any) => {
+
+        const matchesDate = !dateRange || (
+            dayjs(item.createdAt).isAfter(dateRange[0].startOf('day')) &&
+            dayjs(item.createdAt).isBefore(dateRange[1].endOf('day'))
+        );
+
+        return  matchesDate;
+    });
+
+
     if (isLoading) return <Spin style={{ display: 'block', margin: '50px auto' }} />;
     if (!activities || activities.length === 0) return <Empty description={t('common.noHistory')} />;
 
@@ -67,9 +80,17 @@ const TicketHistoryTab: React.FC = () => {
             }}>
                 <Space direction='vertical' align='end'>
                     <Segmented options={[
-                        { value: 'timeline', icon: <HistoryOutlined /> },
                         { value: 'table', icon: <TableOutlined /> },
+                        { value: 'timeline', icon: <HistoryOutlined /> },
                     ]} value={viewType} onChange={(value) => setViewType(value as 'timeline' | 'table')} />
+                    <Flex gap="small" wrap="wrap" justify="end">
+                        <RangePicker
+                        placeholder={[t('common.startDate'), t('common.endDate')]}
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            onChange={(dates) => setDateRange(dates as any)}
+                            style={{ width: 210 }}
+                        />
+                    </Flex>
                     {viewType === 'timeline' && (
                         <Card size="small" style={{ borderRadius: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
                             <Space>
@@ -85,16 +106,16 @@ const TicketHistoryTab: React.FC = () => {
 
             {viewType === 'timeline' ? (
 
-                <TicketHistoryTimeline 
-                    activities={activities} 
-                    zoom={zoom} 
+                <TicketHistoryTimeline
+                    activities={filteredActivities}
+                    zoom={zoom}
                     handlers={{ handleZoomIn, handleZoomOut, handleResetZoom }}
                     getIcon={getActivityIcon}
                     getColor={getActivityColor}
                 />
             ) : (
-                <TicketHistoryTable 
-                    activities={activities} 
+                <TicketHistoryTable
+                    activities={filteredActivities}
                     getIcon={getActivityIcon}
                     getColor={getActivityColor}
                 />
