@@ -36,21 +36,21 @@ const TicketForm: React.FC = () => {
     const [selectedProblem, setSelectedProblem] = useState<{ id: string, name: string, specId: string } | null>(null);
 
     const [treeData, setTreeData] = useState<any[]>([
-        { 
-            id: 'admin_root', 
-            pId: 0, 
-            value: 'admin_root', 
-            title: t('Admins'), 
-            isLeaf: false, 
-            selectable: false 
+        {
+            id: 'admin_root',
+            pId: 0,
+            value: 'admin_root',
+            title: t('Admins'),
+            isLeaf: false,
+            selectable: false
         },
-        { 
-            id: 'tech_root', 
-            pId: 0, 
-            value: 'tech_root', 
-            title: t('Technicians'), 
-            isLeaf: false, 
-            selectable: false 
+        {
+            id: 'tech_root',
+            pId: 0,
+            value: 'tech_root',
+            title: t('Technicians'),
+            isLeaf: false,
+            selectable: false
         },
     ]);
 
@@ -64,27 +64,27 @@ const TicketForm: React.FC = () => {
                 resolve();
                 return;
             }
-    
+
             try {
-                let usersArray = []; 
+                let usersArray = [];
                 if (id === 'admin_root') {
                     const response = await fetchAdmins();
-                    usersArray = response.data?.users || response.users || []; 
+                    usersArray = response.data?.users || response.users || [];
                 } else if (id === 'tech_root') {
                     const response = await fetchTechs();
                     usersArray = response.data?.users || response.users || [];
                 }
-    
+
                 const newNodes = usersArray.map((u: any) => ({
                     id: u.id,
-                    pId: id, 
+                    pId: id,
                     value: u.id,
                     title: `${u.first_name} ${u.last_name}`,
                     isLeaf: true,
                     selectable: true
                 }));
                 console.log(newNodes);
-    
+
                 setTreeData((prev) => [...prev, ...newNodes]);
                 resolve();
             } catch (error) {
@@ -159,7 +159,7 @@ const TicketForm: React.FC = () => {
         const formData = new FormData();
         formData.append('title', values.title);
         formData.append('description', values.description);
-        formData.append('requester', user.id);
+        formData.append('requester', "user.id");
 
         if (selectedProblem) {
             formData.append('problem', selectedProblem.id);
@@ -198,14 +198,17 @@ const TicketForm: React.FC = () => {
 
 
     const problemMenuItems = groupedData?.specializations?.map((spec: any) => ({
-        key: spec.id,
+        key: `spec-${spec.id}`,
         label: spec.name,
-        type: 'group' as const,
         children: spec.problems?.map((prob: any) => ({
             key: prob.id,
             label: prob.name,
             onClick: () => {
-                setSelectedProblem({ id: prob.id, name: prob.name, specId: spec.id });
+                setSelectedProblem({
+                    id: prob.id,
+                    name: prob.name,
+                    specId: spec.id
+                });
                 form.setFieldValue('problem', prob.id);
             }
         }))
@@ -262,6 +265,13 @@ const TicketForm: React.FC = () => {
                                     </Dropdown>
                                 </Space>
                             </Flex>
+                            <Form.Item
+                                name="problem"
+                                noStyle
+                                rules={[{ required: true, message: t('errors.problemRequired') }]}
+                            >
+                                <Input type="hidden" />
+                            </Form.Item>
                         </Form.Item>
 
 
