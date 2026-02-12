@@ -6,7 +6,7 @@ import { Table, Tag, Typography, Spin, Alert, Pagination, Space, Button, Flex, P
 import type { ColumnsType } from 'antd/es/table';
 import { FilterOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import type { Specialization, Ticket } from '../Types/tickets';
+import type { Problem, Specialization, Ticket } from '../Types/tickets';
 import { useTickets } from '../Hooks/useTicket';
 import { useNavigate, useParams } from 'react-router-dom';
 import EllipsisComponent from '../../../components/EllipsisComponent';
@@ -286,7 +286,7 @@ const TicketList: React.FC = () => {
             key: 'problem',
             width: 180,
             ellipsis: true,
-            render: (problem: Specialization | null) => (
+            render: (problem: Problem | null) => (
                 <Tag color={problem?.name ? 'blue' : 'red'} variant="outlined">
                     {renderHighlightedText(problem?.name ?? t('tickets.noType'), 'problem')}
                 </Tag>

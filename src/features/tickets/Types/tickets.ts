@@ -7,6 +7,13 @@ export interface Requester {
   export interface Specialization {
     id: string;
     name: string;
+    review_required: boolean;
+  }
+
+  export interface Problem {
+    id: string;
+    name: string;
+    review_required: boolean;
   }
   
   export interface Ticket {
@@ -15,6 +22,7 @@ export interface Requester {
     description: string;
     requester: Requester;
     specialization: Specialization | null; 
+    problem: Problem | null; 
     status: string;
     priority: string;
     isOutOfService: boolean;

@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React from 'react';
-import { Descriptions, Tag, Typography,  Space, Card, Button, Flex, message } from 'antd';
+import React, { useState } from 'react';
+import { Descriptions, Tag, Typography, Space, Card, Button, Flex, message, Popconfirm } from 'antd';
 import { CheckCircleOutlined, EditOutlined, ToolOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useChangeTicketStatus } from '../../Hooks/useTicket';
+import PostReviewModal from '../ReviewModal';
 
 interface TicketInfoTabProps {
     ticket: any;
@@ -14,15 +15,22 @@ interface TicketInfoTabProps {
 
 const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
     const { t } = useTranslation();
-    const { role } = useParams(); 
+    const { role } = useParams();
     const statusMutation = useChangeTicketStatus(ticket?.id);
 
     const isRequester = role === 'requester';
     const status = ticket?.status;
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
-    let actionButton = null;
+    const isReviewRequired = 
+    ticket?.specialization?.review_required === true || 
+    ticket?.problem?.review_required === true;
 
     const handleStatusChange = async (newStatus: string) => {
+        if (newStatus === 'close' && isReviewRequired) {
+            setIsReviewModalOpen(true);
+            return;
+        }
         try {
             const res = await statusMutation.mutateAsync(newStatus);
             if (res.is_updated) {
@@ -30,57 +38,65 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
             } else {
                 message.error(res.message || t('errors.updateFailed'));
             }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             message.error(t('errors.connectionError'));
         }
     };
 
-    if (isRequester) {
-        if (status === 'closed') {
-            actionButton = (
-                <Button 
-                    style={{ flex: 1 }} 
-                    size="large"
-                    icon={<ReloadOutlined />} 
-                    onClick={() => handleStatusChange('open')}
-                    loading={statusMutation.isPending}
-                >
-                    {t('tickets.reopenTicket')}
-                </Button>
-            );
-        }
-    } else {
+    let actionButton = null;
+
+    if (!isRequester) {
         if (status === 'open') {
             actionButton = (
-                <Button 
-                    style={{ flex: 1 }} 
-                    type="primary" 
+                <Button
+                    style={{ flex: 1 }}
+                    type="primary"
                     size="large"
                     ghost
-                    icon={<ToolOutlined />} 
+                    icon={<ToolOutlined />}
                     onClick={() => handleStatusChange('inprogress')}
                     loading={statusMutation.isPending}
+
                 >
                     {t('tickets.startSolving')}
                 </Button>
             );
         } else if (status === 'in_progress') {
             actionButton = (
-                <Button 
-                    style={{ flex: 1 }} 
-                    type="primary" 
-                    size="large"
-                    color="green" 
-                    variant="outlined"
-                    icon={<CheckCircleOutlined />} 
-                    onClick={() => handleStatusChange('closed')}
-                    loading={statusMutation.isPending}
+                <Popconfirm
+                    title={t('tickets.resolveConfirmTitle')}
+                    onConfirm={() => handleStatusChange('close')}
+                    okText={t('translation.yes')}
+                    cancelText={t('translation.no')}
                 >
-                    {t('tickets.markAsResolved')}
-                </Button>
+                    <Button
+                        style={{ flex: 1 }}
+                        type="primary"
+                        size="large"
+                        icon={<CheckCircleOutlined />}
+                        loading={statusMutation.isPending}
+
+                        color="green"
+                        variant="outlined"
+                    >
+                        {t('tickets.markAsResolved')}
+                    </Button>
+                </Popconfirm>
             );
         }
+    } else if (status === 'closed') {
+        actionButton = (
+            <Button
+                style={{ flex: 1 }}
+                size="large"
+                icon={<ReloadOutlined />}
+                onClick={() => handleStatusChange('reopen')}
+                loading={statusMutation.isPending}
+            >
+                {t('tickets.reopenTicket')}
+            </Button>
+        );
     }
 
     return (
@@ -138,18 +154,23 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                 </Descriptions.Item>
             </Descriptions>
 
-            <Flex gap = "middle" style={{ marginTop: 24 }}>
-            <Button 
-                    type="primary" 
-                    icon={<EditOutlined />} 
-                    onClick={onEdit} 
-                    size="large" 
+            <Flex gap="middle" style={{ marginTop: 24 }}>
+                <Button
+                    type="primary"
+                    icon={<EditOutlined />}
+                    onClick={onEdit}
+                    size="large"
                     style={{ flex: 1 }}
                 >
                     {t('common.edit')}
                 </Button>
                 {actionButton}
             </Flex>
+            <PostReviewModal
+                ticketId={ticket?.id}
+                open={isReviewModalOpen}
+                onClose={() => setIsReviewModalOpen(false)}
+            />
         </Card>
     );
 };

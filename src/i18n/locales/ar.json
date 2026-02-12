@@ -266,7 +266,14 @@
     "reopenTicket": "إعادة فتح الطلب",
     "startSolving": "بدء الحل",
     "markAsResolved": "تعيين كمكتمل",
-    "statusUpdatedSuccess": "تم تحديث حالة الطلب بنجاح"
+    "statusUpdatedSuccess": "تم تحديث حالة الطلب بنجاح",
+    "rateExperience": "قيّم تجربتك",
+    "howWasService": "كيف كانت خدمتك؟",
+    "feedbackNote": "ملاحظات اضافية",
+    "feedbackPlaceholder": "قل لنا المزيد عن خدمتك...",
+    "optional": "(اختياري)",
+    "writeReview": "كتابة تقييم",
+    "resolveConfirmTitle" : "هل انت متاكد انك تريد اغلاق هذا التذكرة؟"
   },
   "priority": {
     "important": "مهمة",
@@ -298,12 +305,15 @@
     "filter": "تصفية",
     "startDate": "تاريخ البدء",
     "endDate": "تاريخ النهاية",
-    "loading": "جاري التحميل..."
+    "loading": "جاري التحميل...",
+    "submit": "تقديم",
+    "cancel": "الغاء"
   },
   "success": {
     "created": "تم إنشاء التذكرة بنجاح",
     "updated": "تم تحديث التذكرة بنجاح",
-    "saved": "تم حفظ التذكرة بنجاح"
+    "saved": "تم حفظ التذكرة بنجاح",
+    "reviewSuccess": "تم تقييم التذكرة بنجاح"
   },
   "validation": {
     "required": "هذا الحقل مطلوب"

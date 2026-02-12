@@ -269,7 +269,14 @@
     "reopenTicket": "Reopen Ticket",
     "startSolving": "Start Solving",
     "markAsResolved": "Mark as Resolved",
-    "statusUpdatedSuccess": "Ticket status updated successfully"
+    "statusUpdatedSuccess": "Ticket status updated successfully",
+    "rateExperience": "Rate Your Experience",
+    "howWasService": "How would you rate the service you received?",
+    "feedbackNote": "Additional Feedback",
+    "feedbackPlaceholder": "Tell us more about the service...",
+    "optional": "(Optional)",
+    "writeReview": "Write a Review",
+    "resolveConfirmTitle": "Are you sure you want to close this ticket?"
   },
   "priority": {
     "important": "Important",
@@ -301,12 +308,15 @@
     "filter": "Filter",
     "startDate": "Start Date",
     "endDate": "End Date",
-    "loading" : "Loading..."
+    "loading" : "Loading...",
+    "submit" : "Submit",
+    "cancel" : "Cancel"
   },
   "success": {
     "created": "Ticket created successfully",
     "updated": "Ticket updated successfully",
-    "saved": "Ticket saved successfully"
+    "saved": "Ticket saved successfully",
+    "reviewSuccess": "Review submitted successfully"
   },
   "validation": {
     "required": "This field is required"
