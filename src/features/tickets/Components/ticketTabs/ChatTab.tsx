@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { List, Avatar, Input, Button, Tag, Upload, Typography, Card, Flex, Spin, Space } from 'antd';
-import { CloseCircleFilled, PaperClipOutlined, SendOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Input, Button, Tag, Upload, Typography, Card, Flex, Spin, Space } from 'antd';
+import {  PaperClipOutlined, SendOutlined, UserOutlined } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { useGetChatMessagesQuery, useSendMessageMutation, useUploadChatMediaMutation } from '../../store/services/chatApi';
@@ -46,8 +46,8 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
         const messageContent = text;
         const mediaIdsToSend = [...pendingMediaIds];
         const mediaPreviews = [...tempFiles];
-
         const tempId = `temp-${Date.now()}`;
+
     const optimisticMsg = {
         id: tempId,
         message: messageContent,
@@ -105,124 +105,113 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
     const allMessages = [...(messages || []), ...optimisticMessages];
 
     return (
-        <div style={{
+        <Flex vertical style={{
             height: 'calc(100vh - 200px)',
-            display: 'flex',
-            flexDirection: 'column',
             backgroundColor: '#f5f5f5',
             borderRadius: '8px',
             overflow: 'hidden'
         }}>
-            <div style={{ padding: '16px 16px 0 16px' }}>
+            <div style={{ padding: '16px' }}>
                 <Tag color="processing" icon={<UserOutlined />} style={{ padding: '4px 12px' }}>
                     {t('tickets.assignedTo')}: <strong>{assigneeName || t('tickets.unassigned')}</strong>
                 </Tag>
             </div>
 
-            <div
-                ref={scrollRef}
-                style={{
-                    flex: 1,
-                    overflowY: 'auto',
-                    marginBottom: 16,
-                    padding: '15px',
-                }}
+            <Flex 
+                vertical 
+                gap="small" 
+                ref={scrollRef} 
+                style={{ flex: 1, overflowY: 'auto', padding: '0 16px 16px 16px' }}
             >
-                <List
-                    dataSource={allMessages}
-                    renderItem={(item) => {
+                {allMessages.map((item) => {
+                    const isMe = String(item.sender.id) === String(user.id);
+                    
+                    return (
+                        <Flex 
+                            key={item.id} 
+                            justify={isMe ? 'end' : 'start'} 
+                            style={{ marginBottom: '8px' }}
+                        >
+                            <Flex 
+                                vertical 
+                                align={isMe ? 'end' : 'start'} 
+                                gap={4} 
+                                style={{ maxWidth: '75%' }}
+                            >
+                                <Space style={{ flexDirection: isMe ? 'row-reverse' : 'row' }}>
+                                    <Typography.Text strong style={{ fontSize: '11px' }}>
+                                        {isMe ? t('common.me') : item.sender.name}
+                                    </Typography.Text>
+                                    <Typography.Text type="secondary" style={{ fontSize: '10px' }}>
+                                        {dayjs(item.createdAt).format('h:mm A')}
+                                    </Typography.Text>
+                                </Space>
 
-                        const isMe = String(item.sender.id) === String(user.id);
-
-                        return (
-                            <List.Item style={{
-                                border: 'none',
-                                padding: '4px 0',
-                                justifyContent: isMe ? 'flex-end' : 'flex-start',
-                                display: 'flex'
-                            }}>
-                                <Flex vertical align={isMe ? 'end' : 'start'} style={{ maxWidth: '80%' }}>
-                                    { }
-                                    <Space style={{ marginBottom: 4, flexDirection: isMe ? 'row-reverse' : 'row' }}>
-                                        <Typography.Text strong style={{ fontSize: '12px' }}>
-                                            {isMe ? t('common.me') : item.sender.name}
-                                        </Typography.Text>
-                                        <Typography.Text type="secondary" style={{ fontSize: '10px' }}>
-                                            {dayjs(item.createdAt).format('h:mm A')}
-                                        </Typography.Text>
-                                    </Space>
-
-                                    <Flex style={{ flexDirection: isMe ? 'row-reverse' : 'row' }} align="start" gap="small">
-                                        <Avatar src={item.sender.image} size="small" />
-
+                                <Flex align="start" gap="small" style={{ flexDirection: isMe ? 'row-reverse' : 'row' }}>
+                                    <Avatar src={item.sender.image} size="small" style={{ flexShrink: 0 }} />
+                                    
+                                    <Flex vertical align={isMe ? 'end' : 'start'} gap={4}>
                                         <div style={{
                                             background: isMe ? '#1677ff' : '#fff',
                                             color: isMe ? '#fff' : 'rgba(0, 0, 0, 0.88)',
-                                            padding: '8px 12px',
-                                            borderRadius: isMe ? '12px 0 12px 12px' : '0 12px 12px 12px',
-                                            boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-                                            opacity: item.isSending ? 0.6 : 1
+                                            padding: '8px 14px',
+                                            borderRadius: isMe ? '16px 4px 16px 16px' : '4px 16px 16px 16px',
+                                            boxShadow: '0 2px 5px rgba(0,0,0,0.04)',
+                                            opacity: item.isSending ? 0.6 : 1,
+                                            wordBreak: 'break-word'
                                         }}>
-                                            <Typography.Text style={{ color: 'inherit' }}>{item.message}</Typography.Text>
+                                            <Typography.Text style={{ color: 'inherit' }}>
+                                                {item.message}
+                                            </Typography.Text>
+                                        </div>
 
-                                            <Flex gap="small" wrap="wrap" style={{ marginTop: item.media?.length ? 8 : 0 }}>
-                                                {item.media?.map((m) => (
-                                                    <Card key={m.id} size="small" style={{ width: 140, background: isMe ? 'rgba(255,255,255,0.1)' : '#fafafa', border: 'none' }} bodyStyle={{ padding: '8px' }}>
-                                                        <Typography.Link href={m.url} target="_blank" ellipsis title={m.fileName} style={{ color: isMe ? '#fff' : '#1677ff' }}>
+                                        {item.media?.length > 0 && (
+                                            <Flex gap="small" wrap="wrap" justify={isMe ? 'end' : 'start'}>
+                                                {item.media.map((m: any) => (
+                                                    <Card 
+                                                        key={m.id} 
+                                                        size="small" 
+                                                        styles={{ body: { padding: '6px 10px' } }}
+                                                        style={{ 
+                                                            minWidth: 120, 
+                                                            background: isMe ? 'rgba(22, 119, 255, 0.1)' : '#fff', 
+                                                            borderColor: '#d9d9d9' 
+                                                        }}
+                                                    >
+                                                        <Typography.Link href={m.url} target="_blank" ellipsis style={{ fontSize: '12px' }}>
                                                             <PaperClipOutlined /> {m.fileName}
                                                         </Typography.Link>
                                                     </Card>
                                                 ))}
                                             </Flex>
-                                        </div>
+                                        )}
                                     </Flex>
                                 </Flex>
-                            </List.Item>
-                        );
-                    }}
-                />
-            </div>
+                            </Flex>
+                        </Flex>
+                    );
+                })}
+            </Flex>
 
-            <div style={{
-                padding: '12px 16px',
-                background: '#fff',
-                borderTop: '1px solid #f0f0f0',
-                display: 'flex',
-                flexDirection: 'column'
-            }}>
-                {/* Modern Integrated Upload Preview */}
+            <div style={{ padding: '12px 16px', background: '#fff', borderTop: '1px solid #f0f0f0' }}>
                 <div style={{
                     border: '1px solid #d9d9d9',
                     borderRadius: '12px',
-                    padding: '8px',
-                    background: '#fff',
-                    transition: 'border-color 0.3s'
+                    padding: '6px',
+                    background: '#fff'
                 }}>
                     {tempFiles.length > 0 && (
                         <Flex gap="8px" style={{ marginBottom: 8, padding: '4px' }} wrap="wrap">
                             {tempFiles.map((file) => (
-                                <div key={file.id} style={{
-                                    position: 'relative',
-                                    background: '#f0f5ff',
-                                    border: '1px solid #adc6ff',
-                                    borderRadius: '8px',
-                                    padding: '4px 24px 4px 8px',
-                                    fontSize: '12px'
-                                }}>
-                                    <PaperClipOutlined style={{ marginRight: 4 }} />
-                                    <Typography.Text ellipsis style={{ maxWidth: 100 }}>{file.name}</Typography.Text>
-                                    <CloseCircleFilled
-                                        onClick={() => removeAttachment(file.id)}
-                                        style={{
-                                            position: 'absolute',
-                                            right: 4,
-                                            top: '50%',
-                                            transform: 'translateY(-50%)',
-                                            color: '#ff4d4f',
-                                            cursor: 'pointer'
-                                        }}
-                                    />
-                                </div>
+                                <Tag 
+                                    key={file.id} 
+                                    closable 
+                                    onClose={() => removeAttachment(file.id)}
+                                    icon={<PaperClipOutlined />}
+                                    color="blue"
+                                >
+                                    {file.name}
+                                </Tag>
                             ))}
                             {isUploading && <Spin size="small" />}
                         </Flex>
@@ -230,7 +219,7 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
 
                     <Flex align="center">
                         <Upload customRequest={handleFileUpload} showUploadList={false} multiple disabled={isUploading}>
-                            <Button type="text" icon={<PaperClipOutlined style={{ fontSize: '18px' }} />} loading={isUploading} />
+                            <Button type="text" icon={<PaperClipOutlined />} loading={isUploading} />
                         </Upload>
                         <Input.TextArea
                             autoSize={{ minRows: 1, maxRows: 4 }}
@@ -253,12 +242,11 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
                             onClick={handleSend}
                             loading={isSending}
                             disabled={isUploading || (!text.trim() && pendingMediaIds.length === 0)}
-                            style={{ marginLeft: 8 }}
                         />
                     </Flex>
                 </div>
             </div>
-        </div>
+        </Flex>
     );
 };
 

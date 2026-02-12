@@ -19,6 +19,12 @@ export const useSpecializations = () =>
         },
     });
 };
+  
+  export const useSpecializations = () =>
+    useQuery({
+      queryKey: ['specializations'], queryFn: () =>
+        api.get('v1/lockups/specializations/').then(res => res.data.specializations)
+    });
 
 export const useTechnicians = () =>
   useQuery({

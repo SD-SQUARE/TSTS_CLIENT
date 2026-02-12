@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { List, Avatar, Rate, Typography, Empty, Space } from 'antd';
+import {  Avatar, Rate, Typography, Empty,  Flex, Card, Divider, Spin } from 'antd';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 
@@ -12,40 +12,71 @@ interface Props {
 const TicketReviewsTab: React.FC<Props> = ({ reviews, isLoading }) => {
     const { t } = useTranslation();
 
-    return (
-        <div style={{ padding: '24px 0' }}>
-            <List
-                loading={isLoading}
-                dataSource={reviews}
-                locale={{ emptyText: <Empty description={t('tickets.noReviews')} /> }}
-                renderItem={(item) => (
-                    <List.Item key={item.id} style={{ borderBottom: '1px solid #f0f0f0', padding: '16px 0' }}>
-                        <List.Item.Meta
-                            avatar={<Avatar src={item.reviewer?.image} size="large" />}
-                            title={
-                                <Space direction="vertical" size={0}>
-                                    <Typography.Text strong>
-                                        {item.reviewer?.firstName} {item.reviewer?.lastName}
-                                    </Typography.Text>
-                                    <Rate disabled defaultValue={item.rating > 5 ? 5 : item.rating} style={{ fontSize: 14 }} />
-                                </Space>
-                            }
-                            description={
-                                <div style={{ marginTop: 8 }}>
-                                    <Typography.Paragraph type="secondary" style={{ fontSize: '12px', marginBottom: 4 }}>
+        if (isLoading) {
+            return (
+                <Flex justify="center" align="center" style={{ minHeight: '200px' }}>
+                    <Spin size="large" tip={t('common.loading')} />
+                </Flex>
+            );
+        }
+    
+        if (!reviews || reviews.length === 0) {
+            return (
+                <Flex justify="center" align="center" style={{ minHeight: '200px' }}>
+                    <Empty description={t('tickets.noReviews')} />
+                </Flex>
+            );
+        }
+    
+        return (
+            <Flex vertical gap="middle" style={{ padding: '24px 0' }}>
+                {reviews.map((item) => (
+                    <Card 
+                        key={item.id} 
+                        styles={{ body: { padding: '20px' } }}
+                        style={{ borderRadius: '8px', border: '1px solid #f0f0f0' }}
+                    >
+                        <Flex gap="large">
+                            {/* Left Side: Avatar */}
+                            <Avatar 
+                                src={item.reviewer?.image} 
+                                size={54} 
+                                style={{ flexShrink: 0, border: '1px solid #f0f0f0' }} 
+                            />
+    
+                            {/* Right Side: Content */}
+                            <Flex vertical style={{ flex: 1 }}>
+                                <Flex justify="space-between" align="start">
+                                    <Flex vertical>
+                                        <Typography.Text strong style={{ fontSize: '16px' }}>
+                                            {item.reviewer?.firstName} {item.reviewer?.lastName}
+                                        </Typography.Text>
+                                        <Rate 
+                                            disabled 
+                                            defaultValue={item.rating > 5 ? 5 : item.rating} 
+                                            style={{ fontSize: 12, marginTop: 4 }} 
+                                        />
+                                    </Flex>
+                                    
+                                    <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
                                         {dayjs(item.createdAt).format('YYYY-MM-DD h:mm A')}
-                                    </Typography.Paragraph>
-                                    <Typography.Text>
-                                        {item.note || <span style={{ fontStyle: 'italic', color: '#bfbfbf' }}>{t('tickets.noComment')}</span>}
                                     </Typography.Text>
-                                </div>
-                            }
-                        />
-                    </List.Item>
-                )}
-            />
-        </div>
-    );
-};
-
+                                </Flex>
+    
+                                <Divider style={{ margin: '12px 0' }} />
+    
+                                <Typography.Text style={{ color: '#434343', lineHeight: '1.6' }}>
+                                    {item.note || (
+                                        <Typography.Text type="secondary" italic style={{ opacity: 0.6 }}>
+                                            {t('tickets.noComment')}
+                                        </Typography.Text>
+                                    )}
+                                </Typography.Text>
+                            </Flex>
+                        </Flex>
+                    </Card>
+                ))}
+            </Flex>
+        );
+    };
 export default TicketReviewsTab;
