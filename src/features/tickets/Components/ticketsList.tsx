@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import React, { useRef, useState } from 'react';
-import { Table, Tag, Typography, Spin, Alert, Pagination, Space, Button, Flex, Popover, type InputRef, Input, type TableColumnType, Select } from 'antd';
+import { Table, Tag, Typography, Spin, Alert, Pagination, Space, Button, Flex, Popover, type InputRef, Input, type TableColumnType, Select, TreeSelect } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { FilterOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import EllipsisComponent from '../../../components/EllipsisComponent';
 import Highlighter from 'react-highlight-words';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
-import { useProblems, useSpecializations } from '../Hooks/useTicketForm';
+import {  useSpecializations, useTicketProblems } from '../Hooks/useTicketForm';
 
 type SearchableDataIndex = `title` | `problem` |`specialization` | `status` | 'priority' | 'description';
 
@@ -26,7 +26,7 @@ const TicketList: React.FC = () => {
     const [searchedColumn, setSearchedColumn] = useState<SearchableDataIndex | ''>('');
     const searchInput = useRef<InputRef>(null);
     const { data: specs } = useSpecializations();
-    const { data: problems } = useProblems();
+    const { data: hierarchicalProblems } = useTicketProblems();
 
     const [apiSearchQuery, setApiSearchQuery] = useState<{ [key: string]: string }>({});
 
@@ -34,6 +34,19 @@ const TicketList: React.FC = () => {
 
 
     const isRequester = role === 'requester';
+
+    const problemTreeData = hierarchicalProblems?.specializations?.map((spec: any) => ({
+        title: spec.name,
+        value: `spec-${spec.id}`, 
+        key: spec.id,
+        selectable: false, 
+        children: spec.problems?.map((prob: any) => ({
+            title: prob.name,
+            value: prob.id, 
+            key: prob.id,
+            isLeaf: true,
+        }))
+    })) || [];
 
     const handleTableChange = (page: number, pageSize: number) => {
         setPagination({ page, pageSize });
@@ -97,6 +110,45 @@ const TicketList: React.FC = () => {
             text
         );
     };
+
+    const getColumnTreeProps = (dataIndex: SearchableDataIndex, titleKey: string, treeData: any[]): TableColumnType<Ticket> => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+            <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+                <TreeSelect
+                    style={{ width: 250, marginBottom: 8 }} 
+                    dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                    placeholder={`${t('common.select')} ${t(titleKey)}`}
+                    treeData={treeData}
+                    value={selectedKeys[0]}
+                    onChange={(value) => setSelectedKeys(value ? [value] : [])}
+                    treeDefaultExpandAll={false} 
+                    showSearch
+                    allowClear
+                    listHeight={300} 
+                />
+                <Flex gap="small">
+                    <Button
+                        type="primary"
+                        onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
+                        size="small"
+                        style={{ flex: 1 }}
+                    >
+                        {t('common.filter')}
+                    </Button>
+                    <Button
+                        onClick={() => clearFilters && handleReset(clearFilters, dataIndex)}
+                        size="small"
+                        style={{ flex: 1 }}
+                    >
+                        {t('common.reset')}
+                    </Button>
+                </Flex>
+            </div>
+        ),
+        filterIcon: (filtered: boolean) => (
+            <FilterOutlined style={{ color: filtered || apiSearchQuery[dataIndex] ? '#1677ff' : undefined }} />
+        ),
+    });
 
     const getColumnSearchProps = (dataIndex: SearchableDataIndex, titleKey: string): TableColumnType<Ticket> => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
@@ -291,12 +343,7 @@ const TicketList: React.FC = () => {
                     {renderHighlightedText(problem?.name ?? t('tickets.noType'), 'problem')}
                 </Tag>
             ),
-            ...getColumnSelectProps('problem', 'tickets.problemType',
-                (Array.isArray(problems) ? problems : []).map((p: any) => ({
-                    label: p.name,
-                    value: p.id,
-                }))
-            ),
+            ...getColumnTreeProps('problem', 'tickets.problemType', problemTreeData),
         },
         {
             title: t('tickets.requester'),
