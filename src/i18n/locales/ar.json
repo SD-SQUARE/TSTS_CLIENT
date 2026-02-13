@@ -478,5 +478,21 @@
   "departments": "الأقسام",
   "specializations": "التخصصات",
   "permissions": "الصلاحية",
-  "Add_User": "اضافة مستخدم"
+  "Add_User": "اضافة مستخدم",
+  "trusted_devices": {
+      "User": "المستخدم",
+      "Browser": "المتصفح",
+      "Trusted Devices": "الأجهزة الموثوقة",
+      "Search by email or SSN": "ابحث بالبريد الإلكتروني أو الرقم القومي",
+      "Device Name": "اسم الجهاز",
+      "Activated Since": "تاريخ التفعيل",
+      "Are you sure you want to revoke this device?": "هل أنت متأكد من حذف هذا الجهاز؟",
+      "Confirm Device Revocation": "تأكيد حذف الجهاز",
+      "Type DELETE to confirm device revocation.": "اكتب DELETE لتأكيد حذف الجهاز.",
+      "Cancel": "إلغاء",
+      "Actions": "العمليات",
+      "OS": "نظام التشغيل",
+      "Type": "نوع",
+      "Delete": "حذف"
+  }
 }
