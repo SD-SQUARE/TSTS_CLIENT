@@ -30,7 +30,8 @@ import {
     TeamOutlined,
     UserOutlined,
     ToolOutlined,
-    IdcardOutlined
+    IdcardOutlined,
+    IssuesCloseOutlined
 } from '@ant-design/icons';
 import TicketList from "../features/tickets/Components/ticketsList.tsx";
 import TicketForm from "../features/tickets/Components/ticketForm.tsx";
@@ -39,6 +40,7 @@ import GuardedRoute from "./GuardedRoute.tsx";
 import PageLayout from "../components/PageLayout.tsx";
 import Profile from './../features/profile/Profile.page';
 import { useTranslation } from "react-i18next";
+import ProblemsPage from "../features/Problems/components/ProblemsPage.tsx";
 
 export const AppRoutes = () => {
     const { t } = useTranslation();
@@ -78,6 +80,8 @@ export const AppRoutes = () => {
         { key: "/settings/domains", label: t('Domains'), icon: <ProjectOutlined /> },
         { key: "/settings/departments", label: t('Departments'), icon: <ApartmentOutlined /> },
         { key: "/settings/specializations", label: t('Specializations'), icon: <ExperimentOutlined /> },
+        { key: "/settings/problems", label: t('Problems'), icon: <IssuesCloseOutlined /> },
+
         // { key: "/settings/permissions", label: t('Permissions'), icon: <SafetyOutlined /> },
     ];
     return (
@@ -88,9 +92,9 @@ export const AppRoutes = () => {
 
             <Route index path={`${APP_BASE_PATH}/profile`} element={
 
-                <GuardedRoute roles={["*"]}>
+                // <GuardedRoute roles={["*"]}>
                     <PageLayout> <Profile /></PageLayout>
-                </GuardedRoute> 
+                // </GuardedRoute> 
                 } />
             
 
@@ -102,76 +106,81 @@ export const AppRoutes = () => {
 
                 {/* Super/admin routes */}
             <Route path={`${APP_BASE_PATH}/identities`} element={
-                <GuardedRoute roles={["superadmin", "admin"]}>
+                // <GuardedRoute roles={["superadmin", "admin"]}>
                     <MainLayout menuItems={IdentitiesMenuItems} />
-                </GuardedRoute>
+                // </GuardedRoute>
             }>
                 <Route index  element={
-                    <GuardedRoute roles={["superadmin", "admin"]}>
+                    // <GuardedRoute roles={["superadmin", "admin"]}>
                        <GroupsList />
-                    </GuardedRoute>
+                    // </GuardedRoute>
                 } />
                 
                 <Route path="groups" element={
-                    <GuardedRoute roles={["superadmin", "admin"]}>
+                    // <GuardedRoute roles={["superadmin", "admin"]}>
                         <GroupsList />
-                    </GuardedRoute>
+                    // </GuardedRoute>
                 } />
                 <Route path="groups/:id" element={
-                    <GuardedRoute roles={["superadmin", "admin"]}>
+                    // <GuardedRoute roles={["superadmin", "admin"]}>
                         <GroupViewPage />
-                    </GuardedRoute>
+                    // </GuardedRoute>
                 } />
 
                 <Route path="users/technicians" element={
-                    <GuardedRoute roles={["superadmin", "admin"]}>
+                    // <GuardedRoute roles={["superadmin", "admin"]}>
                         <UserList role={'technicians'} />
-                    </GuardedRoute>
+                    // </GuardedRoute>
                 } />
                 <Route path="users/requesters" element={
-                    <GuardedRoute roles={["superadmin", "admin"]}>
+                    // <GuardedRoute roles={["superadmin", "admin"]}>
                         <UserList role={'requesters'} />
-                    </GuardedRoute>
+                    // </GuardedRoute>
                 } />
                 <Route path="users/admins" element={
-                    <GuardedRoute roles={["superadmin", "admin"]}>
+                    // <GuardedRoute roles={["superadmin", "admin"]}>
                         <UserList role={'admins'} />
-                    </GuardedRoute>
+                    // </GuardedRoute>
                 } />
                 <Route path="users/:role/:id" element={
-                    <GuardedRoute roles={["superadmin", "admin"]}>
+                    // <GuardedRoute roles={["superadmin", "admin"]}>
                         <UserViewPage />
-                    </GuardedRoute>
+                    // </GuardedRoute>
                 } />
 
                 </Route>
             {/* Routes that use MainLayout */}
             <Route path={`${APP_BASE_PATH}/settings`} element={
-                <GuardedRoute roles={["superadmin", "admin"]}>
+                // <GuardedRoute roles={["superadmin", "admin"]}>
                     <MainLayout menuItems={SettingsMenuItems} />
-                </GuardedRoute>
+                // </GuardedRoute>
                 }>
 
                 <Route path="universities" element={
-                    <GuardedRoute roles={["superadmin", "admin"]}>
+                    // <GuardedRoute roles={["superadmin", "admin"]}>
                     <UniversitiesPage />
-                    </GuardedRoute>
+                    // </GuardedRoute>
                 } />
                 
                 <Route path="domains" element={
-                    <GuardedRoute roles={["superadmin", "admin"]}>
+                    // <GuardedRoute roles={["superadmin", "admin"]}>
                         <DomainsPage />
-                    </GuardedRoute>
+                    // </GuardedRoute>
                 } />
                 <Route path="departments" element={
-                    <GuardedRoute roles={["superadmin", "admin"]}>
+                    // <GuardedRoute roles={["superadmin", "admin"]}>
                         <DepartmentsPage />
-                    </GuardedRoute>
+                    // </GuardedRoute>
                 } />
                 <Route path="specializations" element={
-                    <GuardedRoute roles={["superadmin", "admin"]}>
+                    // <GuardedRoute roles={["superadmin", "admin"]}>
                         <SpecializationsPage />
-                    </GuardedRoute>
+                    // </GuardedRoute>
+                } />
+                <Route path="problems" element={
+                    // <GuardedRoute roles={["superadmin", "admin"]}>
+                        <ProblemsPage />
+                    // </GuardedRoute>
                 } />
 
                 {/* TODO:connect pages later */}

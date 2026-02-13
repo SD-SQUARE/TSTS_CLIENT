@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Form, Input, Tooltip } from 'antd';
 import { GenericCrudPage } from '../../../components/GenericCrudPage';
 import { useGenericCrud } from '../../../api/common/hooks/common-hooks';
@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 
 const UniversitiesPage: React.FC = () => {
   const { t } = useTranslation();
+  const [searchTerm, setSearchTerm] = useState("");
 //   const universityApi = new BaseCrudService<University>(
 //     "v1/universities",
 //     "v1/universities/:id"
@@ -21,8 +22,8 @@ const UniversitiesPage: React.FC = () => {
     updateMutation,
     deleteMutation,
   } = useGenericCrud<University, CreateUniversityDto, UpdateUniversityDto>({
-    queryKey: ['universities'],
-    fetchFn: () => universityApi.getAll(),
+    queryKey: ['universities',searchTerm],
+    fetchFn: () => universityApi.getAll({ search: searchTerm }),
     createFn: (data) => universityApi.create(data),
     updateFn: ({ id, data }) => universityApi.update(id, data),
     deleteFn:  (id) => universityApi.delete(id),
@@ -104,6 +105,8 @@ const UniversitiesPage: React.FC = () => {
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}
+      searchText={searchTerm}
+      onSearch={(val) => setSearchTerm(val)}
     />
   );
 };

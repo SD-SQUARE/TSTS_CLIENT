@@ -206,6 +206,9 @@
   "description_en": "Description (English)",
   "description_ar": "Description (Arabic)",
   "required": "This field is required",
+  "review_required": "Review Required",
+  "required": "Required",
+  "not_required": "Not Required",
   "universities": "Universities",
   "home": {
     "hero_title": "Resolve Tickets.",
@@ -316,10 +319,23 @@
     "unauthorized": "Unauthorized access",
     "unauthorizedDescription": "You are not authorized to access this page"
   },
+
+ 
+  "problems": "Problems",
+  "specialization_type": "Specialization Type",
+  "review_required": "Review Required",
+  "required": "Required",
+  "not_required": "Not Required",
+  "select_specialization": "Select Specialization",
+  "filter_by_spec": "Filter by Specialization",
+ 
+
+
+
   "Tickets": "Tickets",
   "Settings": "Settings",
   "Personnel": "Personnel",
-  "Knowledge-Base": "Explore Solutions",
+  "Knowledge-Base": "Knowledge Hub",
   "profile": {
     "tabs": {
       "profile": "Profile",
@@ -376,6 +392,44 @@
         "guide": "Installation Guide",
         "videoUnavailable": "Video guide is currently unavailable",
         "fileMissing": "Extension file is not available."
+      }
+    },
+    "knowledge": {
+      "hub_title": "Knowledge Hub",
+      "hub_subtitle": "Manage documentation, guides, and internal resources.",
+      "create_btn": "Create Article",
+      "search_placeholder": "Search knowledge base...",
+      "no_articles": "No articles found.",
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Del",
+      "read_article": "Read Article",
+      "modal_draft": "Draft New Article",
+      "modal_edit": "Edit Article",
+      "modal_subtitle": "Share your knowledge with the team",
+      "steps": {
+        "details": "Details",
+        "content": "Content"
+      },
+      "fields": {
+        "title": "Article Title",
+        "title_placeholder": "e.g. Setting up the Development Environment",
+        "category": "Category",
+        "category_placeholder": "e.g. React Development",
+        "summary": "Short Summary",
+        "summary_placeholder": "A brief overview...",
+        "import_title": "Import Content",
+        "import_desc": "Upload a .docx file to auto-fill",
+        "import_btn": "Select File",
+        "content_placeholder": "Write content..."
+      },
+      "actions": {
+        "prev": "Previous",
+        "reset": "Reset",
+        "next": "Next Step",
+        "save": "Save Changes",
+        "publish": "Publish Article",
+        "close": "Close"
       }
     },
 

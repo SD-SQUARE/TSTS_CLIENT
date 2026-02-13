@@ -12,6 +12,13 @@
   "NOT_ALLOWED": "عذراً، ليس لديك الصلاحية للوصول إلى هذه الصفحة.",
   "SERVER_ERROR": "عذراً، حدث خطأ ما. يرجى المحاولة مرة أخرى في وقت لاحق.",
   "NAVIGATION_TITLE": "نظام التذاكر",
+  "problems": "المشكلات",
+  "specialization_type": "نوع التخصص",
+  "review_required": "مراجعة مطلوبة",
+  "select_specialization": "اختر التخصص",
+  "filter_by_spec": "تصفية حسب التخصص",
+  "not_required": "غير مطلوب",
+  "Knowledge-Base": "استكشاف الحلول",
   "forgotPassword": {
     "title": "نسيت كلمة المرور",
     "steps": {
@@ -48,6 +55,44 @@
     "changePassword": "تغيير كلمة المرور",
     "required": "مطلوب"
   },
+  "knowledge": {
+    "hub_title": "مركز المعرفة",
+    "hub_subtitle": "إدارة الوثائق والأدلة والموارد الداخلية.",
+    "create_btn": "إنشاء مقال",
+    "search_placeholder": "البحث في قاعدة المعرفة...",
+    "no_articles": "لم يتم العثور على مقالات.",
+    "view": "عرض",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "read_article": "قراءة المقال",
+    "modal_draft": "مسودة مقال جديد",
+    "modal_edit": "تعديل المقال",
+    "modal_subtitle": "شارك معرفتك مع الفريق",
+    "steps": {
+      "details": "التفاصيل",
+      "content": "المحتوى"
+    },
+    "fields": {
+      "title": "عنوان المقال",
+      "title_placeholder": "مثال: إعداد بيئة التطوير",
+      "category": "الفئة",
+      "category_placeholder": "مثال: تطوير ريأكت",
+      "summary": "ملخص قصير",
+      "summary_placeholder": "نظرة عامة موجزة...",
+      "import_title": "استيراد المحتوى",
+      "import_desc": "قم برفع ملف .docx للتعبئة التلقائية",
+      "import_btn": "اختر ملف",
+      "content_placeholder": "اكتب المحتوى هنا..."
+    },
+    "actions": {
+      "prev": "السابق",
+      "reset": "إعادة تعيين",
+      "next": "الخطوة التالية",
+      "save": "حفظ التغييرات",
+      "publish": "نشر المقال",
+      "close": "إغلاق"
+    }
+  },
   "app": {
     "title": "التطبيق"
   },
@@ -65,6 +110,9 @@
     "name_en": "الاسم (بالإنجليزية)",
     "description_ar": "الوصف (بالعربية)",
     "description_en": "الوصف (بالإنجليزية)",
+    "review_required": "مطلوب مراجعة",
+    "required": "مطلوب",
+    "not_required": "غير مطلوب",
     "heads": "الرؤساء",
     "team_leader": "قائد الفريق",
     "specializations": "التخصصات",
@@ -316,7 +364,6 @@
   "Tickets": "التذاكر",
   "Settings": "الاعدادات",
   "Personnel": "قسم الموظفين",
-  "Knowledge-Base": "استكشاف الحلول",
   "profile": {
     "tabs": {
       "profile": "الملف الشخصي",
@@ -324,7 +371,6 @@
       "specializations": "التخصصات",
       "settings": "الإعدادات"
     },
-
     "groups": {
       "title": "مجموعات المستخدم",
       "empty": "لا توجد مجموعات مخصصة لهذا المستخدم",
@@ -334,7 +380,6 @@
         "color": "اللون"
       }
     },
-
     "specializations": {
       "title": "تخصصات المستخدم",
       "empty": "لا توجد تخصصات مخصصة لهذا المستخدم",
@@ -343,12 +388,10 @@
         "description": "الوصف"
       }
     },
-
     "settings": {
       "password": "كلمة المرور",
       "devices": "الأجهزة الموثوقة",
       "extension": "إضافة المتصفح",
-
       "reset": {
         "title": "إعادة تعيين كلمة المرور",
         "description": "اختر كلمة مرور قوية للحفاظ على أمان حسابك.",
@@ -363,7 +406,6 @@
         "hint": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل.",
         "weakPassword": "كلمة المرور يجب ان تحتوي على حرف كبير وحرف صغير ورقم وحرف خاص"
       },
-
       "extensionSection": {
         "title": "إضافة المتصفح",
         "description": "قم بتثبيت الإضافة الرسمية لتحسين سير العمل.",
@@ -375,7 +417,6 @@
         "fileMissing": "ملف الإضافة غير متوفر."
       }
     },
-
     "trustedDevices": {
       "cancel": "الغاء",
       "title": "الأجهزة الموثوقة",
@@ -386,12 +427,10 @@
       "trusted": "موثوق",
       "remove": "إزالة الجهاز",
       "motive": "سجل هذا المتصفح او الجهاز للتسجيل بسرعة وامان",
-
       "security": {
         "title": "تسجيل جهاز آمن",
         "description": "سيتم التحقق من هذا الجهاز باستخدام WebAuthn واعتماده لتسجيلات الدخول المستقبلية."
       },
-
       "device": {
         "name": "اسم الجهاز",
         "namePlaceholder": "مثال: جهاز العمل",
@@ -402,47 +441,40 @@
         "os": "نظام التشغيل",
         "activatedSince": "مفعل منذ"
       },
-
       "status": {
         "notVerifiedTitle": "الجهاز غير موثوق",
         "notVerifiedDesc": "يجب التحقق من الجهاز قبل إضافته . الرجاء الضغط على الزر ادناه",
         "verifiedTitle": "تم التحقق من الجهاز بنجاح",
         "verifiedDesc": "الجهاز جاهز ليكون موثوقاً."
       },
-
       "messages": {
         "verifyError": "فشل التحقق من الجهاز. يرجى التأكد من عدم التحقق منه مسبقاً ثم المحاولة مرة أخرى.",
         "addSuccess": "تمت إضافة الجهاز الموثوق بنجاح",
         "addError": "فشل إضافة الجهاز الموثوق"
       }
     },
-
     "personal": {
       "title": "المعلومات الشخصية",
       "arabicName": "الاسم العربي",
       "email": "البريد الإلكتروني",
       "ssn": "الرقم القومي"
     },
-
     "contacts": {
       "title": "جهات الاتصال",
       "phones": "الهواتف",
       "mobiles": "الهواتف المحمولة",
       "copy": "اضغط للنسخ"
     },
-
     "organization": {
       "title": "المؤسسة",
       "university": "الجامعة",
       "domain": "النطاق"
     },
-
     "departments": {
       "title": "الأقسام",
       "copy": "اضغط للنسخ",
       "copySuccess": "تم النسخ"
     },
-
     "profileHeader": {
       "userType": "نوع المستخدم"
     }

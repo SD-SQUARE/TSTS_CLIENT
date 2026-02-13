@@ -14,6 +14,8 @@ const DomainsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [selectedUni, setSelectedUni] = useState<number | null>(null);
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   const {
     data,
     isLoading,
@@ -21,8 +23,8 @@ const DomainsPage: React.FC = () => {
     updateMutation,
     deleteMutation,
   } = useGenericCrud<Domain, CreateDomainDto, UpdateDomainDto>({
-    queryKey: ['domains'],
-    fetchFn: () => domainApi.getAll(),
+    queryKey: ['domains', searchTerm],
+    fetchFn: () => domainApi.getAll({ search: searchTerm }),
     createFn: (data) => domainApi.create(data),
     updateFn: ({ id, data }) => domainApi.update(id, data),
     deleteFn: (id) => domainApi.delete(id),
@@ -181,7 +183,9 @@ const DomainsPage: React.FC = () => {
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}
-      nestedFieldMappers={nestedFieldMappers}    
+      nestedFieldMappers={nestedFieldMappers} 
+      searchText={searchTerm} 
+      onSearch={(val) => setSearchTerm(val)}   
     />
   );
 };

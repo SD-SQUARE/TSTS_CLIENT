@@ -41,13 +41,16 @@ interface GenericCrudProps<T> {
   disableAdd?: boolean;
   nestedFieldMappers?: FieldMapper<T>;
   tableSize?: "small" | "middle" | "large";
+
+  searchText?: string;
+  onSearch?: (value: string) => void;
 }
 
 export const GenericCrudPage = <T extends { id: string | number }>({
   title,
   columns,
   formItems,
-  data,
+  data=[],
   isLoading,
   createMutation,
   updateMutation,
@@ -55,13 +58,15 @@ export const GenericCrudPage = <T extends { id: string | number }>({
   disableAdd = false,
   nestedFieldMappers = {},
   tableSize = "middle",
+  searchText="",
+  onSearch,
 }: GenericCrudProps<T>) => {
   const [viewingItem, setViewingItem] = useState<T | null>(null);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<T | null>(null);
   const [form] = Form.useForm();
-  const [searchText, setSearchText] = useState("");
+  // const [searchText, setSearchText] = useState("");
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
@@ -268,13 +273,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
   }
 
   
-  const filteredData = data.filter((item) =>
-    Object.values(item).some(
-      (value) =>
-        typeof value === "string" &&
-        value.toLowerCase().includes(searchText.toLowerCase())
-    )
-  );
+
 
   const skeletonRows = Array.from({ length: 6 }, (_, idx) => ({ 
     id: `loading-${idx}` 
@@ -305,7 +304,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
             prefix={<SearchOutlined />}
             allowClear
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={(e) => onSearch?.(e.target.value)} 
             style={{ flex: 1, minWidth: 150 }}
           />
 
@@ -327,7 +326,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
           className="super-compact-table"
           size={tableSize}
           columns={isLoading ? skeletonColumns : columns}
-          dataSource={isLoading ? skeletonRows : filteredData}
+          dataSource={isLoading ? skeletonRows : data}
           rowKey="id"
           scroll={{ x: 800 }}
           onRow={(record) => ({

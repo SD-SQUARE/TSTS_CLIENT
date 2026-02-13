@@ -11,6 +11,7 @@ import { departmentApi } from "../services/departmentApi";
 const DepartmentsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [selectedUni, setSelectedUni] = useState<number | null>(null);
+  const [searchTerm, setSearchTerm] = useState(""); 
 
   const {
     data,
@@ -19,8 +20,8 @@ const DepartmentsPage: React.FC = () => {
     updateMutation,
     deleteMutation,
   } = useGenericCrud<Department, CreateDepartmentDto, UpdateDepartmentDto>({
-    queryKey: ['departments'],
-    fetchFn: () => departmentApi.getAll(),
+    queryKey: ['departments', searchTerm],
+    fetchFn: () => departmentApi.getAll({ search: searchTerm }),
     createFn: (data) => departmentApi.create(data),
     updateFn: ({ id, data }) => departmentApi.update(id, data),
     deleteFn: (id) => departmentApi.delete(id),
@@ -175,7 +176,9 @@ const nestedFieldMappers = {
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}
-    nestedFieldMappers={nestedFieldMappers}    
+      nestedFieldMappers={nestedFieldMappers}   
+      searchText={searchTerm}
+      onSearch={(val) => setSearchTerm(val)} 
     />
   );
 };
