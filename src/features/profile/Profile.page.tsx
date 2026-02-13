@@ -7,6 +7,8 @@ import SettingsTab from "./components/tabs/SettingsTab.component";
 import i18next from "i18next";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
+import { useCookies } from 'react-cookie';
+import { set } from "zod";
 
 const Profile = () => {
     const { t } = useTranslation();
@@ -14,9 +16,10 @@ const Profile = () => {
 
     const [activeMainTab, setActiveMainTab] = useState("profile");
     const [forceSettingsDevices, setForceSettingsDevices] = useState(false);
+    const [ cookie , setCookie, _ ] = useCookies(['showTrustedDeviceTour', 'skipTrustedDeviceTour-for-week']);
 
     useEffect(() => {
-        if (localStorage.getItem("showTrustedDeviceTour")) {
+        if (cookie["showTrustedDeviceTour"]) {
             setActiveMainTab("settings");
             setForceSettingsDevices(true);
         }
@@ -51,7 +54,8 @@ const Profile = () => {
                     forceDevices={forceSettingsDevices}
                     onTourReady={() => {
                         console.log("onTourReady"); 
-                        localStorage.removeItem("showTrustedDeviceTour");
+                        // localStorage.removeItem("showTrustedDeviceTour");
+                        setCookie("showTrustedDeviceTour", "0");
                      }}
                 />
             ),
@@ -70,7 +74,8 @@ const Profile = () => {
                 <SettingsTab
                     forceDevices={forceSettingsDevices}
                     onTourReady={() =>
-                        localStorage.removeItem("showTrustedDeviceTour")
+                        // localStorage.removeItem("showTrustedDeviceTour")\
+                        setCookie("showTrustedDeviceTour", "0")
                     }
                 />
             ),
