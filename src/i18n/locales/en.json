@@ -199,7 +199,19 @@
     "group": "Groups",
     "status": "Status",
     "details": "Details",
-    "view_user_title": "User Details"
+    "view_user_title": "User Details",
+    "bulk_create": "Bulk Create Users"
+  },
+  "bulk": {
+    "upload_sample": "Upload Sample (Bulk)",
+    "sample_title": "1. Download Template",
+    "sample_instruction": "Please download the sample file and fill it with user data.",
+    "download_sample": "Download Sample",
+    "upload_title": "2. Upload Completed Files",
+    "drag_drop_text": "Click or drag files to this area to upload",
+    "upload_preview": "Selected Files",
+    "no_files_selected": "No files selected yet",
+    "create_success": "Bulk creation processed successfully"
   },
   "name_en": "Name (English)",
   "name_ar": "Name (Arabic)",
@@ -316,7 +328,8 @@
     "created": "Ticket created successfully",
     "updated": "Ticket updated successfully",
     "saved": "Ticket saved successfully",
-    "reviewSuccess": "Review submitted successfully"
+    "reviewSuccess": "Review submitted successfully",
+    "bulk_upload" : "Bulk upload successful"
   },
   "validation": {
     "required": "This field is required"
@@ -331,7 +344,9 @@
     "downloadFailed": "Failed to download file. Please try again.",
     "uploadFailed": "Failed to upload file. Please try again.",
     "connectionError" : "Connection error. Please check your internet connection.",
-    "updateFailed" : "Failed to update ticket. Please try again."
+    "updateFailed" : "Failed to update ticket. Please try again.",
+    "sample_fetch_failed": "Failed to retrieve the sample file.",
+    "upload_failed": "Bulk upload failed. Please check file format."
   },
   "Email_Is_Required": "Email is required",
   "Invalid_email_address_format": "Invalid email address format",

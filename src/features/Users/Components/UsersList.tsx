@@ -14,6 +14,7 @@ import { useDeleteUser, useUsers } from "../Hooks/useUsers";
 import AvatarDisplay from "../../../components/AvatarDisplay";
 import UserFormModal from "./UsersFormModal";
 import { useNavigate } from "react-router-dom";
+import BulkCreateModal from "./BulkCreateModal";
 
 type SearchableDataIndex = `first_name` | `mid_name` | `last_name` | 'ssn';
 
@@ -36,6 +37,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [editingUser, setEditingUser] = useState<UserListItem | undefined>();
 
+    const [isBulkModalVisible, setIsBulkModalVisible] = useState(false);
 
     const handleSearch = (
         selectedKeys: string[],
@@ -129,12 +131,12 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
             onClick: (event: React.MouseEvent<HTMLElement>) => {
                 const target = event.target as HTMLElement;
                 const isInteractive = target.closest('button, a, .ant-popconfirm, .ant-popover-open, .ant-tooltip-open');
-    
+
                 if (!isInteractive) {
                     handleView(record.id);
                 }
             },
-            style: { cursor: 'pointer' }, 
+            style: { cursor: 'pointer' },
         };
     };
     const handleEdit = (user: UserListItem) => { setEditingUser(user); setIsModalVisible(true); };
@@ -353,7 +355,19 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                     onChange={(page, pageSize) => setPagination({ page, pageSize })}
                     showSizeChanger
                 />
-                <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>{t("Add_User")}</Button>
+                <Space >
+                    {role === "requesters" && (
+                        <Button
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsBulkModalVisible(true)}
+                        >
+                            {t("bulk.upload_sample")}
+                        </Button>
+                    )}
+                    <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+                        {t("Add_User")}
+                    </Button>
+                </Space>           
             </Space>
 
             <Table
@@ -381,6 +395,12 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                 isVisible={isModalVisible}
                 onClose={handleCloseModal}
                 userData={editingUser}
+                role={role}
+            />
+
+            <BulkCreateModal
+                visible={isBulkModalVisible}
+                onClose={() => setIsBulkModalVisible(false)}
                 role={role}
             />
         </div>

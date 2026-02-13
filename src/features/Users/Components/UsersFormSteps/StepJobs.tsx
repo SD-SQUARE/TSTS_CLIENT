@@ -52,7 +52,7 @@ const StepJobLocation: React.FC<Props> = ({ initialData, onNext }) => {
             job_ar: data.job_ar,
             university: data.university,
             domain: data.domain,
-            departments: data.departments,
+            departments: data.departments || [data.domain],
         });
     };
 
@@ -131,10 +131,10 @@ const StepJobLocation: React.FC<Props> = ({ initialData, onNext }) => {
                         )}
                     />
                 </Form.Item>
-                <Form.Item label={<Flex gap="small"><span>{t("user_list.department")}</span><RequiredTag /></Flex>}
+                <Form.Item label={<Flex gap="small"><span>{t("user_list.department")}</span></Flex>}
                     validateStatus={errors.departments ? "error" : ""} help={errors.departments?.message} required>
                     <Controller name="departments" control={control}
-                        rules={{ required: "Required", validate: val => Array.isArray(val) && val.length > 0 || "Required" }}
+                        rules={{  validate: val => Array.isArray(val) && val.length > 0  }}
                         render={({ field }) => (
                             <Select
                                 {...field}
