@@ -11,7 +11,6 @@ import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import RequiredTag from '../../../components/RequiredTag';
 import { useSelector } from 'react-redux';
-import api from '../../../api/http';
 import { fetchGroups, fetchGroupUsers, useTicketDetails, useTicketMutations, useTicketProblems } from '../Hooks/useTicketForm';
 
 const { TextArea } = Input;
@@ -177,7 +176,7 @@ const TicketForm: React.FC = () => {
         const formData = new FormData();
         formData.append('title', values.title);
         formData.append('description', values.description);
-        formData.append('requester', "user.id");
+        formData.append('requester', user.id);
 
         if (selectedProblem) {
             formData.append('problem', selectedProblem.id);

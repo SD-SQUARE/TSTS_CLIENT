@@ -4,12 +4,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../../api/http';
 
 
-export const useSpecializations = () =>
-  useQuery({
-    queryKey: ['specializations'], queryFn: () =>
-      api.get('v1/lockups/specializations/').then(res => res.data.specializations)
-  });
-
   export const useTicketProblems = () => {
     return useQuery({
         queryKey: ['ticketGroupedProblems'],
@@ -32,21 +26,12 @@ export const useTechnicians = () =>
           api.get('v1/lockups/technicians/').then(res => res.data.users)
   });
 
-  export const fetchTechs = async () => {
-    const { data } = await api.get('v1/lockups/technicians/');
-    return data; 
-};
 
 export const useAdmins = () =>
   useQuery({
     queryKey: ['admins'], queryFn: () =>
       api.get('v1/lockups/admins').then(res => res.data.users)
   });
-
-  export const fetchAdmins = async () => {
-    const { data } = await api.get('v1/lockups/admins');
-    return data; 
-};
 
 export const useTicketDetails = (id?: string) =>
   useQuery({
