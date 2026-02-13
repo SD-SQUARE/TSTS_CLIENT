@@ -504,6 +504,8 @@
     "Users": "Users",
     "Admins": "Admins",
     "Technicians": "Technicians",
+    "team_leader": "Team Leader",
+    "heads": "Heads",
     "Requesters": "Requesters",
     "Universities": "Universities",
     "Domains": "Domains",

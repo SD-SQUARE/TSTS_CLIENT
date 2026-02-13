@@ -9,10 +9,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Input, Select, Button, Upload, Tag, Dropdown, Space, Typography, message, Flex, Card, Steps, Badge, TreeSelect } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { fetchAdmins, fetchTechs, useAdmins, useTechnicians, useTicketDetails, useTicketMutations, useTicketProblems } from '../Hooks/useTicketForm';
 import RequiredTag from '../../../components/RequiredTag';
 import { useSelector } from 'react-redux';
 import api from '../../../api/http';
+import { fetchGroups, fetchGroupUsers, useTicketDetails, useTicketMutations, useTicketProblems } from '../Hooks/useTicketForm';
 
 const { TextArea } = Input;
 
@@ -35,29 +35,33 @@ const TicketForm: React.FC = () => {
 
     const [selectedProblem, setSelectedProblem] = useState<{ id: string, name: string, specId: string } | null>(null);
 
-    const [treeData, setTreeData] = useState<any[]>([
-        {
-            id: 'admin_root',
-            pId: 0,
-            value: 'admin_root',
-            title: t('Admins'),
-            isLeaf: false,
-            selectable: false
-        },
-        {
-            id: 'tech_root',
-            pId: 0,
-            value: 'tech_root',
-            title: t('Technicians'),
-            isLeaf: false,
-            selectable: false
-        },
-    ]);
+    const [treeData, setTreeData] = useState<any[]>([]);
 
     const currentStatus = Form.useWatch('status', form);
     const currentPriority = Form.useWatch('priority', form);
 
-    const onLoadData = ({ id }: any) => {
+    useEffect(() => {
+        const loadInitialGroups = async () => {
+            try {
+                const { data } = await fetchGroups();
+                const groups = data.groups.map((g: any) => ({
+                    id: g.id,
+                    pId: 0,
+                    value: g.id,
+                    title: g.name,
+                    isLeaf: false,
+                    selectable: false, // User selects people, not groups
+                    color: g.color // Optional: use for styling
+                }));
+                setTreeData(groups);
+            } catch (error) {
+                message.error(t('errors.fetchGroupsFailed'));
+            }
+        };
+        loadInitialGroups();
+    }, [t]);
+
+    const onLoadData = ({ id, pId, title }: any) => {
         // eslint-disable-next-line no-async-promise-executor
         return new Promise<void>(async (resolve) => {
             if (treeData.some(node => node.pId === id)) {
@@ -66,16 +70,31 @@ const TicketForm: React.FC = () => {
             }
 
             try {
-                let usersArray = [];
-                if (id === 'admin_root') {
-                    const response = await fetchAdmins();
-                    usersArray = response.data?.users || response.users || [];
-                } else if (id === 'tech_root') {
-                    const response = await fetchTechs();
-                    usersArray = response.data?.users || response.users || [];
+                if (pId === 0) {
+                    const roleNodes = [
+                        { id: `${id}_tl`, pId: id, value: `${id}_tl`, title: t('team_leader'), isLeaf: false, selectable: false },
+                        { id: `${id}_heads`, pId: id, value: `${id}_heads`, title: t('heads'), isLeaf: false, selectable: false },
+                        { id: `${id}_techs`, pId: id, value: `${id}_techs`, title: t('Technicians'), isLeaf: false, selectable: false },
+                    ];
+                    setTreeData((prev) => [...prev, ...roleNodes]);
+                    resolve();
+                    return;
+                }
+                const groupId = id.split('_')[0];
+                const roleType = id.split('_')[1];
+
+                const { data } = await fetchGroupUsers(groupId);
+                let usersArray: any[] = [];
+
+                if (roleType === 'tl' && data.team_leader) {
+                    usersArray = [data.team_leader];
+                } else if (roleType === 'heads') {
+                    usersArray = data.heads || [];
+                } else if (roleType === 'techs') {
+                    usersArray = data.technicians || [];
                 }
 
-                const newNodes = usersArray.map((u: any) => ({
+                const userNodes = usersArray.map((u: any) => ({
                     id: u.id,
                     pId: id,
                     value: u.id,
@@ -83,9 +102,8 @@ const TicketForm: React.FC = () => {
                     isLeaf: true,
                     selectable: true
                 }));
-                console.log(newNodes);
 
-                setTreeData((prev) => [...prev, ...newNodes]);
+                setTreeData((prev) => [...prev, ...userNodes]);
                 resolve();
             } catch (error) {
                 console.error("Load failed", error);

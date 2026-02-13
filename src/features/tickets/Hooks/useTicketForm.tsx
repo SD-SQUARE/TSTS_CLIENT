@@ -73,4 +73,25 @@ export const useTicketMutations = (id?: string) => {
   });
 
   return { createMutation, updateMutation, coordinateMutation };
+};};
+
+export const useTicketReview = (ticketId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+      mutationFn: async (payload: { rating: number; note?: string }) => {
+          const { data } = await api.post(`/tickets/${ticketId}/reviews`, payload);
+          return data;
+      },
+      onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['ticketReviews', ticketId] });
+          message.success(t('success.reviewSuccess'));
+      },
+      onError: (error: any) => {
+          message.error(error?.response?.data?.message || t('errors.submitFailed'));
+      }
+  });
 };
+
+export const fetchGroups = () => api.get('v1/lockups/groups/');
+export const fetchGroupUsers = (groupId: string) => api.get(`v1/groups/${groupId}/users`);
