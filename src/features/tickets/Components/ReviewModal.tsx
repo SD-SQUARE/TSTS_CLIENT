@@ -31,7 +31,6 @@ const PostReviewModal: React.FC<Props> = ({ ticketId, open, onClose }) => {
             // Validation or API error handled by mutation/form
         }
     };
-
     return (
         <Modal
             title={t('tickets.rateExperience')}

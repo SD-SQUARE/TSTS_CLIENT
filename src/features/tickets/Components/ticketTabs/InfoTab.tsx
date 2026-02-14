@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Descriptions, Tag, Typography, Space, Card, Button, Flex, message, Popconfirm } from 'antd';
 import { CheckCircleOutlined, EditOutlined, ToolOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -24,13 +24,17 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
 
     const isReviewRequired = 
     ticket?.specialization?.review_required === true || 
-    ticket?.problem?.review_required === true;
+        ticket?.problem?.review_required === true;
+
+    // FIXME: to be closeable but not skipable
+    // useEffect(() => {
+    //     if (isReviewRequired) {
+    //         setIsReviewModalOpen(true);
+    //     }
+    // }, [isReviewRequired]);
 
     const handleStatusChange = async (newStatus: string) => {
-        if (newStatus === 'close' && isReviewRequired) {
-            setIsReviewModalOpen(true);
-            return;
-        }
+        
         try {
             const res = await statusMutation.mutateAsync(newStatus);
             if (res.is_updated) {
@@ -55,7 +59,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                     size="large"
                     ghost
                     icon={<ToolOutlined />}
-                    onClick={() => handleStatusChange('inprogress')}
+                    onClick={() => handleStatusChange('in_progress')}
                     loading={statusMutation.isPending}
 
                 >
@@ -66,7 +70,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
             actionButton = (
                 <Popconfirm
                     title={t('tickets.resolveConfirmTitle')}
-                    onConfirm={() => handleStatusChange('close')}
+                    onConfirm={() => handleStatusChange('closed')}
                     okText={t('translation.yes')}
                     cancelText={t('translation.no')}
                 >
@@ -91,14 +95,14 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                 style={{ flex: 1 }}
                 size="large"
                 icon={<ReloadOutlined />}
-                onClick={() => handleStatusChange('reopen')}
+                onClick={() => handleStatusChange('re_open')}
                 loading={statusMutation.isPending}
             >
                 {t('tickets.reopenTicket')}
             </Button>
         );
     }
-
+    console.log("isReviewModalOpen", isReviewModalOpen);
     return (
         <Card bordered={false} style={{ background: 'transparent', boxShadow: 'none', paddingBottom: '24px' }} styles={{ body: { padding: 0 } }}>
             <Descriptions

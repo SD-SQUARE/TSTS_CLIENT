@@ -3,6 +3,7 @@ import React from 'react';
 import {  Avatar, Rate, Typography, Empty,  Flex, Card, Divider, Spin } from 'antd';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import i18next from 'i18next';
 
 interface Props {
     reviews: any[];
@@ -49,7 +50,7 @@ const TicketReviewsTab: React.FC<Props> = ({ reviews, isLoading }) => {
                                 <Flex justify="space-between" align="start">
                                     <Flex vertical>
                                         <Typography.Text strong style={{ fontSize: '16px' }}>
-                                            {item.reviewer?.firstName} {item.reviewer?.lastName}
+                                            {item.reviewer?.firstName[i18next.language]} {item.reviewer?.lastName[i18next.language]}
                                         </Typography.Text>
                                         <Rate 
                                             disabled 

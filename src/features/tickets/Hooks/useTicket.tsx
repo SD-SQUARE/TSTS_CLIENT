@@ -83,7 +83,7 @@ export const useTicketReviews = (ticketId: string | undefined) => {
         queryKey: ['ticketReviews', ticketId],
         queryFn: async () => {
             if (!ticketId) return null;
-            const { data } = await api.get(`/tickets/${ticketId}/reviews`);
+            const { data } = await api.get(`/v1/tickets/${ticketId}/reviews`);
             return data;
         },
         enabled: !!ticketId, 

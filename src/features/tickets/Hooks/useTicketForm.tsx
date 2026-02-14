@@ -10,7 +10,7 @@ import { t } from 'i18next';
     return useQuery({
         queryKey: ['ticketGroupedProblems'],
         queryFn: async () => {
-            const { data } = await api.get('v1/lockups/ticket/problems/');
+            const { data } = await api.get('/v1/lockups/ticket/problems/');
             return data;
         },
     });
@@ -67,7 +67,7 @@ export const useTicketReview = (ticketId: string) => {
 
   return useMutation({
       mutationFn: async (payload: { rating: number; note?: string }) => {
-          const { data } = await api.post(`/tickets/${ticketId}/reviews`, payload);
+          const { data } = await api.post(`/v1/tickets/${ticketId}/reviews`, payload);
           return data;
       },
       onSuccess: () => {
