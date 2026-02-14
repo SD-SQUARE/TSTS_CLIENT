@@ -11,6 +11,8 @@ const Departments = ({ user }: { user: User }) => {
         message.success(`${t("profile.departments.copied")} "${text}"`);
     };
 
+    if (user?.departments.length === 0) return null;
+    
     return (
         <>
             <Title level={5}>{t("profile.departments.title")}</Title>
