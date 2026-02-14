@@ -20,7 +20,7 @@ const TicketList: React.FC = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { role } = useParams();
-    const [pagination, setPagination] = useState({ page: 1, pageSize: 10 });
+    const [pagination, setPagination] = useState({ page: 1, pageSize: 50 });
 
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState<SearchableDataIndex | ''>('');

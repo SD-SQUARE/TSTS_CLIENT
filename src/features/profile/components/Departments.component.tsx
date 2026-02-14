@@ -11,7 +11,7 @@ const Departments = ({ user }: { user: User }) => {
         message.success(`${t("profile.departments.copied")} "${text}"`);
     };
 
-    if (user?.departments.length === 0) return null;
+    if ( !user || !user?.departments || user?.departments.length === 0) return null;
     
     return (
         <>
@@ -29,7 +29,7 @@ const Departments = ({ user }: { user: User }) => {
                 hoverable
             >
                 <Space wrap size={[8, 12]}>
-                    {user?.departments.map(dep => (
+                    {user?.departments?.map(dep => (
                         <Tooltip key={dep.id} title={t("profile.departments.copy")}>
                             <Tag
                                 color="cyan"

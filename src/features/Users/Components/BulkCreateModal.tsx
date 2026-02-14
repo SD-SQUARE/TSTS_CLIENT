@@ -19,12 +19,31 @@ const BulkCreateModal: React.FC<BulkCreateModalProps> = ({ visible, onClose, rol
     const { t } = useTranslation();
     const [fileList, setFileList] = useState<any[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [sampleUrl, setSampleUrl] = useState<string | null>(null);
 
     const fetchSample = async () => {
         try {
-            const response = await api.get(`v1/users/${role}/bulk-sample`);
-            setSampleUrl(response.data.file || response.data);
+            const response = await api.get(`v1/users/${role}/bulk-sample`, {
+                responseType: 'blob'
+            });
+            const blob = new Blob(
+                [response.data],
+                {
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                }
+            );
+
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const dispositionHeader = response.headers['content-disposition'];
+            const fileNameMatch = dispositionHeader?.split('filename=');
+            const fileName = fileNameMatch?.[1] || 'sample.xlsx';
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+
+            a.remove();
+            window.URL.revokeObjectURL(url);
         } catch (error) {
             message.error(t("errors.sample_fetch_failed"));
         }
@@ -42,21 +61,74 @@ const BulkCreateModal: React.FC<BulkCreateModalProps> = ({ visible, onClose, rol
 
         const formData = new FormData();
         fileList.forEach(file => {
-            formData.append('files', file.originFileObj);
+            formData.append("file", file.originFileObj);
         });
 
         setIsSubmitting(true);
+
         try {
-            await api.post(`v1/users/${role}/bulk-sample`, formData);
+            // ✅ Success case (200 JSON)
+            await api.post(
+                `v1/users/${role}/bulk-sample`,
+                formData,
+                {
+                    responseType: "blob", // IMPORTANT: works for both cases
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+
             message.success(t("success.bulk_upload"));
             setFileList([]);
             onClose();
-        } catch (error) {
+
+        } catch (error: any) {
+            const response = error?.response;
+
+            // ❌ No response → real network/server error
+            if (!response) {
+                message.error(t("errors.upload_failed"));
+                return;
+            }
+
+            // ❌ 400 → ZIP file
+            if (response.status === 400) {
+                const blob = new Blob([response.data], {
+                    type: response.headers["content-type"] || "application/zip",
+                });
+
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+
+                // 🔽 Extract filename safely
+                const disposition = response.headers["content-disposition"];
+                let filename = "bulk-errors.zip";
+
+                if (disposition) {
+                    const match = disposition.split("filename=");
+                    if (match?.[1]) filename = match[1];
+                }
+
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+
+                a.remove();
+                window.URL.revokeObjectURL(url);
+
+                message.error(t("errors.upload_failed"));
+                return;
+            }
+
+            // ❌ Any other error
             message.error(t("errors.upload_failed"));
         } finally {
             setIsSubmitting(false);
         }
     };
+
 
     const removeFile = (uid: string) => {
         setFileList(prev => prev.filter(item => item.uid !== uid));
@@ -101,11 +173,7 @@ const BulkCreateModal: React.FC<BulkCreateModalProps> = ({ visible, onClose, rol
                         </Space>
                         <Button 
                             type="link" 
-                            icon={<DownloadOutlined />} 
-                            // href={sampleUrl || '#'} 
-                            // target="_blank"  
-                            // disabled={!sampleUrl}
-                            download
+                            icon={<DownloadOutlined />}
                             onClick={fetchSample}
                         >
                             {t("bulk.download_sample")}

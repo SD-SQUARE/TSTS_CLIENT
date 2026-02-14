@@ -23,7 +23,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const currentLanguage = i18n.language;
-    const [pagination, setPagination] = useState({ page: 1, pageSize: 10 });
+    const [pagination, setPagination] = useState({ page: 1, pageSize: 50 });
 
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState<SearchableDataIndex | ''>('');
@@ -280,7 +280,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
             key: "domain",
             render: (_, user) => user.domain?.name ?? "-"
         },
-        {
+        ...(role !== "requesters" ? [] : [{
             title: t("user_list.department"),
             dataIndex: "departments",
             key: "departments",
@@ -297,7 +297,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
 
                 return renderExpandList(departmentNames, "user_list.department");
             },
-        },
+        }]),
         // {
         //       title: t("user_list.perm_prof"),
         //       dataIndex: "permission_profile",
