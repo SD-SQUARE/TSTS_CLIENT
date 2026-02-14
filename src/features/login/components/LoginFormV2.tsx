@@ -226,6 +226,23 @@ const LoginFormV2 = () => {
                                 {t("Login")}
                             </Button>
                         </Form.Item>
+
+                        <div style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }} >
+                            <NavLink to={`${APP_BASE_PATH}/auth/first-time/login`}>
+                                <Text style={{
+                                    color: "var(--color-primary)",
+                                    opacity: "0.8",
+                                }}
+                                    strong
+                                >
+                                    {t("First_Time")}   
+                                </Text>
+                            </NavLink>
+                        </div>
                     </Form>
                 )}
 

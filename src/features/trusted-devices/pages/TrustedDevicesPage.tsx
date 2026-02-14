@@ -43,6 +43,10 @@ const TrustedDevicesPage = () => {
             dataIndex: ["user", "email"],
         },
         {
+            title: t("trusted_devices.ipAddress"),
+            dataIndex: "ipAddress",
+        },
+        {
             title: t("trusted_devices.Device Name"),
             dataIndex: "name",
         },
@@ -58,10 +62,6 @@ const TrustedDevicesPage = () => {
         {
             title: t("trusted_devices.OS"),
             dataIndex: "os",
-        },
-        {
-            title: t("trusted_devices.Activated Since"),
-            dataIndex: "activatedSince",
         },
         {
             title: t("trusted_devices.Actions"),

@@ -495,7 +495,10 @@
     "Delete": "Delete",
     "Actions": "Actions",
     "OS": "OS",
-    "Type": "Type"
-  }
+    "Type": "Type",
+    "ipAddress": "IP Address"
+  },
+  "First_Time": "Joining us for the first time ?",
+  "First_time_Title": "First Time Login"
   
 }

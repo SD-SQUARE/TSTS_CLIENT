@@ -100,6 +100,7 @@ export const AppRoutes = () => {
                 <Route index element={<LoginPage />} />
                 <Route path="login" element={<LoginPage />} />
                 <Route path="forgot-password" element={<ForgotPasswordForm />} />
+                <Route path="first-time/login" element={<ForgotPasswordForm />} />
             </Route>
 
                 {/* Super/admin routes */}
