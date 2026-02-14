@@ -19,7 +19,9 @@ const ProblemsPage: React.FC = () => {
     queryFn: () => specializationApi.getAll(), 
   });
 
-  const specializationsArray = specResponse?.data || [];
+    const specializationsArray = (specResponse as any)?.specializations ?? [];
+
+    console.log("specResponse", specResponse);
 
   const {
     data,
@@ -75,6 +77,7 @@ const ProblemsPage: React.FC = () => {
         filterDropdown: ({ confirm, clearFilters }: any) => (
           <div style={{ padding: 8 }}>
             <Select
+                key={specializationsArray.length} 
               showSearch
               placeholder={t("filter_by_spec")}
               value={selectedSpecId}
@@ -82,7 +85,7 @@ const ProblemsPage: React.FC = () => {
                 setSelectedSpecId(val);
                 confirm(); 
               }}
-              style={{ width: 188, marginBottom: 8, display: 'block' }}
+            //   style={{ width: "fit-content", marginBottom: 8, display: 'block' }}
               allowClear
               onClear={() => {
                 setSelectedSpecId(undefined);
@@ -116,16 +119,7 @@ const ProblemsPage: React.FC = () => {
           { pattern: /^[A-Za-z0-9\s.,-]*$/, message: t("english_only") }]}>
         <Input />
       </Form.Item>
-      <Form.Item 
-        name="name_ar" 
-        label={t("name_ar")} 
-        rules={[
-          { required: true, message: t("required") },
-          { pattern: /^[\u0600-\u06FF\s0-9.,-]*$/, message: t("arabic_only") },
-        ]}
-      >
-        <Input style={{ direction: "rtl" }} />
-      </Form.Item>
+      
       <Form.Item 
         name="description_en" 
         label={t("description_en")}
@@ -134,7 +128,17 @@ const ProblemsPage: React.FC = () => {
         ]}
       >
         <Input.TextArea rows={4} />
-      </Form.Item>
+          </Form.Item>
+          <Form.Item
+              name="name_ar"
+              label={t("name_ar")}
+              rules={[
+                  { required: true, message: t("required") },
+                  { pattern: /^[\u0600-\u06FF\s0-9.,-]*$/, message: t("arabic_only") },
+              ]}
+          >
+              <Input style={{ direction: "rtl" }} />
+          </Form.Item>
       <Form.Item 
         name="description_ar" 
         label={t("description_ar")}
@@ -145,7 +149,7 @@ const ProblemsPage: React.FC = () => {
         <Input.TextArea rows={4} style={{ direction: "rtl" }} />
       </Form.Item>
       <Form.Item 
-        name="specialization_id" 
+        name="specialization" 
         label={t("specialization_type")} 
         rules={[{ required: true, message: t("required") }]}
       >

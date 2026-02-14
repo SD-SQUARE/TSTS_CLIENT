@@ -13,9 +13,9 @@ export class BaseCrudService<T> {
   }
 
   async getAll(params?: Record<string, any>): Promise<PaginatedResponse<T>> {
-      console.log(this.listUrl);
+    //   console.log(this.listUrl);
       const response = await api.get<PaginatedResponse<T>>(this.listUrl, { params });
-      console.log("API RESPONSE:", response.data);
+    //   console.log("API RESPONSE:", response.data);
       return response.data;
   }
 
