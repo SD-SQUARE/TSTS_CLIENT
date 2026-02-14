@@ -21,7 +21,7 @@ const DepartmentsPage: React.FC = () => {
     deleteMutation,
   } = useGenericCrud<Department, CreateDepartmentDto, UpdateDepartmentDto>({
     queryKey: ['departments', searchTerm],
-    fetchFn: () => departmentApi.getAll({ search: searchTerm }),
+      fetchFn: () => departmentApi.getAll({ name: searchTerm }),
     createFn: (data) => departmentApi.create(data),
     updateFn: ({ id, data }) => departmentApi.update(id, data),
     deleteFn: (id) => departmentApi.delete(id),

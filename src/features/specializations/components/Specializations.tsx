@@ -20,7 +20,7 @@ const SpecializationsPage: React.FC = () => {
     deleteMutation,
   } = useGenericCrud<Specialization, CreateSpecializationDto, UpdateSpecializationDto>({
     queryKey: ['specializations', searchTerm],
-    fetchFn: () => specializationApi.getAll({ search: searchTerm }),
+      fetchFn: () => specializationApi.getAll({ name: searchTerm }),
     createFn: (data) => specializationApi.create(data),
     updateFn: ({ id, data }) => specializationApi.update(id, data),
     deleteFn: (id) => specializationApi.delete(id),

@@ -80,7 +80,7 @@ const TrustedDevicesPage = () => {
 
     return (
         <>
-            <Space style={{ marginBottom: 16 }}>
+            <Space style={{ marginBottom: 16 , width: "100%", justifyContent: "flex-end"}}>
                 <Input.Search
                     placeholder={t("trusted_devices.Search by email or SSN")}
                     onSearch={setSearch}
@@ -89,6 +89,7 @@ const TrustedDevicesPage = () => {
             </Space>
 
             <Table
+                title={() => <Typography.Title level={3}>{t("trusted_devices.Trusted Devices")}</Typography.Title>}
                 rowKey="id"
                 loading={isLoading}
                 columns={columns}

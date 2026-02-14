@@ -24,7 +24,7 @@ const DomainsPage: React.FC = () => {
     deleteMutation,
   } = useGenericCrud<Domain, CreateDomainDto, UpdateDomainDto>({
     queryKey: ['domains', searchTerm],
-    fetchFn: () => domainApi.getAll({ search: searchTerm }),
+      fetchFn: () => domainApi.getAll({ name: searchTerm }),
     createFn: (data) => domainApi.create(data),
     updateFn: ({ id, data }) => domainApi.update(id, data),
     deleteFn: (id) => domainApi.delete(id),

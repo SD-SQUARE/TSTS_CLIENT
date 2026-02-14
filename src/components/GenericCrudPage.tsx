@@ -296,7 +296,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
           marginBottom: 20,
         }}
       >
-              <h2 className="page-title">{title}</h2>
+              <h2 className="page-title"></h2>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
           <Input
@@ -323,6 +323,8 @@ export const GenericCrudPage = <T extends { id: string | number }>({
 
       <div className="admin-card compact-table-wrapper">
         <Table
+            title={() => <Typography.Title level={3}>{title}</Typography.Title>}
+                        
           className="super-compact-table"
           size={tableSize}
           columns={isLoading ? skeletonColumns : columns}
@@ -336,11 +338,11 @@ export const GenericCrudPage = <T extends { id: string | number }>({
           pagination={
             isLoading
               ? false
-              : {
-                  position: ["topLeft"],
+                  : {
+                  position: ["bottomRight"],
                   pageSize: 10,
-                  showSizeChanger: true,
-                  showTotal: (total) => `Total ${total} items`,
+                      showSizeChanger: true,
+                    className: "custom-pagination",
                 }
           }
         />

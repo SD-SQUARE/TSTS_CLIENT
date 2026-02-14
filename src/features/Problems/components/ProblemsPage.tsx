@@ -30,7 +30,7 @@ const ProblemsPage: React.FC = () => {
   } = useGenericCrud<Problem, CreateProblemDto, UpdateProblemDto>({
     queryKey: ['problems', searchTerm, selectedSpecId],
     fetchFn: () => problemsApi.getAll({ 
-      search: searchTerm, 
+        name: searchTerm, 
       specialization_id: selectedSpecId
     }),
     createFn: (data) => problemsApi.create(data),
