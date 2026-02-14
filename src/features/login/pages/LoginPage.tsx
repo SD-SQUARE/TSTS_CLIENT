@@ -6,7 +6,7 @@ import LoginFormV2 from "../components/LoginFormV2";
 export const LoginPage = () => {
     return (
             <PageLayout>
-                <div style={{ width: '100%', marginTop: 40,}}>
+                <div style={{ width: '100%', marginTop: 40, height: "80vh"}}>
                     {/* <LoginForm /> */}
                     <LoginFormV2 />
                 </div>

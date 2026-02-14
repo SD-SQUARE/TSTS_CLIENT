@@ -13,6 +13,7 @@ import { getJWTPayload } from "../../../utils/jwt_payload.utils";
 // v2 hooks
 import { useLoginV2 } from "../hooks/useLoginV2";
 import { useTrustedDeviceAuth } from "../hooks/useTrustedDeviceAuth";
+import { useCookies } from 'react-cookie';
 const { Title,Text } = Typography;
 
 const LoginFormV2 = () => {
@@ -24,6 +25,7 @@ const LoginFormV2 = () => {
     const [isHovered, setIsHovered] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [ _, setCookie ] = useCookies(['showTrustedDeviceTour']);
 
     // 🔐 step control
     const [step, setStep] = useState<"CREDENTIALS" | "DEVICE">("CREDENTIALS");
@@ -95,7 +97,8 @@ const LoginFormV2 = () => {
                 );
 
                 // 👇 mark tour needed
-                localStorage.setItem("showTrustedDeviceTour", "1");
+                // localStorage.setItem("showTrustedDeviceTour", "1");
+                setCookie("showTrustedDeviceTour", "1");
 
                 gotoMainPage();
             }
@@ -223,6 +226,23 @@ const LoginFormV2 = () => {
                                 {t("Login")}
                             </Button>
                         </Form.Item>
+
+                        <div style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }} >
+                            <NavLink to={`${APP_BASE_PATH}/auth/first-time/login`}>
+                                <Text style={{
+                                    color: "var(--color-primary)",
+                                    opacity: "0.8",
+                                }}
+                                    strong
+                                >
+                                    {t("First_Time")}   
+                                </Text>
+                            </NavLink>
+                        </div>
                     </Form>
                 )}
 

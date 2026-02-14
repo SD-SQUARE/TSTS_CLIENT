@@ -10,6 +10,7 @@ import { ConfigProvider } from "antd";
 import i18n from "./i18n";
 
 import { getCssVar } from "./utils/get_css_var.utils";
+import { CookiesProvider } from "react-cookie";
 
 const TOKENS = {
     colorPrimary: getCssVar("--color-primary"),           // main brand color
@@ -22,13 +23,15 @@ const TOKENS = {
 };
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-    <Provider store={store}>
-        <QueryClientProvider client={queryClient}>
-            <ConfigProvider direction={i18n.language === "ar" ? "rtl" : "ltr"}
-                theme={{ token: TOKENS }}>
-                <App />
-            </ConfigProvider>
-        </QueryClientProvider>
-    </Provider>
+    <CookiesProvider>
+        <Provider store={store}>
+            <QueryClientProvider client={queryClient}>
+                <ConfigProvider direction={i18n.language === "ar" ? "rtl" : "ltr"}
+                    theme={{ token: TOKENS }}>
+                    <App />
+                </ConfigProvider>
+            </QueryClientProvider>
+        </Provider>
+    </CookiesProvider>
 );
 
