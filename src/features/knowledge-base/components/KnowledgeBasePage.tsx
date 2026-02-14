@@ -27,8 +27,8 @@ const KnowledgeBasePage: React.FC = () => {
   const isRtl = i18n.language === 'ar';
 
     const auth = useSelector((state: any) => state.auth);
-  // const role: string = auth.user.role.toLowerCase();
-  // const isPrivileged = role === 'admin' || role === 'technician';
+  const role: string = auth.user.role.toLowerCase();
+  const isPrivileged = role === 'admin' || role === 'technician';
 
   const {
     form,
@@ -124,11 +124,11 @@ const KnowledgeBasePage: React.FC = () => {
             <Title level={2} style={{ color: 'white', margin: 0 }}>{t('Knowledge-Base')}</Title>
             <Text style={{ color: 'rgba(255,255,255,0.65)' }}>{t('home.hero_desc')}</Text>
           </div>
-          {/* {isPrivileged && ( */}
+          {isPrivileged && (
             <Button type="primary" size="large" icon={<PlusOutlined />} onClick={() => openModal()} style={{ borderRadius: 6, height: 45 }}>
               {isRtl ? 'إنشاء مقال' : 'Create Article'}
             </Button>
-          {/* )} */}
+           )} 
         </div>
       </div>
 
@@ -152,7 +152,8 @@ const KnowledgeBasePage: React.FC = () => {
   dataSource={filteredData}
   renderItem={(item) => (
     <List.Item style={{ height: '100%' }}> 
-      <Card
+        <Card
+        onClick={() => openViewModal(item)}
         hoverable
         style={{ 
           borderRadius: 16, 
@@ -214,7 +215,7 @@ const KnowledgeBasePage: React.FC = () => {
         </div>
     
         <div style={{ marginTop: 24, display: 'flex', gap: 8, alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
-          {/* {isPrivileged ? ( */}
+          {isPrivileged ? (
             <>
               <Button 
                 type="text" 
@@ -247,7 +248,7 @@ const KnowledgeBasePage: React.FC = () => {
                  <DeleteOutlined /> {t('translation.delete')}
               </Button>
             </>
-          {/* ) : ( */}
+          ) : (
             <Button 
               block 
               type="primary" 
@@ -257,7 +258,7 @@ const KnowledgeBasePage: React.FC = () => {
             >
               {isRtl ? 'قراءة المقال' : 'Read Article'}
             </Button>
-          {/* )} */}
+           )} 
         </div>
       </Card>
     </List.Item>
