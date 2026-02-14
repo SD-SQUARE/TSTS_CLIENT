@@ -6,6 +6,8 @@ export interface BaseEntity {
   
     description_en?: string;
     description_ar?: string;
+
+    review_required?: boolean;
   }
   
 

@@ -1,18 +1,20 @@
 import { Tour } from "antd";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useCookies } from 'react-cookie';
 
 const TrustedDeviceTour = () => {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [skip, setSkip] = useState(false);
+    const [cookie , setCookie, removeCookie ] = useCookies(['showTrustedDeviceTour', 'skipTrustedDeviceTour-for-week']);
 
     useEffect(() => {
 
-        if (localStorage.getItem("skipTrustedDeviceTour-for-week")) {
+        if (cookie["skipTrustedDeviceTour-for-week"]) {
             setSkip(true);
         }
-        if (localStorage.getItem("showTrustedDeviceTour")) {
+        if (cookie["showTrustedDeviceTour"]) {
             setOpen(true);
         }
 
@@ -37,8 +39,8 @@ const TrustedDeviceTour = () => {
             open={open}
             onClose={() => {
                 setOpen(false);
-                localStorage.removeItem("showTrustedDeviceTour");
-                localStorage.addItem("skipTrustedDeviceTour-for-week", "1");
+                setCookie("showTrustedDeviceTour", "0");
+                setCookie("skipTrustedDeviceTour-for-week", "1",{ expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) });
              }}
             steps={[
                 {

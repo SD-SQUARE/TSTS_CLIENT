@@ -11,6 +11,7 @@ import Extension from "../Extension.component";
 import useTrustedDevices from "../../hooks/useTrustedDevices.hook";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useCookies } from 'react-cookie';
 
 const SettingsTab = ({ forceDevices, onTourReady }: any) => {
     const { t } = useTranslation();
@@ -22,9 +23,10 @@ const SettingsTab = ({ forceDevices, onTourReady }: any) => {
     const [activeTab, setActiveTab] = useState("password");
     const [tourOpen, setTourOpen] = useState(false);
     const [skip, setskip] = useState(false);
+    const [ cookie , setCookie, removeCookie ] = useCookies(['showTrustedDeviceTour', 'skipTrustedDeviceTour-for-week']);
 
     useEffect(() => {
-        if (localStorage.getItem("skipTrustedDeviceTour-for-week")) {
+        if (cookie["skipTrustedDeviceTour-for-week"]) {
             setskip(true);
         }
         if (!forceDevices) return;
@@ -59,17 +61,17 @@ const SettingsTab = ({ forceDevices, onTourReady }: any) => {
 
     
 
-    if (skip) return null;
+  
 
     return (
         <>
-            <Tour
+            {!skip && (<Tour
                 open={tourOpen}
                 onClose={() => {
                     setTourOpen(false);
-                    localStorage.removeItem("showTrustedDeviceTour");
+                    setCookie("showTrustedDeviceTour", "0");
                     setskip(true);
-                    localStorage.setItem("skipTrustedDeviceTour-for-week", "1");
+                    setCookie("skipTrustedDeviceTour-for-week", "1");
                 }}
                 steps={[
                     {
@@ -81,7 +83,7 @@ const SettingsTab = ({ forceDevices, onTourReady }: any) => {
                         prevButtonProps: { style: { display: "none" } },
                     },
                 ]}
-            />
+            />)}
 
             <Card bordered={false} style={{ borderRadius: 16 }}>
                 <Tabs

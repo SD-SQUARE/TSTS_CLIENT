@@ -6,12 +6,14 @@ import StepOtp from './ForgotPasswordSteps/StepOtp';
 import StepResetPassword from './ForgotPasswordSteps/StepResetPassword';
 import { useTranslation } from 'react-i18next';
 import PageLayout from '../../components/PageLayout';
+import { useLocation } from 'react-router-dom';
 
 
 const ForgotPasswordForm = () => {
     const [step, setStep] = useState(0);
     const [email, setEmail] = useState('');
     const [otp, setOtp] = useState('');
+    const location = useLocation();
 
     const { t , i18n} = useTranslation();
 
@@ -35,9 +37,9 @@ const ForgotPasswordForm = () => {
 
     return (
         <PageLayout>
-            <div style={{display: 'flex',justifyContent:'center', alignItems:"center", height: '100%'}}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: "center", height: "50vh" }}>
                 <Card
-                    title={t('forgotPassword.title')} 
+                    title={location.pathname.includes('/forgot-password') ? t('forgotPassword.title') : t('First_time_Title')} 
                     style={{ width: "50%",height: "auto" , borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', textAlign: isArabic? 'right' : 'left' }}
                 >
                     <Steps current={step} items={steps} size="default" style={{ marginBottom: 30 }} />

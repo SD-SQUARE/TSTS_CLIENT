@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Form, message, Modal } from 'antd';
 import mammoth from 'mammoth';
+import { useTranslation } from 'react-i18next'; 
 import { useGenericCrud } from '../../../api/common/hooks/common-hooks';
 import { knowledgeBaseApi } from '../services/knowledgeBaseApi';
 import type { KnowledgeBaseItem, CreateKnowledgeBaseDto, UpdateKnowledgeBaseDto } from '../types/knowledge-types';
 
 export const useKnowledgeBase = () => {
+  const { t } = useTranslation(); 
   const [form] = Form.useForm();
 
     const [searchText, setSearchText] = useState("");
@@ -32,18 +34,18 @@ export const useKnowledgeBase = () => {
 
 
   const handleWordImport = async (file: File) => {
-    const hide = message.loading('Converting Word document...', 0);
+    const hide = message.loading(t('errors.uploadFailed') === 'uploadFailed' ? 'Converting...' : t('tickets.upload'), 0); // Using existing keys
     try {
       const arrayBuffer = await file.arrayBuffer();
       const result = await mammoth.convertToHtml({ arrayBuffer });
       if (result.value) {
         const currentContent = form.getFieldValue('content') || '';
         form.setFieldValue('content', currentContent + result.value);
-        message.success('Word document imported successfully!');
+        message.success(t('success.saved')); 
         } 
     } catch (error) {
       console.error(error);
-      message.error('Failed to parse Word document.');
+      message.error(t('errors.uploadFailed')); 
     } finally {
       hide();
     }
@@ -81,20 +83,24 @@ export const useKnowledgeBase = () => {
       const values = await form.validateFields();
       if (editingId) {
         await updateMutation.mutateAsync({ id: editingId, data: values });
-        message.success("Article updated successfully");
+        message.success(t('success.updated')); 
       } else {
         await createMutation.mutateAsync(values);
-        message.success("Article published successfully");
+        message.success(t('success.created')); 
       }
       closeModal();
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+      console.error(e);
+      message.error(t('errors.submitFailed')); 
+    }
   };
 
   const handleDelete = (id: string | number) => {
     Modal.confirm({
-      title: 'Delete Article?',
-      content: 'This action cannot be undone.',
-      okText: 'Yes, Delete',
+      title: t('translation.confirm_delete'), 
+      content: t('translation.delete_prompt_group'), 
+      okText: t('translation.yes'),
+      cancelText: t('translation.no'),
       okType: 'danger',
       onOk: () => deleteMutation.mutate(id),
     });
@@ -107,7 +113,7 @@ export const useKnowledgeBase = () => {
   };
   
     useEffect(() => {
-        const timeout = setTimeout(() => setDebouncedSearch(searchText), 500); // 300ms debounce
+        const timeout = setTimeout(() => setDebouncedSearch(searchText), 500); 
         return () => clearTimeout(timeout);
     }, [searchText]);
 

@@ -30,7 +30,8 @@ import {
     TeamOutlined,
     UserOutlined,
     ToolOutlined,
-    IdcardOutlined
+    IdcardOutlined,
+    IssuesCloseOutlined
 } from '@ant-design/icons';
 import TicketList from "../features/tickets/Components/ticketsList.tsx";
 import TicketForm from "../features/tickets/Components/ticketForm.tsx";
@@ -39,6 +40,8 @@ import GuardedRoute from "./GuardedRoute.tsx";
 import PageLayout from "../components/PageLayout.tsx";
 import Profile from './../features/profile/Profile.page';
 import { useTranslation } from "react-i18next";
+import ProblemsPage from "../features/Problems/components/ProblemsPage.tsx";
+import TrustedDevicesPage from "../features/trusted-devices/pages/TrustedDevicesPage.tsx";
 
 export const AppRoutes = () => {
     const { t } = useTranslation();
@@ -78,6 +81,9 @@ export const AppRoutes = () => {
         { key: "/settings/domains", label: t('Domains'), icon: <ProjectOutlined /> },
         { key: "/settings/departments", label: t('Departments'), icon: <ApartmentOutlined /> },
         { key: "/settings/specializations", label: t('Specializations'), icon: <ExperimentOutlined /> },
+        { key: "/settings/problems", label: t('Problems'), icon: <IssuesCloseOutlined /> },
+
+        { key: "/settings/trusted-devices", label: t("trusted_devices.Trusted Devices"), icon: <SafetyOutlined /> },
         // { key: "/settings/permissions", label: t('Permissions'), icon: <SafetyOutlined /> },
     ];
     return (
@@ -98,6 +104,7 @@ export const AppRoutes = () => {
                 <Route index element={<LoginPage />} />
                 <Route path="login" element={<LoginPage />} />
                 <Route path="forgot-password" element={<ForgotPasswordForm />} />
+                <Route path="first-time/login" element={<ForgotPasswordForm />} />
             </Route>
 
                 {/* Super/admin routes */}
@@ -173,7 +180,17 @@ export const AppRoutes = () => {
                         <SpecializationsPage />
                     </GuardedRoute>
                 } />
-
+                <Route path="problems" element={
+                    <GuardedRoute roles={["superadmin", "admin"]}>
+                        <ProblemsPage />
+                    </GuardedRoute>
+                } />
+                
+                <Route path="trusted-devices" element={
+                    <GuardedRoute roles={["superadmin", "admin"]}>
+                        <TrustedDevicesPage />
+                    </GuardedRoute>
+                } />
                 {/* TODO:connect pages later */}
                 {/* <Route path="permissions" element={<PermissionsPage />} /> */}
                 {/* <Route path="work-hours" element={<WorkHoursPage />} /> */}

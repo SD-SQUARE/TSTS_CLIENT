@@ -21,19 +21,21 @@ const BulkCreateModal: React.FC<BulkCreateModalProps> = ({ visible, onClose, rol
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [sampleUrl, setSampleUrl] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (visible) {
-            const fetchSample = async () => {
-                try {
-                    const response = await api.get(`http://127.0.0.1:3658/m1/1197709-1192710-default/users/${role}/bulk-sample`);
-                    setSampleUrl(response.data.file || response.data);
-                } catch (error) {
-                    message.error(t("errors.sample_fetch_failed"));
-                }
-            };
-            fetchSample();
+    const fetchSample = async () => {
+        try {
+            const response = await api.get(`v1/users/${role}/bulk-sample`);
+            setSampleUrl(response.data.file || response.data);
+        } catch (error) {
+            message.error(t("errors.sample_fetch_failed"));
         }
-    }, [visible, role, t]);
+    };
+
+    // useEffect(() => {
+    //     if (visible) {
+            
+    //         fetchSample();
+    //     }
+    // }, [visible, role, t]);
 
     const handleUpload = async () => {
         if (fileList.length === 0) return;
@@ -45,7 +47,7 @@ const BulkCreateModal: React.FC<BulkCreateModalProps> = ({ visible, onClose, rol
 
         setIsSubmitting(true);
         try {
-            await api.post(`http://127.0.0.1:3658/m1/1197709-1192710-default/users/${role}/bulk-sample`, formData);
+            await api.post(`v1/users/${role}/bulk-sample`, formData);
             message.success(t("success.bulk_upload"));
             setFileList([]);
             onClose();
@@ -65,21 +67,29 @@ const BulkCreateModal: React.FC<BulkCreateModalProps> = ({ visible, onClose, rol
             title={t("user_list.bulk_create")}
             open={visible}
             onCancel={onClose}
-            width={700}
+            width={900}
             closable={false}
             keyboard={false}
             maskClosable={false}
             footer={[
-                <Button key="cancel" onClick={onClose}>{t("common.cancel")}</Button>,
-                <Button 
-                    key="submit" 
-                    type="primary" 
-                    loading={isSubmitting} 
-                    onClick={handleUpload}
-                    disabled={fileList.length === 0}
-                >
-                    {t("common.submit")}
-                </Button>
+                <Flex justify="space-between" gap={8} style={{ width: '100%' }}>
+                    <Button
+
+                        style={{ width: "100%" }}
+                        key="cancel"
+                        onClick={onClose}>{t("common.cancel")}</Button>
+                    <Button 
+
+                        style={{ width: "100%" }}
+                        key="submit" 
+                        type="primary" 
+                        loading={isSubmitting} 
+                        onClick={handleUpload}
+                        disabled={fileList.length === 0}
+                    >
+                        {t("common.submit")}
+                    </Button>
+                </Flex>
             ]}
         >
             <Flex vertical gap="large">
@@ -92,10 +102,11 @@ const BulkCreateModal: React.FC<BulkCreateModalProps> = ({ visible, onClose, rol
                         <Button 
                             type="link" 
                             icon={<DownloadOutlined />} 
-                            href={sampleUrl || '#'} 
-                            target="_blank"
-                            disabled={!sampleUrl}
+                            // href={sampleUrl || '#'} 
+                            // target="_blank"  
+                            // disabled={!sampleUrl}
                             download
+                            onClick={fetchSample}
                         >
                             {t("bulk.download_sample")}
                         </Button>
@@ -123,10 +134,10 @@ const BulkCreateModal: React.FC<BulkCreateModalProps> = ({ visible, onClose, rol
                             <List.Item
                                 actions={[<Button type="text" danger icon={<DeleteOutlined />} onClick={() => removeFile(file.uid)} />]}
                             >
-                                <Space>
+                                <Space  >
                                     <FileTextOutlined />
-                                    {file.name}
-                                    <Text type="secondary" >({(file.size / 1024).toFixed(2)} KB)</Text>
+                                    <Text >{file.name}</Text>
+                                    <Text type="secondary" style={{margin: "0 2rem"}} >({(file.size / 1024).toFixed(2)} KB)</Text>
                                 </Space>
                             </List.Item>
                         )}

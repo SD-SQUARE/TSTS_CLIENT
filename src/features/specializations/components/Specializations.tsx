@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Select, Tooltip , message} from "antd";
+import { Form, Input, Select, Tooltip , message, Switch} from "antd";
 import { GenericCrudPage } from "../../../components/GenericCrudPage";
 import { useGenericCrud } from "../../../api/common/hooks/common-hooks";
 import { specializationApi } from '../services/specializationsApi';
@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 
 const SpecializationsPage: React.FC = () => {
   const { t } = useTranslation();
+  const [searchTerm, setSearchTerm] = useState("");
 
   const {
     data,
@@ -18,8 +19,8 @@ const SpecializationsPage: React.FC = () => {
     updateMutation,
     deleteMutation,
   } = useGenericCrud<Specialization, CreateSpecializationDto, UpdateSpecializationDto>({
-    queryKey: ['specializations'],
-    fetchFn: () => specializationApi.getAll(),
+    queryKey: ['specializations', searchTerm],
+      fetchFn: () => specializationApi.getAll({ name: searchTerm }),
     createFn: (data) => specializationApi.create(data),
     updateFn: ({ id, data }) => specializationApi.update(id, data),
     deleteFn: (id) => specializationApi.delete(id),
@@ -51,7 +52,15 @@ const SpecializationsPage: React.FC = () => {
           </div>
         </Tooltip>
       ),
-    }
+    },
+    {
+      title: t("review_required"), 
+      dataIndex: "review_required",
+      key: "review_required",
+      render: (checked: boolean) => (
+        <Switch checked={checked} disabled />
+      ),
+    },
   ];
 
   const formItems = (
@@ -88,6 +97,16 @@ const SpecializationsPage: React.FC = () => {
       >
         <Input.TextArea rows={4} style={{ direction: "rtl" }} />
       </Form.Item>
+      <Form.Item 
+      name="review_required" 
+      label={t("review_required")} 
+      valuePropName="checked" 
+    >
+      <Switch 
+        checkedChildren={t("required")} 
+        unCheckedChildren={t("not_required")} 
+      />
+    </Form.Item>
     </>
   );
 
@@ -101,6 +120,8 @@ const SpecializationsPage: React.FC = () => {
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}
+      searchText={searchTerm}
+      onSearch={(val) => setSearchTerm(val)}
     />
   );
 };

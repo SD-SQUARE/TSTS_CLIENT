@@ -2,13 +2,15 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../../api/http';
+import { message } from 'antd';
+import { t } from 'i18next';
 
 
   export const useTicketProblems = () => {
     return useQuery({
         queryKey: ['ticketGroupedProblems'],
         queryFn: async () => {
-            const { data } = await api.get('http://127.0.0.1:3658/m1/1197709-1192710-default/lockups/ticket/problems/');
+            const { data } = await api.get('v1/lockups/ticket/problems/');
             return data;
         },
     });
@@ -58,7 +60,7 @@ export const useTicketMutations = (id?: string) => {
   });
 
   return { createMutation, updateMutation, coordinateMutation };
-};};
+};
 
 export const useTicketReview = (ticketId: string) => {
   const queryClient = useQueryClient();

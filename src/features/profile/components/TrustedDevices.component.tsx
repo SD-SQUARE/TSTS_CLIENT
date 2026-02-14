@@ -114,6 +114,11 @@ const TrustedDevices = () => {
                                 <Text>{device.os}</Text>
 
                                 <Text type="secondary" style={{ marginTop: 8 }}>
+                                    {t("trusted_devices.ipAddress") }
+                                </Text>
+                                <Text>{device.ipAddress}</Text>
+
+                                <Text type="secondary" style={{ marginTop: 8 }}>
                                     {t("profile.trustedDevices.device.activatedSince") }
                                 </Text>
                                 <Text>{dayjs(device.activatedSince).format("DD/MM/YYYY, hh:mm a")}</Text>
