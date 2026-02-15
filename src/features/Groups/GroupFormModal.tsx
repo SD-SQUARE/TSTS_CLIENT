@@ -253,7 +253,7 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
         >
 
             <Spin spinning={isModalLoading}>
-                <Steps current={current} style={{ marginBottom: 24 }} items={stepItems} />
+                <Steps current={current} style={{ marginBottom: 24 }} items={stepItems} onChange={step => setCurrent(step)} />
 
                 <div className="steps-content">
                     <CurrentStepComponent
