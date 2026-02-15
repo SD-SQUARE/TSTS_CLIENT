@@ -284,7 +284,7 @@
     "id": "الرقم التسلسلي",
     "title": "العنوان",
     "problemType": "نوع المشكلة",
-    "specialization" : "التخصص",
+    "specialization": "التخصص",
     "noSpecialization": "لا تخصص",
     "requester": "صاحب الطلب",
     "noType": "لا نوع",
@@ -333,7 +333,7 @@
     "feedbackPlaceholder": "قل لنا المزيد عن خدمتك...",
     "optional": "(اختياري)",
     "writeReview": "كتابة تقييم",
-    "resolveConfirmTitle" : "هل انت متاكد انك تريد اغلاق هذا التذكرة؟"
+    "resolveConfirmTitle": "هل انت متاكد انك تريد اغلاق هذا التذكرة؟"
   },
   "priority": {
     "important": "مهمة",
@@ -388,8 +388,8 @@
     "submitFailed": "فشل الإرسال. يرجى المحاولة مرة أخرى.",
     "downloadFailed": "فشل التحميل. يرجى المحاولة مرة أخرى.",
     "uploadFailed": "فشل رفع الملفات. يرجى المحاولة مرة أخرى.",
-    "connectionError" : "خطاء في الاتصال. يرجى التحقق من الاتصال بالانترنت.",
-    "updateFailed" : "فشل تحديث التذكرة. يرجى المحاولة مرة اخرى.",
+    "connectionError": "خطاء في الاتصال. يرجى التحقق من الاتصال بالانترنت.",
+    "updateFailed": "فشل تحديث التذكرة. يرجى المحاولة مرة اخرى.",
     "sample_fetch_failed": "فشل في استرداد ملف النموذج.",
     "upload_failed": "فشل الرفع الجماعي. يرجى التحقق من تنسيق الملف.",
     "problemRequired": "المشكلة مطلوبة"
@@ -582,6 +582,15 @@
     "ipAddress": "العنوان الرقمي"
   },
   "First_Time": "تنضم لنا للمرة الاولي ؟",
-  "First_time_Title": "تسجيل الدخول الاول"
-  
+  "First_time_Title": "تسجيل الدخول الاول",
+  "yes": "نعم",
+  "no": "لا",
+  "deleteModal": {
+    "title": "التحقق الأمني",
+    "confirmText": "لتأكيد الحذف، يرجى كتابة",
+    "keyword": "delete",
+    "placeholder": "اكتب \"delete\"",
+    "ok": "حذف",
+    "cancel": "إلغاء"
+  }
 }

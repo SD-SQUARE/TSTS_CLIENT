@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Select, Tooltip , message, Switch} from "antd";
+import { Form, Input, Select, Tooltip , message, Switch, Tag} from "antd";
 import { GenericCrudPage } from "../../../components/GenericCrudPage";
 import { useGenericCrud } from "../../../api/common/hooks/common-hooks";
 import { specializationApi } from '../services/specializationsApi';
@@ -7,6 +7,7 @@ import { departmentApi} from '../../departments/services/departmentApi'
 import type { Specialization, CreateSpecializationDto, UpdateSpecializationDto } from "../types/types";
 import type { Department } from "../../departments/types/types";
 import { useTranslation } from "react-i18next";
+import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
 const SpecializationsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -58,7 +59,10 @@ const SpecializationsPage: React.FC = () => {
       dataIndex: "review_required",
       key: "review_required",
       render: (checked: boolean) => (
-        <Switch checked={checked} disabled />
+          <Tag key={checked ? "true" : "false"} color={checked ? "green" : "red"} variant="outlined" icon={checked ? <CheckCircleOutlined /> : <CloseCircleOutlined />}>
+            
+            {checked ? t("yes") : t("no")}
+          </Tag>
       ),
     },
   ];

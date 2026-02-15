@@ -22,7 +22,7 @@ import {
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { mapRecordToFormValues, type FieldMapper } from "../utils/mapper";
-import i18next from "i18next";
+import i18next, { t } from "i18next";
 
 const { Text } = Typography;
 
@@ -185,16 +185,18 @@ export const GenericCrudPage = <T extends { id: string | number }>({
               type="primary"
               icon={<EditOutlined />}
               onClick={() => openEditModal(viewingItem)}
-              style={{ backgroundColor: "#faad14", borderColor: "#faad14" }}
+            style={{ backgroundColor: "var(--color-secondary)", borderColor: "var(--color-secondary)", color: "var(--color-black)" }}
             >
               {i18next.language === 'en' ? 'Edit' : 'تعديل'}
             </Button>
             
             <Button 
               type="primary" 
-              danger 
+               
               icon={<DeleteOutlined />}
-              onClick={openDeletePrompt}
+                        onClick={openDeletePrompt}
+            style={{ backgroundColor: "var(--color-red)", borderColor: "var(--color-red)", }}
+
             >
               {i18next.language === 'en' ? 'Delete' : 'حذف'}
             </Button>
@@ -225,8 +227,9 @@ export const GenericCrudPage = <T extends { id: string | number }>({
         <Button 
               icon={<ArrowLeftOutlined />} 
               onClick={handleBackToTable} 
-              type="text"
-              style={{marginTop:'2rem' ,fontSize: '16px', backgroundColor:'#cad8ec' }}
+              type="primary"
+                style={{ marginTop: '2rem', fontSize: '16px' }}
+                
             >
               {i18next.language === 'en' ? 'Back to Table' : 'عودة إلى الجدول'}
         </Button>
@@ -247,27 +250,36 @@ export const GenericCrudPage = <T extends { id: string | number }>({
           </Form>
         </Modal>
 
-        <Modal
-          title="Security Check"
-          open={isDeleteModalOpen}
-          onOk={verifyDeleteInput}
-          onCancel={() => setIsDeleteModalOpen(false)}
-          okText="Delete"
-          okButtonProps={{ danger: true }}
-          cancelText="Cancel"
-          centered
-        >
-          <div style={{ paddingTop: 10, paddingBottom: 10 }}>
-            <Text>To confirm deletion, please type <strong>"delete"</strong> below:</Text>
-            <Input 
-              style={{ marginTop: 15 }} 
-              placeholder='Type "delete"'
-              value={deleteInput}
-              onChange={(e) => setDeleteInput(e.target.value)}
-              onPressEnter={verifyDeleteInput}
-            />
-          </div>
-        </Modal>
+            <Modal
+                title={t("deleteModal.title")}
+                open={isDeleteModalOpen}
+                onOk={verifyDeleteInput}
+                onCancel={() => setIsDeleteModalOpen(false)}
+                okText={t("deleteModal.ok")}
+                cancelText={t("deleteModal.cancel")}
+                okButtonProps={{
+                    style: {
+                        backgroundColor: "var(--color-red)",
+                        borderColor: "var(--color-red)",
+                    },
+                }}
+                centered
+            >
+                <div style={{ paddingTop: 10, paddingBottom: 10 }}>
+                    <Text>
+                        {t("deleteModal.confirmText")}{" "}
+                        <strong>"{t("deleteModal.keyword")}"</strong>
+                    </Text>
+
+                    <Input
+                        style={{ marginTop: 15 }}
+                        placeholder={t("deleteModal.placeholder")}
+                        value={deleteInput}
+                        onChange={(e) => setDeleteInput(e.target.value)}
+                        onPressEnter={verifyDeleteInput}
+                    />
+                </div>
+            </Modal>
       </div>
     );
   }
@@ -311,7 +323,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
           {!disableAdd && (
             <Button
               icon={<PlusOutlined />}
-              style={{ flexShrink: 0, backgroundColor: "#cad8ec" }}
+            type="primary"
               size="large"
               onClick={openAddModal}
             >

@@ -242,7 +242,7 @@
     "id": "ID",
     "title": "Title",
     "problemType": "Problem Type",
-    "specialization" : "Specialization",
+    "specialization": "Specialization",
     "noSpecialization": "No Specialization",
     "requester": "Requester",
     "noType": "No Type",
@@ -271,7 +271,7 @@
     "unassigned": "Not Assigned Yet",
     "type": "Type",
     "content": "Content",
-    "date" : "Date",
+    "date": "Date",
     "user": "User",
     "ipAddress": "IP Address",
     "tabReviews": "Reviews",
@@ -323,16 +323,16 @@
     "filter": "Filter",
     "startDate": "Start Date",
     "endDate": "End Date",
-    "loading" : "Loading...",
-    "submit" : "Submit",
-    "cancel" : "Cancel"
+    "loading": "Loading...",
+    "submit": "Submit",
+    "cancel": "Cancel"
   },
   "success": {
     "created": "Ticket created successfully",
     "updated": "Ticket updated successfully",
     "saved": "Ticket saved successfully",
     "reviewSuccess": "Review submitted successfully",
-    "bulk_upload" : "Bulk upload successful"
+    "bulk_upload": "Bulk upload successful"
   },
   "validation": {
     "required": "This field is required"
@@ -346,8 +346,8 @@
     "submitFailed": "Failed to submit. Please try again.",
     "downloadFailed": "Failed to download file. Please try again.",
     "uploadFailed": "Failed to upload file. Please try again.",
-    "connectionError" : "Connection error. Please check your internet connection.",
-    "updateFailed" : "Failed to update ticket. Please try again.",
+    "connectionError": "Connection error. Please check your internet connection.",
+    "updateFailed": "Failed to update ticket. Please try again.",
     "sample_fetch_failed": "Failed to retrieve the sample file.",
     "upload_failed": "Bulk upload failed. Please check file format.",
     "problemRequired": "Problem is required"
@@ -371,7 +371,6 @@
     "unauthorizedDescription": "You are not authorized to access this page"
   },
 
- 
   "problems": "Problems",
   "specialization_type": "Specialization Type",
   "review_required": "Review Required",
@@ -379,9 +378,6 @@
   "not_required": "Not Required",
   "select_specialization": "Select Specialization",
   "filter_by_spec": "Filter by Specialization",
- 
-
-
 
   "Tickets": "Tickets",
   "Settings": "Settings",
@@ -574,8 +570,8 @@
   "Users": "Users",
   "Admins": "Admins",
   "Technicians": "Technicians",
-    "team_leader": "Team Leader",
-    "heads": "Heads",
+  "team_leader": "Team Leader",
+  "heads": "Heads",
   "Requesters": "Requesters",
   "Universities": "Universities",
   "Domains": "Domains",
@@ -606,6 +602,15 @@
     "ipAddress": "IP Address"
   },
   "First_Time": "Joining us for the first time ?",
-  "First_time_Title": "First Time Login"
-  
+  "First_time_Title": "First Time Login",
+  "yes": "Yes",
+  "no": "No",
+  "deleteModal": {
+    "title": "Security Check",
+    "confirmText": "To confirm deletion, please type",
+    "keyword": "delete",
+    "placeholder": "Type \"delete\"",
+    "ok": "Delete",
+    "cancel": "Cancel"
+  }
 }

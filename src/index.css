@@ -15,7 +15,7 @@ body{
 /* SYSTEM COLORING SCHEMA */
 :root {
   --color-primary: #021d40; /* Navy */
-  --color-secondary: #a67d03; /* Gold */
+  --color-secondary: #e0a10d; /* Gold */
   --color-white: #f2f2f2;
   --color-dark-white: #E5E4EE;
   --color-black: #070e16;
@@ -24,6 +24,7 @@ body{
   --bg-light: #f4f7f9;
   --text-grey: #555;
   --text-light: #dbe4ee;
+  --color-red: #cf1b2b;
 }
 
 .primary-color { color: var(--color-primary) !important; }

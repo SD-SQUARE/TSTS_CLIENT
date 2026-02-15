@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Form, Input, Select, Tooltip, Switch, Button, Space } from "antd";
-import { FilterOutlined, SearchOutlined } from "@ant-design/icons"; 
+import { Form, Input, Select, Tooltip, Switch, Button, Space, Tag } from "antd";
+import { CheckCircleOutlined, CloseCircleOutlined, FilterOutlined, SearchOutlined } from "@ant-design/icons"; 
 import { GenericCrudPage } from "../../../components/GenericCrudPage";
 import { useGenericCrud } from "../../../api/common/hooks/common-hooks";
 import { problemsApi } from '../services/problemsApi';
@@ -108,7 +108,10 @@ const ProblemsPage: React.FC = () => {
         dataIndex: "review_required",
         key: "review_required",
         render: (checked: boolean) => (
-          <Switch checked={checked} disabled />
+            <Tag key={checked ? "true" : "false"} color={checked ? "green" : "red"} variant="outlined" icon={checked ? <CheckCircleOutlined /> : <CloseCircleOutlined />}>
+
+                {checked ? t("yes") : t("no")}
+            </Tag>
         ),
       },
   ];
