@@ -41,25 +41,22 @@ const TicketMediaTab: React.FC<TicketMediaTabProps> = () => {
         if (url) window.open(url, '_blank');
     };
 
-    const handleDownload = async (e: React.MouseEvent, aid: string, fileName: string) => {
+    const handleDownload = (
+        e: React.MouseEvent,
+        presignedUrl: string,
+        fileName: string
+    ) => {
         e.stopPropagation();
-        try {
-            const response = await api.get(`/api/v1/tickets/${ticketId}/media/${aid}`, {
-                responseType: 'blob',
-            });
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', fileName);
-            document.body.appendChild(link);
-            link.click();
-            link.parentNode?.removeChild(link);
-            window.URL.revokeObjectURL(url);
 
-        } catch (error) {
-            message.error(t('errors.downloadFailed'));
-        }
+        const a = document.createElement('a');
+        a.href = presignedUrl;
+        a.download = fileName; // optional (browser may ignore)
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
     };
+
 
     if (isLoading) return <Spin style={{ display: 'block', margin: '50px auto' }} />;
     if (!media || media.length === 0) return <Empty description={t('common.noMedia')} />;
@@ -88,7 +85,9 @@ const TicketMediaTab: React.FC<TicketMediaTabProps> = () => {
                         actions={[
                             <div
                                 key="download"
-                                onClick={(e) => handleDownload(e, item.id, item.name)}
+                                // TODO: remove this method
+                                // onClick={(e) => handleDownload(e, item.id, item.name)}
+                                onClick={() => handleViewMedia(item.url)}
                                 style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
                             >
                                 <DownloadOutlined />
