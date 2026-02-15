@@ -284,14 +284,15 @@
     "reopenTicket": "Reopen Ticket",
     "startSolving": "Start Solving",
     "markAsResolved": "Mark as Resolved",
+    "closeConfirmTitle": "Are you sure you want to close this ticket?",
+    "closeTicket": "Close Ticket",
     "statusUpdatedSuccess": "Ticket status updated successfully",
     "rateExperience": "Rate Your Experience",
     "howWasService": "How would you rate the service you received?",
     "feedbackNote": "Additional Feedback",
     "feedbackPlaceholder": "Tell us more about the service...",
     "optional": "(Optional)",
-    "writeReview": "Write a Review",
-    "resolveConfirmTitle": "Are you sure you want to close this ticket?"
+    "writeReview": "Write a Review"
   },
   "priority": {
     "important": "Important",

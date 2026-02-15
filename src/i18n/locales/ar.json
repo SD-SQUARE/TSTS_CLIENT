@@ -326,14 +326,15 @@
     "reopenTicket": "إعادة فتح الطلب",
     "startSolving": "بدء الحل",
     "markAsResolved": "تعيين كمكتمل",
+    "closeConfirmTitle": "هل انت متاكد انك تريد اغلاق هذا التذكرة؟",
+    "closeTicket": "اغلاق التذكرة",
     "statusUpdatedSuccess": "تم تحديث حالة الطلب بنجاح",
     "rateExperience": "قيّم تجربتك",
     "howWasService": "كيف كانت خدمتك؟",
     "feedbackNote": "ملاحظات اضافية",
     "feedbackPlaceholder": "قل لنا المزيد عن خدمتك...",
     "optional": "(اختياري)",
-    "writeReview": "كتابة تقييم",
-    "resolveConfirmTitle": "هل انت متاكد انك تريد اغلاق هذا التذكرة؟"
+    "writeReview": "كتابة تقييم"
   },
   "priority": {
     "important": "مهمة",

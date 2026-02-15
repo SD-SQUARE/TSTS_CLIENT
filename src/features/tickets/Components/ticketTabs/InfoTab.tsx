@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Descriptions, Tag, Typography, Space, Card, Button, Flex, message, Popconfirm } from 'antd';
-import { CheckCircleOutlined, EditOutlined, ToolOutlined, ReloadOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, EditOutlined, ToolOutlined, ReloadOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useChangeTicketStatus } from '../../Hooks/useTicket';
@@ -22,19 +22,27 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
     const status = ticket?.status;
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
-    const isReviewRequired = 
-    ticket?.specialization?.review_required === true || 
+    const isReviewRequired =
+        ticket?.specialization?.review_required === true ||
         ticket?.problem?.review_required === true;
 
     // FIXME: to be closeable but not skipable
     // useEffect(() => {
     //     if (isReviewRequired) {
+    //         // eslint-disable-next-line react-hooks/set-state-in-effect
     //         setIsReviewModalOpen(true);
     //     }
     // }, [isReviewRequired]);
 
     const handleStatusChange = async (newStatus: string) => {
-        
+
+        if (isRequester && newStatus === 'closed') {
+            if (isReviewRequired) {
+                setIsReviewModalOpen(true);
+                return;
+            }
+        }
+
         try {
             const res = await statusMutation.mutateAsync(newStatus);
             if (res.is_updated) {
@@ -50,7 +58,44 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
 
     let actionButton = null;
 
-    if (!isRequester) {
+    if (isRequester) {
+        if (status === 'closed') {
+            actionButton = (
+                <Button
+                    style={{ flex: 1 }}
+                    size="large"
+                    icon={<ReloadOutlined />}
+                    onClick={() => handleStatusChange('open')}
+                    loading={statusMutation.isPending}
+                >
+                    {t('tickets.reopenTicket')}
+                </Button>
+            );
+        } else if (status === 'in_progress') {
+            actionButton = (
+                <Popconfirm
+                    title={t('tickets.closeConfirmTitle')}
+                    onConfirm={() => handleStatusChange('closed')}
+                    okText={t('translation.yes')}
+                    cancelText={t('translation.no')}
+                >
+
+                    <Button
+                        type="primary"
+                        size="large"
+                        icon={<CheckCircleOutlined />}
+                        // onClick={() => handleStatusChange('closed')}
+                        loading={statusMutation.isPending}
+                        style={{ borderColor: '#52c41a', color: '#52c41a', flex: 1 }}
+                        variant='outlined'
+                        ghost
+                    >
+                        {t('tickets.markAsResolved')}
+                    </Button>
+                </Popconfirm>
+            );
+        }
+    } else {
         if (status === 'open') {
             actionButton = (
                 <Button
@@ -61,7 +106,6 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                     icon={<ToolOutlined />}
                     onClick={() => handleStatusChange('in_progress')}
                     loading={statusMutation.isPending}
-
                 >
                     {t('tickets.startSolving')}
                 </Button>
@@ -69,40 +113,24 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
         } else if (status === 'in_progress') {
             actionButton = (
                 <Popconfirm
-                    title={t('tickets.resolveConfirmTitle')}
+                    title={t('tickets.closeConfirmTitle')}
                     onConfirm={() => handleStatusChange('closed')}
                     okText={t('translation.yes')}
                     cancelText={t('translation.no')}
                 >
                     <Button
                         style={{ flex: 1 }}
-                        type="primary"
+                        danger
                         size="large"
-                        icon={<CheckCircleOutlined />}
+                        icon={<CloseCircleOutlined />}
                         loading={statusMutation.isPending}
-
-                        color="green"
-                        variant="outlined"
                     >
-                        {t('tickets.markAsResolved')}
+                        {t('tickets.closeTicket')}
                     </Button>
                 </Popconfirm>
             );
         }
-    } else if (status === 'closed') {
-        actionButton = (
-            <Button
-                style={{ flex: 1 }}
-                size="large"
-                icon={<ReloadOutlined />}
-                onClick={() => handleStatusChange('re_open')}
-                loading={statusMutation.isPending}
-            >
-                {t('tickets.reopenTicket')}
-            </Button>
-        );
     }
-    console.log("isReviewModalOpen", isReviewModalOpen);
     return (
         <Card bordered={false} style={{ background: 'transparent', boxShadow: 'none', paddingBottom: '24px' }} styles={{ body: { padding: 0 } }}>
             <Descriptions
