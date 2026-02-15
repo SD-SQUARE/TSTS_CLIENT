@@ -35,18 +35,43 @@ const TicketList: React.FC = () => {
 
     const isRequester = role === 'requester';
 
-    const problemTreeData = hierarchicalProblems?.specializations?.map((spec: any) => ({
-        title: spec.name,
-        value: `spec-${spec.id}`, 
-        key: spec.id,
-        selectable: false, 
-        children: spec.problems?.map((prob: any) => ({
-            title: prob.name,
-            value: prob.id, 
-            key: prob.id,
-            isLeaf: true,
-        }))
-    })) || [];
+    const problemTreeData = hierarchicalProblems?.specializations?.map((spec: any) => {
+        const hasProblems = spec.problems && spec.problems.length > 0;
+    
+        return {
+            title: (
+                <span title={spec.name} style={{ display: 'inline-block', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {spec.name}
+                </span>
+            ),
+            value: `spec-${spec.id}`,
+            key: spec.id,
+            selectable: false,
+            children: hasProblems 
+                ? spec.problems.map((prob: any) => ({
+                    title: (
+                        <span title={prob.name} style={{ display: 'inline-block', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {prob.name}
+                        </span>
+                    ),
+                    value: prob.id,
+                    key: prob.id,
+                    isLeaf: true,
+                }))
+                : [{
+                    title: (
+                        <Flex justify="space-between" align="center" style={{ width: '100%' }}>
+                            <span title={spec.name} style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{spec.name}</span>
+                            {!hasProblems && <Tag style={{ fontSize: '10px', marginInlineEnd: 0 }}>{t('common.empty')}</Tag>}
+                        </Flex>
+                    ),
+                    value: `empty-${spec.id}`,
+                    key: `empty-${spec.id}`,
+                    disabled: true, 
+                    isLeaf: true,
+                }]
+        };
+    }) || [];
 
     const handleTableChange = (page: number, pageSize: number) => {
         setPagination({ page, pageSize });
@@ -119,12 +144,12 @@ const TicketList: React.FC = () => {
                     dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                     placeholder={`${t('common.select')} ${t(titleKey)}`}
                     treeData={treeData}
+                    treeNodeFilterProp="title"
                     value={selectedKeys[0]}
                     onChange={(value) => setSelectedKeys(value ? [value] : [])}
                     treeDefaultExpandAll={false} 
                     showSearch
                     allowClear
-                    listHeight={300} 
                 />
                 <Flex gap="small">
                     <Button

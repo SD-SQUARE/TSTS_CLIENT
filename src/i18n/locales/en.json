@@ -327,7 +327,8 @@
     "endDate": "End Date",
     "loading": "Loading...",
     "submit": "Submit",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "empty": "Empty"
   },
   "success": {
     "created": "Ticket created successfully",

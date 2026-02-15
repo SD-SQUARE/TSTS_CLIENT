@@ -278,22 +278,45 @@ const TicketForm: React.FC = () => {
     };
 
 
-    const problemMenuItems = groupedData?.specializations?.map((spec: any) => ({
-        key: `spec-${spec.id}`,
-        label: spec.name,
-        children: spec.problems?.map((prob: any) => ({
-            key: prob.id,
-            label: prob.name,
-            onClick: () => {
-                setSelectedProblem({
-                    id: prob.id,
-                    name: prob.name,
-                    specId: spec.id
-                });
-                form.setFieldValue('problem', prob.id);
-            }
-        }))
-    })) || [];
+    const problemMenuItems = groupedData?.specializations?.map((spec: any) => {
+        const hasProblems = spec.problems && spec.problems.length > 0;
+    
+        return {
+            key: `spec-${spec.id}`,
+            label: (
+                <span title={spec.name} style={{ display: 'inline-block', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {spec.name}
+                </span>
+            ),
+            children: hasProblems 
+                ? spec.problems?.map((prob: any) => ({
+                    key: prob.id,
+                    label: (
+                        <span title={prob.name} style={{ display: 'inline-block', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {prob.name}
+                        </span>
+                    ),
+                    onClick: () => {
+                        setSelectedProblem({
+                            id: prob.id,
+                            name: prob.name,
+                            specId: spec.id
+                        });
+                        form.setFieldValue('problem', prob.id);
+                    }
+                }))
+                : [{
+                    key: `empty-${spec.id}`,
+                    label: (
+                        <Flex justify="space-between" align="center" style={{ width: '100%' }}>
+                            <span title={spec.name} style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{spec.name}</span>
+                            {!hasProblems && <Tag style={{ fontSize: '10px', marginInlineEnd: 0 }}>{t('common.empty')}</Tag>}
+                        </Flex>
+                    ),
+                    disabled: true,
+                }]
+        };
+    }) || [];
 
 
     if (isEdit && isLoading) return <Card loading={true} />;
