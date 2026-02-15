@@ -334,7 +334,8 @@
     "feedbackNote": "ملاحظات اضافية",
     "feedbackPlaceholder": "قل لنا المزيد عن خدمتك...",
     "optional": "(اختياري)",
-    "writeReview": "كتابة تقييم"
+    "writeReview": "كتابة تقييم",
+    "currently_assigned": "معين لفني بعد"
   },
   "priority": {
     "important": "مهمة",

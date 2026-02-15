@@ -292,7 +292,8 @@
     "feedbackNote": "Additional Feedback",
     "feedbackPlaceholder": "Tell us more about the service...",
     "optional": "(Optional)",
-    "writeReview": "Write a Review"
+    "writeReview": "Write a Review",
+    "currently_assigned": "Currently Assigned"
   },
   "priority": {
     "important": "Important",

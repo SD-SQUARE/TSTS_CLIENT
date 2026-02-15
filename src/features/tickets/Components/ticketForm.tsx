@@ -11,7 +11,8 @@ import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import RequiredTag from '../../../components/RequiredTag';
 import { useSelector } from 'react-redux';
-import { fetchGroups, fetchGroupUsers, useTicketDetails, useTicketMutations, useTicketProblems } from '../Hooks/useTicketForm';
+import { fetchAdmins, fetchGroups, fetchGroupUsers, useAdmins, useTicketDetails, useTicketMutations, useTicketProblems } from '../Hooks/useTicketForm';
+import { queryClient } from '../../../app/queryClient';
 
 const { TextArea } = Input;
 
@@ -49,10 +50,18 @@ const TicketForm: React.FC = () => {
                     value: g.id,
                     title: g.name,
                     isLeaf: false,
-                    selectable: false, // User selects people, not groups
-                    color: g.color // Optional: use for styling
+                    selectable: false, 
+                    color: g.color 
                 }));
-                setTreeData(groups);
+                const adminRoot = {
+                    id: 'admin_root',
+                    pId: 0,
+                    value: 'admin_root',
+                    title: t('Admins'), 
+                    isLeaf: false,
+                    selectable: false,
+                };
+                setTreeData([adminRoot, ...groups]);
             } catch (error) {
                 message.error(t('errors.fetchGroupsFailed'));
             }
@@ -69,6 +78,30 @@ const TicketForm: React.FC = () => {
             }
 
             try {
+                if (id === 'admin_root') {
+                    const response = await queryClient.fetchQuery({
+                        queryKey: ['admins'],
+                        queryFn: fetchAdmins
+                    });
+                    const adminUsers = response.data?.users || [];
+                    
+                    const adminNodes = adminUsers.map((u: any) => ({
+                        id: u.id,
+                        pId: 'admin_root',
+                        value: u.id,
+                        title: `${u.first_name} ${u.last_name}`,
+                        isLeaf: true,
+                        selectable: true
+                    }));
+    
+                    setTreeData((prev) => {
+                        const newUserIds = new Set(adminNodes.map(n => n.id));
+                        const filteredPrev = prev.filter(node => !newUserIds.has(node.id));
+                        return [...filteredPrev, ...adminNodes];
+                    });
+                    resolve();
+                    return;
+                }
                 if (pId === 0) {
                     const roleNodes = [
                         { id: `${id}_tl`, pId: id, value: `${id}_tl`, title: t('team_leader'), isLeaf: false, selectable: false },
@@ -102,7 +135,11 @@ const TicketForm: React.FC = () => {
                     selectable: true
                 }));
 
-                setTreeData((prev) => [...prev, ...userNodes]);
+                setTreeData((prev) => {
+                    const newUserIds = new Set(userNodes.map(n => n.id));
+                    const filteredPrev = prev.filter(node => !newUserIds.has(node.id));
+                    return [...filteredPrev, ...userNodes];
+                });
                 resolve();
             } catch (error) {
                 console.error("Load failed", error);
@@ -147,11 +184,38 @@ const TicketForm: React.FC = () => {
 
     useEffect(() => {
         if (ticketData) {
+            const assigneeIds = ticketData.assignee?.map((a: any) => a.id) || [];
             form.setFieldsValue({
                 ...ticketData,
-                assignee: ticketData.assignee?.map((a: any) => a.id),
+                assignee: assigneeIds,
                 problem: ticketData.problem?.id
             });
+            if (ticketData.assignee && ticketData.assignee.length > 0) {
+                const ASSIGNED_GROUP_ID = 'currently_assigned_group';
+
+                const assignedGroupNode = {
+                    id: ASSIGNED_GROUP_ID,
+                    pId: 0,
+                    value: ASSIGNED_GROUP_ID,
+                    title: t('tickets.currently_assigned'), 
+                    isLeaf: false,
+                    selectable: false,
+                };
+                const preloadedNodes = ticketData.assignee.map((a: any) => ({
+                    id: a.id,
+                    pId: ASSIGNED_GROUP_ID,
+                    value: a.id,
+                    title: a.name || `${a.first_name} ${a.last_name}`,
+                    isLeaf: true,
+                    selectable: true
+                }));
+
+                setTreeData((prev) => {
+                    const newUserIds = new Set(preloadedNodes.map(n => n.id));
+                    const filteredPrev = prev.filter(node => !newUserIds.has(node.id) && node.id !== ASSIGNED_GROUP_ID);
+                    return [assignedGroupNode,...filteredPrev, ...preloadedNodes];
+                });
+            }
             if (ticketData.problem) {
                 setSelectedProblem({
                     id: ticketData.problem.id,

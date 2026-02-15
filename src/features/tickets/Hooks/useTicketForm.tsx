@@ -81,4 +81,4 @@ export const useTicketReview = (ticketId: string) => {
 };
 
 export const fetchGroups = () => api.get('v1/lockups/groups/');
-export const fetchGroupUsers = (groupId: string) => api.get(`v1/groups/${groupId}/users`);
+export const fetchGroupUsers = (groupId: string) => api.get(`v1/groups/${groupId}/users`);export const fetchAdmins = () => api.get('v1/lockups/admins');
