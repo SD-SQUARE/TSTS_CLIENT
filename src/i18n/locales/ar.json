@@ -18,7 +18,7 @@
   "select_specialization": "اختر التخصص",
   "filter_by_spec": "تصفية حسب التخصص",
   "not_required": "غير مطلوب",
-  "Knowledge-Base": "استكشاف الحلول",
+  "Knowledge-Base": "مركز المعرفة",
   "forgotPassword": {
     "title": "نسيت كلمة المرور",
     "steps": {
@@ -59,7 +59,7 @@
     "hub_title": "مركز المعرفة",
     "hub_subtitle": "إدارة الوثائق والأدلة والموارد الداخلية.",
     "create_btn": "إنشاء مقال",
-    "search_placeholder": "البحث في قاعدة المعرفة...",
+    "search_placeholder": "البحث في مركز المعرفة...",
     "no_articles": "لم يتم العثور على مقالات.",
     "view": "عرض",
     "edit": "تعديل",
@@ -67,30 +67,37 @@
     "read_article": "قراءة المقال",
     "modal_draft": "مسودة مقال جديد",
     "modal_edit": "تعديل المقال",
-    "modal_subtitle": "شارك معرفتك مع الفريق",
+    "modal_subtitle": "شارك معرفتك مع فريق العمل",
     "steps": {
       "details": "التفاصيل",
       "content": "المحتوى"
     },
     "fields": {
       "title": "عنوان المقال",
-      "title_placeholder": "مثال: إعداد بيئة التطوير",
-      "category": "الفئة",
-      "category_placeholder": "مثال: تطوير ريأكت",
-      "summary": "ملخص قصير",
-      "summary_placeholder": "نظرة عامة موجزة...",
+      "title_placeholder": "مثال: إعداد بيئة العمل",
+      "category": "التخصص / الفئة",
+      "category_placeholder": "اختر تخصص المقال...",
+      "summary": "ملخص الوصف",
+      "summary_placeholder": "نظرة عامة موجزة عن المقال...",
       "import_title": "استيراد المحتوى",
-      "import_desc": "قم برفع ملف .docx للتعبئة التلقائية",
-      "import_btn": "اختر ملف",
-      "content_placeholder": "اكتب المحتوى هنا..."
+      "import_desc": "ارفع ملف .docx للتعبئة التلقائية",
+      "import_btn": "رفع ملف",
+      "content_placeholder": "اكتب محتوى المقال هنا..."
     },
     "actions": {
       "prev": "السابق",
       "reset": "إعادة تعيين",
-      "next": "الخطوة التالية",
+      "next": "التالي",
       "save": "حفظ التغييرات",
       "publish": "نشر المقال",
       "close": "إغلاق"
+    },
+    "messages": {
+      "import_loading": "جاري تحويل الملف...",
+      "import_success": "تم استيراد المحتوى بنجاح",
+      "import_error": "فشل استيراد ملف Word",
+      "delete_title": "حذف المقال",
+      "delete_confirm": "هل أنت متأكد من رغبتك في حذف هذا المقال؟"
     }
   },
   "app": {

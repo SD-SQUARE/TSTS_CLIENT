@@ -34,14 +34,14 @@ export const useKnowledgeBase = () => {
 
 
   const handleWordImport = async (file: File) => {
-    const hide = message.loading(t('errors.uploadFailed') === 'uploadFailed' ? 'Converting...' : t('tickets.upload'), 0); // Using existing keys
+    const hide = message.loading(t('knowledge.fields.import_title'), 0); 
     try {
       const arrayBuffer = await file.arrayBuffer();
       const result = await mammoth.convertToHtml({ arrayBuffer });
       if (result.value) {
         const currentContent = form.getFieldValue('content') || '';
         form.setFieldValue('content', currentContent + result.value);
-        message.success(t('success.saved')); 
+        message.success(t('success.bulk_upload')); 
         } 
     } catch (error) {
       console.error(error);
@@ -98,7 +98,7 @@ export const useKnowledgeBase = () => {
   const handleDelete = (id: string | number) => {
     Modal.confirm({
       title: t('translation.confirm_delete'), 
-      content: t('translation.delete_prompt_group'), 
+      content: t('knowledge.delete'), 
       okText: t('translation.yes'),
       cancelText: t('translation.no'),
       okType: 'danger',
