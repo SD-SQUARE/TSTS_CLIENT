@@ -12,9 +12,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import EllipsisComponent from '../../../components/EllipsisComponent';
 import Highlighter from 'react-highlight-words';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
-import {  useSpecializations, useTicketProblems } from '../Hooks/useTicketForm';
+import { useSpecializations, useTicketProblems } from '../Hooks/useTicketForm';
 
-type SearchableDataIndex = `title` | `problem` |`specialization` | `status` | 'priority' | 'description';
+type SearchableDataIndex = `title` | `problem` | `specialization` | `status` | 'priority' | 'description';
 
 const TicketList: React.FC = () => {
     const { t } = useTranslation();
@@ -29,7 +29,7 @@ const TicketList: React.FC = () => {
     const pending_state = "Pending"
     const out_of_service_state = "Out of Service"
     const resolved_status = "Resolved"
-    
+
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState<SearchableDataIndex | ''>('');
     const searchInput = useRef<InputRef>(null);
@@ -45,20 +45,20 @@ const TicketList: React.FC = () => {
 
     const problemTreeData = hierarchicalProblems?.specializations?.map((spec: any) => {
         const hasProblems = spec.problems && spec.problems.length > 0;
-    
+
         return {
             title: (
-                <span title={spec.name} style={{ display: 'inline-block', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <span title={spec.name} style={{ display: 'block', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {spec.name}
                 </span>
             ),
             value: `spec-${spec.id}`,
             key: spec.id,
             selectable: false,
-            children: hasProblems 
+            children: hasProblems
                 ? spec.problems.map((prob: any) => ({
                     title: (
-                        <span title={prob.name} style={{ display: 'inline-block', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <span title={prob.name} style={{ display: 'block', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {prob.name}
                         </span>
                     ),
@@ -68,14 +68,15 @@ const TicketList: React.FC = () => {
                 }))
                 : [{
                     title: (
-                        <Flex justify="space-between" align="center" style={{ width: '100%' }}>
-                            <span title={spec.name} style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{spec.name}</span>
-                            {!hasProblems && <Tag style={{ fontSize: '10px', marginInlineEnd: 0 }}>{t('common.empty')}</Tag>}
-                        </Flex>
+                        <div style={{ paddingLeft: '4px' }}>
+                            <Tag style={{ fontSize: '10px', margin: 0 }}>
+                                {t('common.empty')}
+                            </Tag>
+                        </div>
                     ),
                     value: `empty-${spec.id}`,
                     key: `empty-${spec.id}`,
-                    disabled: true, 
+                    disabled: true,
                     isLeaf: true,
                 }]
         };
@@ -148,16 +149,17 @@ const TicketList: React.FC = () => {
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
             <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
                 <TreeSelect
-                    style={{ width: 250, marginBottom: 8 }} 
-                    dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                    style={{ width: 250, marginBottom: 8 }}
+                    dropdownStyle={{ maxHeight: 400, overflow: 'hidden', maxWidth: 300 }}
                     placeholder={`${t('common.select')} ${t(titleKey)}`}
                     treeData={treeData}
                     treeNodeFilterProp="title"
                     value={selectedKeys[0]}
                     onChange={(value) => setSelectedKeys(value ? [value] : [])}
-                    treeDefaultExpandAll={false} 
+                    treeDefaultExpandAll={false}
                     showSearch
                     allowClear
+                    treeExpandAction="click"
                 />
                 <Flex gap="small">
                     <Button
@@ -282,8 +284,8 @@ const TicketList: React.FC = () => {
             key: 'status',
             width: 140,
             ellipsis: true,
-            render: (status: string) => { 
-                
+            render: (status: string) => {
+
                 switch (status) {
                     case openstate:
                         status = openstate;
@@ -309,8 +311,8 @@ const TicketList: React.FC = () => {
                     default:
                         status = openstate;
                 }
-                return(
-                    <Tag variant='outlined' color={status === openstate || status === reopenstate ? 'green' : status === in_progress_state ? 'blue' : status === closestate ? 'red' : status === pending_state ? 'gold' : status === out_of_service_state ? 'volcano': status === resolved_status ? 'lime' : 'geekblue'}>
+                return (
+                    <Tag variant='outlined' color={status === openstate || status === reopenstate ? 'green' : status === in_progress_state ? 'blue' : status === closestate ? 'red' : status === pending_state ? 'gold' : status === out_of_service_state ? 'volcano' : status === resolved_status ? 'lime' : 'geekblue'}>
                         {renderHighlightedText(status, 'status')}
                     </Tag>
                 )
