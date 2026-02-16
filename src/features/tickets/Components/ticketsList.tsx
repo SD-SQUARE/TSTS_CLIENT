@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import React, { useRef, useState } from 'react';
-import { Table, Tag, Typography, Spin, Alert, Pagination, Space, Button, Flex, Popover, type InputRef, Input, type TableColumnType, Select, TreeSelect } from 'antd';
+import { Table, Tag, Typography, Spin, Alert, Pagination, Space, Button, Flex, Popover, type InputRef, Input, type TableColumnType, Select, TreeSelect, Tooltip } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { FilterOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -48,20 +48,34 @@ const TicketList: React.FC = () => {
 
         return {
             title: (
-                <span title={spec.name} style={{ display: 'block', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {spec.name}
-                </span>
+                <Tooltip
+                    title={spec.name}
+                    mouseEnterDelay={0.1}
+                    placement="top"
+                >
+                    <span title={spec.name} style={{ display: 'block', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {spec.name}
+                    </span>
+                </Tooltip>
             ),
+            label: spec.name,
             value: `spec-${spec.id}`,
             key: spec.id,
             selectable: false,
             children: hasProblems
                 ? spec.problems.map((prob: any) => ({
                     title: (
-                        <span title={prob.name} style={{ display: 'block', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {prob.name}
-                        </span>
+                        <Tooltip
+                            title={prob.name}
+                            mouseEnterDelay={0.1}
+                            placement="top"
+                        >
+                            <span title={prob.name} style={{ display: 'block', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {prob.name}
+                            </span>
+                        </Tooltip>
                     ),
+                    label: prob.name,
                     value: prob.id,
                     key: prob.id,
                     isLeaf: true,
