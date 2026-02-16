@@ -253,7 +253,7 @@ const UserFormModal: React.FC<{
             style={{ top: 20 }}
         >
             <Spin spinning={isModalLoading}>
-            <Steps current={current} style={{ marginBottom: 24 }} items={stepItems}/>
+            <Steps current={current} style={{ marginBottom: 24 }} items={stepItems}  onChange={ step => setCurrent(step)} />
         
 
             <div className="steps-content">
