@@ -48,6 +48,22 @@
     "changePassword": "Change Password",
     "required": "Required"
   },
+  "crud": {
+    "details": "Details",
+    "add_new": "Add New {{title}}",
+    "edit_item": "Edit {{title}}",
+    "create": "Create",
+    "save_changes": "Save Changes",
+    "back_to_list": "Back to List",
+    "search_placeholder": "Search...",
+    "delete_confirm_title": "Are you sure you want to delete this?",
+    "delete_confirm_content": "This action cannot be undone.",
+    "delete_verify_error": "You must type \"delete\" exactly to proceed.",
+    "create_success": "{{title}} created successfully",
+    "update_success": "{{title}} updated successfully",
+    "delete_success": "{{title}} deleted successfully",
+    "delete_failed": "Delete failed"
+  },
   "app": {
     "title": "My App"
   },

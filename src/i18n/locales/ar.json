@@ -100,6 +100,23 @@
       "delete_confirm": "هل أنت متأكد من رغبتك في حذف هذا المقال؟"
     }
   },
+  "crud": {
+    "details": "التفاصيل",
+    "add_new": "إضافة {{title}} الجديدة",
+    "edit_item": "تعديل {{title}}",
+    "edit": "تعديل",
+    "create": "إنشاء",
+    "save_changes": "حفظ التغييرات",
+    "back_to_list": "العودة للقائمة",
+    "search_placeholder": "بحث...",
+    "delete_confirm_title": "هل أنت متأكد من رغبتك في الحذف؟",
+    "delete_confirm_content": "هذا الإجراء لا يمكن التراجع عنه.",
+    "delete_verify_error": "يجب كتابة كلمة \"delete\" بشكل صحيح للمتابعة.",
+    "create_success": "تم إنشاء {{title}} بنجاح",
+    "update_success": "تم تحديث {{title}} بنجاح",
+    "delete_success": "تم حذف {{title}} بنجاح",
+    "delete_failed": "فشل في الحذف"
+  },
   "app": {
     "title": "التطبيق"
   },

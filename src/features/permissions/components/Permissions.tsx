@@ -120,7 +120,7 @@ const PermissionsPage: React.FC = () => {
       <Form.Item 
         name="name_en" 
         label="Profile Name (English)" 
-        rules={[{ required: true, message: 'Profile name is required' },
+        rules={[{ required: true, message: t("required") },
         { pattern: /^[A-Za-z0-9\s.,-]*$/, message: t("english_only") }]}
       >
         <Input placeholder="e.g. HR Manager" />

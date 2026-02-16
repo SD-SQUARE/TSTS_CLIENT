@@ -39,12 +39,12 @@ function App() {
                         < >
                             <NavItem to={`${APP_BASE_PATH}/knowledge-base`}>{t('Knowledge-Base')}</NavItem>
                             <NavItem to={`/${user.role.toLowerCase()}/tickets`}>{t('Tickets')}</NavItem>
-                            <GuardedRoute roles={["admin"]} allowNavigation={false}>
+                            {/* <GuardedRoute roles={["admin"]} allowNavigation={false}> */}
                                 <NavItem to={`/identities/groups`}>{t('Personnel')}</NavItem>
-                            </GuardedRoute>    
-                            <GuardedRoute roles={["admin"]} allowNavigation={false}>
+                            {/* </GuardedRoute>     */}
+                            {/* <GuardedRoute roles={["admin"]} allowNavigation={false}> */}
                                 <NavItem to={`/settings/domains`}>{t('Settings')}</NavItem>
-                            </GuardedRoute>    
+                            {/* </GuardedRoute>     */}
                         </>
                     )}
                 </NavBar>

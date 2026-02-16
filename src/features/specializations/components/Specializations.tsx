@@ -12,6 +12,7 @@ import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 const SpecializationsPage: React.FC = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 50 });
 
   const {
     data,
@@ -20,8 +21,9 @@ const SpecializationsPage: React.FC = () => {
     updateMutation,
     deleteMutation,
   } = useGenericCrud<Specialization, CreateSpecializationDto, UpdateSpecializationDto>({
-    queryKey: ['specializations', searchTerm],
-      fetchFn: () => specializationApi.getAll({ name: searchTerm }),
+    queryKey: ['specializations', searchTerm,pagination.current, pagination.pageSize],
+      fetchFn: () => specializationApi.getAll({ name: searchTerm , page: pagination.current, 
+        page_size: pagination.pageSize}),
     createFn: (data) => specializationApi.create(data),
     updateFn: ({ id, data }) => specializationApi.update(id, data),
     deleteFn: (id) => specializationApi.delete(id),
@@ -69,7 +71,7 @@ const SpecializationsPage: React.FC = () => {
 
   const formItems = (
     <>
-      <Form.Item name="name_en" label={t("name_en")} rules={[{ required: true },
+      <Form.Item name="name_en" label={t("name_en")} rules={[{ required: true, message: t("required") },
           { pattern: /^[A-Za-z0-9\s.,-]*$/, message: t("english_only") }]}>
         <Input />
       </Form.Item>
@@ -119,13 +121,20 @@ const SpecializationsPage: React.FC = () => {
       title={t("specializations")}
       columns={columns}
       formItems={formItems}
-      data={data}
+      data={data.data}
       isLoading={isLoading}
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}
       searchText={searchTerm}
-      onSearch={(val) => setSearchTerm(val)}
+      onSearch={(val) => {
+          setSearchTerm(val);
+          setPagination(prev => ({ ...prev, current: 1 })); // Reset to page 1 on search
+      }}
+      total={data.meta?.total}
+      pageIndex={pagination.current}
+      pageSize={pagination.pageSize}
+      onPageChange={(page, size) => setPagination({ current: page, pageSize: size })}
     />
   );
 };
