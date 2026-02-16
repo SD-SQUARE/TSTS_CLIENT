@@ -150,7 +150,8 @@ const TicketList: React.FC = () => {
             <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
                 <TreeSelect
                     style={{ width: 250, marginBottom: 8 }}
-                    dropdownStyle={{ maxHeight: 400, overflow: 'hidden', maxWidth: 300 }}
+                    dropdownClassName="tree-select-no-scroll"
+                    dropdownStyle={{ maxHeight: 400, overflow: 'hidden', maxWidth: 250 }}
                     placeholder={`${t('common.select')} ${t(titleKey)}`}
                     treeData={treeData}
                     treeNodeFilterProp="title"
@@ -464,6 +465,22 @@ const TicketList: React.FC = () => {
 
     return (
         <div style={{ padding: '24px' }}>
+            <style>
+                {`
+                .tree-select-no-scroll .ant-select-tree-list-holder-inner {
+                    width: 100% !important;
+                }
+                .tree-select-no-scroll .ant-select-tree-node-content-wrapper {
+                    flex: 1 !important;
+                    overflow: hidden !important;
+                    display: flex !important;
+                }
+                .tree-select-no-scroll .ant-select-tree-title {
+                    flex: 1 !important;
+                    overflow: hidden !important;
+                }
+                `}
+            </style>
             <Typography.Title level={2} style={{ marginBottom: 16 }}>
                 {t('tickets.listTitle')}
             </Typography.Title>
