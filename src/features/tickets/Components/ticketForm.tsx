@@ -59,6 +59,7 @@ const TicketForm: React.FC = () => {
                     title: g.name,
                     isLeaf: false,
                     selectable: false, 
+                    checkable: false,
                     color: g.color 
                 }));
                 const adminRoot = {
@@ -68,6 +69,7 @@ const TicketForm: React.FC = () => {
                     title: t('Admins'), 
                     isLeaf: false,
                     selectable: false,
+                    checkable: false
                 };
                 setTreeData([adminRoot, ...groups]);
                 setTreeReady(true);
@@ -113,12 +115,15 @@ const TicketForm: React.FC = () => {
                 }
                 if (pId === 0) {
                     const roleNodes = [
-                        { id: `${id}_tl`, pId: id, value: `${id}_tl`, title: t('team_leader'), isLeaf: false, selectable: false },
-                        { id: `${id}_heads`, pId: id, value: `${id}_heads`, title: t('heads'), isLeaf: false, selectable: false },
-                        { id: `${id}_techs`, pId: id, value: `${id}_techs`, title: t('Technicians'), isLeaf: false, selectable: false },
+                        { id: `${id}_tl`, pId: id, value: `${id}_tl`, title: t('team_leader'), isLeaf: false, selectable: false, checkable: false },
+                        { id: `${id}_heads`, pId: id, value: `${id}_heads`, title: t('heads'), isLeaf: false, selectable: false, checkable: false },
+                        { id: `${id}_techs`, pId: id, value: `${id}_techs`, title: t('Technicians'), isLeaf: false, selectable: false, checkable: false },
                     ];
-                    setTreeData((prev) => [...prev, ...roleNodes]);
-                    resolve();
+                    setTreeData((prev) => {
+                        const exists = prev.some(node => node.pId === id);
+                        if (exists) return prev;
+                        return [...prev, ...roleNodes];
+                    });                    resolve();
                     return;
                 }
                 const groupId = id.split('_')[0];
@@ -303,6 +308,7 @@ const TicketForm: React.FC = () => {
             title: t('tickets.currently_assigned'),
             isLeaf: false,
             selectable: false,
+            checkable: false
         };
 
         const preloadedNodes = ticketData.assignee.map((a: any) => ({
@@ -516,7 +522,7 @@ const TicketForm: React.FC = () => {
                                 </Flex>
                                 <Form.Item name="assignee" label={t('tickets.assignee')} style={{ marginBottom: 0 }}>
                                     <TreeSelect
-                                        key={treeData.length}
+                                        // key={treeData.length}
                                         treeDataSimpleMode
                                         style={{ width: '100%' }}
                                         dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
@@ -526,6 +532,8 @@ const TicketForm: React.FC = () => {
                                         multiple
                                         treeCheckable
                                         showCheckedStrategy={TreeSelect.SHOW_CHILD}
+                                        treeExpandAction="click"
+                                        treeDefaultExpandAll={false}
                                     />
                                 </Form.Item>
                             </div>
