@@ -17,9 +17,17 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
     const { t } = useTranslation();
     const { role } = useParams();
     const statusMutation = useChangeTicketStatus(ticket?.id);
+    
+    const openstate = "Open"
+    const reopenstate = "Re Open"
+    const closestate = "Closed"
+    const in_progress_state = "In Progress"
+    const pending_state = "Pending"
+    const out_of_service_state = "Out of Service"
+    
 
     const isRequester = role === 'requester';
-    const status = ticket?.status;
+    let status = ticket?.status;
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
     const isReviewRequired =
@@ -36,13 +44,44 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
 
     const handleStatusChange = async (newStatus: string) => {
 
-        if (isRequester && newStatus === 'closed') {
+        
+
+        if (isRequester && (newStatus === closestate || newStatus === pending_state)) {
             if (isReviewRequired) {
                 setIsReviewModalOpen(true);
                 return;
             }
         }
 
+        switch (newStatus) {
+            case openstate:
+                newStatus = "open";
+                status = "open";
+                break;
+            case reopenstate:
+                newStatus = "re_open";
+                status = "re_open";
+                break;
+            case closestate:
+                newStatus = "closed";
+                status = "closed";
+                break;
+            case in_progress_state:
+                newStatus = "in_progress";
+                status = "in_progress";
+                break;
+            case pending_state:
+                newStatus = "pending";
+                status = "pending";
+                break;
+            case out_of_service_state:
+                newStatus = "out_of_service";
+                status = "out_of_service";
+                break;
+            default:
+                newStatus = "open";
+                status = "open";
+        }
         try {
             const res = await statusMutation.mutateAsync(newStatus);
             if (res.is_updated) {
@@ -59,23 +98,23 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
     let actionButton = null;
 
     if (isRequester) {
-        if (status === 'closed') {
+        if (status === closestate) {
             actionButton = (
                 <Button
                     style={{ flex: 1 }}
                     size="large"
                     icon={<ReloadOutlined />}
-                    onClick={() => handleStatusChange('open')}
+                    onClick={() => handleStatusChange(reopenstate)}
                     loading={statusMutation.isPending}
                 >
                     {t('tickets.reopenTicket')}
                 </Button>
             );
-        } else if (status === 'in_progress') {
+        } else if (status === in_progress_state || status === pending_state || status === closestate) {
             actionButton = (
                 <Popconfirm
                     title={t('tickets.closeConfirmTitle')}
-                    onConfirm={() => handleStatusChange('closed')}
+                    onConfirm={() => handleStatusChange(closestate)}
                     okText={t('translation.yes')}
                     cancelText={t('translation.no')}
                 >
@@ -84,7 +123,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                         type="primary"
                         size="large"
                         icon={<CheckCircleOutlined />}
-                        // onClick={() => handleStatusChange('closed')}
+                        // onClick={() => handleStatusChange(closestate)}
                         loading={statusMutation.isPending}
                         style={{ borderColor: '#52c41a', color: '#52c41a', flex: 1 }}
                         variant='outlined'
@@ -96,7 +135,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
             );
         }
     } else {
-        if (status === 'open') {
+        if (status === openstate || status === reopenstate) {
             actionButton = (
                 <Button
                     style={{ flex: 1 }}
@@ -104,17 +143,17 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                     size="large"
                     ghost
                     icon={<ToolOutlined />}
-                    onClick={() => handleStatusChange('in_progress')}
+                    onClick={() => handleStatusChange(in_progress_state)}
                     loading={statusMutation.isPending}
                 >
                     {t('tickets.startSolving')}
                 </Button>
             );
-        } else if (status === 'in_progress') {
+        } else if (status === in_progress_state) {
             actionButton = (
                 <Popconfirm
                     title={t('tickets.closeConfirmTitle')}
-                    onConfirm={() => handleStatusChange('closed')}
+                    onConfirm={() => handleStatusChange(closestate)}
                     okText={t('translation.yes')}
                     cancelText={t('translation.no')}
                 >
@@ -161,7 +200,10 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                 </Descriptions.Item>
 
                 <Descriptions.Item label={t('tickets.status')}>
-                    <Tag variant='outlined' color={ticket?.status === 'open' ? 'green' : ticket?.status === 'in-progress' ? 'blue' : ticket?.status === 'closed' ? 'red' : ticket?.status === 'pending' ? 'orange' : ticket?.status === 'out-of-service' ? 'volcano' : 'geekblue'}>
+                    <Tag variant='outlined'
+                        color={
+                            ticket?.status === openstate || ticket?.status === reopenstate ? 'green' : ticket?.status === in_progress_state ? 'blue' : ticket?.status === closestate ? 'red' : ticket?.status === pending_state ? 'orange' : ticket?.status === out_of_service_state ? 'volcano' : 'geekblue'}>
+                        {/* color={ticket?.status === openstate ? 'green' : ticket?.status === 'in-progress' ? 'blue' : ticket?.status === closestate ? 'red' : ticket?.status === pending_state ? 'orange' : ticket?.status === 'out-of-service' ? 'volcano' : 'geekblue'}> */}
                         {ticket?.status}
                     </Tag>
                 </Descriptions.Item>

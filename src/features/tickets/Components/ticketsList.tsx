@@ -22,6 +22,13 @@ const TicketList: React.FC = () => {
     const { role } = useParams();
     const [pagination, setPagination] = useState({ page: 1, pageSize: 50 });
 
+    const openstate = "Open"
+    const reopenstate = "Re Open"
+    const closestate = "Closed"
+    const in_progress_state = "In Progress"
+    const pending_state = "Pending"
+    const out_of_service_state = "Out of Service"
+    
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState<SearchableDataIndex | ''>('');
     const searchInput = useRef<InputRef>(null);
@@ -274,11 +281,36 @@ const TicketList: React.FC = () => {
             key: 'status',
             width: 140,
             ellipsis: true,
-            render: (status: string) => (
-                <Tag variant='outlined' color={status === 'open' ? 'green' : status === 'in-progress' ? 'blue' : status === 'closed' ? 'red' : status === 'pending' ? 'orange' : status === 'out-of-service' ? 'volcano' : 'geekblue'}>
-                    {renderHighlightedText(status, 'status')}
-                </Tag>
-            ),
+            render: (status: string) => { 
+                
+                switch (status) {
+                    case openstate:
+                        status = openstate;
+                        break;
+                    case reopenstate:
+                        status = reopenstate;
+                        break;
+                    case closestate:
+                        status = closestate;
+                        break;
+                    case in_progress_state:
+                        status = in_progress_state;
+                        break;
+                    case pending_state:
+                        status = pending_state;
+                        break;
+                    case out_of_service_state:
+                        status = out_of_service_state;
+                        break;
+                    default:
+                        status = openstate;
+                }
+                return(
+                    <Tag variant='outlined' color={status === openstate || status === reopenstate ? 'green' : status === in_progress_state ? 'blue' : status === closestate ? 'red' : status === pending_state ? 'orange' : status === out_of_service_state ? 'volcano' : 'geekblue'}>
+                        {renderHighlightedText(status, 'status')}
+                    </Tag>
+                )
+            },
             ...getColumnSelectProps('status', 'tickets.status', [
                 { label: t('status.open'), value: 'open' },
                 { label: t('status.in_progress'), value: 'in_progress' },

@@ -22,6 +22,13 @@ const TicketForm: React.FC = () => {
     const navigate = useNavigate();
     const [form] = Form.useForm();
     const { user } = useSelector((state: any) => state.auth);
+    const [treeReady, setTreeReady] = useState(false);
+
+    const openstate = "Open"
+    const closestate = "Closed"
+    const in_progress_state = "In Progress"
+    const pending_state = "Pending"
+    const out_of_service_state = "Out of Service"
 
     const isEdit = !!id;
     const isRequester = role === 'requester';
@@ -62,6 +69,7 @@ const TicketForm: React.FC = () => {
                     selectable: false,
                 };
                 setTreeData([adminRoot, ...groups]);
+                setTreeReady(true);
             } catch (error) {
                 message.error(t('errors.fetchGroupsFailed'));
             }
@@ -148,9 +156,24 @@ const TicketForm: React.FC = () => {
         });
     };
     const getStepperData = () => {
-        // Default middle state if none is selected or if 'open' is selected
-        const middleStates = ['in_progress', 'pending', 'out_of_service'];
-        const activeMiddleState = middleStates.includes(currentStatus) ? currentStatus : 'in_progress';
+        // Default middle state if none is selected or if 'open' is selectedKey
+
+        const middleStates = [in_progress_state, pending_state, out_of_service_state];
+        const middleStatesNames = ['in_progress', 'pending', 'out_of_service'];
+        let activeMiddleState = 'in_progress';
+        switch (currentStatus) {
+            case in_progress_state:
+                activeMiddleState = middleStatesNames[0];
+                break;
+            case pending_state:
+                activeMiddleState = middleStatesNames[1];
+                break;
+            case out_of_service_state:
+                activeMiddleState = middleStatesNames[2];
+                break;
+            default:
+                activeMiddleState = middleStatesNames[0];
+        }
 
         const steps = [
             { key: 'open', title: t('status.open') },
@@ -182,58 +205,124 @@ const TicketForm: React.FC = () => {
         }
     };
 
+    // TODO: Remove useEffect that causes reace-condition
+    // useEffect(() => {
+    //     if (ticketData) {
+    //         const assigneeIds = ticketData.assignee?.map((a: any) => a.id) || [];
+    //         form.setFieldsValue({
+    //             ...ticketData,
+    //             assignee: assigneeIds,
+    //             problem: ticketData.problem?.id
+    //         });
+    //         if (ticketData.assignee && ticketData.assignee.length > 0) {
+    //             const ASSIGNED_GROUP_ID = 'currently_assigned_group';
+
+    //             const assignedGroupNode = {
+    //                 id: ASSIGNED_GROUP_ID,
+    //                 pId: 0,
+    //                 value: ASSIGNED_GROUP_ID,
+    //                 title: t('tickets.currently_assigned'), 
+    //                 isLeaf: false,
+    //                 selectable: false,
+    //             };
+    //             const preloadedNodes = ticketData.assignee.map((a: any) => ({
+    //                 id: a.id,
+    //                 pId: ASSIGNED_GROUP_ID,
+    //                 value: a.id,
+    //                 title: a.name || `${a.first_name} ${a.last_name}`,
+    //                 isLeaf: true,
+    //                 selectable: true
+    //             }));
+
+    //             setTreeData((prev) => {
+    //                 const newUserIds = new Set(preloadedNodes.map(n => n.id));
+    //                 const filteredPrev = prev.filter(node => !newUserIds.has(node.id) && node.id !== ASSIGNED_GROUP_ID);
+    //                 return [assignedGroupNode,...filteredPrev, ...preloadedNodes];
+    //             });
+    //         }
+    //         if (ticketData.problem) {
+    //             setSelectedProblem({
+    //                 id: ticketData.problem.id,
+    //                 name: ticketData.problem.name,
+    //                 specId: ticketData.specialization?.id
+    //             });
+    //         }
+    //         if (ticketData.attachments && Array.isArray(ticketData.attachments)) {
+    //             const existingFiles = ticketData.attachments.map((file: any) => ({
+    //                 uid: file.id,
+    //                 name: file.fileName || file.name || 'Attachment',
+    //                 status: 'done',
+    //                 url: file.url,
+    //             }));
+    //             setFileList(existingFiles);
+    //         }
+    //     }
+    // }, [ticketData, form]);
+
     useEffect(() => {
-        if (ticketData) {
-            const assigneeIds = ticketData.assignee?.map((a: any) => a.id) || [];
-            form.setFieldsValue({
-                ...ticketData,
-                assignee: assigneeIds,
-                problem: ticketData.problem?.id
+        if (!ticketData) return;
+
+        form.setFieldsValue({
+            ...ticketData,
+            problem: ticketData.problem?.id,
+        });
+
+        if (ticketData.problem) {
+            setSelectedProblem({
+                id: ticketData.problem.id,
+                name: ticketData.problem.name,
+                specId: ticketData.specialization?.id
             });
-            if (ticketData.assignee && ticketData.assignee.length > 0) {
-                const ASSIGNED_GROUP_ID = 'currently_assigned_group';
+        }
 
-                const assignedGroupNode = {
-                    id: ASSIGNED_GROUP_ID,
-                    pId: 0,
-                    value: ASSIGNED_GROUP_ID,
-                    title: t('tickets.currently_assigned'), 
-                    isLeaf: false,
-                    selectable: false,
-                };
-                const preloadedNodes = ticketData.assignee.map((a: any) => ({
-                    id: a.id,
-                    pId: ASSIGNED_GROUP_ID,
-                    value: a.id,
-                    title: a.name || `${a.first_name} ${a.last_name}`,
-                    isLeaf: true,
-                    selectable: true
-                }));
-
-                setTreeData((prev) => {
-                    const newUserIds = new Set(preloadedNodes.map(n => n.id));
-                    const filteredPrev = prev.filter(node => !newUserIds.has(node.id) && node.id !== ASSIGNED_GROUP_ID);
-                    return [assignedGroupNode,...filteredPrev, ...preloadedNodes];
-                });
-            }
-            if (ticketData.problem) {
-                setSelectedProblem({
-                    id: ticketData.problem.id,
-                    name: ticketData.problem.name,
-                    specId: ticketData.specialization?.id
-                });
-            }
-            if (ticketData.attachments && Array.isArray(ticketData.attachments)) {
-                const existingFiles = ticketData.attachments.map((file: any) => ({
+        if (Array.isArray(ticketData.attachments)) {
+            setFileList(
+                ticketData.attachments.map((file: any) => ({
                     uid: file.id,
                     name: file.fileName || file.name || 'Attachment',
                     status: 'done',
                     url: file.url,
-                }));
-                setFileList(existingFiles);
-            }
+                }))
+            );
         }
-    }, [ticketData, form]);
+    }, [ticketData]);
+
+    useEffect(() => {
+        if (!ticketData || !treeReady) return;
+
+        const assigneeIds = ticketData.assignee?.map((a: any) => a.id) || [];
+        if (assigneeIds.length === 0) return;
+
+        const ASSIGNED_GROUP_ID = 'currently_assigned_group';
+
+        const assignedGroupNode = {
+            id: ASSIGNED_GROUP_ID,
+            pId: 0,
+            value: ASSIGNED_GROUP_ID,
+            title: t('tickets.currently_assigned'),
+            isLeaf: false,
+            selectable: false,
+        };
+
+        const preloadedNodes = ticketData.assignee.map((a: any) => ({
+            id: a.id,
+            pId: ASSIGNED_GROUP_ID,
+            value: a.id,
+            title: a.name || `${a.first_name} ${a.last_name}`,
+            isLeaf: true,
+            selectable: true,
+        }));
+
+        setTreeData(prev => [
+            assignedGroupNode,
+            ...prev.filter(n => !preloadedNodes.some(p => p.id === n.id)),
+            ...preloadedNodes,
+        ]);
+
+        // CRITICAL: AFTER nodes exist
+        form.setFieldsValue({ assignee: assigneeIds });
+
+    }, [ticketData, treeReady]);
 
 
     const onFinish = async (values: any) => {
@@ -256,7 +345,27 @@ const TicketForm: React.FC = () => {
 
         if (!isRequester && isEdit) {
             formData.append('priority', values.priority);
-            formData.append('status', values.status);
+            let status = '';
+            switch (values.status) {
+                case openstate:
+                    status = "open";
+                    break;
+                case closestate:
+                    status = "closed";
+                    break;
+                case in_progress_state:
+                    status = "in_progress";
+                    break;
+                case pending_state:
+                    status = "pending";
+                    break;
+                case out_of_service_state:
+                    status = "out_of_service";
+                    break;
+                default:
+                    status = "open";
+            }
+            formData.append('status', status);
             formData.append('assigneeList', JSON.stringify(values.assignee));
         }
 
@@ -392,16 +501,17 @@ const TicketForm: React.FC = () => {
                                     </Form.Item>
                                     <Form.Item name="status" label={t('tickets.status')} style={{ flex: 1, minWidth: '200px' }}>
                                         <Select options={[
-                                            { value: 'open', label: t('status.open') },
-                                            { value: 'in_progress', label: t('status.in_progress') },
-                                            { value: 'pending', label: t('status.pending') },
-                                            { value: 'out_of_service', label: t('status.out_of_service') },
-                                            { value: 'closed', label: t('status.closed') }
+                                            { value: openstate, label: t('status.open') },
+                                            { value: in_progress_state, label: t('status.in_progress') },
+                                            { value: pending_state, label: t('status.pending') },
+                                            { value: out_of_service_state, label: t('status.out_of_service') },
+                                            { value: closestate, label: t('status.closed') }
                                         ]} />
                                     </Form.Item>
                                 </Flex>
                                 <Form.Item name="assignee" label={t('tickets.assignee')} style={{ marginBottom: 0 }}>
                                     <TreeSelect
+                                        key={treeData.length}
                                         treeDataSimpleMode
                                         style={{ width: '100%' }}
                                         dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
