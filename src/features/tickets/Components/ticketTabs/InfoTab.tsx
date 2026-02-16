@@ -24,6 +24,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
     const in_progress_state = "In Progress"
     const pending_state = "Pending"
     const out_of_service_state = "Out of Service"
+    const resolved_status = "Resolved"
     
 
     const isRequester = role === 'requester';
@@ -45,11 +46,14 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
     const handleStatusChange = async (newStatus: string) => {
 
         
-
+            
         if (isRequester && (newStatus === closestate || newStatus === pending_state)) {
             if (isReviewRequired) {
                 setIsReviewModalOpen(true);
                 return;
+            } else {
+                setIsReviewModalOpen(true);
+                newStatus = resolved_status;
             }
         }
 
@@ -77,6 +81,10 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
             case out_of_service_state:
                 newStatus = "out_of_service";
                 status = "out_of_service";
+                break;
+            case resolved_status:
+                newStatus = "resolved";
+                status = "resolved";
                 break;
             default:
                 newStatus = "open";
@@ -202,7 +210,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                 <Descriptions.Item label={t('tickets.status')}>
                     <Tag variant='outlined'
                         color={
-                            ticket?.status === openstate || ticket?.status === reopenstate ? 'green' : ticket?.status === in_progress_state ? 'blue' : ticket?.status === closestate ? 'red' : ticket?.status === pending_state ? 'orange' : ticket?.status === out_of_service_state ? 'volcano' : 'geekblue'}>
+                            ticket?.status === openstate || ticket?.status === reopenstate ? 'green' : ticket?.status === in_progress_state ? 'blue' : ticket?.status === closestate ? 'red' : ticket?.status === pending_state ? 'orange' : ticket?.status === out_of_service_state ? 'volcano' : ticket?.status === resolved_status ? 'green' : 'geekblue'}>
                         {/* color={ticket?.status === openstate ? 'green' : ticket?.status === 'in-progress' ? 'blue' : ticket?.status === closestate ? 'red' : ticket?.status === pending_state ? 'orange' : ticket?.status === 'out-of-service' ? 'volcano' : 'geekblue'}> */}
                         {ticket?.status}
                     </Tag>

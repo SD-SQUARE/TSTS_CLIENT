@@ -355,7 +355,8 @@
     "in_progress": "قيد المعالجة",
     "closed": "مغلقة",
     "pending": "قيد الانتظار",
-    "out_of_service": "خارج الخدمة"
+    "out_of_service": "خارج الخدمة",
+    "resolved": "مكتمل"
   },
   "common": {
     "reset": "إعادة تعيين",

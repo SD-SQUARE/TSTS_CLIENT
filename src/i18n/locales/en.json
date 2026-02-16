@@ -306,7 +306,8 @@
     "in_progress": "In Progress",
     "closed": "Closed",
     "pending": "Pending",
-    "out_of_service": "Out of Service"
+    "out_of_service": "Out of Service",
+    "resolved": "Resolved"
   },
   "common": {
     "reset": "Reset",

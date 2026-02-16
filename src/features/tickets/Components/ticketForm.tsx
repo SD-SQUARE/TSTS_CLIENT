@@ -29,6 +29,7 @@ const TicketForm: React.FC = () => {
     const in_progress_state = "In Progress"
     const pending_state = "Pending"
     const out_of_service_state = "Out of Service"
+    const resolved_status = "Resolved"
 
     const isEdit = !!id;
     const isRequester = role === 'requester';
@@ -359,6 +360,9 @@ const TicketForm: React.FC = () => {
                 case pending_state:
                     status = "pending";
                     break;
+                case resolved_status:
+                    status = "resolved";
+                    break;
                 case out_of_service_state:
                     status = "out_of_service";
                     break;
@@ -505,7 +509,8 @@ const TicketForm: React.FC = () => {
                                             { value: in_progress_state, label: t('status.in_progress') },
                                             { value: pending_state, label: t('status.pending') },
                                             { value: out_of_service_state, label: t('status.out_of_service') },
-                                            { value: closestate, label: t('status.closed') }
+                                            { value: closestate, label: t('status.closed') },
+                                            { value: resolved_status, label: t('status.resolved') }
                                         ]} />
                                     </Form.Item>
                                 </Flex>

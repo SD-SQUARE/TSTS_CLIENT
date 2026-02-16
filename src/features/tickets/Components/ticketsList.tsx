@@ -28,6 +28,7 @@ const TicketList: React.FC = () => {
     const in_progress_state = "In Progress"
     const pending_state = "Pending"
     const out_of_service_state = "Out of Service"
+    const resolved_status = "Resolved"
     
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState<SearchableDataIndex | ''>('');
@@ -302,11 +303,14 @@ const TicketList: React.FC = () => {
                     case out_of_service_state:
                         status = out_of_service_state;
                         break;
+                    case resolved_status:
+                        status = resolved_status;
+                        break;
                     default:
                         status = openstate;
                 }
                 return(
-                    <Tag variant='outlined' color={status === openstate || status === reopenstate ? 'green' : status === in_progress_state ? 'blue' : status === closestate ? 'red' : status === pending_state ? 'orange' : status === out_of_service_state ? 'volcano' : 'geekblue'}>
+                    <Tag variant='outlined' color={status === openstate || status === reopenstate ? 'green' : status === in_progress_state ? 'blue' : status === closestate ? 'red' : status === pending_state ? 'gold' : status === out_of_service_state ? 'volcano': status === resolved_status ? 'lime' : 'geekblue'}>
                         {renderHighlightedText(status, 'status')}
                     </Tag>
                 )
