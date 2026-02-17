@@ -47,12 +47,13 @@ export const useGenericCrud = <
     const queryClient = useQueryClient();
 
     const {
-        data,
+        data = [],
         isLoading,
         error: fetchError,
     } = useQuery({
         queryKey,
         queryFn: fetchFn,
+        select: (result) => extractArray<T>(result),
     });
 
     const createMutation = useMutation({
@@ -95,7 +96,7 @@ export const useGenericCrud = <
     });
 
     return {
-        data: data || { data: [], meta: { total: 0, page_index: 1, page_size: 50 } },
+        data: data ,
         isLoading,
         fetchError,
         createMutation,
