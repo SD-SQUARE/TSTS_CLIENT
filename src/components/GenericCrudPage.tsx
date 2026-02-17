@@ -22,7 +22,7 @@ import {
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { mapRecordToFormValues, type FieldMapper } from "../utils/mapper";
-import i18next, { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 const { Text } = Typography;
 
@@ -30,18 +30,18 @@ interface GenericCrudProps<T> {
   title: string;
   columns: ColumnsType<T>;
   formItems: React.ReactNode;
-  
   data: T[];
   isLoading: boolean;
-  
+  total?: number;
+  pageIndex?: number;
+  pageSize?: number;
+  onPageChange?: (page: number, pageSize: number) => void;
   createMutation: any;
   updateMutation: any;
   deleteMutation: any;
-  
   disableAdd?: boolean;
   nestedFieldMappers?: FieldMapper<T>;
   tableSize?: "small" | "middle" | "large";
-
   searchText?: string;
   onSearch?: (value: string) => void;
 }
@@ -50,26 +50,36 @@ export const GenericCrudPage = <T extends { id: string | number }>({
   title,
   columns,
   formItems,
-  data=[],
+  data = [],
   isLoading,
+  total = 0,
+  pageIndex = 1,
+  pageSize = 50,
+  onPageChange,
   createMutation,
   updateMutation,
   deleteMutation,
   disableAdd = false,
   nestedFieldMappers = {},
   tableSize = "middle",
-  searchText="",
+  searchText = "",
   onSearch,
 }: GenericCrudProps<T>) => {
-  const [viewingItem, setViewingItem] = useState<T | null>(null);
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.language === "ar";
 
+  const [viewingItem, setViewingItem] = useState<T | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<T | null>(null);
   const [form] = Form.useForm();
-  // const [searchText, setSearchText] = useState("");
-
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
+
+  const formStyle: React.CSSProperties = {
+    marginTop: 20,
+    direction: isRtl ? "rtl" : "ltr",
+    textAlign: isRtl ? "right" : "left",
+  };
 
   useEffect(() => {
     if (viewingItem) {
@@ -80,14 +90,13 @@ export const GenericCrudPage = <T extends { id: string | number }>({
     }
   }, [data]);
 
-
   const handleApiErrors = (error: any) => {
     if (error.response?.data?.errors) {
       error.response.data.errors.forEach((err: any) => {
         form.setFields([{ name: err.key, errors: [err.message] }]);
       });
     } else {
-      message.error(error.message || "An unexpected error occurred");
+      message.error(error.message || t("SERVER_ERROR"));
     }
   };
 
@@ -97,10 +106,10 @@ export const GenericCrudPage = <T extends { id: string | number }>({
 
       if (editingItem) {
         await updateMutation.mutateAsync({ id: editingItem.id, data: values });
-        message.success(`${title} updated successfully`);
+        message.success(t("crud.update_success", { title }));
       } else {
         await createMutation.mutateAsync(values);
-        message.success(`${title} created successfully`);
+        message.success(t("crud.create_success", { title }));
       }
 
       setIsEditModalOpen(false);
@@ -114,34 +123,33 @@ export const GenericCrudPage = <T extends { id: string | number }>({
   const executeDelete = (id: string | number) => {
     deleteMutation.mutate(id, {
       onSuccess: () => {
-        message.success(`${title} deleted successfully`);
+        message.success(t("crud.delete_success", { title }));
         setViewingItem(null);
       },
-      onError: () => message.error("Delete failed"),
+      onError: () => message.error(t("crud.delete_failed")),
     });
   };
 
-
   const openDeletePrompt = () => {
-    setDeleteInput(""); 
+    setDeleteInput("");
     setIsDeleteModalOpen(true);
   };
 
   const verifyDeleteInput = () => {
     if (deleteInput !== "delete") {
-      message.error('You must type "delete" exactly to proceed.');
+      message.error(t("crud.delete_verify_error"));
       return;
     }
 
     setIsDeleteModalOpen(false);
 
     Modal.confirm({
-      title: 'Are you sure you want to delete this?',
+      title: t("crud.delete_confirm_title"),
       icon: <ExclamationCircleOutlined />,
-      content: `This action cannot be undone.`,
-      okText: 'Yes, Delete',
-      okType: 'danger',
-      cancelText: 'No',
+      content: t("crud.delete_confirm_content"),
+      okText: t("translation.yes"),
+      okType: "danger",
+      cancelText: t("translation.no"),
       onOk() {
         if (viewingItem) {
           executeDelete(viewingItem.id);
@@ -149,7 +157,6 @@ export const GenericCrudPage = <T extends { id: string | number }>({
       },
     });
   };
-
 
   const handleRowClick = (record: T) => {
     setViewingItem(record);
@@ -174,130 +181,151 @@ export const GenericCrudPage = <T extends { id: string | number }>({
 
   if (viewingItem) {
     return (
-      <div className="fade-in-animation">
-        <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="fade-in-animation" dir={isRtl ? "rtl" : "ltr"}>
+        <div
+          style={{
+            marginBottom: 20,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Space>
-                    <h2 style={{ margin: 0 }}> {i18next.language === 'en' ? 'Details' : 'تفاصيل'} </h2>
+            <h2 style={{ margin: 0 }}>{t("crud.details")}</h2>
           </Space>
-          
+
           <Space>
             <Button
               type="primary"
               icon={<EditOutlined />}
               onClick={() => openEditModal(viewingItem)}
-            style={{ backgroundColor: "var(--color-secondary)", borderColor: "var(--color-secondary)", color: "var(--color-black)" }}
+              style={{
+                backgroundColor: "var(--color-secondary)",
+                borderColor: "var(--color-secondary)",
+                color: "var(--color-black)",
+              }}
             >
-              {i18next.language === 'en' ? 'Edit' : 'تعديل'}
+              {t("translation.edit")}
             </Button>
-            
-            <Button 
-              type="primary" 
-               
-              icon={<DeleteOutlined />}
-                        onClick={openDeletePrompt}
-            style={{ backgroundColor: "var(--color-red)", borderColor: "var(--color-red)", }}
 
+            <Button
+              type="primary"
+              icon={<DeleteOutlined />}
+              onClick={openDeletePrompt}
+              style={{
+                backgroundColor: "var(--color-red)",
+                borderColor: "var(--color-red)",
+              }}
             >
-              {i18next.language === 'en' ? 'Delete' : 'حذف'}
+              {t("translation.delete")}
             </Button>
           </Space>
         </div>
 
         <Card bordered={false} className="admin-card">
-          <Descriptions 
-            bordered 
-            column={{ xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }} 
+          <Descriptions
+            bordered
+            column={{ xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }}
             size="middle"
-            labelStyle={{ width: '200px', fontWeight: 'bold', backgroundColor: '#fafafa' }}
+            labelStyle={{
+              width: "200px",
+              fontWeight: "bold",
+              backgroundColor: "#fafafa",
+            }}
           >
             {columns.map((col: any) => {
               const value = viewingItem[col.dataIndex as keyof T];
-              const renderedValue = col.render 
-                ? col.render(value, viewingItem, 0) 
+              const renderedValue = col.render
+                ? col.render(value, viewingItem, 0)
                 : value;
-                
+
               return (
-                <Descriptions.Item key={col.key || col.dataIndex} label={col.title}>
+                <Descriptions.Item
+                  key={col.key || col.dataIndex}
+                  label={col.title}
+                >
                   {renderedValue}
                 </Descriptions.Item>
               );
             })}
           </Descriptions>
         </Card>
-        <Button 
-              icon={<ArrowLeftOutlined />} 
-              onClick={handleBackToTable} 
-              type="primary"
-                style={{ marginTop: '2rem', fontSize: '16px' }}
-                
-            >
-              {i18next.language === 'en' ? 'Back to Table' : 'عودة إلى الجدول'}
+        <Button
+          icon={
+            <ArrowLeftOutlined
+              style={isRtl ? { transform: "rotate(180deg)" } : {}}
+            />
+          }
+          onClick={handleBackToTable}
+          type="primary"
+          style={{ marginTop: "2rem", fontSize: "16px" }}
+        >
+          {t("crud.back_to_list")}
         </Button>
 
         <Modal
-          title={`Edit ${title}`}
+          title={t("crud.edit_item", { title })}
           open={isEditModalOpen}
           onOk={handleEditOk}
           onCancel={() => setIsEditModalOpen(false)}
-          okText="Save Changes"
-          cancelText="Cancel"
+          okText={t("crud.save_changes")}
+          cancelText={t("common.cancel")}
           width="90%"
           style={{ maxWidth: 600 }}
           centered
         >
-          <Form form={form} layout="vertical" style={{ marginTop: 20 }}>
+          <Form form={form} layout="vertical" style={formStyle}>
             {formItems}
           </Form>
         </Modal>
 
-            <Modal
-                title={t("deleteModal.title")}
-                open={isDeleteModalOpen}
-                onOk={verifyDeleteInput}
-                onCancel={() => setIsDeleteModalOpen(false)}
-                okText={t("deleteModal.ok")}
-                cancelText={t("deleteModal.cancel")}
-                okButtonProps={{
-                    style: {
-                        backgroundColor: "var(--color-red)",
-                        borderColor: "var(--color-red)",
-                    },
-                }}
-                centered
-            >
-                <div style={{ paddingTop: 10, paddingBottom: 10 }}>
-                    <Text>
-                        {t("deleteModal.confirmText")}{" "}
-                        <strong>"{t("deleteModal.keyword")}"</strong>
-                    </Text>
+        <Modal
+          title={t("deleteModal.title")}
+          open={isDeleteModalOpen}
+          onOk={verifyDeleteInput}
+          onCancel={() => setIsDeleteModalOpen(false)}
+          okText={t("deleteModal.ok")}
+          cancelText={t("deleteModal.cancel")}
+          okButtonProps={{
+            style: {
+              backgroundColor: "var(--color-red)",
+              borderColor: "var(--color-red)",
+            },
+          }}
+          centered
+        >
+          <div style={{ paddingTop: 10, paddingBottom: 10 }}>
+            <Text>
+              {t("deleteModal.confirmText")}{" "}
+              <strong>"{t("deleteModal.keyword")}"</strong>
+            </Text>
 
-                    <Input
-                        style={{ marginTop: 15 }}
-                        placeholder={t("deleteModal.placeholder")}
-                        value={deleteInput}
-                        onChange={(e) => setDeleteInput(e.target.value)}
-                        onPressEnter={verifyDeleteInput}
-                    />
-                </div>
-            </Modal>
+            <Input
+              style={{ marginTop: 15 }}
+              placeholder={t("deleteModal.placeholder")}
+              value={deleteInput}
+              onChange={(e) => setDeleteInput(e.target.value)}
+              onPressEnter={verifyDeleteInput}
+            />
+          </div>
+        </Modal>
       </div>
     );
   }
 
-  
-
-
-  const skeletonRows = Array.from({ length: 6 }, (_, idx) => ({ 
-    id: `loading-${idx}` 
+  const skeletonRows = Array.from({ length: 6 }, (_, idx) => ({
+    id: `loading-${idx}`,
   })) as T[];
-  
+
   const skeletonColumns = columns.map((col) => ({
     ...col,
-    render: () => <Skeleton.Input style={{ width: "100%", height: 12 }} active />,
+    render: () => (
+      <Skeleton.Input style={{ width: "100%", height: 12 }} active />
+    ),
   }));
 
   return (
-    <div dir={i18next.language === "ar" ? "rtl" : "ltr"}>
+    <div dir={isRtl ? "rtl" : "ltr"}>
       <div
         className="page-header-row"
         style={{
@@ -308,26 +336,26 @@ export const GenericCrudPage = <T extends { id: string | number }>({
           marginBottom: 20,
         }}
       >
-              <h2 className="page-title"></h2>
+        <h2 className="page-title"></h2>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
           <Input
-            placeholder="Search..."
+            placeholder={t("crud.search_placeholder")}
             prefix={<SearchOutlined />}
             allowClear
             value={searchText}
-            onChange={(e) => onSearch?.(e.target.value)} 
+            onChange={(e) => onSearch?.(e.target.value)}
             style={{ flex: 1, minWidth: 150 }}
           />
 
           {!disableAdd && (
             <Button
               icon={<PlusOutlined />}
-            type="primary"
+              type="primary"
               size="large"
               onClick={openAddModal}
             >
-              {i18next.language === "ar" ? "اضافة" : "Add"} {title}
+              {t("crud.add_new", { title })}
             </Button>
           )}
         </div>
@@ -335,8 +363,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
 
       <div className="admin-card compact-table-wrapper">
         <Table
-            title={() => <Typography.Title level={3}>{title}</Typography.Title>}
-                        
+          title={() => <Typography.Title level={3}>{title}</Typography.Title>}
           className="super-compact-table"
           size={tableSize}
           columns={isLoading ? skeletonColumns : columns}
@@ -350,28 +377,33 @@ export const GenericCrudPage = <T extends { id: string | number }>({
           pagination={
             isLoading
               ? false
-                  : {
+              : {
                   position: ["bottomRight"],
-                  pageSize: 10,
-                      showSizeChanger: true,
-                    className: "custom-pagination",
+                  current: pageIndex,
+                  pageSize: pageSize,
+                  total: total,
+                  showSizeChanger: true,
+                  className: "custom-pagination",
+                  onChange: (page, pSize) => {
+                    onPageChange?.(page, pSize);
+                  },
                 }
           }
         />
       </div>
 
       <Modal
-        title={`${i18next.language === "ar" ? "اضافة" : "Add"} ${title}`}
+        title={t("crud.add_new", { title })}
         open={isEditModalOpen}
         onOk={handleEditOk}
         onCancel={() => setIsEditModalOpen(false)}
-        okText="Create"
-        cancelText="Cancel"
+        okText={t("crud.create")}
+        cancelText={t("common.cancel")}
         width="90%"
         style={{ maxWidth: 600 }}
         centered
       >
-        <Form form={form} layout="vertical" style={{ marginTop: 20 }}>
+        <Form form={form} layout="vertical" style={formStyle}>
           {formItems}
         </Form>
       </Modal>

@@ -81,7 +81,7 @@ export const AppRoutes = () => {
         { key: "/settings/domains", label: t('Domains'), icon: <ProjectOutlined /> },
         { key: "/settings/departments", label: t('Departments'), icon: <ApartmentOutlined /> },
         { key: "/settings/specializations", label: t('Specializations'), icon: <ExperimentOutlined /> },
-        { key: "/settings/problems", label: t('Problems'), icon: <IssuesCloseOutlined /> },
+        { key: "/settings/problems", label: t('problems'), icon: <IssuesCloseOutlined /> },
 
         { key: "/settings/trusted-devices", label: t("trusted_devices.Trusted Devices"), icon: <SafetyOutlined /> },
         // { key: "/settings/permissions", label: t('Permissions'), icon: <SafetyOutlined /> },
