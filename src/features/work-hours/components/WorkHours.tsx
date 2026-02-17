@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Input, TimePicker, Checkbox, Switch, Tag } from 'antd';
 import { GenericCrudPage } from '../../../components/GenericCrudPage';
 import { useGenericCrud } from '../../../api/common/hooks/common-hooks';
 import type { WorkHour, CreateWorkHourDto, UpdateWorkHourDto } from '../types/types';
 import { useTranslation } from "react-i18next";
 import dayjs from 'dayjs';
-const STATIC_DATA: WorkHour[] = Array.from({length: 40}, (_, i) => ({
+
+const STATIC_DATA: WorkHour[] = Array.from({length: 120}, (_, i) => ({
   id: i + 1,
   name_en: `Shift ${i + 1}`,
-  startTime: `${Math.floor(Math.random() * 24)}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
-  endTime: `${Math.floor(Math.random() * 24)}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
+  startTime: `${Math.floor(Math.random() * 24).toString().padStart(2, '0')}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
+  endTime: `${Math.floor(Math.random() * 24).toString().padStart(2, '0')}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
   isActive: Math.random() < 0.5,
   daysOfWeek: Array.from({length: Math.floor(Math.random() * 7)}, (_, j) => j),
 }));
@@ -20,8 +21,29 @@ const formatTime = (time: any) => {
 };
 
 const mockWorkHourService = {
-  getAll: async (): Promise<WorkHour[]> => {
-    return new Promise((resolve) => setTimeout(() => resolve([...STATIC_DATA]), 500));
+  getAll: async (params?: { page?: number; page_size?: number; name?: string }): Promise<any> => {
+    const page = params?.page || 1;
+    const pageSize = params?.page_size || 50;
+    const nameFilter = params?.name?.toLowerCase() || "";
+
+    const filteredData = STATIC_DATA.filter(item => 
+      item.name_en?.toLowerCase().includes(nameFilter)
+    );
+
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+    const paginatedData = filteredData.slice(start, end);
+
+    return new Promise((resolve) => 
+      setTimeout(() => resolve({
+        data: paginatedData,
+        meta: {
+          total: filteredData.length,
+          page_index: page,
+          page_size: pageSize
+        }
+      }), 500)
+    );
   },
   
   create: async (data: CreateWorkHourDto): Promise<WorkHour> => {
@@ -38,7 +60,6 @@ const mockWorkHourService = {
 
   update: async (id: string | number, data: UpdateWorkHourDto): Promise<WorkHour> => {
     const index = STATIC_DATA.findIndex(item => item.id === id);
-    
     if (index > -1) {
       const updated = { 
         ...STATIC_DATA[index], 
@@ -46,7 +67,6 @@ const mockWorkHourService = {
         startTime: formatTime(data.startTime), 
         endTime: formatTime(data.endTime)
       } as WorkHour;
-      
       STATIC_DATA[index] = updated; 
       return Promise.resolve(updated);
     }
@@ -64,6 +84,8 @@ const mockWorkHourService = {
 
 const WorkHoursPage: React.FC = () => {
   const { t } = useTranslation();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 50 });
   
   const daysOptions = [
     { label: 'Sun', value: 0 },
@@ -84,8 +106,12 @@ const WorkHoursPage: React.FC = () => {
     updateMutation,
     deleteMutation,
   } = useGenericCrud<WorkHour, CreateWorkHourDto, UpdateWorkHourDto>({
-    queryKey: ['workHours'],
-    fetchFn: mockWorkHourService.getAll,
+    queryKey: ['workHours', searchTerm, pagination.current, pagination.pageSize],
+    fetchFn: () => mockWorkHourService.getAll({ 
+      name: searchTerm, 
+      page: pagination.current, 
+      page_size: pagination.pageSize 
+    }),
     createFn: mockWorkHourService.create,
     updateFn: ({ id, data }) => mockWorkHourService.update(id, data),
     deleteFn: mockWorkHourService.delete,
@@ -134,7 +160,7 @@ const WorkHoursPage: React.FC = () => {
         name="name_en" 
         label="Shift Name" 
         rules={[
-          { required: true, message: 'Please enter a name' },
+          { required: true, message: t("required") },
           { pattern: /^[A-Za-z0-9\s.,-]*$/, message: t("english_only") }
         ]}
       >
@@ -185,13 +211,22 @@ const WorkHoursPage: React.FC = () => {
       title="Work Hours (Test Mode)"
       columns={columns}
       formItems={formItems}
-      data={data}
+      data={data?.data || []}
       isLoading={isLoading}
+      total={data?.meta?.total || 0}
+      pageIndex={pagination.current}
+      pageSize={pagination.pageSize}
+      onPageChange={(page, size) => setPagination({ current: page, pageSize: size })}
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}
       nestedFieldMappers={nestedFieldMappers}
-      disableAdd={true} 
+      searchText={searchTerm}
+      onSearch={(val) => {
+        setSearchTerm(val);
+        setPagination(prev => ({ ...prev, current: 1 }));
+      }}
+      disableAdd={false} 
       tableSize="small"
     />
   );

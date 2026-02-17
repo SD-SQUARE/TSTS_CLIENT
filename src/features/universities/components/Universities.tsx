@@ -1,19 +1,15 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { Form, Input, Tooltip } from 'antd';
 import { GenericCrudPage } from '../../../components/GenericCrudPage';
 import { useGenericCrud } from '../../../api/common/hooks/common-hooks';
 import { universityApi } from '../services/universityApi';
 import type { University, CreateUniversityDto, UpdateUniversityDto } from '../types/types';
 import { useTranslation } from "react-i18next";
-// import { BaseCrudService } from '../../../api/common/services/common-services';
 
 const UniversitiesPage: React.FC = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
-//   const universityApi = new BaseCrudService<University>(
-//     "v1/universities",
-//     "v1/universities/:id"
-//   );
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 50 });
   
   const {
     data,
@@ -22,11 +18,15 @@ const UniversitiesPage: React.FC = () => {
     updateMutation,
     deleteMutation,
   } = useGenericCrud<University, CreateUniversityDto, UpdateUniversityDto>({
-    queryKey: ['universities',searchTerm],
-      fetchFn: () => universityApi.getAll({ name: searchTerm }),
+    queryKey: ['universities', searchTerm, pagination.current, pagination.pageSize],
+    fetchFn: () => universityApi.getAll({ 
+      name: searchTerm, 
+      page: pagination.current, 
+      page_size: pagination.pageSize 
+    }),
     createFn: (data) => universityApi.create(data),
     updateFn: ({ id, data }) => universityApi.update(id, data),
-    deleteFn:  (id) => universityApi.delete(id),
+    deleteFn: (id) => universityApi.delete(id),
   });
 
   const columns = [
@@ -100,13 +100,20 @@ const UniversitiesPage: React.FC = () => {
       title={t("universities")}
       columns={columns}
       formItems={formItems}
-      data={data}
+      data={data?.data || []}
       isLoading={isLoading}
+      total={data?.meta?.total || 0}
+      pageIndex={pagination.current}
+      pageSize={pagination.pageSize}
+      onPageChange={(page, size) => setPagination({ current: page, pageSize: size })}
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}
       searchText={searchTerm}
-      onSearch={(val) => setSearchTerm(val)}
+      onSearch={(val) => {
+        setSearchTerm(val);
+        setPagination(prev => ({ ...prev, current: 1 }));
+      }}
     />
   );
 };
