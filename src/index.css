@@ -396,3 +396,7 @@ body{
 .custom-pagination{
     margin-top: 1rem !important;
 }
+
+:where(.css-3uaqrl).ant-avatar>img {
+  object-fit: contain !important;
+}

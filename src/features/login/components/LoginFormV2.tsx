@@ -143,7 +143,7 @@ const LoginFormV2 = () => {
             onMouseLeave={() => setIsHovered(false)}
         >
             <div className="login-left">
-                <Avatar src={loginImage} shape="square" size={350} />
+                <Avatar src={loginImage} shape="square" size={250} style={{objectFit: "contain"}} />
             </div>
 
             <div className="login-right">

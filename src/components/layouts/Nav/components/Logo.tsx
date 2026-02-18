@@ -11,11 +11,11 @@ const Logo = ({ onClick }) => {
     const navigate = useNavigate();
 
     const getLogoSize = (screens) => {
-        if (screens.xl) return 54;
-        if (screens.lg) return 48;
-        if (screens.md) return 38;
-        if (screens.sm) return 38;
-        return 38; // default for xs
+        if (screens.xl) return 48;
+        if (screens.lg) return 38;
+        if (screens.md) return 32;
+        if (screens.sm) return 28;
+        return 24; // default for xs
     };
 
 
