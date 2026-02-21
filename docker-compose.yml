@@ -13,7 +13,6 @@ services:
     networks:
       - tsts-network
 
-
 networks:
   tsts-network:
     external: true
