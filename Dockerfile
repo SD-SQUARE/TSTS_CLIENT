@@ -1,3 +1,4 @@
+# Build stage
 FROM node:20-alpine AS builder
 WORKDIR /app
 
@@ -7,27 +8,9 @@ RUN npm ci
 COPY . .
 RUN npm run build:staging
 
+# Runtime stage
 FROM nginx:alpine
-
-COPY ./nginx.conf.template /etc/nginx/templates/default.conf.template
+COPY ./nginx.conf /etc/nginx/nginx.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
-
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
-
-# # Build stage
-# FROM node:20-alpine AS builder
-# WORKDIR /app
-
-# COPY package*.json ./
-# RUN npm ci
-
-# COPY . .
-# RUN npm run build:staging
-
-# # Runtime stage
-# FROM nginx:alpine
-# COPY ./nginx.conf /etc/nginx/nginx.conf
-# COPY --from=builder /app/dist /usr/share/nginx/html
-# EXPOSE 80
-# CMD ["nginx", "-g", "daemon off;"]
