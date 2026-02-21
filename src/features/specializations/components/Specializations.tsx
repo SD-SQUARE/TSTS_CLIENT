@@ -121,7 +121,7 @@ const SpecializationsPage: React.FC = () => {
       title={t("specializations")}
       columns={columns}
       formItems={formItems}
-      data={data.data}
+    data={data}
       isLoading={isLoading}
       createMutation={createMutation}
       updateMutation={updateMutation}
@@ -131,7 +131,6 @@ const SpecializationsPage: React.FC = () => {
           setSearchTerm(val);
           setPagination(prev => ({ ...prev, current: 1 })); // Reset to page 1 on search
       }}
-      total={data.meta?.total}
       pageIndex={pagination.current}
       pageSize={pagination.pageSize}
       onPageChange={(page, size) => setPagination({ current: page, pageSize: size })}

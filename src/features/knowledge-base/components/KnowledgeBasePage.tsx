@@ -215,7 +215,7 @@ const KnowledgeBasePage: React.FC = () => {
                   </div>
 
                   <div style={{ marginTop: 24, display: 'flex', gap: 8, alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
-                    {/* {isPrivileged ? ( */}
+                    {isPrivileged ? (
                     <>
                       <Button
                         type="text"
@@ -248,8 +248,8 @@ const KnowledgeBasePage: React.FC = () => {
                         <DeleteOutlined /> {t('knowledge.delete')}
                       </Button>
                     </>
-                    {/* ) : ( */}
-                    {/* <Button 
+                    ) : (
+                    <Button 
                       block 
                       type="primary" 
                       style={{ borderRadius: 12, height: 48, background: 'linear-gradient(90deg, #1890ff 0%, #096dd9 100%)', border: 'none', boxShadow: '0 6px 16px rgba(24, 144, 255, 0.25)', fontWeight: 600, fontSize: 15, letterSpacing: '0.5px' }}
@@ -257,8 +257,8 @@ const KnowledgeBasePage: React.FC = () => {
                       onClick={() => openViewModal(item)}
                     >
                       {isRtl ? 'قراءة المقال' : 'Read Article'}
-                    </Button> */}
-                    {/* )}  */}
+                    </Button> 
+                    )}  
                   </div>
                 </Card>
               </List.Item>

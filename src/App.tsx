@@ -12,6 +12,7 @@ import { useEffect, useState } from "react"
 import { getUserData } from "./utils/getUserData.utils"
 import { authInitialized, loginSuccess } from "./features/login/store/authSlice"
 import { useDispatch, useSelector } from "react-redux"
+import { loadCsrfToken } from "./api/http"
 
 function App() {
     const { t } = useTranslation();
@@ -19,6 +20,7 @@ function App() {
     const { user } = useSelector((state: any) => state.auth);
     
     useEffect(() => {
+        loadCsrfToken().catch(console.error);
         const userData = getUserData();
         if (userData) {
             dispatch(loginSuccess(userData));
@@ -39,12 +41,12 @@ function App() {
                         < >
                             <NavItem to={`${APP_BASE_PATH}/knowledge-base`}>{t('Knowledge-Base')}</NavItem>
                             <NavItem to={`/${user.role.toLowerCase()}/tickets`}>{t('Tickets')}</NavItem>
-                            {/* <GuardedRoute roles={["admin"]} allowNavigation={false}> */}
+                            <GuardedRoute roles={["admin"]} allowNavigation={false}>
                                 <NavItem to={`/identities/groups`}>{t('Personnel')}</NavItem>
-                            {/* </GuardedRoute>     */}
-                            {/* <GuardedRoute roles={["admin"]} allowNavigation={false}> */}
+                            </GuardedRoute>    
+                            <GuardedRoute roles={["admin"]} allowNavigation={false}>
                                 <NavItem to={`/settings/domains`}>{t('Settings')}</NavItem>
-                            {/* </GuardedRoute>     */}
+                            </GuardedRoute>    
                         </>
                     )}
                 </NavBar>

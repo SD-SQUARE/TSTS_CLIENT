@@ -195,9 +195,8 @@ const ProblemsPage: React.FC = () => {
       title={t("problems")}
       columns={columns}
       formItems={formItems}
-      data={data?.data || []}
+      data={data ?? []}
       isLoading={isLoading}
-      total={data?.meta?.total || 0}
       pageIndex={pagination.current}
       pageSize={pagination.pageSize}
       onPageChange={(page, size) => setPagination({ current: page, pageSize: size })}

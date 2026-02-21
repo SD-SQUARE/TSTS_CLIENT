@@ -297,7 +297,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
           <div style={{ paddingTop: 10, paddingBottom: 10 }}>
             <Text>
               {t("deleteModal.confirmText")}{" "}
-              <strong>"{t("deleteModal.keyword")}"</strong>
+              <Text strong copyable>{t("deleteModal.keyword")}</Text>
             </Text>
 
             <Input

@@ -10,6 +10,12 @@ const api = axios.create({
     withCredentials: true,
 })
 
+let csrfToken: string | null = null;
+
+export async function loadCsrfToken() {
+    const res = await api.get("v1/auth/csrf-token");
+    csrfToken = res.data.csrfToken;
+}
 
 // Attach token from session storage (simple approach)
 api.interceptors.request.use((config) => {
@@ -17,6 +23,12 @@ api.interceptors.request.use((config) => {
     const token = sessionStorage.getItem('token')
     if (token && config.headers)
         config.headers.Authorization = `Bearer ${token}`
+
+    if (csrfToken) {
+        
+        config.headers['X-CSRF-Token'] = csrfToken;
+    }
+
     return config
 })
 
