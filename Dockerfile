@@ -15,20 +15,15 @@ RUN npm run build:staging
 # EXPOSE 80
 # CMD ["nginx", "-g", "daemon off;"]
 
-# Runtime stage
 FROM nginx:alpine
 
 WORKDIR /etc/nginx
 
-# Copy your template
 COPY ./nginx.conf /etc/nginx/nginx.conf.template
-
-# Copy frontend build
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 EXPOSE 80
 
-# Run envsubst to create the actual nginx.conf
 CMD envsubst '$VITE_API_PROTOCOL $VITE_API_HOST $VITE_API_PORT $VITE_API_BASE_PATH' \
     < /etc/nginx/nginx.conf.template \
     > /etc/nginx/nginx.conf && nginx -g 'daemon off;'
