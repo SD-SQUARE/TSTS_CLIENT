@@ -2,7 +2,7 @@ import axios from 'axios'
 import { API_BASE_PATH, API_HOST, APP_PORT, API_PROTOCOL } from '../app/config'
 import i18n from '../i18n';
 
-const URL = API_PROTOCOL + '://' + API_HOST + ':' + APP_PORT + '/' + API_BASE_PATH;
+const URL = API_PROTOCOL + '://' + API_HOST + ':' + 80 + '/' + API_BASE_PATH;
 
 const api = axios.create({
     baseURL: URL,
