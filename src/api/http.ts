@@ -5,7 +5,7 @@ import i18n from '../i18n';
 const URL = API_PROTOCOL + '://' + API_HOST + ':' + API_PORT + '/' + API_BASE_PATH;
 
 const api = axios.create({
-    baseURL: URL,
+    baseURL: '/api',
     headers: { 'Content-Type': 'application/json' },
     withCredentials: true,
 })
