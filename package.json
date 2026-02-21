@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "app:ProdBuild": "docker compose up --build -d",
-    "app:ProdDown": "docker compose down"
+    "app:ProdDown": "docker compose down",
+    "secret:publish": "npx --yes tsx ./scripts/publish-env.ts"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.10.1",
