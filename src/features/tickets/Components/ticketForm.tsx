@@ -11,10 +11,10 @@ import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import RequiredTag from '../../../components/RequiredTag';
 import { useSelector } from 'react-redux';
-import { fetchAdmins, fetchGroups, fetchGroupUsers, useAdmins, useTicketDetails, useTicketMutations, useTicketProblems } from '../Hooks/useTicketForm';
+import { fetchAdmins, fetchGroups, fetchGroupUsers,  useTicketDetails, useTicketMutations, useTicketProblems } from '../Hooks/useTicketForm';
 import { queryClient } from '../../../app/queryClient';
+import ReactQuill from 'react-quill-new';
 
-const { TextArea } = Input;
 
 const TicketForm: React.FC = () => {
     const { t } = useTranslation();
@@ -58,15 +58,15 @@ const TicketForm: React.FC = () => {
                     value: g.id,
                     title: g.name,
                     isLeaf: false,
-                    selectable: false, 
+                    selectable: false,
                     checkable: false,
-                    color: g.color 
+                    color: g.color
                 }));
                 const adminRoot = {
                     id: 'admin_root',
                     pId: 0,
                     value: 'admin_root',
-                    title: t('Admins'), 
+                    title: t('Admins'),
                     isLeaf: false,
                     selectable: false,
                     checkable: false
@@ -95,7 +95,7 @@ const TicketForm: React.FC = () => {
                         queryFn: fetchAdmins
                     });
                     const adminUsers = response.data?.users || [];
-                    
+
                     const adminNodes = adminUsers.map((u: any) => ({
                         id: u.id,
                         pId: 'admin_root',
@@ -104,7 +104,7 @@ const TicketForm: React.FC = () => {
                         isLeaf: true,
                         selectable: true
                     }));
-    
+
                     setTreeData((prev) => {
                         const newUserIds = new Set(adminNodes.map(n => n.id));
                         const filteredPrev = prev.filter(node => !newUserIds.has(node.id));
@@ -123,7 +123,7 @@ const TicketForm: React.FC = () => {
                         const exists = prev.some(node => node.pId === id);
                         if (exists) return prev;
                         return [...prev, ...roleNodes];
-                    });                    resolve();
+                    }); resolve();
                     return;
                 }
                 const groupId = id.split('_')[0];
@@ -162,8 +162,6 @@ const TicketForm: React.FC = () => {
         });
     };
     const getStepperData = () => {
-        // Default middle state if none is selected or if 'open' is selectedKey
-
         const middleStates = [in_progress_state, pending_state, out_of_service_state];
         const middleStatesNames = ['in_progress', 'pending', 'out_of_service'];
         let activeMiddleState = 'in_progress';
@@ -193,7 +191,7 @@ const TicketForm: React.FC = () => {
         } else if (middleStates.includes(currentStatus)) {
             currentStepIndex = 1;
         } else {
-            currentStepIndex = 0; // 'open'
+            currentStepIndex = 0; 
         }
 
         return { steps, currentStepIndex };
@@ -396,10 +394,41 @@ const TicketForm: React.FC = () => {
         }
     };
 
+    const handleCustomReset = () => {
+        const currentTitle = form.getFieldValue('title');
+        const currentDescription = form.getFieldValue('description');
+    
+        form.resetFields();
+    
+        form.setFieldsValue({
+            title: currentTitle,
+            description: currentDescription,
+        });
+    
+        if (isEdit && ticketData?.attachments) {
+            setFileList(ticketData.attachments.map((file: any) => ({
+                uid: file.id,
+                name: file.fileName || file.name || 'Attachment',
+                status: 'done',
+                url: file.url,
+            })));
+        } else {
+            setFileList([]);
+        }
+    };
+
+    const modules = {
+        toolbar: [
+            [{ 'header': [1, 2, false] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            ['link', 'image', 'clean']
+        ],
+    };
 
     const problemMenuItems = groupedData?.specializations?.map((spec: any) => {
         const hasProblems = spec.problems && spec.problems.length > 0;
-    
+
         return {
             key: `spec-${spec.id}`,
             label: (
@@ -407,7 +436,7 @@ const TicketForm: React.FC = () => {
                     {spec.name}
                 </span>
             ),
-            children: hasProblems 
+            children: hasProblems
                 ? spec.problems?.map((prob: any) => ({
                     key: prob.id,
                     label: (
@@ -455,7 +484,6 @@ const TicketForm: React.FC = () => {
                 }}
             >
                 <Card bordered={false}>
-                    { }
                     {!isRequester && isEdit && (
                         <div style={{ marginBottom: 48, marginTop: 12, padding: '0 40px' }}>
                             <Steps
@@ -470,7 +498,7 @@ const TicketForm: React.FC = () => {
                         {isEdit ? t('tickets.editTicket') : t('tickets.newTicket')}
                     </Typography.Title>
 
-                    <Form form={form} layout="vertical" onFinish={onFinish} requiredMark={false} style={{ width: '100%' }}>
+                    <Form form={form} layout="vertical" onFinish={onFinish} requiredMark={false} style={{ width: '100%' }} >
 
                         <Form.Item style={{ marginBottom: 24 }} >
                             <Flex align="center" gap="middle" wrap="wrap" >
@@ -522,7 +550,6 @@ const TicketForm: React.FC = () => {
                                 </Flex>
                                 <Form.Item name="assignee" label={t('tickets.assignee')} style={{ marginBottom: 0 }}>
                                     <TreeSelect
-                                        // key={treeData.length}
                                         treeDataSimpleMode
                                         style={{ width: '100%' }}
                                         dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
@@ -541,13 +568,25 @@ const TicketForm: React.FC = () => {
 
 
                         <Form.Item name="title" label={<Flex align="center" gap="small"><span>{t('tickets.title')}</span><RequiredTag /></Flex>} rules={[{ required: true }]}>
-                            <Input style={{ width: '100%' }} showCount maxLength={255} />
+                            <Input disabled={isEdit} style={{ width: '100%' }} showCount maxLength={255} />
                         </Form.Item>
 
 
-                        <Form.Item name="description" label={<Flex align="center" gap="small"><span>{t('tickets.description')}</span><RequiredTag /></Flex>} rules={[{ required: true }]}>
-                            <TextArea style={{ width: '100%' }} showCount maxLength={20000} rows={6} />
-                        </Form.Item>
+                        <Form.Item 
+    name="description" 
+    label={<Flex align="center" gap="small"><span>{t('tickets.description')}</span><RequiredTag /></Flex>} 
+    rules={[{ required: true }]}
+    trigger="onChange"
+    validateTrigger="onBlur"
+>
+    <ReactQuill 
+        theme="snow"
+        modules={modules}
+        placeholder={t('tickets.descriptionPlaceholder')}
+        readOnly={isEdit}
+        style={{ height: '150px', marginBottom: '50px' }} 
+    />
+</Form.Item>
 
 
                         {canEditAttachments && (
@@ -588,7 +627,7 @@ const TicketForm: React.FC = () => {
                             <Flex justify="flex-end" gap="middle">
                                 <Button size="large"
                                     onClick={handleBack}>{t('common.back')}</Button>
-                                <Button size="large" onClick={() => form.resetFields()}>{t('common.reset')}</Button>
+                                <Button size="large" onClick={handleCustomReset}>{t('common.reset')}</Button>
                                 <Button size="large" type="primary" htmlType="submit" loading={createMutation.isPending || updateMutation.isPending || coordinateMutation.isPending}>
                                     {isEdit ? t('common.save') : t('common.create')}
                                 </Button>
