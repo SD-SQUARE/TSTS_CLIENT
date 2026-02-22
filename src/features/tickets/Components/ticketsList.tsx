@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import React, { useRef, useState } from 'react';
-import { Table, Tag, Typography, Spin, Alert, Pagination, Space, Button, Flex, Popover, type InputRef, Input, type TableColumnType, Select, TreeSelect, Tooltip } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import { Resizable } from 'react-resizable';
+import { Table, Tag, Typography, Spin, Alert, Pagination, Space, Button, Flex, Popover, type InputRef, Input, type TableColumnType, Select, TreeSelect, Tooltip, Checkbox } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { FilterOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { FilterOutlined, HolderOutlined, PlusOutlined, SearchOutlined, SettingOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import type { Problem, Specialization, Ticket } from '../Types/tickets';
 import { useTickets } from '../Hooks/useTicket';
@@ -13,6 +14,9 @@ import EllipsisComponent from '../../../components/EllipsisComponent';
 import Highlighter from 'react-highlight-words';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
 import { useSpecializations, useTicketProblems } from '../Hooks/useTicketForm';
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 type SearchableDataIndex = `title` | `problem` | `specialization` | `status` | 'priority' | 'description';
 
@@ -466,6 +470,143 @@ const TicketList: React.FC = () => {
         },
     ];
 
+
+
+    const columnOptions = columns.map(col => ({
+        label: col.title as string,
+        value: col.key as string,
+    }));
+
+    const [visibleColumns, setVisibleColumns] = useState<string[]>(
+        columns.map(col => col.key as string)
+    );
+
+    const [columnOrder, setColumnOrder] = useState<string[]>(
+        columns.map(col => col.key as string)
+    );
+
+    const SortableItem = ({ id, label, isChecked, onCheck }: any) => {
+        const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+
+        const style = {
+            transform: CSS.Transform.toString(transform),
+            transition,
+            display: 'flex',
+            alignItems: 'center',
+            padding: '4px 8px',
+            background: isDragging ? '#fafafa' : 'transparent',
+            zIndex: isDragging ? 1000 : 1,
+            borderRadius: '4px',
+            border: isDragging ? '1px solid #91caff' : '1px solid transparent',
+        };
+
+        return (
+            <div ref={setNodeRef} style={style}>
+                <HolderOutlined {...attributes} {...listeners} style={{ cursor: 'grab', marginRight: 8, color: '#bfbfbf' }} />
+                <Checkbox checked={isChecked} onChange={() => onCheck(id)}>
+                    {label}
+                </Checkbox>
+            </div>
+        );
+    };
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: { distance: 8 },
+        })
+    );
+
+    const onDragEnd = ({ active, over }: any) => {
+        if (active.id !== over?.id) {
+            setColumnOrder((prev) => {
+                const activeIndex = prev.indexOf(active.id);
+                const overIndex = prev.indexOf(over.id);
+                return arrayMove(prev, activeIndex, overIndex);
+            });
+        }
+    };
+
+    const controlPanel = (
+        <div style={{ padding: '8px', width: '220px' }}>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+                <SortableContext items={columnOrder} strategy={verticalListSortingStrategy}>
+                    <Flex vertical gap="small">
+                        {columnOrder.map((key) => {
+                            const col = columns.find(c => c.key === key);
+                            return (
+                                <SortableItem
+                                    key={key}
+                                    id={key}
+                                    label={col?.title as string}
+                                    isChecked={visibleColumns.includes(key)}
+                                    onCheck={(id: string) => {
+                                        setVisibleColumns(prev =>
+                                            prev.includes(id) ? prev.filter(k => k !== id) : [...prev, id]
+                                        );
+                                    }}
+                                />
+                            );
+                        })}
+                    </Flex>
+                </SortableContext>
+            </DndContext>
+        </div>
+    );
+
+    const filteredColumns = columns.filter(col => visibleColumns.includes(col.key as string));
+
+    const ResizableTitle = (props: any) => {
+        const { onResize, width, ...restProps } = props;
+        const [localWidth, setLocalWidth] = useState(width);
+
+        useEffect(() => {
+            setLocalWidth(width);
+        }, [width]);
+        if (!width) return <th {...restProps} />;
+        return (
+            <Resizable
+                width={localWidth}
+                height={0}
+                handle={<span className="react-resizable-handle" onClick={(e) => e.stopPropagation()} />}
+                onResize={(_, { size }) => {
+                    setLocalWidth(size.width);
+                }}
+                onResizeStop={onResize}
+                draggableOpts={{ enableUserSelectHack: false }}
+            >
+                <th {...restProps} style={{ ...restProps.style, width: localWidth }} />
+            </Resizable>
+        );
+    };
+
+
+    const [colWidths, setColWidths] = useState<{ [key: string]: number }>({
+        id: 60, status: 140, priority: 120, title: 250, description: 400, specialization: 180, problem: 180, requesterName: 180, assignee: 300
+    });
+
+    const handleResize = (key: string) => (e: any, { size }: any) => {
+        setColWidths(prev => ({ ...prev, [key]: size.width }));
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const finalColumns = React.useMemo(() => {
+        
+        return columnOrder
+        .map(key => columns.find(c => c.key === key)) 
+        .filter(col => col && visibleColumns.includes(col.key as string)) 
+        .map(col => ({
+            ...col,
+            width: colWidths[col!.key as string] || col!.width,
+            onHeaderCell: (column: any) => ({
+                width: column.width,
+                onResize: handleResize(column.key as string),
+            }),
+        }));
+    }, [columnOrder, colWidths, visibleColumns]);
+
+
+
+
     if (isLoading) return <Spin size="large" style={{ display: 'block', margin: '50px auto' }} />;
 
     if (isError) return (
@@ -493,38 +634,43 @@ const TicketList: React.FC = () => {
                     flex: 1 !important;
                     overflow: hidden !important;
                 }
+                .react-resizable {
+                    position: relative;
+                    background-clip: padding-box;
+                }
+                .react-resizable-handle {
+                    position: absolute;
+                    right: -10px !important;
+                    bottom: 0;
+                    z-index: 10;
+                    width: 20px !important;
+                    height: 100%;
+                    cursor: col-resize;
+                }
+                
                 `}
             </style>
-            <Typography.Title level={2} style={{ marginBottom: 16 }}>
-                {t('tickets.listTitle')}
-            </Typography.Title>
 
-            <Flex justify="space-between" align="center" wrap="wrap" gap="middle" style={{ marginBottom: 24 }}>
-                <Pagination
-                    current={pagination.page}
-                    pageSize={pagination.pageSize}
-                    total={data?.total || 0}
-                    onChange={handleTableChange}
-                    showSizeChanger
-                />
-                {isRequester &&
-                    <Button
-                        type="primary"
-                        icon={<PlusOutlined />}
-                        onClick={handleAdd}
-                        size="large"
-                    >
-                        {t('tickets.new_ticket')}
-                    </Button>
-                }
+
+            <Flex justify="space-between" align="center" style={{ marginBottom: 16 }}>
+                <Typography.Title level={2} style={{ margin: 0 }}>{t('tickets.listTitle')}</Typography.Title>
+
+                <Space>
+                    <Popover content={controlPanel} title={t('common.showHideColumns')} trigger="click">
+                        <Button icon={<SettingOutlined />}>{t('common.columns')}</Button>
+                    </Popover>
+                    {isRequester && <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>{t('tickets.new_ticket')}</Button>}
+                </Space>
             </Flex>
 
             <Table
-                columns={columns}
+                components={{ header: { cell: ResizableTitle } }}
+                columns={finalColumns}
                 dataSource={data?.data || []}
                 rowKey="id"
                 loading={isLoading}
-                scroll={{ x: 1600 }}
+                tableLayout='fixed'
+                scroll={{ x: 'max-content', y: 'calc(100vh - 280px)' }}
                 pagination={false}
                 onRow={handleRowClick}
             />

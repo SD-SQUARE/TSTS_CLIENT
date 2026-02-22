@@ -354,7 +354,9 @@
     "cancel": "Cancel",
     "empty": "Empty",
     "old": "Old",
-    "new": "New"
+    "new": "New",
+    "showHideColumns": "Show/Hide Columns",
+    "columns": "Columns"
   },
   "success": {
     "created": "Ticket created successfully",
