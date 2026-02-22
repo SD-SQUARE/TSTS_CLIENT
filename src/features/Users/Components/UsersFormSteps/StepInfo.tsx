@@ -18,6 +18,24 @@ const StepInfo: React.FC<Props> = ({ initialData, onNext }) => {
     useEffect(() => { reset(initialData); }, [initialData, reset]);
     const { t } = useTranslation();
 
+    const firstName = watch("first_name_en");
+    const midName = watch("mid_name_en");
+    const lastName = watch("last_name_en");
+
+    useEffect(() => {
+        const concatenated = `${firstName || ""} ${midName || ""} ${lastName || ""}`.trim().replace(/\s+/g, ' ');
+        setValue("full_name_en", concatenated, { shouldValidate: true });
+    }, [firstName, midName, lastName, setValue]);
+
+    const firstNameAr = watch("first_name_ar");
+    const midNameAr = watch("mid_name_ar");
+    const lastNameAr = watch("last_name_ar");
+
+    useEffect(() => {
+        const concatenatedAr = `${firstNameAr || ""} ${midNameAr || ""} ${lastNameAr || ""}`.trim().replace(/\s+/g, ' ');
+        setValue("full_name_ar", concatenatedAr, { shouldValidate: true });
+    }, [firstNameAr, midNameAr, lastNameAr, setValue]);
+
 
     const imageFile = watch("image");
     const getImageSrc = () => {
@@ -27,7 +45,7 @@ const StepInfo: React.FC<Props> = ({ initialData, onNext }) => {
     };
 
     const onSubmit = (data: UserFormData) => {
-        onNext({ image: data.image, first_name_en: data.first_name_en, first_name_ar: data.first_name_ar, mid_name_en: data.mid_name_en, mid_name_ar: data.mid_name_ar, last_name_en: data.last_name_en, last_name_ar: data.last_name_ar, ssn: data.ssn });
+        onNext({ image: data.image, first_name_en: data.first_name_en, first_name_ar: data.first_name_ar, mid_name_en: data.mid_name_en, mid_name_ar: data.mid_name_ar, last_name_en: data.last_name_en, last_name_ar: data.last_name_ar, full_name_en: data.full_name_en, full_name_ar: data.full_name_ar, ssn: data.ssn });
     };
 
     const hoverStyles = `
@@ -116,6 +134,15 @@ const StepInfo: React.FC<Props> = ({ initialData, onNext }) => {
                         }}
                         render={({ field }) => <Input {...field} />} />
                 </Form.Item>
+                <Form.Item label={t("user_list.full_name_ar")}
+                    validateStatus={errors.full_name_ar ? "error" : ""} help={errors.full_name_ar?.message}>
+                    <Controller
+                        name="full_name_ar"
+                        control={control}
+                        rules={{ pattern: { value: ARABIC_REGEX, message: t("arabic_only") } }}
+                        render={({ field }) => <Input {...field} placeholder={t("user_list.full_name_placeholder")} />}
+                    />
+                </Form.Item>
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.fname_en")}</span><RequiredTag /></Flex>}
                     validateStatus={errors.first_name_en ? "error" : ""} help={errors.first_name_en?.message} required>
                     <Controller name="first_name_en" control={control}
@@ -148,6 +175,15 @@ const StepInfo: React.FC<Props> = ({ initialData, onNext }) => {
                             }
                         }}
                         render={({ field }) => <Input {...field} />} />
+                </Form.Item>
+                <Form.Item label={t("user_list.full_name_en")}
+                    validateStatus={errors.full_name_en ? "error" : ""} help={errors.full_name_en?.message}>
+                    <Controller
+                        name="full_name_en"
+                        control={control}
+                        rules={{ pattern: { value: ENGLISH_REGEX, message: t("english_only") } }}
+                        render={({ field }) => <Input {...field} placeholder={t("user_list.full_name_placeholder")} />}
+                    />
                 </Form.Item>
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.ssn")}</span><RequiredTag /></Flex>}
                     validateStatus={errors.ssn ? "error" : ""} help={errors.ssn?.message} required>

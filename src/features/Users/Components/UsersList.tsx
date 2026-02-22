@@ -212,11 +212,11 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                         onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
                         onPressEnter={() => {
                             const val = selectedKeys[0] as string;
-                            setApiSearchQuery(prev => ({ 
-                                ...prev, 
-                                first_name: val, 
-                                mid_name: val, 
-                                last_name: val 
+                            setApiSearchQuery(prev => ({
+                                ...prev,
+                                first_name: val,
+                                mid_name: val,
+                                last_name: val
                             }));
                             confirm();
                         }}
@@ -230,11 +230,11 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                             style={{ width: 90 }}
                             onClick={() => {
                                 const val = selectedKeys[0] as string;
-                                setApiSearchQuery(prev => ({ 
-                                    ...prev, 
-                                    first_name: val, 
-                                    mid_name: val, 
-                                    last_name: val 
+                                setApiSearchQuery(prev => ({
+                                    ...prev,
+                                    first_name: val,
+                                    mid_name: val,
+                                    last_name: val
                                 }));
                                 confirm();
                             }}
@@ -269,12 +269,12 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                 const mn = record[`mid_name_${currentLanguage}`] || "";
                 const ln = record[`last_name_${currentLanguage}`] || "";
                 const fullName = `${fn} ${mn} ${ln}`.trim().replace(/\s+/g, ' ');
-                
+
                 return (
                     <Typography.Text strong>
                         <Highlighter
                             highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                            searchWords={[apiSearchQuery.first_name || '']} 
+                            searchWords={[apiSearchQuery.first_name || '']}
                             autoEscape
                             textToHighlight={fullName}
                         />
@@ -431,7 +431,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                     <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
                         {t("Add_User")}
                     </Button>
-                </Space>           
+                </Space>
             </Space>
 
             <Table
