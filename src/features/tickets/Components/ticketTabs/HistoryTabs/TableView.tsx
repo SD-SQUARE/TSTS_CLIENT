@@ -15,7 +15,7 @@ interface Props {
 const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor }) => {
     const { t } = useTranslation();
 
-    const columns = [
+    const columns: any[] = [
         {
             title: t('tickets.type'),
             dataIndex: 'type',
@@ -50,10 +50,10 @@ const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor }) 
             dataIndex: 'meta',
             key: 'user',
             render: (meta: any) => {
-                if (!meta?.user) return '-'; 
-                
-                const displayName = i18n.language === 'ar' 
-                    ? meta.user.full_name_ar 
+                if (!meta?.user) return '-';
+
+                const displayName = i18n.language === 'ar'
+                    ? meta.user.full_name_ar
                     : meta.user.full_name_en;
 
                 return (
@@ -75,6 +75,33 @@ const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor }) 
                 </Typography.Text>
             ),
         },
+        {
+            title: t('tickets.state'),
+            key: 'state_group',
+            align: 'center',
+            children: [
+                {
+                    title: t('common.old'),
+                    dataIndex: 'meta',
+                    key: 'old_state',
+                    width: 120,
+                    align: 'center',
+                    render: (meta: any) => meta?.old ? (
+                        <Tag>{t(`status.${meta.old.toLowerCase().replace(' ', '_')}`, { defaultValue: meta.old })}</Tag>
+                    ) : '-',
+                },
+                {
+                    title: t('common.new'),
+                    dataIndex: 'meta',
+                    key: 'new_state',
+                    width: 120,
+                    align: 'center',
+                    render: (meta: any) => meta?.new ? (
+                        <Tag color="blue">{t(`status.${meta.new.toLowerCase().replace(' ', '_')}`, { defaultValue: meta.new })}</Tag>
+                    ) : '-',
+                },
+            ],
+        },
     ];
 
     return (
@@ -84,6 +111,7 @@ const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor }) 
             rowKey="id"
             pagination={{ pageSize: 10 }}
             bordered
+            size="small"
         />
     );
 };
