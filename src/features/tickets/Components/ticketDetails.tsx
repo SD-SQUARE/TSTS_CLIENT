@@ -9,7 +9,6 @@ import { useTicketActivities, useTicketMedia, useTicketReviews } from '../Hooks/
 import TicketInfoTab from './ticketTabs/InfoTab';
 import TicketMediaTab from './ticketTabs/MediaTab';
 import TicketHistoryTab from './ticketTabs/HistoryTab';
-import TicketChatTab from './ticketTabs/ChatTab';
 import { useGetChatMessagesQuery } from '../store/services/chatApi';
 import TicketReviewsTab from './ticketTabs/ReviewTab';
 
@@ -19,11 +18,11 @@ const TicketView: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const { data: ticket, isLoading: infoLoading, refetch : refetchInfo } = useTicketDetails(id);
-    const { data: media, isLoading: mediaLoading, refetch : refetchMedia } = useTicketMedia(id);
-    const { refetch : refetchHistory } = useTicketActivities(id);
-    const { refetch : refetchChat } = useGetChatMessagesQuery(id);
-    const { data: reviewsData, isLoading: reviewsLoading, refetch : refetchReviews } = useTicketReviews(id);
+    const { data: ticket, isLoading: infoLoading, refetch: refetchInfo } = useTicketDetails(id);
+    const { data: media, isLoading: mediaLoading, refetch: refetchMedia } = useTicketMedia(id);
+    const { refetch: refetchHistory } = useTicketActivities(id);
+    const { refetch: refetchChat } = useGetChatMessagesQuery(id);
+    const { data: reviewsData, isLoading: reviewsLoading, refetch: refetchReviews } = useTicketReviews(id);
 
     const pathParts = location.pathname.split('/');
     const lastPart = pathParts[pathParts.length - 1];
@@ -46,10 +45,10 @@ const TicketView: React.FC = () => {
         }
     }, [activeKey, refetchInfo, refetchMedia, refetchChat, refetchHistory, refetchReviews]);
 
-    const assigneeNames = ticket?.assignee
+    // const assigneeNames = ticket?.assignee
 
-        ?.map((a: any) => a.name || `${a.first_name} ${a.last_name}`)
-        .join(', ');
+    //     ?.map((a: any) => a.name || `${a.first_name} ${a.last_name}`)
+    //     .join(', ');
 
     const handleTabChange = (key: string) => {
         if (key === 'info') {
@@ -80,11 +79,11 @@ const TicketView: React.FC = () => {
             label: t('tickets.tabMedia'),
             children: <TicketMediaTab media={media} isLoading={mediaLoading} />,
         },
-        {
-            key: 'chat',
-            label: t('tickets.tabChat'),
-            children: <TicketChatTab assigneeName={assigneeNames} />
-        },
+        // {
+        //     key: 'chat',
+        //     label: t('tickets.tabChat'),
+        //     children: <TicketChatTab assigneeName={assigneeNames} />
+        // },
         {
             key: 'reviews',
             label: t('tickets.tabReviews'),
@@ -99,17 +98,32 @@ const TicketView: React.FC = () => {
 
     return (
         <div style={{ padding: '24px', paddingBottom: 0, backgroundColor: '#fff', borderRadius: '8px' }}>
-<Flex align="center" gap="middle" style={{ marginBottom: 24 }}>
-                <Button 
-                    type="text" 
-                    icon={<ArrowLeftOutlined />} 
+            <style>{`
+            .ant-tabs-left > .ant-tabs-nav .ant-tabs-tab {
+                border-bottom: 1px solid #f0f0f0 !important;
+                margin-bottom: 0 !important;
+                padding: 12px 16px !important;
+            }
+            .ant-tabs-left > .ant-tabs-nav .ant-tabs-tab:last-child {
+                border-bottom: none !important;
+            }
+            /* Optional: Add hover effect to make them feel more like menu items */
+            .ant-tabs-left > .ant-tabs-nav .ant-tabs-tab:hover {
+                background: #fafafa;
+            }
+        `}</style>
+            <Flex align="center" gap="middle" style={{ marginBottom: 24 }}>
+                <Button
+                    type="text"
+                    icon={<ArrowLeftOutlined />}
                     onClick={handleBack}
                     style={{ fontSize: '18px' }}
                 />
                 <Typography.Title level={2} style={{ margin: 0 }}>
                     {t('tickets.ticketDetails')}
                 </Typography.Title>
-            </Flex>            <Tabs  activeKey={activeKey} onChange={handleTabChange} items={tabItems} />
+            </Flex>
+            <Tabs activeKey={activeKey} onChange={handleTabChange} items={tabItems} tabPlacement='start' style={{ minHeight: '500px' }} />
         </div>
     );
 };
