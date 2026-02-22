@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useRef, useState } from "react";
-import { Table, Button, Space, Popconfirm, message, Pagination, Tooltip, Badge, Tag, Popover, Input } from "antd";
+import { Table, Button, Space, Popconfirm, message, Pagination, Tooltip, Badge, Tag, Popover, Input, Typography } from "antd";
 import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined, DownOutlined, SearchOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import type { ColumnsType } from "antd/es/table";
@@ -199,24 +199,88 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                 );
             },
         },
-
         {
-            title: t("user_list.fname"),
-            dataIndex: `first_name_${currentLanguage}`,
-            key: "first_name",
-            ...getColumnSearchProps(`first_name`, "user_list.fname")
-        },
-        {
-            title: t("user_list.mname"),
-            dataIndex: `mid_name_${currentLanguage}`,
-            key: "mid_name",
-            ...getColumnSearchProps(`mid_name`, "user_list.mname")
-        },
-        {
-            title: t("user_list.lname"),
-            dataIndex: `last_name_${currentLanguage}`,
-            key: "last_name",
-            ...getColumnSearchProps(`last_name`, "user_list.lname")
+            title: t("user_list.full_name"),
+            key: "full_name",
+            fixed: "left",
+            width: 250,
+            filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+                <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+                    <Input
+                        placeholder={`${t("common.search")}...`}
+                        value={selectedKeys[0]}
+                        onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                        onPressEnter={() => {
+                            const val = selectedKeys[0] as string;
+                            setApiSearchQuery(prev => ({ 
+                                ...prev, 
+                                first_name: val, 
+                                mid_name: val, 
+                                last_name: val 
+                            }));
+                            confirm();
+                        }}
+                        style={{ marginBottom: 8, display: 'block' }}
+                    />
+                    <Space>
+                        <Button
+                            type="primary"
+                            size="small"
+                            icon={<SearchOutlined />}
+                            style={{ width: 90 }}
+                            onClick={() => {
+                                const val = selectedKeys[0] as string;
+                                setApiSearchQuery(prev => ({ 
+                                    ...prev, 
+                                    first_name: val, 
+                                    mid_name: val, 
+                                    last_name: val 
+                                }));
+                                confirm();
+                            }}
+                        >
+                            {t("common.search")}
+                        </Button>
+                        <Button
+                            size="small"
+                            style={{ width: 90 }}
+                            onClick={() => {
+                                setApiSearchQuery(prev => {
+                                    const newState = { ...prev };
+                                    delete newState.first_name;
+                                    delete newState.mid_name;
+                                    delete newState.last_name;
+                                    return newState;
+                                });
+                                clearFilters?.();
+                                confirm();
+                            }}
+                        >
+                            {t("common.reset")}
+                        </Button>
+                    </Space>
+                </div>
+            ),
+            filterIcon: (filtered: boolean) => (
+                <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />
+            ),
+            render: (_, record) => {
+                const fn = record[`first_name_${currentLanguage}`] || "";
+                const mn = record[`mid_name_${currentLanguage}`] || "";
+                const ln = record[`last_name_${currentLanguage}`] || "";
+                const fullName = `${fn} ${mn} ${ln}`.trim().replace(/\s+/g, ' ');
+                
+                return (
+                    <Typography.Text strong>
+                        <Highlighter
+                            highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                            searchWords={[apiSearchQuery.first_name || '']} 
+                            autoEscape
+                            textToHighlight={fullName}
+                        />
+                    </Typography.Text>
+                );
+            },
         },
         {
             title: t("user_list.ssn"),
