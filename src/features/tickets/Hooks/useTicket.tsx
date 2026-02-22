@@ -104,3 +104,14 @@ export const useChangeTicketStatus = (id: string) => {
         },
     });
 };
+
+export const useUserProfile = (id: string) => {
+    return useQuery({
+        queryKey: ['userProfile', id],
+        queryFn: async () => {
+            const { data } = await api.get(`/v1/users/profile/${id}/view`);
+            return data;
+        },
+        enabled: !!id,
+    });
+};

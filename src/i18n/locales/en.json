@@ -279,7 +279,7 @@
     "ticketDetails": "Ticket Details",
     "tabInfo": "Info",
     "tabMedia": "Media",
-    "tabChat": "Chat",
+    "commentSection": "Comments",
     "tabHistory": "History",
     "Timeline": "Timeline",
     "Table": "Table",
@@ -309,7 +309,11 @@
     "feedbackPlaceholder": "Tell us more about the service...",
     "optional": "(Optional)",
     "writeReview": "Write a Review",
-    "currently_assigned": "Currently Assigned"
+    "currently_assigned": "Currently Assigned",
+    "details": "Details",
+    "reviewSubmitted": "Thank you! Your review has been submitted.",
+    "state" : "State",
+    "techs": "Technician"
   },
   "priority": {
     "important": "Important",
@@ -345,7 +349,9 @@
     "loading": "Loading...",
     "submit": "Submit",
     "cancel": "Cancel",
-    "empty": "Empty"
+    "empty": "Empty",
+    "old": "Old",
+    "new": "New"
   },
   "success": {
     "created": "Ticket created successfully",

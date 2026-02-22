@@ -329,7 +329,7 @@
     "ticketDetails": "تفاصيل التذكرة",
     "tabInfo": "المعلومات",
     "tabMedia": "الوسائط",
-    "tabChat": "المحادثة",
+    "commentSection": "التعليقات",
     "tabHistory": "التاريخ",
     "Timeline": "الجدول الزمني",
     "Table": "جدول",
@@ -359,7 +359,11 @@
     "feedbackPlaceholder": "قل لنا المزيد عن خدمتك...",
     "optional": "(اختياري)",
     "writeReview": "كتابة تقييم",
-    "currently_assigned": "معين لفني بعد"
+    "currently_assigned": "معين لفني بعد",
+    "details": "التفاصيل",
+    "reviewSubmitted": "شكرا لك! تم تقديم التقييم الخاص بك.",
+    "state" : "الحالة",
+    "techs": "الفني"
   },
   "priority": {
     "important": "مهمة",
@@ -395,7 +399,9 @@
     "loading": "جاري التحميل...",
     "submit": "تقديم",
     "cancel": "الغاء",
-    "empty": "لا يوجد بيانات"
+    "empty": "لا يوجد بيانات",
+    "old": "قديم",
+    "new": "جديد"
   },
   "success": {
     "created": "تم إنشاء التذكرة بنجاح",
