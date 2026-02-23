@@ -12,29 +12,26 @@ const ARABIC_REGEX = /^[\u0600-\u06FF\s\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\u
 interface Props { initialData: UserFormData; onNext: (data: Partial<UserFormData>) => void; }
 
 const StepInfo: React.FC<Props> = ({ initialData, onNext }) => {
-    const { handleSubmit, control, formState: { errors }, reset, setValue, watch } =
+    const { handleSubmit, control, formState: { errors }, reset, setValue,getValues, watch } =
         useForm<UserFormData>({ defaultValues: initialData, mode: "onChange" });
+
+    const isEditMode = !!initialData.first_name_ar;
 
     useEffect(() => { reset(initialData); }, [initialData, reset]);
     const { t } = useTranslation();
 
-    const firstName = watch("first_name_en");
-    const midName = watch("mid_name_en");
-    const lastName = watch("last_name_en");
+    const handleNamePartChange = (lang: 'en' | 'ar') => {
+        if (isEditMode) return; 
 
-    useEffect(() => {
-        const concatenated = `${firstName || ""} ${midName || ""} ${lastName || ""}`.trim().replace(/\s+/g, ' ');
-        setValue("full_name_en", concatenated, { shouldValidate: true });
-    }, [firstName, midName, lastName, setValue]);
-
-    const firstNameAr = watch("first_name_ar");
-    const midNameAr = watch("mid_name_ar");
-    const lastNameAr = watch("last_name_ar");
-
-    useEffect(() => {
-        const concatenatedAr = `${firstNameAr || ""} ${midNameAr || ""} ${lastNameAr || ""}`.trim().replace(/\s+/g, ' ');
-        setValue("full_name_ar", concatenatedAr, { shouldValidate: true });
-    }, [firstNameAr, midNameAr, lastNameAr, setValue]);
+        const values = getValues();
+        const f = values[`first_name_${lang}`] || "";
+        const m = values[`mid_name_${lang}`] || "";
+        const l = values[`last_name_${lang}`] || "";
+        
+        const full = `${f} ${m} ${l}`.trim().replace(/\s+/g, ' ');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setValue(`full_name_${lang}` as any, full, { shouldValidate: true });
+    };
 
 
     const imageFile = watch("image");
@@ -110,7 +107,10 @@ const StepInfo: React.FC<Props> = ({ initialData, onNext }) => {
                                 message: t("arabic_only"),
                             }
                         }}
-                        render={({ field }) => <Input {...field} />} />
+                        render={({ field }) => <Input {...field} onChange={(e) => {
+                            field.onChange(e); 
+                            handleNamePartChange('ar'); 
+                        }} />} />
                 </Form.Item>
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.mname_ar")}</span><RequiredTag /></Flex>}
                     validateStatus={errors.mid_name_ar ? "error" : ""} help={errors.mid_name_ar?.message} required>
@@ -121,7 +121,10 @@ const StepInfo: React.FC<Props> = ({ initialData, onNext }) => {
                                 message: t("arabic_only"),
                             }
                         }}
-                        render={({ field }) => <Input {...field} />} />
+                        render={({ field }) => <Input {...field} onChange={(e) => {
+                            field.onChange(e); 
+                            handleNamePartChange('ar'); 
+                        }}/>} />
                 </Form.Item>
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.lname_ar")}</span><RequiredTag /></Flex>}
                     validateStatus={errors.last_name_ar ? "error" : ""} help={errors.last_name_ar?.message} required>
@@ -132,14 +135,17 @@ const StepInfo: React.FC<Props> = ({ initialData, onNext }) => {
                                 message: t("arabic_only"),
                             }
                         }}
-                        render={({ field }) => <Input {...field} />} />
+                        render={({ field }) => <Input {...field} onChange={(e) => {
+                            field.onChange(e); 
+                            handleNamePartChange('ar'); 
+                        }}/>} />
                 </Form.Item>
-                <Form.Item label={t("user_list.full_name_ar")}
-                    validateStatus={errors.full_name_ar ? "error" : ""} help={errors.full_name_ar?.message}>
+                <Form.Item label={<Flex gap="small"><span>{t("user_list.full_name_ar")}</span><RequiredTag /></Flex>}
+                    validateStatus={errors.full_name_ar ? "error" : ""} help={errors.full_name_ar?.message} required>
                     <Controller
                         name="full_name_ar"
                         control={control}
-                        rules={{ pattern: { value: ARABIC_REGEX, message: t("arabic_only") } }}
+                        rules={{ required: t("required"), pattern: { value: ARABIC_REGEX, message: t("arabic_only") } }}
                         render={({ field }) => <Input {...field} placeholder={t("user_list.full_name_placeholder")} />}
                     />
                 </Form.Item>
@@ -152,7 +158,10 @@ const StepInfo: React.FC<Props> = ({ initialData, onNext }) => {
                                 message: t("english_only"),
                             }
                         }}
-                        render={({ field }) => <Input {...field} />} />
+                        render={({ field }) => <Input {...field} onChange={(e) => {
+                            field.onChange(e); 
+                            handleNamePartChange('en'); 
+                        }}/>} />
                 </Form.Item>
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.mname_en")}</span><RequiredTag /></Flex>}
                     validateStatus={errors.mid_name_en ? "error" : ""} help={errors.mid_name_en?.message} required>
@@ -163,7 +172,10 @@ const StepInfo: React.FC<Props> = ({ initialData, onNext }) => {
                                 message: t("english_only"),
                             }
                         }}
-                        render={({ field }) => <Input {...field} />} />
+                        render={({ field }) => <Input {...field} onChange={(e) => {
+                            field.onChange(e); 
+                            handleNamePartChange('en'); 
+                        }}/>} />
                 </Form.Item>
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.lname_en")}</span><RequiredTag /></Flex>}
                     validateStatus={errors.last_name_en ? "error" : ""} help={errors.last_name_en?.message} required>
@@ -174,14 +186,17 @@ const StepInfo: React.FC<Props> = ({ initialData, onNext }) => {
                                 message: t("english_only"),
                             }
                         }}
-                        render={({ field }) => <Input {...field} />} />
+                        render={({ field }) => <Input {...field} onChange={(e) => {
+                            field.onChange(e); 
+                            handleNamePartChange('en'); 
+                        }}/>} />
                 </Form.Item>
-                <Form.Item label={t("user_list.full_name_en")}
-                    validateStatus={errors.full_name_en ? "error" : ""} help={errors.full_name_en?.message}>
+                <Form.Item label={<Flex gap="small"><span>{t("user_list.full_name_en")}</span><RequiredTag /></Flex>}
+                    validateStatus={errors.full_name_en ? "error" : ""} help={errors.full_name_en?.message} required>
                     <Controller
                         name="full_name_en"
                         control={control}
-                        rules={{ pattern: { value: ENGLISH_REGEX, message: t("english_only") } }}
+                        rules={{ required: t("required"), pattern: { value: ENGLISH_REGEX, message: t("english_only") } }}
                         render={({ field }) => <Input {...field} placeholder={t("user_list.full_name_placeholder")} />}
                     />
                 </Form.Item>
