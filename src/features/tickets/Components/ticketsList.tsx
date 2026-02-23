@@ -18,7 +18,7 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from 
 import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-type SearchableDataIndex = `title` | `problem` | `specialization` | `status` | 'priority' | 'description';
+type SearchableDataIndex = `id` | `title` | `problem` | `specialization` | `status` | 'priority' | 'description';
 
 const TicketList: React.FC = () => {
     const { t } = useTranslation();
@@ -293,10 +293,23 @@ const TicketList: React.FC = () => {
             title: "#",
             dataIndex: 'id',
             key: 'id',
-            width: 60,
+            width: 150,
             fixed: 'left',
-            render: (_, __, index) => (pagination.page - 1) * pagination.pageSize + index + 1,
-        },
+            ...getColumnSearchProps('id' as any, 'tickets.id'), 
+            render: (id: string) => {
+                if (!id) return "-";
+                const shortId = id.substring(0, 4);
+        
+                return (
+                    <Tooltip title={id} placement="topLeft">
+                        <Typography.Text copyable={{ text: id }} style={{ cursor: 'help' }}>
+                            <span style={{ fontFamily: 'monospace' }}>
+                                {shortId}...
+                            </span>
+                        </Typography.Text>
+                    </Tooltip>
+                );
+            },        },
         {
             title: t('tickets.status'),
             dataIndex: 'status',
