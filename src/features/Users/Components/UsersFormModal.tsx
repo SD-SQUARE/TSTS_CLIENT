@@ -31,6 +31,8 @@ const initialFormData: UserFormData = {
     mid_name_ar: "",
     last_name_en: "",
     last_name_ar: "",
+    full_name_en: "",
+    full_name_ar: "",
     ssn: "",
     contacts: { phones: [""], mobiles: [""] },
     job_ar: "",
@@ -83,6 +85,8 @@ const UserFormModal: React.FC<{
                     mid_name_ar: fetchedUserDetail.mid_name_ar,
                     last_name_en: fetchedUserDetail.last_name_en,
                     last_name_ar: fetchedUserDetail.last_name_ar,
+                    full_name_en: fetchedUserDetail.full_name_en,
+                    full_name_ar: fetchedUserDetail.full_name_ar,
                     ssn: fetchedUserDetail.ssn,
                     contacts: { phones: fetchedUserDetail.contacts.phones, mobiles: fetchedUserDetail.contacts.mobiles },
                     job_en: fetchedUserDetail.job_en,
@@ -121,6 +125,8 @@ const UserFormModal: React.FC<{
             formData.mid_name_en !== initialFormData.mid_name_en ||
             formData.last_name_ar !== initialFormData.last_name_ar ||
             formData.last_name_en !== initialFormData.last_name_en ||
+            formData.full_name_ar !== initialFormData.full_name_ar ||
+            formData.full_name_en !== initialFormData.full_name_en ||
             formData.ssn !== initialFormData.ssn
         );
     };
@@ -164,6 +170,8 @@ const UserFormModal: React.FC<{
             mid_name_ar: data.mid_name_ar,
             last_name_en: data.last_name_en,
             last_name_ar: data.last_name_ar,
+            full_name_en: data.full_name_en,
+            full_name_ar: data.full_name_ar,
             ssn: data.ssn,
             job_en: data.job_en,
             job_ar: data.job_ar,

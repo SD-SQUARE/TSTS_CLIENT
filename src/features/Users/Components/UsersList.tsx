@@ -265,11 +265,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                 <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />
             ),
             render: (_, record) => {
-                const fn = record[`first_name_${currentLanguage}`] || "";
-                const mn = record[`mid_name_${currentLanguage}`] || "";
-                const ln = record[`last_name_${currentLanguage}`] || "";
-                const fullName = `${fn} ${mn} ${ln}`.trim().replace(/\s+/g, ' ');
-
+                const fullName = record[`full_name_${currentLanguage}`] || "";
                 return (
                     <Typography.Text strong>
                         <Highlighter
