@@ -568,7 +568,7 @@ const TicketForm: React.FC = () => {
 
 
                         <Form.Item name="title" label={<Flex align="center" gap="small"><span>{t('tickets.title')}</span><RequiredTag /></Flex>} rules={[{ required: true }]}>
-                            <Input disabled={isEdit} style={{ width: '100%' }} showCount maxLength={255} />
+                            <Input readOnly={isEdit} style={{ width: '100%' }} showCount maxLength={255} />
                         </Form.Item>
 
 
