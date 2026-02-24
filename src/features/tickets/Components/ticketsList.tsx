@@ -303,20 +303,18 @@ const TicketList: React.FC = () => {
             width: 150,
             fixed: 'left',
             ...getColumnSearchProps('id' as any, 'tickets.id'), 
-            render: (id: string) => {
-                if (!id) return "-";
-                const shortId = id.split('-')[0];
-        
-                return (
-                    <Tooltip title={id} placement="topLeft">
-                        <Typography.Text copyable={{ text: id }} style={{ cursor: 'help' }}>
-                            <span style={{ fontFamily: 'monospace' }}>
-                                {shortId}...
-                            </span>
-                        </Typography.Text>
-                    </Tooltip>
-                );
-            },        },
+            render: (id: string) => (
+                <Popover
+                    title={t('tickets.id')}
+                    content={<div style={{ maxWidth: 400, fontFamily: 'monospace' }}>{id}</div>}
+                    trigger="hover"
+                    placement="topLeft"
+                >
+                    <EllipsisComponent content={renderHighlightedText(id, 'id')} copyable />
+                </Popover>
+            ),      },
+            
+            
         {
             title: t('tickets.status'),
             dataIndex: 'status',

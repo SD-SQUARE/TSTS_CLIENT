@@ -53,14 +53,15 @@ import React, { useState } from 'react';
 
 interface EllipsisComponentProps {
     content: React.ReactNode;
+    copyable?: boolean;
 }
 
-const EllipsisComponent: React.FC<EllipsisComponentProps> = ({ content }) => {
+const EllipsisComponent: React.FC<EllipsisComponentProps> = ({ content, copyable = false }) => {
     const [expanded, setExpanded] = useState(false);
 
     return (
         <Typography.Paragraph
-        
+        copyable={copyable}
             style={{ margin: 0 }}
             ellipsis={{
                 rows: 1,
