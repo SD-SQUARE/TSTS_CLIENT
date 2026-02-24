@@ -19,7 +19,9 @@ import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } 
 import { CSS } from '@dnd-kit/utilities';
 import DOMPurify from "dompurify";
 
-type SearchableDataIndex = `id` | `title` | `problem` | `specialization` | `status` | 'priority' | 'description';
+type SearchableDataIndex = `id` | `title` | `problem` | `specialization` | `status` | 'priority'; 
+// | 'description';
+
 const getSavedData = (key: string, fallback: any) => {
     const saved = localStorage.getItem(key);
     return saved ? JSON.parse(saved) : fallback;
@@ -54,6 +56,8 @@ const TicketList: React.FC = () => {
 
     const problemTreeData = hierarchicalProblems?.specializations?.map((spec: any) => {
         const hasProblems = spec.problems && spec.problems.length > 0;
+
+        
 
         return {
             title: (
@@ -156,7 +160,7 @@ const TicketList: React.FC = () => {
 
 
     const renderHighlightedText = (text: string, dataIndex: SearchableDataIndex) => {
-        
+
         return searchedColumn === dataIndex && searchText ? (
             <Highlighter
                 highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
@@ -165,12 +169,12 @@ const TicketList: React.FC = () => {
                 textToHighlight={text ? text.toString() : ''}
             />
         ) : (
-                text
-                // <div
-                //     // TODO: use quilljs here
-                //     dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(text || '') }}
-                // />
-            
+            text
+            // <div
+            //     // TODO: use quilljs here
+            //     dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(text || '') }}
+            // />
+
         );
     };
 
@@ -306,7 +310,7 @@ const TicketList: React.FC = () => {
             key: 'id',
             width: 150,
             fixed: 'left',
-            ...getColumnSearchProps('id' as any, 'tickets.id'), 
+            ...getColumnSearchProps('id' as any, 'tickets.id'),
             render: (id: string) => (
                 <Popover
                     title={t('tickets.id')}
@@ -316,9 +320,10 @@ const TicketList: React.FC = () => {
                 >
                     <EllipsisComponent content={renderHighlightedText(id, 'id')} copyable />
                 </Popover>
-            ),      },
-            
-            
+            ),
+        },
+
+
         {
             title: t('tickets.status'),
             dataIndex: 'status',
@@ -401,25 +406,36 @@ const TicketList: React.FC = () => {
             ),
             ...getColumnSearchProps('title', 'tickets.title'),
         },
-        {
-            title: t('tickets.description'),
-            dataIndex: 'description',
-            key: 'description',
-            width: 500,
-            render: (text: string) => (
-                <Popover
-                    title={t('tickets.description')} 
-                    content={<div style={{ maxWidth: 500 }}>{text}</div>}
-                    trigger="hover"
-                    placement="topLeft"
-                >
-                    <EllipsisComponent  content={renderHighlightedText(text, 'description')} />
-                    {/* <EllipsisComponent percentage={4} isDescription={true} content={renderHighlightedText(text, 'description')} /> */}
+        // {
+        //     title: t('tickets.description'),
+        //     dataIndex: 'description',
+        //     key: 'description',
+        //     width: 500,
+        //     render: (text: string) => (
+        //         <Popover
+        //             title={t('tickets.description')}
+        //             content={<div className="quill-content-full" style={{ maxWidth: 500, maxHeight: 400, overflowY: 'auto' }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(text || '') }} />}
+        //             trigger="hover"
+        //             placement="topLeft"
+        //         >
+        //             {(() => {
+        //                 const HTMLtext = `
+        //     <p>This is a <strong>Quill JS</strong> generated description.</p>
+        //     <p>It contains multiple paragraphs to test if the <em>ellipsis</em> handles block elements correctly.</p>
+        //     <ul>
+        //         <li>Point one for testing lists</li>
+        //         <li>Point two for testing lists</li>
+        //     </ul>
+        //     <p>Finally, some <span style="color: red;">colored text</span> to check if inline styles are preserved after sanitization.</p>
+        //     `;
+        //                 return <EllipsisComponent content={renderHighlightedText(HTMLtext, 'description')} isHTML />;
+        //             })()}
+        //             {/* <EllipsisComponent percentage={4} isDescription={true} content={renderHighlightedText(text, 'description')} /> */}
 
-                </Popover>
-            ),
-            ...getColumnSearchProps('description', 'tickets.description'),
-        },
+        //         </Popover>
+        //     ),
+        //     ...getColumnSearchProps('description', 'tickets.description'),
+        // },
         {
             title: t('tickets.specialization'),
             dataIndex: 'specialization',
@@ -501,14 +517,14 @@ const TicketList: React.FC = () => {
         value: col.key as string,
     }));
 
-    const [visibleColumns, setVisibleColumns] = useState<string[]>(() => 
+    const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
         getSavedData('ticket_visible_columns', columns.map(col => col.key as string))
     );
     useEffect(() => {
         localStorage.setItem('ticket_visible_columns', JSON.stringify(visibleColumns));
     }, [visibleColumns]);
 
-    const [columnOrder, setColumnOrder] = useState<string[]>(() => 
+    const [columnOrder, setColumnOrder] = useState<string[]>(() =>
         getSavedData('ticket_column_order', columns.map(col => col.key as string))
     );
     useEffect(() => {
@@ -558,12 +574,13 @@ const TicketList: React.FC = () => {
 
     const handleResetSettings = () => {
         const defaultOrder = columns.map(col => col.key as string);
-        const defaultWidths = { id: 150, status: 140, priority: 120, title: 250, description: 500, specialization: 180, problem: 180, requesterName: 180, assignee: 300 };
-        
+        const defaultWidths = { id: 150, status: 140, priority: 120, title: 250,  specialization: 180, problem: 180, requesterName: 180, assignee: 300};
+            // description: 500,};
+
         setColumnOrder(defaultOrder);
         setVisibleColumns(defaultOrder);
         setColWidths(defaultWidths);
-        
+
         localStorage.removeItem('ticket_column_order');
         localStorage.removeItem('ticket_visible_columns');
         localStorage.removeItem('ticket_column_widths');
@@ -628,9 +645,10 @@ const TicketList: React.FC = () => {
     };
 
 
-    const [colWidths, setColWidths] = useState<{ [key: string]: number }>(() => 
+    const [colWidths, setColWidths] = useState<{ [key: string]: number }>(() =>
         getSavedData('ticket_column_widths', {
-            id: 150, status: 140, priority: 120, title: 250, description: 500, specialization: 180, problem: 180, requesterName: 180, assignee: 300
+            id: 150, status: 140, priority: 120, title: 250,  specialization: 180, problem: 180, requesterName: 180, assignee: 300
+        // description: 500,
         })
     );
     useEffect(() => {
@@ -643,18 +661,18 @@ const TicketList: React.FC = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const finalColumns = React.useMemo(() => {
-        
+
         return columnOrder
-        .map(key => columns.find(c => c.key === key)) 
-        .filter(col => col && visibleColumns.includes(col.key as string)) 
-        .map(col => ({
-            ...col,
-            width: colWidths[col!.key as string] || col!.width,
-            onHeaderCell: (column: any) => ({
-                width: column.width,
-                onResize: handleResize(column.key as string),
-            }),
-        }));
+            .map(key => columns.find(c => c.key === key))
+            .filter(col => col && visibleColumns.includes(col.key as string))
+            .map(col => ({
+                ...col,
+                width: colWidths[col!.key as string] || col!.width,
+                onHeaderCell: (column: any) => ({
+                    width: column.width,
+                    onResize: handleResize(column.key as string),
+                }),
+            }));
     }, [columnOrder, colWidths, visibleColumns]);
 
 
