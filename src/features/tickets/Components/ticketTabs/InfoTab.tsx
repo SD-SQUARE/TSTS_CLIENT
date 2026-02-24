@@ -8,6 +8,7 @@ import { useChangeTicketStatus } from '../../Hooks/useTicket';
 import TicketChatTab from './ChatTab';
 import InlineReview from '../InlineReview';
 import AssigneeList from '../AssigneesList';
+import DOMPurify from "dompurify";
 
 interface TicketInfoTabProps {
     ticket: any;
@@ -93,25 +94,34 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                     .resolve-btn-success:hover { border-color: #73d13d !important; color: #73d13d !important; }
                 `}
             </style>
-            <Splitter style={{ height: 'calc(100vh - 200px)', boxShadow: '0 8px 24px rgba(0,0,0,0.05)' }}>
-                <Splitter.Panel defaultSize="60%" min="30%" style={{ overflowY: 'auto', padding: '16px' }}>
+            <Splitter style={{  boxShadow: '0 8px 24px rgba(229, 56, 56, 0.05)' }}>
+                <Splitter.Panel defaultSize="80%" min="45%" style={{ overflowY: 'auto', padding: '16px' }}>
                     <Flex vertical gap="large">
-                        <Card style={{ borderTop: '2px solid' }} title={<Typography.Title level={4} style={{ margin: 0 }}>{ticket?.title}</Typography.Title>}>
+                        <Card style={{
+                            borderRightWidth: "2px",
+                            // borderRightColor: "lightgray",
+                            borderLeftWidth: "2px",
+                            // borderLeftColor: "lightgray",
+                            borderBottomWidth: "2px",
+                            // borderBottomColor: "lightgray",
+                            borderTop: '0.3rem solid',
+                            borderTopColor: 'var(--color-primary)'
+                        }} title={<Typography.Title level={4} style={{ margin: 0 }}>{ticket?.title}</Typography.Title>}>
                             <div
                                 className="quill-content"
-                                style={{ color: '#595959', fontSize: '14px' }}
-                                dangerouslySetInnerHTML={{ __html: ticket?.description || '' }}
+                                style={{ color: '#595959', fontSize: '14px', wordBreak: 'break-word' }}
+                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(ticket?.description || '') }}
                             />
                         </Card>
 
-                        <div style={{ height: '500px' }}>
+                        <div >
                             <Typography.Title level={5}><MessageOutlined /> {t('tickets.commentSection')}</Typography.Title>
                             <TicketChatTab assigneeName={ticket?.assignee?.map((a: any) => a.name).join(', ')} />
                         </div>
                     </Flex>
                 </Splitter.Panel>
 
-                <Splitter.Panel min="25%" style={{ overflowY: 'auto', padding: '16px', backgroundColor: '#fafafa' }}>
+                <Splitter.Panel defaultSize="30%" min="25%" style={{ overflowY: 'auto', padding: '16px', backgroundColor: '#fafafa' }}>
                     <Flex vertical gap="large">
                         <Card size="small" title={t('tickets.details')}>
                             <Flex vertical gap="middle">

@@ -97,7 +97,7 @@ const TicketView: React.FC = () => {
     ];
 
     return (
-        <div style={{ padding: '24px', paddingBottom: 0, backgroundColor: '#fff', borderRadius: '8px' }}>
+        <div style={{ padding: '24px', paddingBottom: 0, backgroundColor: '#fff', borderRadius: '8px', }}>
             <style>{`
             .ant-tabs-left > .ant-tabs-nav .ant-tabs-tab {
                 border-bottom: 1px solid #f0f0f0 !important;
@@ -123,7 +123,11 @@ const TicketView: React.FC = () => {
                     {t('tickets.ticketDetails')}
                 </Typography.Title>
             </Flex>
-            <Tabs activeKey={activeKey} onChange={handleTabChange} items={tabItems} tabPlacement='start' style={{ minHeight: '500px' }} />
+            <Tabs activeKey={activeKey} onChange={handleTabChange} items={tabItems} tabPlacement='top' type='card' style={{ minHeight: '90vh', overflow: 'auto', height: '100%' }} styles={{
+                content: {
+                    borderRadius: '0 8px 8px',
+                }
+            }} />
         </div>
     );
 };

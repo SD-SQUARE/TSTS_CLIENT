@@ -17,6 +17,7 @@ import { useSpecializations, useTicketProblems } from '../Hooks/useTicketForm';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import DOMPurify from "dompurify";
 
 type SearchableDataIndex = `id` | `title` | `problem` | `specialization` | `status` | 'priority' | 'description';
 
@@ -151,6 +152,7 @@ const TicketList: React.FC = () => {
 
 
     const renderHighlightedText = (text: string, dataIndex: SearchableDataIndex) => {
+        
         return searchedColumn === dataIndex && searchText ? (
             <Highlighter
                 highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
@@ -159,7 +161,11 @@ const TicketList: React.FC = () => {
                 textToHighlight={text ? text.toString() : ''}
             />
         ) : (
-            text
+                <div
+                    // TODO: use quilljs here
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(text || '') }}
+                />
+            
         );
     };
 
@@ -298,7 +304,7 @@ const TicketList: React.FC = () => {
             ...getColumnSearchProps('id' as any, 'tickets.id'), 
             render: (id: string) => {
                 if (!id) return "-";
-                const shortId = id.substring(0, 4);
+                const shortId = id.split('-')[0];
         
                 return (
                     <Tooltip title={id} placement="topLeft">
@@ -396,15 +402,17 @@ const TicketList: React.FC = () => {
             title: t('tickets.description'),
             dataIndex: 'description',
             key: 'description',
-            width: 400,
+            width: 500,
             render: (text: string) => (
                 <Popover
-                    title={t('translation.description_ar')}
-                    content={<div style={{ maxWidth: 400 }}>{text}</div>}
+                    title={t('tickets.description')} 
+                    content={<div style={{ maxWidth: 500 }}>{text}</div>}
                     trigger="hover"
                     placement="topLeft"
                 >
-                    <EllipsisComponent content={renderHighlightedText(text, 'description')} />
+                    <EllipsisComponent  content={renderHighlightedText(text, 'description')} />
+                    {/* <EllipsisComponent percentage={4} isDescription={true} content={renderHighlightedText(text, 'description')} /> */}
+
                 </Popover>
             ),
             ...getColumnSearchProps('description', 'tickets.description'),
@@ -594,7 +602,7 @@ const TicketList: React.FC = () => {
 
 
     const [colWidths, setColWidths] = useState<{ [key: string]: number }>({
-        id: 60, status: 140, priority: 120, title: 250, description: 400, specialization: 180, problem: 180, requesterName: 180, assignee: 300
+        id: 150, status: 140, priority: 120, title: 250, description: 500, specialization: 180, problem: 180, requesterName: 180, assignee: 300
     });
 
     const handleResize = (key: string) => (e: any, { size }: any) => {

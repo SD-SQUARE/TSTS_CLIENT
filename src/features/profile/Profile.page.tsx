@@ -20,6 +20,7 @@ const Profile = () => {
 
     useEffect(() => {
         if (cookie["showTrustedDeviceTour"]) {
+            if (cookie["skipTrustedDeviceTour-for-week"]) return;
             setActiveMainTab("settings");
             setForceSettingsDevices(true);
         }

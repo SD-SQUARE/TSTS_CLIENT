@@ -86,18 +86,18 @@ const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor }) 
                     key: 'old_state',
                     width: 120,
                     align: 'center',
-                    render: (meta: any) => meta?.old ? (
-                        <Tag>{t(`status.${meta.old.toLowerCase().replace(' ', '_')}`, { defaultValue: meta.old })}</Tag>
+                    render: (meta: any) => meta?.previousStatus ? (
+                        <Tag>{t(`status.${meta.previousStatus.toLowerCase().replace(' ', '_')}`, { defaultValue: meta.previousStatus })}</Tag>
                     ) : '-',
                 },
                 {
                     title: t('common.new'),
                     dataIndex: 'meta',
-                    key: 'new_state',
+                    key: 'newStatus',
                     width: 120,
                     align: 'center',
-                    render: (meta: any) => meta?.new ? (
-                        <Tag color="blue">{t(`status.${meta.new.toLowerCase().replace(' ', '_')}`, { defaultValue: meta.new })}</Tag>
+                    render: (meta: any) => meta?.newStatus ? (
+                        <Tag color="blue">{t(`status.${meta.newStatus.toLowerCase().replace(' ', '_')}`, { defaultValue: meta.newStatus })}</Tag>
                     ) : '-',
                 },
             ],

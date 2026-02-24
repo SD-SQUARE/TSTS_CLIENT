@@ -45,8 +45,8 @@ const AssigneeItem: React.FC<{ id: string; roleLabel: string; isRequester?: bool
                 }
                 title={
                     <Flex justify="space-between" align="center">
-                        <Typography.Text strong style={{ fontSize: '13px' }}>{fullName}</Typography.Text>
-                        <Tag color={isRequester ? 'blue' : 'default'} style={{ fontSize: '10px', marginInlineEnd: 0 }}>
+                        <Typography.Text strong style={{ fontSize: '14px' }}>{fullName}</Typography.Text>
+                        <Tag color={isRequester ? 'blue' : 'default'} style={{ fontSize: '0.8em', marginInlineEnd: 0 }}>
                             {roleLabel}
                         </Tag>
                     </Flex>
@@ -54,18 +54,24 @@ const AssigneeItem: React.FC<{ id: string; roleLabel: string; isRequester?: bool
                 description={
                     <div style={{ marginTop: 2 }}>
                         <Typography.Text type="secondary" style={{ fontSize: '11px', display: 'block' }}>
-                            {job}
+                           <Tag color="orange"> {job} </Tag>
                         </Typography.Text>
                         <Space size={8} wrap>
                             {profile?.email && (
-                                <Typography.Text type="secondary" style={{ fontSize: '11px' }}>
-                                    <MailOutlined /> {profile.email}
-                                </Typography.Text>
+                                <Flex gap={8}>
+                                    <MailOutlined />
+                                    <Typography.Text type="secondary" style={{ fontSize: '11px' }} copyable>
+                                        {profile.email}
+                                    </Typography.Text>
+                                </Flex>
                             )}
                             {profile?.contacts?.mobiles?.[0] && (
-                                <Typography.Text type="secondary" style={{ fontSize: '11px' }}>
-                                    <PhoneOutlined /> {profile.contacts.mobiles[0]}
-                                </Typography.Text>
+                                <Flex  gap={8}>
+                                    <PhoneOutlined />
+                                    <Typography.Text type="secondary" style={{ fontSize: '11px' }} copyable >
+                                        {profile.contacts.mobiles[0]}
+                                    </Typography.Text>
+                                </Flex >
                             )}
                         </Space>
                     </div>

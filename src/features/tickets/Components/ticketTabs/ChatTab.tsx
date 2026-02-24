@@ -141,11 +141,13 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
 
     return (
         <Flex vertical style={{
-            height: 'calc(100vh - 200px)',
+            height: 'calc(100vh - 50px)',
             backgroundColor: '#f5f5f5',
             borderRadius: '8px',
             overflow: 'hidden'
-        }}>
+        }}
+        justify='end'
+        >
             <style>{`
                 .quill-chat-editor .ql-container {
                     border-bottom-left-radius: 12px;
@@ -197,7 +199,7 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
                                             style={{
                                                 background: isMe ? '#1677ff' : '#fff',
                                                 color: isMe ? '#fff' : 'rgba(0, 0, 0, 0.88)',
-                                                padding: '8px 14px',
+                                                padding: '8px 1.25rem',
                                                 borderRadius: isMe ? '16px 4px 16px 16px' : '4px 16px 16px 16px',
                                                 boxShadow: '0 2px 5px rgba(0,0,0,0.04)',
                                                 opacity: item.isSending ? 0.6 : 1,
@@ -235,10 +237,10 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
                 })}
             </Flex>
 
-            <div style={{ padding: '12px 16px', background: '#fff', borderTop: '1px solid #f0f0f0' }}>
+            <div style={{ padding: '0 0 12px 0px', background: '#fff', borderTop: '1px solid #f0f0f0' }}>
                 <div style={{
                     border: '1px solid #d9d9d9',
-                    borderRadius: '12px',
+                    borderRadius: '0 0 12px 12px',
                     background: '#fff',
                     overflow: 'hidden'
                 }}>

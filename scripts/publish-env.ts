@@ -2,7 +2,12 @@ import { readFileSync, writeFileSync } from "fs";
 import { getHostIp } from "./network.utils";
 
 async function main() {
-  const HOST_IP = getHostIp();
+
+    const HOST_IP = getHostIp();
+    // local stagging
+    // const HOST_IP = "192.168.1.200";
+    // prod stagging
+    // const HOST_IP = "172.1.50.91";
   const FROM = `./secrets/.env.stagging`;
 
   const TARGETS = [`./.env`,];

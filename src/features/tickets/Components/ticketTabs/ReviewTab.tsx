@@ -4,6 +4,7 @@ import {  Avatar, Rate, Typography, Empty,  Flex, Card, Divider, Spin } from 'an
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import i18next from 'i18next';
+import DOMPurify from "dompurify";
 
 interface Props {
     reviews: any[];
@@ -67,10 +68,17 @@ const TicketReviewsTab: React.FC<Props> = ({ reviews, isLoading }) => {
                                 <Divider style={{ margin: '12px 0' }} />
     
                                 <Typography.Text style={{ color: '#434343', lineHeight: '1.6' }}>
-                                    {item.note || (
+                                    
+                                    {!(item.note) ? (
                                         <Typography.Text type="secondary" italic style={{ opacity: 0.6 }}>
                                             {t('tickets.noComment')}
                                         </Typography.Text>
+                                    ): (
+                                            <div
+                                                className="quill-content"
+                                                style={{ color: '#595959', fontSize: '14px', wordBreak: 'break-word' }}
+                                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.note || '') }}
+                                            />
                                     )}
                                 </Typography.Text>
                             </Flex>

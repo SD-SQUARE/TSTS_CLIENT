@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Table, Button, Space, Popconfirm, message, Pagination, Tooltip, Badge, Tag, Popover, Input, Typography } from "antd";
 import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined, DownOutlined, SearchOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
@@ -123,6 +123,17 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
 
 
     const handleAdd = () => { setEditingUser(undefined); setIsModalVisible(true); };
+    const handleResetAll = () => {
+        setSearchText('');
+        setSearchedColumn(undefined);
+        setApiSearchQuery({});
+        setPagination(prev => ({ ...prev, page: 1 }));
+    };
+
+    useEffect(() => {
+        handleResetAll();
+    },[role])
+
     const handleView = (id: string) => {
         navigate(`/identities/users/${role}/${id}`);
     };
