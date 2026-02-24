@@ -17,10 +17,30 @@ const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor }) 
 
     const columns: any[] = [
         {
+            title: t('tickets.user'),
+            dataIndex: 'meta',
+            key: 'user',
+            width: 150,
+            render: (meta: any) => {
+                if (!meta?.user) return '-';
+    
+                const displayName = i18n.language === 'ar'
+                    ? meta.user.full_name_ar
+                    : meta.user.full_name_en;
+    
+                return (
+                    <Space>
+                        <Avatar size="small" src={meta.user.image} />
+                        <Typography.Text>{displayName || '-'}</Typography.Text>
+                    </Space>
+                );
+            },
+        },
+        {
             title: t('tickets.type'),
             dataIndex: 'type',
             key: 'type',
-            width: 150,
+            width: 120,
             render: (type: string) => (
                 <Tag color={getColor(type)} icon={getIcon(type, 12)}>
                     {type.toUpperCase()}
@@ -31,44 +51,27 @@ const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor }) 
             title: t('tickets.title'),
             dataIndex: 'title',
             key: 'title',
+            width: 170,
             render: (text: string) => <Typography.Text strong>{text}</Typography.Text>,
         },
         {
             title: t('tickets.content'),
             dataIndex: 'content',
             key: 'content',
+            width: 250,
         },
         {
             title: t('tickets.date'),
             dataIndex: 'createdAt',
             key: 'createdAt',
-            width: 200,
+            width: 160,
             render: (date: string) => dayjs(date).format('YYYY-MM-DD h:mm A'),
-        },
-        {
-            title: t('tickets.user'),
-            dataIndex: 'meta',
-            key: 'user',
-            render: (meta: any) => {
-                if (!meta?.user) return '-';
-
-                const displayName = i18n.language === 'ar'
-                    ? meta.user.full_name_ar
-                    : meta.user.full_name_en;
-
-                return (
-                    <Space>
-                        <Avatar size="small" src={meta.user.image} />
-                        <Typography.Text>{displayName || '-'}</Typography.Text>
-                    </Space>
-                );
-            },
         },
         {
             title: t('tickets.ipAddress'),
             dataIndex: 'meta',
             key: 'ip',
-            width: 130,
+            width: 100,
             render: (meta: any) => (
                 <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
                     {meta?.ip || '-'}
@@ -84,7 +87,7 @@ const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor }) 
                     title: t('common.old'),
                     dataIndex: 'meta',
                     key: 'old_state',
-                    width: 120,
+                    width: 100,
                     align: 'center',
                     render: (meta: any) => meta?.previousStatus ? (
                         <Tag>{t(`status.${meta.previousStatus.toLowerCase().replace(' ', '_')}`, { defaultValue: meta.previousStatus })}</Tag>
@@ -94,7 +97,7 @@ const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor }) 
                     title: t('common.new'),
                     dataIndex: 'meta',
                     key: 'newStatus',
-                    width: 120,
+                    width: 100,
                     align: 'center',
                     render: (meta: any) => meta?.newStatus ? (
                         <Tag color="blue">{t(`status.${meta.newStatus.toLowerCase().replace(' ', '_')}`, { defaultValue: meta.newStatus })}</Tag>

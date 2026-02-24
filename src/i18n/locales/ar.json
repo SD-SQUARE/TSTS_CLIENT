@@ -381,7 +381,8 @@
     "closed": "مغلقة",
     "pending": "قيد الانتظار",
     "out_of_service": "خارج الخدمة",
-    "resolved": "مكتمل"
+    "resolved": "مكتمل",
+    "re_open": "مفتوحة مرة اخرى"
   },
   "common": {
     "reset": "إعادة تعيين",

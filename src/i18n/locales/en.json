@@ -331,7 +331,8 @@
     "closed": "Closed",
     "pending": "Pending",
     "out_of_service": "Out of Service",
-    "resolved": "Resolved"
+    "resolved": "Resolved",
+    "re_open": "Re Open"
   },
   "common": {
     "reset": "Reset",
