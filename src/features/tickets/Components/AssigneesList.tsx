@@ -90,7 +90,7 @@ const AssigneeList: React.FC<AssigneeListProps> = ({ assignees, requesterId }) =
     const { t } = useTranslation();
 
     return (
-        <Collapse ghost expandIconPosition="end" defaultActiveKey={['1']}>
+        <Collapse ghost expandIconPosition="end" >
             <Collapse.Panel
                 header={
                     <Typography.Text strong>
