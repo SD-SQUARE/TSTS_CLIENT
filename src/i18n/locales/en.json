@@ -336,6 +336,7 @@
   },
   "common": {
     "reset": "Reset",
+    "reset_layout": "Reset Layout",
     "create": "Create Ticket",
     "save": "Save Changes",
     "edit": "Edit Ticket",

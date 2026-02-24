@@ -20,6 +20,10 @@ import { CSS } from '@dnd-kit/utilities';
 import DOMPurify from "dompurify";
 
 type SearchableDataIndex = `id` | `title` | `problem` | `specialization` | `status` | 'priority' | 'description';
+const getSavedData = (key: string, fallback: any) => {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : fallback;
+};
 
 const TicketList: React.FC = () => {
     const { t } = useTranslation();
@@ -497,13 +501,19 @@ const TicketList: React.FC = () => {
         value: col.key as string,
     }));
 
-    const [visibleColumns, setVisibleColumns] = useState<string[]>(
-        columns.map(col => col.key as string)
+    const [visibleColumns, setVisibleColumns] = useState<string[]>(() => 
+        getSavedData('ticket_visible_columns', columns.map(col => col.key as string))
     );
+    useEffect(() => {
+        localStorage.setItem('ticket_visible_columns', JSON.stringify(visibleColumns));
+    }, [visibleColumns]);
 
-    const [columnOrder, setColumnOrder] = useState<string[]>(
-        columns.map(col => col.key as string)
+    const [columnOrder, setColumnOrder] = useState<string[]>(() => 
+        getSavedData('ticket_column_order', columns.map(col => col.key as string))
     );
+    useEffect(() => {
+        localStorage.setItem('ticket_column_order', JSON.stringify(columnOrder));
+    }, [columnOrder]);
 
     const SortableItem = ({ id, label, isChecked, onCheck }: any) => {
         const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
@@ -546,8 +556,26 @@ const TicketList: React.FC = () => {
         }
     };
 
+    const handleResetSettings = () => {
+        const defaultOrder = columns.map(col => col.key as string);
+        const defaultWidths = { id: 150, status: 140, priority: 120, title: 250, description: 500, specialization: 180, problem: 180, requesterName: 180, assignee: 300 };
+        
+        setColumnOrder(defaultOrder);
+        setVisibleColumns(defaultOrder);
+        setColWidths(defaultWidths);
+        
+        localStorage.removeItem('ticket_column_order');
+        localStorage.removeItem('ticket_visible_columns');
+        localStorage.removeItem('ticket_column_widths');
+    };
+
     const controlPanel = (
         <div style={{ padding: '8px', width: '220px' }}>
+            <div style={{ marginBottom: 12, borderBottom: '1px solid #f0f0f0', paddingBottom: 8 }}>
+                <Button type="link" size="small" onClick={handleResetSettings} danger style={{ padding: 0 }}>
+                    {t('common.reset_layout')}
+                </Button>
+            </div>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
                 <SortableContext items={columnOrder} strategy={verticalListSortingStrategy}>
                     <Flex vertical gap="small">
@@ -600,9 +628,14 @@ const TicketList: React.FC = () => {
     };
 
 
-    const [colWidths, setColWidths] = useState<{ [key: string]: number }>({
-        id: 150, status: 140, priority: 120, title: 250, description: 500, specialization: 180, problem: 180, requesterName: 180, assignee: 300
-    });
+    const [colWidths, setColWidths] = useState<{ [key: string]: number }>(() => 
+        getSavedData('ticket_column_widths', {
+            id: 150, status: 140, priority: 120, title: 250, description: 500, specialization: 180, problem: 180, requesterName: 180, assignee: 300
+        })
+    );
+    useEffect(() => {
+        localStorage.setItem('ticket_column_widths', JSON.stringify(colWidths));
+    }, [colWidths]);
 
     const handleResize = (key: string) => (e: any, { size }: any) => {
         setColWidths(prev => ({ ...prev, [key]: size.width }));
