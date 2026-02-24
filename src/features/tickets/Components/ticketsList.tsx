@@ -161,10 +161,11 @@ const TicketList: React.FC = () => {
                 textToHighlight={text ? text.toString() : ''}
             />
         ) : (
-                <div
-                    // TODO: use quilljs here
-                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(text || '') }}
-                />
+                text
+                // <div
+                //     // TODO: use quilljs here
+                //     dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(text || '') }}
+                // />
             
         );
     };

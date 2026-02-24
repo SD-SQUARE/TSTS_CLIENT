@@ -177,8 +177,7 @@ const TicketChatTab: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =>
                 style={{ flex: 1, overflowY: 'auto', padding: '0 16px 16px 16px' }}
             >
                 {allMessages.map((item) => {
-                    const isMe = 1;
-                    // String(item.sender.id) === String(user.id);
+                    const isMe = String(item.sender.id) === String(user.id);
                     return (
                         <Flex key={item.id} justify={isMe ? 'end' : 'start'} style={{ marginBottom: '8px' }}>
                             <Flex vertical align={isMe ? 'end' : 'start'} gap={4} style={{ maxWidth: '75%' }}>

@@ -182,11 +182,11 @@ const TicketForm: React.FC = () => {
         const steps = [
             { key: 'open', title: t('status.open') },
             { key: 'middle', title: t(`status.${activeMiddleState}`) },
-            { key: 'closed', title: t('status.closed') }
+            { key: 'Closed', title: t('status.closed') }
         ];
 
         let currentStepIndex = 0;
-        if (currentStatus === 'closed') {
+        if (currentStatus === 'Closed') {
             currentStepIndex = 2;
         } else if (middleStates.includes(currentStatus)) {
             currentStepIndex = 1;
