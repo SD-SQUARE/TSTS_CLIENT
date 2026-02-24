@@ -64,19 +64,31 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                 );
             }
         } else {
-            if (ticket?.status === openstate) {
+            if (ticket?.status === openstate || ticket?.status === reopenstate) {
                 actionButton = (
-                    <Button style={btnStyle} type="primary" ghost size="large" icon={<ToolOutlined />} onClick={() => handleStatusChange(in_progress_state)} loading={statusMutation.isPending}>
+                    <Button style={btnStyle} styles={{
+                        root: {
+                            backgroundColor: "var(--color-primary)",
+                            color: "var(--color-white)"
+                        }
+                    }} type="primary" ghost size="large" icon={<ToolOutlined />} onClick={() => handleStatusChange(in_progress_state)} loading={statusMutation.isPending}>
                         {t('tickets.startSolving')}
                     </Button>
                 );
             } else if (ticket?.status === in_progress_state) {
                 actionButton = (
-                    <Button style={btnStyle} danger size="large" icon={<CloseCircleOutlined />} onClick={() => handleStatusChange(closestate)} loading={statusMutation.isPending}>
+                    <Button style={btnStyle}
+                        styles={{
+                            root: {
+                                backgroundColor: "var(--color-red)",
+                                color: "var(--color-white)"
+                            }
+                        }}
+                        danger size="large" icon={<CloseCircleOutlined />} onClick={() => handleStatusChange(closestate)} loading={statusMutation.isPending}>
                         {t('tickets.closeTicket')}
                     </Button>
                 );
-            } else if (ticket?.status === reopenstate) {
+            } else if (ticket?.status === closestate) {
                 actionButton = (
                     <Button style={btnStyle} type="primary" size="large" icon={<CheckCircleOutlined />} onClick={() => handleStatusChange(resolved_status)} loading={statusMutation.isPending} className="resolve-btn-success" ghost>
                         {t('tickets.markAsResolved')}
@@ -141,7 +153,12 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
 
                                 <Flex gap="small" wrap="wrap" style={{ marginTop: 8 }}>
                                     {!isRequester && (
-                                        <Button style={btnStyle} icon={<EditOutlined />} onClick={onEdit} disabled={ticket?.status === resolved_status}>{t('common.edit')}</Button>
+                                        <Button style={btnStyle} styles={{
+                                            root: {
+                                                borderColor: 'var(--color-secondary)',
+                                                color: 'var(--color-secondary)',
+                                            }
+                                        }} icon={<EditOutlined />} onClick={onEdit} disabled={ticket?.status === resolved_status}>{t('common.edit')}</Button>
                                     )}
                                     {actionButton}
                                 </Flex>

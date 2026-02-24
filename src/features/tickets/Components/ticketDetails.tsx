@@ -97,7 +97,7 @@ const TicketView: React.FC = () => {
     ];
 
     return (
-        <div style={{ padding: '24px', paddingBottom: 0, backgroundColor: '#fff', borderRadius: '8px', }}>
+        <div style={{ padding: '14px', paddingBottom: 0, backgroundColor: '#fff', borderRadius: '8px', }}>
             <style>{`
             .ant-tabs-left > .ant-tabs-nav .ant-tabs-tab {
                 border-bottom: 1px solid #f0f0f0 !important;

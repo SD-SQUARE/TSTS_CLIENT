@@ -14,6 +14,7 @@ import { useSelector } from 'react-redux';
 import { fetchAdmins, fetchGroups, fetchGroupUsers,  useTicketDetails, useTicketMutations, useTicketProblems } from '../Hooks/useTicketForm';
 import { queryClient } from '../../../app/queryClient';
 import ReactQuill from 'react-quill-new';
+import i18next from 'i18next';
 
 
 const TicketForm: React.FC = () => {
@@ -397,25 +398,53 @@ const TicketForm: React.FC = () => {
     const handleCustomReset = () => {
         const currentTitle = form.getFieldValue('title');
         const currentDescription = form.getFieldValue('description');
-    
+
         form.resetFields();
-    
-        form.setFieldsValue({
-            title: currentTitle,
-            description: currentDescription,
-        });
-    
-        if (isEdit && ticketData?.attachments) {
-            setFileList(ticketData.attachments.map((file: any) => ({
-                uid: file.id,
-                name: file.fileName || file.name || 'Attachment',
-                status: 'done',
-                url: file.url,
-            })));
+
+        const restoredValues: any = {};
+
+        if (currentTitle) restoredValues.title = currentTitle;
+        if (currentDescription) restoredValues.description = currentDescription;
+
+        if (Object.keys(restoredValues).length > 0) {
+            form.setFieldsValue(restoredValues);
+        }
+
+        if (isEdit && ticketData?.attachments?.length) {
+            setFileList(
+                ticketData.attachments.map((file: any) => ({
+                    uid: file.id,
+                    name: file.fileName || file.name || 'Attachment',
+                    status: 'done',
+                    url: file.url,
+                }))
+            );
         } else {
             setFileList([]);
         }
     };
+    // const handleCustomReset = () => {
+    //     const currentTitle = form.getFieldValue('title');
+    //     const currentDescription = form.getFieldValue('description');
+    
+    //     form.resetFields();
+    
+    //     form.setFieldsValue({
+    //         title: currentTitle,
+    //         description: currentDescription,
+    //     });
+    
+    //     if (isEdit && ticketData?.attachments) {
+    //         setFileList(ticketData.attachments.map((file: any) => ({
+    //             uid: file.id,
+    //             name: file.fileName || file.name || 'Attachment',
+    //             status: 'done',
+    //             url: file.url,
+    //         })));
+    //     } else {
+    //         setFileList([]);
+    //     }
+    // };
 
     const modules = {
         toolbar: [
@@ -474,7 +503,7 @@ const TicketForm: React.FC = () => {
     };
 
     return (
-        <div style={{ width: '100%', padding: '24px', boxSizing: 'border-box' }}>
+        <div style={{ width: '100%', padding: '14px', boxSizing: 'border-box' }}>
             <Badge.Ribbon
                 text={!isRequester && currentPriority ? t(`priority.${currentPriority}`) : ''}
                 color={getPriorityColor(currentPriority)}
@@ -485,7 +514,7 @@ const TicketForm: React.FC = () => {
             >
                 <Card bordered={false}>
                     {!isRequester && isEdit && (
-                        <div style={{ marginBottom: 48, marginTop: 12, padding: '0 40px' }}>
+                        <div style={{ marginBottom: 14, marginTop: 12, padding: '0 40px' }}>
                             <Steps
                                 size="small"
                                 current={currentStepIndex}
@@ -494,13 +523,13 @@ const TicketForm: React.FC = () => {
                         </div>
                     )}
 
-                    <Typography.Title level={3} style={{ marginBottom: 24 }}>
+                    <Typography.Title level={3} style={{ marginBottom: 14 }}>
                         {isEdit ? t('tickets.editTicket') : t('tickets.newTicket')}
                     </Typography.Title>
 
                     <Form form={form} layout="vertical" onFinish={onFinish} requiredMark={false} style={{ width: '100%' }} >
 
-                        <Form.Item style={{ marginBottom: 24 }} >
+                        <Form.Item style={{ marginBottom: 14 }} >
                             <Flex align="center" gap="middle" wrap="wrap" >
                                 <span>{t('tickets.problemType')}</span>
                                 <Space size={8} wrap align="center">
@@ -527,7 +556,7 @@ const TicketForm: React.FC = () => {
 
 
                         {!isRequester && isEdit && (
-                            <div style={{ marginBottom: 24, borderRadius: '8px' }}>
+                            <div style={{ marginBottom: 14, borderRadius: '8px' }}>
                                 <Flex gap="middle" wrap="wrap">
                                     <Form.Item name="priority" label={t('tickets.priority')} style={{ flex: 1, minWidth: '200px' }}>
                                         <Select options={[
@@ -572,7 +601,31 @@ const TicketForm: React.FC = () => {
                         </Form.Item>
 
 
-                        <Form.Item 
+                        <Form.Item
+                            name="description"
+                            label={
+                                <Flex align="center" gap="small">
+                                    <span>{t('tickets.description')}</span>
+                                    <RequiredTag />
+                                </Flex>
+                            }
+                            rules={[{ required: true }]}
+                            valuePropName="value"
+                            getValueFromEvent={(value) => value}
+                        >
+                            <ReactQuill
+                                theme="snow"
+                                modules={modules}
+                                placeholder={t('tickets.descriptionPlaceholder')}
+                                readOnly={isEdit}
+                                style={{
+                                    height: '16rem',
+                                    marginBottom: '1.5rem',
+                                    direction: i18next.language === 'ar' ? 'rtl' : 'ltr',
+                                }}
+                            />
+                        </Form.Item>
+                        {/* <Form.Item 
     name="description" 
     label={<Flex align="center" gap="small"><span>{t('tickets.description')}</span><RequiredTag /></Flex>} 
     rules={[{ required: true }]}
@@ -584,9 +637,14 @@ const TicketForm: React.FC = () => {
         modules={modules}
         placeholder={t('tickets.descriptionPlaceholder')}
         readOnly={isEdit}
-        style={{ height: '150px', marginBottom: '50px' }} 
+        style={{
+            height: '200px',
+            marginBottom: '1.5rem',
+            direction: i18next.language === 'ar' ? 'rtl' : 'ltr'
+         }} 
+                                
     />
-</Form.Item>
+</Form.Item> */}
 
 
                         {canEditAttachments && (
@@ -623,7 +681,64 @@ const TicketForm: React.FC = () => {
                             </Form.Item>
                         )}
 
-                        <Form.Item style={{ marginTop: 32 }}>
+                        <Form.Item style={{ marginTop: 1 }}>
+                            <Flex
+                                justify="space-between"
+                                align="center"
+                                wrap="wrap"
+                                gap="middle"
+                            >
+                                {/* Right side (Actions) */}
+                                <Flex gap="small" style={{ width: "100%" }}>
+                                    {/* FIXME: Rest handler does not work */}
+                                    {/* <Button
+                                        size="large"
+                                        danger
+                                        onClick={handleCustomReset}
+                                        styles={{
+                                            root: {
+                                                width: "100%"
+                                            }
+                                        }}
+                                    >
+                                        {t('common.reset')}
+                                    </Button> */}
+
+                                    <Button
+                                        size="large"
+                                        type="primary"
+                                        htmlType="submit"
+                                        loading={
+                                            createMutation.isPending ||
+                                            updateMutation.isPending ||
+                                            coordinateMutation.isPending
+                                        }
+                                        styles={{
+                                            root: {
+                                                width: "100%"
+                                            }
+                                        }}
+                                    >
+                                        {isEdit ? t('common.save') : t('common.create')}
+                                    </Button>
+                                </Flex>
+                                {/* Left side (Back) */}
+                                <Button
+                                    size="large"
+                                    onClick={handleBack}
+                                    styles={{
+                                        root: {
+                                            width: "100%"
+                                        }
+                                    }}
+                                >
+                                    {t('common.back')}
+                                </Button>
+
+                                
+                            </Flex>
+                        </Form.Item>
+                        {/* <Form.Item >
                             <Flex justify="flex-end" gap="middle">
                                 <Button size="large"
                                     onClick={handleBack}>{t('common.back')}</Button>
@@ -632,7 +747,7 @@ const TicketForm: React.FC = () => {
                                     {isEdit ? t('common.save') : t('common.create')}
                                 </Button>
                             </Flex>
-                        </Form.Item>
+                        </Form.Item> */}
                     </Form>
                 </Card>
             </Badge.Ribbon>

@@ -78,11 +78,7 @@ const TicketHistoryTab: React.FC = () => {
                 gap: '12px',
                 marginBottom: 20
             }}>
-                <Space direction='vertical' align='end'>
-                    <Segmented options={[
-                        { value: 'table', icon: <TableOutlined /> },
-                        { value: 'timeline', icon: <HistoryOutlined /> },
-                    ]} value={viewType} onChange={(value) => setViewType(value as 'timeline' | 'table')} />
+                <Space  align='end'>
                     <Flex gap="small" wrap="wrap" justify="end">
                         <RangePicker
                         placeholder={[t('common.startDate'), t('common.endDate')]}
@@ -91,6 +87,10 @@ const TicketHistoryTab: React.FC = () => {
                             style={{ width: 210 }}
                         />
                     </Flex>
+                    <Segmented options={[
+                        { value: 'table', icon: <TableOutlined /> },
+                        { value: 'timeline', icon: <HistoryOutlined /> },
+                    ]} value={viewType} onChange={(value) => setViewType(value as 'timeline' | 'table')} />
                     {viewType === 'timeline' && (
                         <Card size="small" style={{ borderRadius: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
                             <Space>

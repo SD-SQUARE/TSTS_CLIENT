@@ -59,7 +59,7 @@ const TicketMediaTab: React.FC<TicketMediaTabProps> = () => {
 
 
     if (isLoading) return <Spin style={{ display: 'block', margin: '50px auto' }} />;
-    if (!media || media.length === 0) return <Empty description={t('common.noMedia')} />;
+    if (!media || media.length === 0) return <Empty style={{marginTop: "5rem"}} description={t('common.noMedia')} />;
 
     return (
         <div style={{ padding: '16px' }}>
