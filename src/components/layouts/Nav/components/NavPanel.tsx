@@ -21,7 +21,6 @@ const NavPanel = ({ children, closeDrawer = () => { } }) => {
             {children &&
                 Children.toArray(children).map((child) => (
                     <div
-                        key={crypto.randomUUID()}
                         style={{ cursor: "pointer", minWidth: screens.md ? "auto" : "100%", display: "flex", gap: 8 , flexDirection: screens.md ? "row" : "column"}}
                         onClick={() => {
                             if (!screens.md) closeDrawer();
