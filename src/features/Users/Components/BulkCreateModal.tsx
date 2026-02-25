@@ -193,7 +193,7 @@ const BulkCreateModal: React.FC<BulkCreateModalProps> = ({ visible, onClose, rol
                         <p className="ant-upload-text">{t("bulk.drag_drop_text")}</p>
                     </Dragger>
 
-                    <Divider  plain>{t("bulk.upload_preview")}</Divider>
+                    <Divider style={{margin: "1rem 0"}}  plain>{t("bulk.upload_preview")}</Divider>
 
                     <List
                         size="small"
