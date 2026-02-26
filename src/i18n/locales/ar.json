@@ -367,7 +367,8 @@
     "details": "التفاصيل",
     "reviewSubmitted": "شكرا لك! تم تقديم التقييم الخاص بك.",
     "state" : "الحالة",
-    "techs": "الفني"
+    "techs": "الفني",
+    "comments": "التعليقات"
   },
   "priority": {
     "important": "مهمة",

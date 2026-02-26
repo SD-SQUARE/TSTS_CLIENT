@@ -317,7 +317,8 @@
     "details": "Details",
     "reviewSubmitted": "Thank you! Your review has been submitted.",
     "state" : "State",
-    "techs": "Technician"
+    "techs": "Technician",
+    "comments": "Comments"
   },
   "priority": {
     "important": "Important",

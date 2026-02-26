@@ -5,7 +5,7 @@ import { CheckCircleOutlined, EditOutlined, ToolOutlined, ReloadOutlined, CloseC
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useChangeTicketStatus } from '../../Hooks/useTicket';
-import TicketChatTab from './ChatTab';
+import TicketComments from './CommentComponent';
 import InlineReview from '../InlineReview';
 import AssigneeList from '../AssigneesList';
 import DOMPurify from "dompurify";
@@ -128,7 +128,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
 
                         <div >
                             <Typography.Title level={5}><MessageOutlined /> {t('tickets.commentSection')}</Typography.Title>
-                            <TicketChatTab assigneeName={ticket?.assignee?.map((a: any) => a.name).join(', ')} />
+                            <TicketComments assigneeName={ticket?.assignee?.map((a: any) => a.name).join(', ')} />
                         </div>
                     </Flex>
                 </Splitter.Panel>
