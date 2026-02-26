@@ -21,7 +21,6 @@ WORKDIR /etc/nginx
 
 COPY ./nginx.conf /etc/nginx/nginx.conf.template
 COPY --from=builder /app/dist /usr/share/nginx/html
-COPY ./certs /etc/nginx/certs
 
 EXPOSE 80
 EXPOSE 443
