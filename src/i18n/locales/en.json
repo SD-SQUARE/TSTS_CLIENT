@@ -360,7 +360,8 @@
     "old": "Old",
     "new": "New",
     "showHideColumns": "Show/Hide Columns",
-    "columns": "Columns"
+    "columns": "Columns",
+    "confirmUpdate": "Are you sure you want to update this field?"
   },
   "success": {
     "created": "Ticket created successfully",

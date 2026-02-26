@@ -200,6 +200,7 @@ const TicketForm: React.FC = () => {
 
     const { steps, currentStepIndex } = getStepperData();
 
+
     const getPriorityColor = (prio: string) => {
         switch (prio) {
             case 'important/urgent': return 'volcano';

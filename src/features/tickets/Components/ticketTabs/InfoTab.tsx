@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Tag, Typography, Card, Button, Flex, message, Splitter } from 'antd';
+import { Tag, Typography, Card, Button, Flex, message, Splitter, Select, Dropdown, Space, Popconfirm, Spin } from 'antd';
 import { CheckCircleOutlined, EditOutlined, ToolOutlined, ReloadOutlined, CloseCircleOutlined, MessageOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -9,6 +9,7 @@ import TicketComments from './CommentComponent';
 import InlineReview from '../InlineReview';
 import AssigneeList from '../AssigneesList';
 import DOMPurify from "dompurify";
+import { useTicketMutations, useTicketProblems } from '../../Hooks/useTicketForm';
 
 interface TicketInfoTabProps {
     ticket: any;
@@ -25,6 +26,9 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
     const openstate = "Open", reopenstate = "Re Open", closestate = "Closed";
     const in_progress_state = "In Progress", pending_state = "Pending";
     const out_of_service_state = "Out of Service", resolved_status = "Resolved";
+
+    const { updateMutation } = useTicketMutations(ticket?.id);
+    const { data: groupedData } = useTicketProblems();
 
     const handleStatusChange = async (newStatus: string) => {
         const statusMap: Record<string, string> = {
@@ -45,7 +49,118 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
         }
     };
 
+
     let actionButton = null;
+
+    const getPriorityColor = (prio: string) => {
+        switch (prio) {
+            case 'important/urgent': return 'volcano';
+            case 'important': return 'orange';
+            case 'urgent': return 'red';
+            case 'NA': return 'cyan';
+            default: return 'blue';
+        }
+    };
+
+    const handleUpdateField = (fieldName: string, value: any) => {
+        const formData = new FormData();
+        formData.append('title', ticket.title);
+        formData.append('description', ticket.description);
+
+        const problemId = fieldName === 'problem' ? value.id : ticket?.problem?.id;
+        const specId = fieldName === 'problem' ? value.specId : ticket?.specialization?.id;
+        const priority = fieldName === 'priority' ? value : ticket?.priority;
+        const status = fieldName === 'status' ? value : ticket?.status;
+
+        if (problemId) formData.append('problem', problemId);
+        if (specId) formData.append('specialization', specId);
+        formData.append('priority', priority);
+        formData.append('status', status);
+        formData.append('requester', ticket?.requester?.id);
+
+        updateMutation.mutate(formData, {
+            onSuccess: () => message.success(t('success.updated')),
+            onError: () => message.error(t('errors.updateFailed'))
+        });
+    };
+
+    const problemMenuItems = groupedData?.specializations?.map((spec: any) => ({
+        key: `spec-${spec.id}`,
+        label: <span style={{ fontWeight: 'bold' }}>{spec.name}</span>,
+        children: spec.problems?.map((prob: any) => ({
+            key: prob.id,
+            label: (
+                <Popconfirm
+                    title={t('common.confirmUpdate')}
+                    onConfirm={() => handleUpdateField('problem', { id: prob.id, specId: spec.id })}
+                    okText={t('translation.yes')}
+                    cancelText={t('translation.no')}
+                >
+                    <div style={{ width: '100%' }}>{prob.name}</div>
+                </Popconfirm>
+            )
+        }))
+    })) || [];
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'Open': return 'green';
+            case 'In Progress': return 'blue';
+            case 'Pending': return 'gold';
+            case 'Closed': return 'red';
+            case 'Resolved': return 'lime';
+            default: return 'geekblue';
+        }
+    };
+
+    // ... inside your component ...
+
+    /* --- 1. Define Menus for Dropdowns --- */
+
+    // Status Menu
+    const statusMenu = {
+        items: [
+            { key: 'Open', label: t('status.open') },
+            { key: 'In Progress', label: t('status.in_progress') },
+            { key: 'Pending', label: t('status.pending') },
+            { key: 'Closed', label: t('status.closed') },
+        ].map(item => ({
+            ...item,
+            label: (
+                <Popconfirm
+                    title={t('common.confirmUpdate')}
+                    onConfirm={() => handleUpdateField('status', item.key)}
+                    okText={t('translation.yes')}
+                    cancelText={t('translation.no')}
+                >
+                    <div style={{ width: '100%' }}>{item.label}</div>
+                </Popconfirm>
+            )
+        }))
+    };
+
+    // Priority Menu
+    const priorityMenu = {
+        items: [
+            { key: 'important/urgent', label: t('priority.important/urgent') },
+            { key: 'important', label: t('priority.important') },
+            { key: 'urgent', label: t('priority.urgent') },
+            { key: 'NA', label: t('priority.NA') },
+        ].map(item => ({
+            ...item,
+            label: (
+                <Popconfirm
+                    title={t('common.confirmUpdate')}
+                    onConfirm={() => handleUpdateField('priority', item.key)}
+                    okText={t('translation.yes')}
+                    cancelText={t('translation.no')}
+                >
+                    <div style={{ width: '100%' }}>{item.label}</div>
+                </Popconfirm>
+            )
+        }))
+    };
+
     const btnStyle: React.CSSProperties = { flex: '1 1 140px', height: '40px' };
 
     if (ticket?.status !== resolved_status) {
@@ -98,6 +213,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
         }
     }
 
+
     return (
         <>
             <style>
@@ -106,7 +222,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                     .resolve-btn-success:hover { border-color: #73d13d !important; color: #73d13d !important; }
                 `}
             </style>
-            <Splitter style={{  boxShadow: '0 8px 24px rgba(229, 56, 56, 0.05)' }}>
+            <Splitter style={{ boxShadow: '0 8px 24px rgba(229, 56, 56, 0.05)' }}>
                 <Splitter.Panel defaultSize="80%" min="45%" style={{ overflowY: 'auto', padding: '16px' }}>
                     <Flex vertical gap="large">
                         <Card style={{
@@ -137,17 +253,48 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                     <Flex vertical gap="large">
                         <Card size="small" title={t('tickets.details')}>
                             <Flex vertical gap="middle">
-                                <Flex justify="space-between">
+                                <Flex justify="space-between" align="center">
                                     <Typography.Text type="secondary">{t('tickets.status')}</Typography.Text>
-                                    <Tag color="blue">{ticket?.status}</Tag>
+                                    <Space size={4}>
+                                        <Tag color={getStatusColor(ticket?.status)} style={{ margin: 0 }}>
+                                            {ticket?.status}
+                                        </Tag>
+                                        <Dropdown menu={statusMenu} trigger={['click']} disabled={updateMutation.isPending}>
+                                            <Button
+                                                type="text"
+                                                size="small"
+                                                shape="circle"
+                                                icon={updateMutation.isPending ? <Spin size="small" /> : <EditOutlined style={{ fontSize: '12px' }} />}
+                                            />
+                                        </Dropdown>
+                                    </Space>
                                 </Flex>
-                                <Flex justify="space-between">
+
+                                <Flex justify="space-between" align="center">
                                     <Typography.Text type="secondary">{t('tickets.priority')}</Typography.Text>
-                                    <Tag color="volcano">{ticket?.priority}</Tag>
+                                    <Space size={4}>
+                                        <Tag color={getPriorityColor(ticket?.priority)} style={{ margin: 0 }}>
+                                            {ticket?.priority}
+                                        </Tag>
+                                        <Dropdown menu={priorityMenu} trigger={['click']} disabled={updateMutation.isPending}>
+                                            <Button
+                                                type="text"
+                                                size="small"
+                                                shape="circle"
+                                                icon={updateMutation.isPending ? <Spin size="small" /> : <EditOutlined style={{ fontSize: '12px' }} />}
+                                            />
+                                        </Dropdown>
+                                    </Space>
                                 </Flex>
-                                <Flex justify="space-between">
+
+                                <Flex justify="space-between" align="center">
                                     <Typography.Text type="secondary">{t('tickets.problemType')}</Typography.Text>
-                                    <Typography.Text strong>{ticket?.problem?.name}</Typography.Text>
+                                    <Space size={4}>
+                                        <Tag color="blue" style={{ margin: 0 }}>{ticket?.problem?.name}</Tag>
+                                        <Dropdown menu={{ items: problemMenuItems }} trigger={['click']}>
+                                            <Button type="text" size="small" shape="circle" icon={<EditOutlined style={{ fontSize: '12px' }} />} />
+                                        </Dropdown>
+                                    </Space>
                                 </Flex>
 
 
