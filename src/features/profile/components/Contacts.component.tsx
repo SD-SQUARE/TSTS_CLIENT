@@ -22,7 +22,7 @@ const Contacts = ({ user }: { user: User }) => {
                         value={
                             <Space direction="vertical" style={{ width: "100%" }}>
                                 {user?.contacts.phones.map((phone, idx) => (
-                                    <Tooltip key={idx} title={t("profile.contacts.copy")}>
+                                    <Tooltip key={idx} title={`t("profile.contacts.copy") ${phone}`}>
                                         <Tag
                                             color="blue"
                                             style={{
@@ -31,9 +31,12 @@ const Contacts = ({ user }: { user: User }) => {
                                                 padding: "4px 12px",
                                                 userSelect: "none",
                                             }}
-                                            onClick={() => navigator.clipboard.writeText(phone)}
+                                            // onClick={() => navigator.clipboard.writeText(phone)}
                                         >
-                                            {phone} <CopyOutlined style={{ fontSize: 12 }} />
+                                            {/* {phone} <CopyOutlined style={{ fontSize: 12 }} /> */}
+                                            <Typography.Text copyable>
+                                                {phone}
+                                            </Typography.Text>
                                         </Tag>
                                     </Tooltip>
                                 ))}
@@ -50,7 +53,7 @@ const Contacts = ({ user }: { user: User }) => {
                         value={
                             <Space direction="vertical" style={{ width: "100%" }}>
                                 {user?.contacts.mobiles.map((mobile, idx) => (
-                                    <Tooltip key={idx} title={t("profile.contacts.copy")}>
+                                    <Tooltip key={idx} title={`t("profile.contacts.copy") ${mobile}`}>
                                         <Tag
                                             color="green"
                                             style={{
@@ -59,9 +62,12 @@ const Contacts = ({ user }: { user: User }) => {
                                                 padding: "4px 12px",
                                                 userSelect: "none",
                                             }}
-                                            onClick={() => navigator.clipboard.writeText(mobile)}
+                                            // onClick={() => navigator.clipboard.writeText(mobile)}
                                         >
-                                            {mobile} <CopyOutlined style={{ fontSize: 12 }} />
+                                            {/* {mobile} <CopyOutlined style={{ fontSize: 12 }} /> */}
+                                            <Typography.Text copyable>
+                                                {mobile}
+                                            </Typography.Text>
                                         </Tag>
                                     </Tooltip>
                                 ))}
