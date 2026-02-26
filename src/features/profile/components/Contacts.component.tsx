@@ -22,7 +22,7 @@ const Contacts = ({ user }: { user: User }) => {
                         value={
                             <Space direction="vertical" style={{ width: "100%" }}>
                                 {user?.contacts.phones.map((phone, idx) => (
-                                    <Tooltip key={idx} title={`t("profile.contacts.copy") ${phone}`}>
+                                    <Tooltip key={idx} title={`${t("profile.contacts.copy")} ${phone}`}>
                                         <Tag
                                             color="blue"
                                             style={{
@@ -53,7 +53,7 @@ const Contacts = ({ user }: { user: User }) => {
                         value={
                             <Space direction="vertical" style={{ width: "100%" }}>
                                 {user?.contacts.mobiles.map((mobile, idx) => (
-                                    <Tooltip key={idx} title={`t("profile.contacts.copy") ${mobile}`}>
+                                    <Tooltip key={idx} title={`${t("profile.contacts.copy")} ${mobile}`}>
                                         <Tag
                                             color="green"
                                             style={{
