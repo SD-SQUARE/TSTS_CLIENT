@@ -15,7 +15,7 @@ services:
     networks:
       - tsts-network
     volumes:
-      -  /opt/certs:/etc/nginx/certs:ro
+      - /opt/tsts-projects/certs:/etc/nginx/certs:ro
 
 networks:
   tsts-network:
