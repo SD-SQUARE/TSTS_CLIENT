@@ -37,6 +37,8 @@ const TicketComments: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =
         return stripped.length === 0 && pendingMediaIds.length === 0;
     };
 
+    const antIcon = <LoadingOutlined style={{ fontSize: 14 }} spin />;
+
     const handleSend = async () => {
         if (isEditorEmpty(text)) return;
         const messageContent = text;
@@ -117,9 +119,9 @@ const TicketComments: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =
 
             <div style={{ padding: '16px 16px 8px 16px' }}>
                 <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Tag color="blue" icon={<UserOutlined />} style={{ padding: '2px 12px', borderRadius: '10px', border: 'none', background: '#e6f4ff' }}>
+                    {/* <Tag color="blue" icon={<UserOutlined />} style={{ padding: '2px 12px', borderRadius: '10px', border: 'none', background: '#e6f4ff' }}>
                         {t('tickets.assignedTo')}: <strong>{assigneeName || t('tickets.unassigned')}</strong>
-                    </Tag>
+                    </Tag> */}
                     <Typography.Text type="secondary" style={{ fontSize: '12px' }}>{allMessages.length} {t('tickets.comments')}</Typography.Text>
                 </div>
 
@@ -165,7 +167,10 @@ const TicketComments: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =
                                 <Flex align="center" gap="middle">
                                     <Avatar src={item.sender.image} icon={<UserOutlined />} size="large" style={{ border: '2px solid #f0f0f0' }} />
                                     <Flex vertical>
-                                        <Typography.Text strong style={{ color: '#262626' }}>{item.sender.name}</Typography.Text>
+                                    <Flex align="center" gap="small">
+                                            <Typography.Text strong style={{ color: '#262626' }}>{item.sender.name}</Typography.Text>
+                                            {item.isSending && <Spin indicator={antIcon} />}
+                                        </Flex>
                                         <Typography.Text type="secondary" style={{ fontSize: '11px' }}>
                                             <ClockCircleOutlined style={{ marginRight: 4 }} />
                                             {dayjs(item.createdAt).format('MMM DD, YYYY - h:mm A')}
