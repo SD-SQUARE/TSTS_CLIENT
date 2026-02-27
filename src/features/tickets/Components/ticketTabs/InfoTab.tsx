@@ -222,8 +222,8 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                     .resolve-btn-success:hover { border-color: #73d13d !important; color: #73d13d !important; }
                 `}
             </style>
-            <Splitter style={{ boxShadow: '0 8px 24px rgba(229, 56, 56, 0.05)' }}>
-                <Splitter.Panel defaultSize="80%" min="45%" style={{ overflowY: 'auto', padding: '16px' }}>
+            <Splitter style={{height: 'calc(100vh - 80px)', boxShadow: '0 8px 24px rgba(229, 56, 56, 0.05)' }}>
+                <Splitter.Panel defaultSize="80%" min="45%" style={{ overflowY: 'auto', padding: '16px', height: '100%' }}>
                     <Flex vertical gap="large">
                         <Card style={{
                             borderRightWidth: "2px",
@@ -249,7 +249,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                     </Flex>
                 </Splitter.Panel>
 
-                <Splitter.Panel defaultSize="30%" min="25%" style={{ overflowY: 'auto', padding: '16px', backgroundColor: '#fafafa' }}>
+                <Splitter.Panel defaultSize="30%" min="25%" style={{ overflowY: 'auto', padding: '16px', backgroundColor: '#fafafa',height: '100%' }}>
                     <Flex vertical gap="large">
                         <Card size="small" title={t('tickets.details')}>
                             <Flex vertical gap="middle">
