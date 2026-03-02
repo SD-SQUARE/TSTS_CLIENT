@@ -319,6 +319,24 @@
     "state" : "State",
     "techs": "Technician"
   },
+  "audit": {
+    "title": "Audit Logs",
+    "summary": "Summary",
+    "userName": "User Name",
+    "role": "Role",
+    "action": "Action",
+    "status": "Status",
+    "createdAt": "Created At",
+    "filterByUser": "Filter by user",
+    "filterByAction": "Filter by action",
+    "details": "Log Details",
+    "username": "Username",
+    "ip": "IP Address",
+    "userAgent": "User Agent",
+    "resourceType": "Resource Type",
+    "steps": "Execution Steps",
+    "metadata": "Changes (Metadata)"
+  },
   "priority": {
     "important": "Important",
     "urgent": "Urgent",

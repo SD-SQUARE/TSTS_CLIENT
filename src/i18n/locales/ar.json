@@ -369,6 +369,24 @@
     "state" : "الحالة",
     "techs": "الفني"
   },
+  "audit": {
+    "title": "سجلات التدقيق",
+    "summary": "الملخص",
+    "userName": "اسم المستخدم",
+    "role": "الدور",
+    "action": "الإجراء",
+    "status": "الحالة",
+    "createdAt": "تاريخ الإنشاء",
+    "filterByUser": "تصفية حسب المستخدم",
+    "filterByAction": "تصفية حسب الإجراء",
+    "details": "تفاصيل السجل",
+    "username": "اسم المستخدم",
+    "ip": "عنوان IP",
+    "userAgent": "متصفح المستخدم",
+    "resourceType": "نوع المورد",
+    "steps": "خطوات التنفيذ",
+    "metadata": "التغييرات (البيانات الوصفية)"
+  },
   "priority": {
     "important": "مهمة",
     "urgent": "ضرورية",
