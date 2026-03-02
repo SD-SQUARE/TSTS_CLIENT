@@ -204,6 +204,10 @@ export const AppRoutes = () => {
                 <Route path=":id/edit" element={<PageLayout><TicketForm /></PageLayout>} />
             </Route>
 
+            {/* Audit logs routes */}
+            <Route path="/logs" element={<AuditLogList />} />
+            <Route path="/logs/:id" element={<AuditLogView />} />
+
             <Route path="knowledge-base" element={<PageLayout><KnowledgeBasePage /> </PageLayout>} />
 
             {/* Complmentary Paths */}
