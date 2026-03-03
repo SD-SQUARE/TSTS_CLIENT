@@ -18,22 +18,6 @@ const AuditLogStepsTable: React.FC<AuditLogStepsTableProps> = ({ steps, metadata
             title: t('audit.createdAt'), dataIndex: 'time', key: 'time',
             render: (time: string) => dayjs(time).format('YYYY-MM-DD HH:mm:ss')
         },
-        {
-            title: t('audit.metadata'),
-            key: 'meta',
-            children: [
-                {
-                    title: t('common.old'),
-                    key: 'oldValue',
-                    render: () => <Tag color="orange">{metadata?.oldValue || '-'}</Tag>
-                },
-                {
-                    title: t('common.new'),
-                    key: 'newValue',
-                    render: () => <Tag color="green">{metadata?.newValue || '-'}</Tag>
-                }
-            ]
-        }
     ];
 
     return (

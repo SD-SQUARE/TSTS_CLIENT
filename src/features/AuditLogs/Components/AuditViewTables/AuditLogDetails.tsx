@@ -27,6 +27,26 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({ data }) => {
                 </Descriptions.Item>
                 <Descriptions.Item label={t('audit.createdAt')}>
                     {dayjs(data?.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+                <Descriptions.Item label={t('audit.metadata')} span={2}>
+                    <Flex gap="small" style={{ width: '100%' }}>
+                        <Card size="small" style={{ flex: 1, backgroundColor: '#fff2f0', border: '1px solid #ffccc7' }}>
+                            <Typography.Text type="secondary" style={{ fontSize: '10px', display: 'block', textTransform: 'uppercase' }}>
+                                {t('common.old')}
+                            </Typography.Text>
+                            <Typography.Text strong>{data?.metadata?.oldValue || '-'}</Typography.Text>
+                        </Card>
+
+                        <Flex align="center" style={{ padding: '0 8px' }}>
+                            <RightOutlined style={{ color: '#bfbfbf' }} />
+                        </Flex>
+
+                        <Card size="small" style={{ flex: 1, backgroundColor: '#f6ffed', border: '1px solid #b7eb8f' }}>
+                            <Typography.Text type="secondary" style={{ fontSize: '10px', display: 'block', textTransform: 'uppercase' }}>
+                                {t('common.new')}
+                            </Typography.Text>
+                            <Typography.Text strong>{data?.metadata?.newValue || '-'}</Typography.Text>
+                        </Card>
+                    </Flex>
                 </Descriptions.Item>
             </Descriptions>
         </Card>
