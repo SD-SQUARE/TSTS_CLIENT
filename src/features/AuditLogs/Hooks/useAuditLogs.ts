@@ -37,7 +37,7 @@ export const useUserLookup = () => {
     return useQuery({
         queryKey: ['users-list'],
         queryFn: async () => {
-            const { data } = await api.get('http://127.0.0.1:3658/m1/1197709-1192710-default/users');
+            const { data } = await api.get('/v1/users');
             return data.users;
         }
     });
