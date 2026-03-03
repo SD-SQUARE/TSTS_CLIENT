@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
-import { Table, DatePicker, Card, Tag, Flex, Pagination, Select, Typography } from 'antd';
+import { Table, DatePicker, Card, Tag, Flex, Pagination, Select, Typography, Popover } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { CalendarOutlined, ClockCircleOutlined, FilterOutlined, SearchOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useAuditLogs, useAuditLookups, useUserLookup } from '../Hooks/useAuditLogs';
 import { useTranslation } from 'react-i18next';
+import EllipsisComponent from '../../../components/EllipsisComponent';
 
 const { RangePicker } = DatePicker;
 
@@ -36,8 +37,21 @@ const AuditLogList: React.FC = () => {
         {
             title: t('audit.summary'),
             dataIndex: 'summary',
+            key: 'summary',
             width: 300,
-            key: 'summary'
+            render: (text: string) => (
+                <div onClick={(e) => e.stopPropagation()}>
+
+                    <Popover
+                        title={t('audit.summary')}
+                        content={<div style={{ maxWidth: 400, fontFamily: 'monospace' }}>{text}</div>}
+                        trigger="hover"
+                        placement="topLeft"
+                    >
+                        <EllipsisComponent content={text} />
+                    </Popover>
+                </div>
+            ),
         },
         {
             title: t('audit.userName'),
@@ -109,24 +123,24 @@ const AuditLogList: React.FC = () => {
             title: t('audit.createdAt'),
             dataIndex: 'createdAt',
             key: 'createdAt',
-            render: (date: string) => 
-                (
-                    <Flex align="center" gap="middle"> 
-                        <Flex align="center" gap="small">
-                            <Typography.Text type="secondary">
-                                {dayjs(date).format('hh:mm A')}
-                            </Typography.Text>
-                            <ClockCircleOutlined style={{ color: '#bfbfbf', fontSize: '12px' }} />
-                        </Flex>
-            
-                        <Flex align="center" gap="small">
-                            <Typography.Text type="secondary">
-                                {dayjs(date).format('DD-MM-YYYY')}
-                            </Typography.Text>
-                            <CalendarOutlined style={{ color: '#bfbfbf', fontSize: '12px' }} />
-                        </Flex>
+            render: (date: string) =>
+            (
+                <Flex align="center" gap="middle">
+                    <Flex align="center" gap="small">
+                        <Typography.Text type="secondary">
+                            {dayjs(date).format('hh:mm A')}
+                        </Typography.Text>
+                        <ClockCircleOutlined style={{ color: '#bfbfbf', fontSize: '12px' }} />
                     </Flex>
-                ),
+
+                    <Flex align="center" gap="small">
+                        <Typography.Text type="secondary">
+                            {dayjs(date).format('DD-MM-YYYY')}
+                        </Typography.Text>
+                        <CalendarOutlined style={{ color: '#bfbfbf', fontSize: '12px' }} />
+                    </Flex>
+                </Flex>
+            ),
         },
     ];
 

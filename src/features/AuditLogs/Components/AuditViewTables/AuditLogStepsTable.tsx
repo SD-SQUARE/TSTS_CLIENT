@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { Card, Flex, Table, Typography } from 'antd';
+import { Card, Flex, Popover, Table, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { CalendarOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import EllipsisComponent from '../../../../components/EllipsisComponent';
 
 interface AuditLogStepsTableProps {
     steps: any[];
@@ -14,7 +15,20 @@ const AuditLogStepsTable: React.FC<AuditLogStepsTableProps> = ({ steps }) => {
     const { t } = useTranslation();
 
     const stepColumns = [
-        { title: t('audit.summary'), dataIndex: 'action', key: 'action', width:300 },
+        { title: t('audit.summary'), dataIndex: 'action', key: 'action', width:300, 
+        render: (text: string) => (
+            <div onClick={(e) => e.stopPropagation()}>
+
+                <Popover
+                    title={t('audit.summary')}
+                    content={<div style={{ maxWidth: 400, fontFamily: 'monospace' }}>{text}</div>}
+                    trigger="hover"
+                    placement="topLeft"
+                >
+                    <EllipsisComponent content={text} />
+                </Popover>
+            </div>
+        ),},
         {
             title: t('audit.createdAt'),
             dataIndex: 'time',
