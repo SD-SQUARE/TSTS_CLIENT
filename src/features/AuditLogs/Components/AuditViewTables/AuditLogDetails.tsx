@@ -1,6 +1,7 @@
 import React from 'react';
-import { Card, Descriptions, Tag } from 'antd';
+import { Card, Descriptions, Flex, Tag, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { CalendarOutlined, ClockCircleOutlined, RightOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
 interface AuditLogDetailsProps {
@@ -26,7 +27,19 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({ data }) => {
                     <Tag color={data?.status === 'SUCCESS' ? 'green' : 'red'}>{data?.status}</Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label={t('audit.createdAt')}>
-                    {dayjs(data?.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+                    <Flex align="center" gap="small">
+                        <Typography.Text type="secondary">
+                            {dayjs(data?.createdAt).format('hh:mm A')}
+                        </Typography.Text>
+                        <ClockCircleOutlined style={{ color: '#bfbfbf', fontSize: '12px' }} />
+
+                        <Typography.Text type="secondary">
+                            {dayjs(data?.createdAt).format('DD-MM-YYYY')}
+                        </Typography.Text>
+                        <CalendarOutlined style={{ color: '#bfbfbf', fontSize: '12px' }} />
+                    </Flex>
+                </Descriptions.Item>
+
                 <Descriptions.Item label={t('audit.metadata')} span={2}>
                     <Flex gap="small" style={{ width: '100%' }}>
                         <Card size="small" style={{ flex: 1, backgroundColor: '#fff2f0', border: '1px solid #ffccc7' }}>

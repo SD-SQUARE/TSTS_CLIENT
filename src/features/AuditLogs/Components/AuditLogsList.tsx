@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
-import { Table, DatePicker, Card, Tag, Flex, Pagination, Select } from 'antd'; 
+import { Table, DatePicker, Card, Tag, Flex, Pagination, Select, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { FilterOutlined, SearchOutlined } from '@ant-design/icons';
+import { CalendarOutlined, ClockCircleOutlined, FilterOutlined, SearchOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useAuditLogs, useAuditLookups, useUserLookup } from '../Hooks/useAuditLogs';
 import { useTranslation } from 'react-i18next';
@@ -43,11 +43,11 @@ const AuditLogList: React.FC = () => {
             dataIndex: ['actor', 'full_name'],
             key: 'actorId',
             filterDropdown: () => (
-                <div style={{ padding: 12 }}> 
+                <div style={{ padding: 12 }}>
                     <Select
                         showSearch
                         placeholder={t('audit.filterByUser')}
-                        style={{ width: 220 }} 
+                        style={{ width: 220 }}
                         allowClear
                         optionFilterProp="children"
                         value={filters.actorId}
@@ -108,7 +108,24 @@ const AuditLogList: React.FC = () => {
             title: t('audit.createdAt'),
             dataIndex: 'createdAt',
             key: 'createdAt',
-            render: (date: string) => dayjs(date).format('YYYY-MM-DD HH:mm:ss'),
+            render: (date: string) => 
+                (
+                    <Flex align="center" gap="middle"> 
+                        <Flex align="center" gap="small">
+                            <Typography.Text type="secondary">
+                                {dayjs(date).format('hh:mm A')}
+                            </Typography.Text>
+                            <ClockCircleOutlined style={{ color: '#bfbfbf', fontSize: '12px' }} />
+                        </Flex>
+            
+                        <Flex align="center" gap="small">
+                            <Typography.Text type="secondary">
+                                {dayjs(date).format('DD-MM-YYYY')}
+                            </Typography.Text>
+                            <CalendarOutlined style={{ color: '#bfbfbf', fontSize: '12px' }} />
+                        </Flex>
+                    </Flex>
+                ),
         },
     ];
 
@@ -126,13 +143,14 @@ const AuditLogList: React.FC = () => {
                     />
 
                     <RangePicker
-                        showTime
+                        showTime={{ format: 'HH:mm A' }}
+                        format="YYYY-MM-DD / HH:mm A"
                         placeholder={[t('common.startDate'), t('common.endDate')]}
                         onChange={(values) => {
                             setFilters(prev => ({
                                 ...prev,
-                                from: values ? values[0]!.format('YYYY-MM-DDTHH:mm:ss') : undefined,
-                                to: values ? values[1]!.format('YYYY-MM-DDTHH:mm:ss') : undefined,
+                                from: values ? values[0]!.format('hh:mm A / DD-mm-YYYY') : undefined,
+                                to: values ? values[1]!.format('hh:mm A / DD-mm-YYYY') : undefined,
                                 page: 1
                             }));
                         }}
