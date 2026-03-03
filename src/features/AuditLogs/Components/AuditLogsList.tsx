@@ -36,6 +36,7 @@ const AuditLogList: React.FC = () => {
         {
             title: t('audit.summary'),
             dataIndex: 'summary',
+            width: 300,
             key: 'summary'
         },
         {
