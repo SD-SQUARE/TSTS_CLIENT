@@ -1,125 +1,115 @@
-import React, { useEffect, useState } from 'react';
-import { Form, Input, Checkbox, Card, Row, Col } from 'antd';
+import React, { useState } from 'react';
+import { Form, Input, Card, Button, Space, Table, Tooltip } from 'antd';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { GenericCrudPage } from '../../../components/GenericCrudPage';
 import { useGenericCrud } from '../../../api/common/hooks/common-hooks';
+import { permissionApi } from '../services/permissionsApi';
 import type { PermissionProfile } from '../types/types';
 import type { CreatePermissionProfileDto, UpdatePermissionProfileDto } from '../types/types';
 import { useTranslation } from "react-i18next";
 
-
-const STATIC_AVAILABLE_PERMISSIONS = [
-  { label: 'View Users', value: 'USER_VIEW' },
-  { label: 'Create Users', value: 'USER_CREATE' },
-  { label: 'Edit Users', value: 'USER_EDIT' },
-  { label: 'Delete Users', value: 'USER_DELETE' },
-  { label: 'Manage Settings', value: 'SETTINGS_MANAGE' },
-  { label: 'View Reports', value: 'REPORTS_VIEW' },
-  { label: 'Export Data', value: 'DATA_EXPORT' },
-  { label: 'Manage Work Hours', value: 'WORKHOURS_MANAGE' },
-];
-
-const STATIC_PROFILES: PermissionProfile[] = [
-  { 
-    id: 1, 
-    name_en: 'Super Admin', 
-    name_ar: '', 
-    code: 'SUPER_ADMIN', 
-    description_en: 'Full system access', 
-    description_ar: '', 
-    permissions: ['USER_VIEW', 'USER_CREATE', 'USER_DELETE', 'SETTINGS_MANAGE', 'REPORTS_VIEW', 'DATA_EXPORT'] 
-  },
-  { 
-    id: 2, 
-    name_en: 'HR Manager', 
-    name_ar: '', 
-    code: 'HR_MANAGER', 
-    description_en: 'Can manage users and work hours', 
-    description_ar: '', 
-    permissions: ['USER_VIEW', 'USER_CREATE', 'USER_EDIT', 'WORKHOURS_MANAGE'] 
-  },
-  { 
-    id: 3, 
-    name_en: 'Viewer', 
-    name_ar: '', 
-    code: 'VIEWER_ONLY', 
-    description_en: 'Read-only access', 
-    description_ar: '', 
-    permissions: ['USER_VIEW', 'REPORTS_VIEW'] 
-  },
-];
-
-
-
-const mockPermissionService = {
-  getAll: async (): Promise<PermissionProfile[]> => {
-    return new Promise((resolve) => setTimeout(() => resolve(STATIC_PROFILES), 500));
-  },
-  create: async (data: CreatePermissionProfileDto): Promise<PermissionProfile> => {
-    console.log('Mock Create Profile:', data);
-    const newProfile = { 
-      ...data, 
-      id: Date.now(),
-      name_ar: data.name_ar || '', 
-      description_en: data.description_en || '',
-      description_ar: data.description_ar || '',
-    } as PermissionProfile;
-    return Promise.resolve(newProfile);
-  },
-  update: async (id: string | number, data: UpdatePermissionProfileDto): Promise<PermissionProfile> => {
-    console.log('Mock Update Profile:', id, data);
-    const profile = STATIC_PROFILES.find(p => p.id === id);
-    const updated = { 
-      ...profile, 
-      ...data, 
-      id,
-      name_ar: data.name_ar || profile?.name_ar || '',
-      description_en: data.description_en || profile?.description_en || '',
-      description_ar: data.description_ar || profile?.description_ar || '',
-    } as PermissionProfile;
-    return Promise.resolve(updated);
-  },
-  delete: async (id: string | number): Promise<void> => {
-    console.log('Mock Delete Profile:', id);
-    return Promise.resolve();
-  },
-};
-
 const PermissionsPage: React.FC = () => {
-  const { t, i18n } = useTranslation();
-  const [availablePermissions, setAvailablePermissions] = useState<any[]>([]);
+  const { t } = useTranslation();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 50 });
 
   const {
     data,
+    total,
     isLoading,
     createMutation,
     updateMutation,
     deleteMutation,
   } = useGenericCrud<PermissionProfile, CreatePermissionProfileDto, UpdatePermissionProfileDto>({
-    queryKey: ['permissionProfiles'],
-    fetchFn: mockPermissionService.getAll,
-    createFn: mockPermissionService.create,
-    updateFn: ({ id, data }) => mockPermissionService.update(id, data),
-    deleteFn: mockPermissionService.delete,
+    queryKey: ['permissionProfiles', searchTerm, pagination.current, pagination.pageSize],
+    
+    fetchFn: () => permissionApi.getAll({ 
+      name: searchTerm, 
+      page_index: pagination.current,
+      page_size: pagination.pageSize 
+    }),
+
+    createFn: (values: any) => {
+      const payload = {
+        name_en: values.name_en,
+        name_ar: values.name_ar,
+        description_en: values.description_en,
+        description_ar: values.description_ar,
+        permissions: values.additional_names || [] 
+      };
+      return permissionApi.create(payload as CreatePermissionProfileDto);
+    },
+
+    updateFn: ({ id, data: values }: any) => {
+      const payload = {
+        name_en: values.name_en,
+        name_ar: values.name_ar,
+        description_en: values.description_en,
+        description_ar: values.description_ar,
+        permissions: values.additional_names || [] 
+      };
+      return permissionApi.update(id, payload as UpdatePermissionProfileDto);
+    },
+
+    deleteFn: (id) => permissionApi.delete(id),
   });
 
-  useEffect(() => {
-    const loadLockups = async () => {
-      setAvailablePermissions(STATIC_AVAILABLE_PERMISSIONS);
-    };
-    loadLockups();
-  }, []);
-
   const columns = [
-    { title: 'Profile Name', dataIndex: 'name_en', key: 'name' },
-    { title: 'Code', dataIndex: 'code', key: 'code' }, 
-    { title: 'Description', dataIndex: 'description_en', key: 'description' },
+    { title: t("name_en"), dataIndex: "name_en", key: "name_en" },
+    { title: t("name_ar"), dataIndex: "name_ar", key: "name_ar" },
+    {
+      title: t("description_en"),
+      dataIndex: "description_en",
+      key: "description_en",
+      render: (text: string) => (
+        <Tooltip title={text}>
+          <div style={{ display: "-webkit-box", WebkitBoxOrient: "vertical", WebkitLineClamp: 1, overflow: "hidden" }}>
+            {text}
+          </div>
+        </Tooltip>
+      ),
+    },
+    {
+      title: t("description_ar"),
+      dataIndex: "description_ar",
+      key: "description_ar",
+      render: (text: string) => (
+        <Tooltip title={text}>
+          <div style={{ display: "-webkit-box", WebkitBoxOrient: "vertical", WebkitLineClamp: 1, overflow: "hidden", direction: "rtl" }}>
+            {text}
+          </div>
+        </Tooltip>
+      ),
+    },
   ];
+
+  const renderViewExtra = (record: PermissionProfile) => {
+    if (!record || !record.permissions || record.permissions.length === 0) return null;
+
+    const innerColumns = [
+      { title: t("name_en"), dataIndex: 'name_en', key: 'name_en' },
+      { title: t("name_ar"), dataIndex: 'name_ar', key: 'name_ar' },
+    ];
+
+    return (
+      <Card bordered={false} className="admin-card">
+        <Table 
+          dataSource={record.permissions as any} 
+          columns={innerColumns} 
+          pagination={false} 
+          size="middle" 
+          rowKey={(r: any) => r.name_en || Math.random()} 
+          bordered
+        />
+      </Card>
+    );
+  };
 
   const formItems = (
     <>
       <Form.Item 
         name="name_en" 
-        label="Profile Name (English)" 
+        label={t("name_en")} 
         rules={[{ required: true, message: t("required") },
         { pattern: /^[A-Za-z0-9\s.,-]*$/, message: t("english_only") }]}
       >
@@ -135,14 +125,6 @@ const PermissionsPage: React.FC = () => {
         ]}
       >
         <Input placeholder="مدير الموارد البشرية" style={{ direction: "rtl", textAlign: "right" }} />
-      </Form.Item>
-
-      <Form.Item 
-        name="code" 
-        label="Unique Code" 
-        rules={[{ required: true, message: 'Code is required' }]}
-      >
-        <Input placeholder="e.g. HR_MANAGER" style={{ textTransform: 'uppercase' }} />
       </Form.Item>
 
       <Form.Item 
@@ -165,35 +147,70 @@ const PermissionsPage: React.FC = () => {
         <Input.TextArea rows={3} style={{ direction: "rtl", textAlign: "right" }} />
       </Form.Item>
 
-      <Card title="Assign Permissions" size="small" style={{ marginTop: 20 }}>
-        <Form.Item 
-          name="permissions" 
-          rules={[{ required: true, message: 'Select at least one permission' }]}
-        >
-          <Checkbox.Group style={{ width: '100%' }}>
-            <Row gutter={[16, 16]}>
-              {availablePermissions.map((perm) => (
-                <Col span={12} key={perm.value}>
-                  <Checkbox value={perm.value}>{perm.label}</Checkbox>
-                </Col>
+      <Card title={t("user_list.perm_title")} size="small" style={{ marginTop: 20 }}>
+        <Form.List name="additional_names">
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map(({ key, name, ...restField }) => (
+                <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
+                  <Form.Item
+                    {...restField}
+                    name={[name, 'name_en']}
+                    rules={[{ required: true, message: t("required") }]}
+                  >
+                    <Input placeholder={t("name_en")} />
+                  </Form.Item>
+                  <Form.Item
+                    {...restField}
+                    name={[name, 'name_ar']}
+                    rules={[{ required: true, message: t("required") }]}
+                  >
+                    <Input placeholder={t("name_ar")} style={{ direction: "rtl", textAlign: "right" }} />
+                  </Form.Item>
+                  <DeleteOutlined 
+                    onClick={() => remove(name)} 
+                    style={{ color: '#ff4d4f', cursor: 'pointer', fontSize: '16px', marginLeft: '8px' }} 
+                    title={t("delete") || "Delete"} 
+                  />
+                </Space>
               ))}
-            </Row>
-          </Checkbox.Group>
-        </Form.Item>
+              <Form.Item style={{ marginBottom: 0 }}>
+                <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                  {t("permissionsPage.add_perm")}
+                </Button>
+              </Form.Item>
+            </>
+          )}
+        </Form.List>
       </Card>
     </>
   );
 
+  const nestedFieldMappers = {
+    additional_names: (record: PermissionProfile) => record.permissions || [],
+  };
+
   return (
     <GenericCrudPage<PermissionProfile>
-      title="Permission Profiles (Test Mode)"
+      title={t("user_list.perm_prof")}
       columns={columns}
       formItems={formItems}
-      data={data}
+      data={data ?? []}
+      total={total}
       isLoading={isLoading}
+      pageIndex={pagination.current}
+      pageSize={pagination.pageSize}
+      onPageChange={(page, size) => setPagination({ current: page, pageSize: size })}
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}
+      searchText={searchTerm}
+      onSearch={(val) => {
+        setSearchTerm(val);
+        setPagination(prev => ({ ...prev, current: 1 })); 
+      }}
+      viewExtraNode={renderViewExtra}
+      nestedFieldMappers={nestedFieldMappers}
     />
   );
 };

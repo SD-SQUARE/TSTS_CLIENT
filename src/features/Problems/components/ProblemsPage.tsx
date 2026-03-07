@@ -24,6 +24,7 @@ const ProblemsPage: React.FC = () => {
 
   const {
     data,
+    total,
     isLoading,
     createMutation,
     updateMutation,
@@ -196,6 +197,7 @@ const ProblemsPage: React.FC = () => {
       columns={columns}
       formItems={formItems}
       data={data ?? []}
+      total={total}
       isLoading={isLoading}
       pageIndex={pagination.current}
       pageSize={pagination.pageSize}

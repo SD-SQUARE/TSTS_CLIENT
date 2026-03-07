@@ -44,6 +44,8 @@ interface GenericCrudProps<T> {
   tableSize?: "small" | "middle" | "large";
   searchText?: string;
   onSearch?: (value: string) => void;
+  // ADDED: Prop to accept custom UI at the bottom of the View Details page
+  viewExtraNode?: (record: T) => React.ReactNode;
 }
 
 export const GenericCrudPage = <T extends { id: string | number }>({
@@ -64,6 +66,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
   tableSize = "middle",
   searchText = "",
   onSearch,
+  viewExtraNode, // ADDED: Destructured prop
 }: GenericCrudProps<T>) => {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.language === "ar";
@@ -250,6 +253,14 @@ export const GenericCrudPage = <T extends { id: string | number }>({
             })}
           </Descriptions>
         </Card>
+
+        {viewExtraNode && (
+          <div style={{ marginTop: '20px' }}>
+            <h2 style={{ margin: 0 }}>{t("Permissions")}</h2>
+            {viewExtraNode(viewingItem)}
+          </div>
+        )}
+
         <Button
           icon={
             <ArrowLeftOutlined

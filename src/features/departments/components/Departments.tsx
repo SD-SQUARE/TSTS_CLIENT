@@ -12,16 +12,22 @@ const DepartmentsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [selectedUni, setSelectedUni] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState(""); 
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 50 });
 
   const {
     data,
+    total,
     isLoading,
     createMutation,
     updateMutation,
     deleteMutation,
   } = useGenericCrud<Department, CreateDepartmentDto, UpdateDepartmentDto>({
-    queryKey: ['departments', searchTerm],
-      fetchFn: () => departmentApi.getAll({ name: searchTerm }),
+    queryKey: ['departments', searchTerm, pagination.current, pagination.pageSize],
+    fetchFn: () => departmentApi.getAll({ 
+      name: searchTerm,
+      page: pagination.current,
+      page_size: pagination.pageSize
+    }),
     createFn: (data) => departmentApi.create(data),
     updateFn: ({ id, data }) => departmentApi.update(id, data),
     deleteFn: (id) => departmentApi.delete(id),
@@ -172,13 +178,20 @@ const nestedFieldMappers = {
       columns={columns}
       formItems={formItems}
       data={data}
+      total={total}
+      pageIndex={pagination.current}
+      pageSize={pagination.pageSize}
+      onPageChange={(page, size) => setPagination({ current: page, pageSize: size })}
+      onSearch={(val) => {
+        setSearchTerm(val);
+        setPagination(prev => ({ ...prev, current: 1 })); 
+      }}
       isLoading={isLoading}
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}
       nestedFieldMappers={nestedFieldMappers}   
       searchText={searchTerm}
-      onSearch={(val) => setSearchTerm(val)} 
     />
   );
 };

@@ -369,6 +369,9 @@
     "state" : "الحالة",
     "techs": "الفني"
   },
+  "permissionsPage":{
+    "add_perm":"إضافة صلاحية"
+  },
   "priority": {
     "important": "مهمة",
     "urgent": "ضرورية",

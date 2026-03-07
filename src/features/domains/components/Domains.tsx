@@ -13,18 +13,23 @@ import { universityApi } from "../../universities/services/universityApi";
 const DomainsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [selectedUni, setSelectedUni] = useState<number | null>(null);
-
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 50 });
   const [searchTerm, setSearchTerm] = useState("");
 
   const {
     data,
+    total,
     isLoading,
     createMutation,
     updateMutation,
     deleteMutation,
   } = useGenericCrud<Domain, CreateDomainDto, UpdateDomainDto>({
-    queryKey: ['domains', searchTerm],
-      fetchFn: () => domainApi.getAll({ name: searchTerm }),
+    queryKey: ['domains', searchTerm, pagination.current, pagination.pageSize],
+    fetchFn: () => domainApi.getAll({ 
+      name: searchTerm,
+      page: pagination.current,
+      page_size: pagination.pageSize
+    }),
     createFn: (data) => domainApi.create(data),
     updateFn: ({ id, data }) => domainApi.update(id, data),
     deleteFn: (id) => domainApi.delete(id),
@@ -178,14 +183,20 @@ const DomainsPage: React.FC = () => {
       title={t("Domains")}
       columns={columns}
       formItems={formItems}
-      data={data}
+      data={data}total={total}
+      pageIndex={pagination.current}
+      pageSize={pagination.pageSize}
+      onPageChange={(page, size) => setPagination({ current: page, pageSize: size })}
+      onSearch={(val) => {
+        setSearchTerm(val);
+        setPagination(prev => ({ ...prev, current: 1 })); 
+      }}
       isLoading={isLoading}
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}
       nestedFieldMappers={nestedFieldMappers} 
       searchText={searchTerm} 
-      onSearch={(val) => setSearchTerm(val)}   
     />
   );
 };

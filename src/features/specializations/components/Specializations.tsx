@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { Form, Input, Select, Tooltip , message, Switch, Tag} from "antd";
+import React, {  useState } from "react";
+import { Form, Input, Tooltip ,  Switch, Tag} from "antd";
 import { GenericCrudPage } from "../../../components/GenericCrudPage";
 import { useGenericCrud } from "../../../api/common/hooks/common-hooks";
 import { specializationApi } from '../services/specializationsApi';
-import { departmentApi} from '../../departments/services/departmentApi'
+// import { departmentApi} from '../../departments/services/departmentApi'
 import type { Specialization, CreateSpecializationDto, UpdateSpecializationDto } from "../types/types";
-import type { Department } from "../../departments/types/types";
+// import type { Department } from "../../departments/types/types";
 import { useTranslation } from "react-i18next";
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
@@ -16,6 +16,7 @@ const SpecializationsPage: React.FC = () => {
 
   const {
     data,
+    total,
     isLoading,
     createMutation,
     updateMutation,
@@ -121,7 +122,8 @@ const SpecializationsPage: React.FC = () => {
       title={t("specializations")}
       columns={columns}
       formItems={formItems}
-    data={data}
+      data={data}
+      total={total}
       isLoading={isLoading}
       createMutation={createMutation}
       updateMutation={updateMutation}

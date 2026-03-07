@@ -13,6 +13,7 @@ const UniversitiesPage: React.FC = () => {
   
   const {
     data,
+    total,
     isLoading,
     createMutation,
     updateMutation,
@@ -101,6 +102,7 @@ const UniversitiesPage: React.FC = () => {
       columns={columns}
       formItems={formItems}
       data={data ?? []}
+      total={total}
       isLoading={isLoading}
       pageIndex={pagination.current}
       pageSize={pagination.pageSize}
