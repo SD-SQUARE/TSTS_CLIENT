@@ -100,12 +100,19 @@ export const useDepartments = (domainId?: string) =>
         staleTime: Infinity,
     });
 
-export const usePermissionProfiles = () =>
-    useQuery({
-        queryKey: ["permissionProfiles"],
-        queryFn: async () => (await api.get("v1/permissions/profile")).data.profiles as ProfileLookup[],
-        staleTime: Infinity,
-    });
+    export const usePermissionProfiles = () =>
+        useQuery({
+            queryKey: ["permissionProfiles"],
+            queryFn: async () => {
+                const response = await api.get("/v1/lockups/permissions/");
+                
+                const data = response.data.profiles || response.data; 
+                
+                if (!data) throw new Error("No data received from permissions API");
+                return data as ProfileLookup[];
+            },
+            staleTime: Infinity,
+        });
 
 
 export const useSpecializations = () =>

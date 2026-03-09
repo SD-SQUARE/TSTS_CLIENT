@@ -94,7 +94,9 @@ const UserFormModal: React.FC<{
                     university: fetchedUserDetail.university ?? null,
                     domain: fetchedUserDetail.domain ?? null,
                     departments: fetchedUserDetail.departments ?? [],
-                    permission_profile: fetchedUserDetail.permission_profile ?? null,
+                    permission_profile: fetchedUserDetail.permission_profile?.map((p: any) => 
+                        `${p.profile_id}|${p.permission_key}`
+                    ) || [],
                     specializations: fetchedUserDetail.specializations ?? [],
                     email: fetchedUserDetail.email,
                     password: "",
@@ -163,6 +165,14 @@ const UserFormModal: React.FC<{
 
     const cleanPayload = (data: UserFormData) => {
 
+        const mappedPermissions = data.permission_profile?.map((item: string) => {
+            const [profileId, permKey] = item.split('|');
+            return {
+                profile_id: profileId,
+                permission_key: permKey
+            };
+        }) || [];
+
         const payload: Partial<UserPayload> = {
             first_name_en: data.first_name_en,
             first_name_ar: data.first_name_ar,
@@ -184,7 +194,7 @@ const UserFormModal: React.FC<{
 
             university: data.university?.id || null,
             domain: data.domain?.id || null,
-            permission_profile: data.permission_profile?.id || null,
+            permission_profile: JSON.stringify(mappedPermissions),
 
             departments: data.departments.map(item => item.id),
             specializations: data.specializations.map(item => item.id),
@@ -213,6 +223,9 @@ const UserFormModal: React.FC<{
                 }
                 else if (key === "contacts") {
                     formPayload.append("contacts", JSON.stringify(val));
+                }
+                else if (key === "permission_profile") {
+                    formPayload.append(key, val as string); 
                 }
                 else if (key === "specializations") {
                     formPayload.append("allowed_specializations", JSON.stringify(val));
