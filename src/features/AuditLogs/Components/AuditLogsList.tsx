@@ -69,7 +69,7 @@ const AuditLogList: React.FC = () => {
                         onChange={(val) => handleFilterChange('actorId', val)}
                         options={users?.map((u: any) => ({
                             value: u.id,
-                            label: isAr ? u.full_name_ar : u.full_name_en
+                            label: u.first_name + ' ' + u.mid_name + ' ' + u.last_name 
                         }))}
                     />
                 </div>
@@ -179,7 +179,7 @@ const AuditLogList: React.FC = () => {
                     rowKey="id"
                     pagination={false}
                     onRow={(record: any) => ({
-                        onClick: () => navigate(`/logs/${record.id}`),
+                        onClick: () => navigate(`/settings/logs/${record.id}`),
                         style: { cursor: 'pointer' }
                     })}
                 />

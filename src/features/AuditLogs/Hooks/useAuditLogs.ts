@@ -6,7 +6,7 @@ export const useAuditLogs = (filters: any) => {
     return useQuery({
         queryKey: ['audit-logs', filters],
         queryFn: async () => {
-            const { data } = await api.get('/audit-logs', { params: filters });
+            const { data } = await api.get('/v1/audit-logs', { params: filters });
             return data;
         },
     });
@@ -16,7 +16,7 @@ export const useAuditLogDetails = (id: string) => {
     return useQuery({
         queryKey: ['audit-log', id],
         queryFn: async () => {
-            const { data } = await api.get(`/audit-logs/${id}`);
+            const { data } = await api.get(`/v1/audit-logs/${id}`);
             return data;
         },
         enabled: !!id,
@@ -27,7 +27,7 @@ export const useAuditLookups = () => {
     return useQuery({
         queryKey: ['audit-actions'],
         queryFn: async () => {
-            const { data } = await api.get('/lookups/actions');
+            const { data } = await api.get('/v1/lookups/actions');
             return data; 
         }
     });
@@ -37,7 +37,7 @@ export const useUserLookup = () => {
     return useQuery({
         queryKey: ['users-list'],
         queryFn: async () => {
-            const { data } = await api.get('/v1/users');
+            const { data } = await api.get('/v1/lockups/users');
             return data.users;
         }
     });

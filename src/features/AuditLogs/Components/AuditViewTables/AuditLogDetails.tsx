@@ -3,6 +3,7 @@ import { Card, Descriptions, Flex, Tag, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { CalendarOutlined, ClockCircleOutlined, RightOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import i18next from 'i18next';
 
 interface AuditLogDetailsProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -15,7 +16,11 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({ data }) => {
     return (
         <Card title={t('audit.details')}>
             <Descriptions bordered column={2}>
-                <Descriptions.Item label={t('audit.username')}>{data?.actor?.full_name}</Descriptions.Item>
+                <Descriptions.Item label={t('audit.username')}>{
+                    data?.actor?.full_name.first[i18next.language] + " " +
+                    data?.actor?.full_name.mid[i18next.language] + " " +
+                    data?.actor?.full_name.last[i18next.language]
+                }</Descriptions.Item>
                 <Descriptions.Item label={t('audit.ip')}>{data?.actor?.ipAddress}</Descriptions.Item>
                 <Descriptions.Item label={t('audit.role')}>
                     <Tag color="blue">{data?.actor?.type}</Tag>
