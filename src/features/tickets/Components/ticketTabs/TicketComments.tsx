@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useRef, useEffect } from 'react';
 import { Avatar, Button, Tag, Upload, Typography, Card, Flex, Spin, Space, Collapse } from 'antd';
-import { PaperClipOutlined, SendOutlined, UserOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { PaperClipOutlined, SendOutlined, UserOutlined, ClockCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { useGetChatMessagesQuery, useSendMessageMutation, useUploadChatMediaMutation } from '../../store/services/chatApi';
@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux';
 import ReactQuill from 'react-quill-new';
 import DOMPurify from 'dompurify';
 import 'react-quill-new/dist/quill.snow.css';
+import i18next from 'i18next';
 
 const TicketComments: React.FC<{ assigneeName?: string }> = ({ assigneeName }) => {
     const { t } = useTranslation();
@@ -41,17 +42,18 @@ const TicketComments: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =
 
     const handleSend = async () => {
         if (isEditorEmpty(text)) return;
+        
         const messageContent = text;
         const mediaIdsToSend = [...pendingMediaIds];
         const tempId = `temp-${Date.now()}`;
-
+        console.log(user.nam)
         const optimisticMsg = {
             id: tempId,
             message: messageContent,
             createdAt: new Date().toISOString(),
             sender: {
                 id: user?.id,
-                name: user?.name || t('common.me'),
+                name: user?.name.first[i18next.language] + ' ' + user?.name.mid[i18next.language] +' ' + user?.name.last[i18next.language] || t('common.me'),
                 image: user?.image
             },
             media: tempFiles.map(f => ({ id: f.id, fileName: f.name, url: '#' })),
@@ -65,6 +67,7 @@ const TicketComments: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =
 
         try {
             await sendMessage({ ticketId: ticketId!, message: messageContent, mediaIds: mediaIdsToSend, userID: user.id }).unwrap();
+            refetch();
         } catch (error) {
             setOptimisticMessages(prev => prev.filter(m => m.id !== tempId));
         }
@@ -109,7 +112,7 @@ const TicketComments: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =
                 /* Quill Styling */
                 .quill-chat-editor .ql-container { border: none !important; }
                 .quill-chat-editor .ql-editor { 
-                    min-height: 42px !important; height: 42px !important; max-height: 42px !important; 
+                    min-height: 42px !important; height: 5rem !important; max-height: 5rem !important; 
                     padding: 10px 12px !important; overflow-y: auto !important; scrollbar-width: none;
                 }
                 .quill-chat-editor .ql-editor::-webkit-scrollbar { display: none; }

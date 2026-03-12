@@ -5,7 +5,7 @@ import { CheckCircleOutlined, EditOutlined, ToolOutlined, ReloadOutlined, CloseC
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useChangeTicketStatus } from '../../Hooks/useTicket';
-import TicketComments from './CommentComponent';
+import TicketComments from './TicketComments';
 import InlineReview from '../InlineReview';
 import AssigneeList from '../AssigneesList';
 import DOMPurify from "dompurify";
@@ -27,22 +27,22 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
     const in_progress_state = "In Progress", pending_state = "Pending";
     const out_of_service_state = "Out of Service", resolved_status = "Resolved";
 
-    const { updateMutation } = useTicketMutations(ticket?.id);
+    const { updateMutation, coordinateMutation } = useTicketMutations(ticket?.id);
     const { data: groupedData } = useTicketProblems();
 
+    const statusMap: Record<string, string> = {
+        [openstate]: "open",
+        [reopenstate]: "re_open",
+        [closestate]: "closed",
+        [in_progress_state]: "in_progress",
+        [pending_state]: "pending",
+        [out_of_service_state]: "out_of_service",
+        [resolved_status]: "resolved"
+    };
     const handleStatusChange = async (newStatus: string) => {
-        const statusMap: Record<string, string> = {
-            [openstate]: "open",
-            [reopenstate]: "re_open",
-            [closestate]: "closed",
-            [in_progress_state]: "in_progress",
-            [pending_state]: "pending",
-            [out_of_service_state]: "out_of_service",
-            [resolved_status]: "resolved"
-        };
-
         try {
             const res = await statusMutation.mutateAsync(statusMap[newStatus] || "open");
+            
             if (res.is_updated) message.success(t('tickets.statusUpdatedSuccess'));
         } catch (err) {
             message.error(t('errors.connectionError'));
@@ -70,7 +70,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
         const problemId = fieldName === 'problem' ? value.id : ticket?.problem?.id;
         const specId = fieldName === 'problem' ? value.specId : ticket?.specialization?.id;
         const priority = fieldName === 'priority' ? value : ticket?.priority;
-        const status = fieldName === 'status' ? value : ticket?.status;
+        const status = fieldName === 'status' ? statusMap[value] : statusMap[ticket?.status];
 
         if (problemId) formData.append('problem', problemId);
         if (specId) formData.append('specialization', specId);
@@ -78,7 +78,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
         formData.append('status', status);
         formData.append('requester', ticket?.requester?.id);
 
-        updateMutation.mutate(formData, {
+        coordinateMutation.mutate(formData, {
             onSuccess: () => message.success(t('success.updated')),
             onError: () => message.error(t('errors.updateFailed'))
         });
@@ -124,6 +124,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
             { key: 'In Progress', label: t('status.in_progress') },
             { key: 'Pending', label: t('status.pending') },
             { key: 'Closed', label: t('status.closed') },
+            { key: 'Resolved', label: t('status.resolved') },
         ].map(item => ({
             ...item,
             label: (
@@ -259,6 +260,8 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                                         <Tag color={getStatusColor(ticket?.status)} style={{ margin: 0 }}>
                                             {ticket?.status}
                                         </Tag>
+
+                                        {!isRequester && (
                                         <Dropdown menu={statusMenu} trigger={['click']} disabled={updateMutation.isPending}>
                                             <Button
                                                 type="text"
@@ -266,16 +269,21 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                                                 shape="circle"
                                                 icon={updateMutation.isPending ? <Spin size="small" /> : <EditOutlined style={{ fontSize: '12px' }} />}
                                             />
-                                        </Dropdown>
+                                            </Dropdown>
+                                        )}
                                     </Space>
                                 </Flex>
 
                                 <Flex justify="space-between" align="center">
                                     <Typography.Text type="secondary">{t('tickets.priority')}</Typography.Text>
+                                        
                                     <Space size={4}>
+
                                         <Tag color={getPriorityColor(ticket?.priority)} style={{ margin: 0 }}>
                                             {ticket?.priority}
                                         </Tag>
+                                            
+                                        {!isRequester && (
                                         <Dropdown menu={priorityMenu} trigger={['click']} disabled={updateMutation.isPending}>
                                             <Button
                                                 type="text"
@@ -284,6 +292,8 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                                                 icon={updateMutation.isPending ? <Spin size="small" /> : <EditOutlined style={{ fontSize: '12px' }} />}
                                             />
                                         </Dropdown>
+                                        )}
+
                                     </Space>
                                 </Flex>
 
@@ -291,9 +301,12 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                                     <Typography.Text type="secondary">{t('tickets.problemType')}</Typography.Text>
                                     <Space size={4}>
                                         <Tag color="blue" style={{ margin: 0 }}>{ticket?.problem?.name}</Tag>
+
+                                        {!isRequester && (
                                         <Dropdown menu={{ items: problemMenuItems }} trigger={['click']}>
                                             <Button type="text" size="small" shape="circle" icon={<EditOutlined style={{ fontSize: '12px' }} />} />
                                         </Dropdown>
+                                        )}
                                     </Space>
                                 </Flex>
 

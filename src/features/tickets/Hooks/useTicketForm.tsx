@@ -52,11 +52,19 @@ export const useTicketMutations = (id?: string) => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: (data: any) => api.put(`/v1/tickets/${id}/`, data, { headers: { 'Content-Type': 'multipart/form-data' } }),
+      mutationFn: (data: any) => api.put(`/v1/tickets/${id}/`, data, { headers: { 'Content-Type': 'multipart/form-data' } }),
+      onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['ticket', id] });
+          queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      }
   });
 
   const coordinateMutation = useMutation({
-    mutationFn: (data: any) => api.put(`/v1/tickets/${id}/co-ordinate`, data, { headers: { 'Content-Type': 'multipart/form-data' } }),
+      mutationFn: (data: any) => api.put(`/v1/tickets/${id}/co-ordinate`, data, { headers: { 'Content-Type': 'multipart/form-data' } }),
+      onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['ticket', id] });
+          queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      }
   });
 
   return { createMutation, updateMutation, coordinateMutation };
