@@ -317,7 +317,8 @@
     "details": "Details",
     "reviewSubmitted": "Thank you! Your review has been submitted.",
     "state" : "State",
-    "techs": "Technician"
+    "techs": "Technician",
+    "comments": "Comments"
   },
   "audit": {
     "title": "Audit Logs",
@@ -377,7 +378,8 @@
     "old": "Old",
     "new": "New",
     "showHideColumns": "Show/Hide Columns",
-    "columns": "Columns"
+    "columns": "Columns",
+    "confirmUpdate": "Are you sure you want to update this field?"
   },
   "success": {
     "created": "Ticket created successfully",
@@ -434,7 +436,7 @@
   "Tickets": "Tickets",
   "Settings": "Settings",
   "Personnel": "Personnel",
-  "Knowledge-Base": "Knowledge Hub",
+  "Knowledge-Base": "Explore Knowledge",
   "profile": {
     "tabs": {
       "profile": "Profile",
@@ -528,6 +530,7 @@
       },
 
       "messages": {
+        "SecurityError": "Failed to verify device. Site is not secured. Please try again using a secure connection.",
         "verifyError": "Failed to verify device. Please make sure it was not verified before and try again.",
         "addSuccess": "Trusted device added successfully",
         "addError": "Failed to add trusted device"
@@ -581,7 +584,7 @@
     }
   },
   "knowledge": {
-    "hub_title": "Knowledge Hub",
+    "hub_title": "Explore Shared Knowledge",
     "hub_subtitle": "Manage documentation, guides, and internal resources.",
     "create_btn": "Create Article",
     "search_placeholder": "Search knowledge base...",

@@ -3,6 +3,7 @@ import { Collapse, Typography, List, Card, Avatar, Tag, Skeleton, Space, Flex } 
 import { UserOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useUserProfile } from '../Hooks/useTicket';
+import { useParams } from 'react-router-dom';
 
 interface Participant {
     id: string;
@@ -88,9 +89,11 @@ interface AssigneeListProps {
 
 const AssigneeList: React.FC<AssigneeListProps> = ({ assignees, requesterId }) => {
     const { t } = useTranslation();
+    const { role } = useParams(); 
+    const defaultOpenKey = role !== 'requester' ? ['1'] : [];
 
     return (
-        <Collapse ghost expandIconPosition="end" >
+        <Collapse ghost expandIconPosition="end" defaultActiveKey={defaultOpenKey}>
             <Collapse.Panel
                 header={
                     <Typography.Text strong>
