@@ -12,6 +12,7 @@ const { Title } = Typography;
 const { Search } = Input;
 const { RangePicker } = DatePicker;
 
+const REFRESH_INTERVAL = 5 * 60 * 1000;
 
 const DashboardPage: React.FC = () => {
     const { t } = useTranslation();
@@ -27,6 +28,10 @@ const DashboardPage: React.FC = () => {
         startDate: dates[0],
         endDate: dates[1],
         periodType
+    },
+        {
+            refetchInterval: REFRESH_INTERVAL,
+            refetchOnWindowFocus: true,
         }
     );
     const { data: reportsData, isLoading: isReportsLoading } = useReportsList(search);
@@ -67,6 +72,29 @@ const DashboardPage: React.FC = () => {
                     }
                 >
                     <DashboardLineChart data={chartData} loading={isChartLoading} />
+                    {dataUpdatedAt > 0 && (
+                        <Space size="small" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
+                            <Typography.Text type="secondary" style={{ fontSize: '11px' }}>
+                                {t('common.last_updated')}: {
+                                    new Date(dataUpdatedAt).toLocaleTimeString('en-US', {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        second: '2-digit',
+                                        hour12: true
+                                    })
+                                }
+                            </Typography.Text>
+
+                            <Button
+                                type="text"
+                                size="small"
+                                shape="circle"
+                                icon={<ReloadOutlined spin={isRefetching} style={{ color: '#1677ff' }} />}
+                                onClick={() => refetch()}
+                                style={{ color: '#8c8c8c' }}
+                            />
+                        </Space>
+                    )}
                 </Card>
 
                 <Card
