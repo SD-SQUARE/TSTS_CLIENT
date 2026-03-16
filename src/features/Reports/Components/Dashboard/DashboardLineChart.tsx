@@ -35,6 +35,17 @@ const DashboardLineChart: React.FC<Props> = ({ data, loading }) => {
         color: ['#1677ff', '#52c41a', '#faad14', '#ff4d4f'],
         point: { size: 4, shape: 'circle' },
         legend: { position: 'top' as const },
+        label: {
+            content: (d: any) => `${d.category}: ${d.value}`,
+            style: {
+                fill: '#595959',
+                fontSize: 11,
+                fontWeight: 600,
+                textBaseline: 'bottom',
+            },
+            offset: 10,
+            layout: [{ type: 'hide-overlap' }],
+        },
     };
 
     if (loading) {
