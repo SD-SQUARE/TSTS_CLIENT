@@ -2,6 +2,7 @@
   "LOGO": "Helwan University",
   "LOGO_ALTER": "Helwan University",
   "HOME": "Home",
+  "DASHBOARD": "Dashboard",
   "CONTACT_US": "Contact Us",
   "Services": "Services",
   "LOGIN": "Login",
@@ -353,6 +354,22 @@
     "resolved": "Resolved",
     "re_open": "Re Open"
   },
+  "dashboard": {
+    "welcome": "Dashboard Overview",
+    "trends": "Ticket Distribution Trends",
+    "reports_overview": "Reports Library",
+    "ticket_trends": "Ticket Trends",
+    "no_reports": "No reports available."
+  },
+  "period": {
+    "daily": "Daily",
+    "monthly": "Monthly",
+    "yearly": "Yearly"
+  },
+  "report": {
+    "choose_format": "Choose Export Format",
+    "details": "Report Details"
+  },
   "common": {
     "reset": "Reset",
     "reset_layout": "Reset Layout",
@@ -379,14 +396,18 @@
     "new": "New",
     "showHideColumns": "Show/Hide Columns",
     "columns": "Columns",
-    "confirmUpdate": "Are you sure you want to update this field?"
+    "confirmUpdate": "Are you sure you want to update this field?",
+    "search_placeholder": "Search by title or description...",
+    "no_data": "No data available",
+    "last_updated": "Last Updated"
   },
   "success": {
     "created": "Ticket created successfully",
     "updated": "Ticket updated successfully",
     "saved": "Ticket saved successfully",
     "reviewSuccess": "Review submitted successfully",
-    "bulk_upload": "Bulk upload successful"
+    "bulk_upload": "Bulk upload successful",
+    "download_complete": "Download completed successfully"
   },
   "validation": {
     "required": "This field is required"
@@ -404,7 +425,8 @@
     "updateFailed": "Failed to update ticket. Please try again.",
     "sample_fetch_failed": "Failed to retrieve the sample file.",
     "upload_failed": "Bulk upload failed. Please check file format.",
-    "problemRequired": "Problem is required"
+    "problemRequired": "Problem is required",
+    "download_error": "Error downloading report"
   },
   "Email_Is_Required": "Email is required",
   "Invalid_email_address_format": "Invalid email address format",

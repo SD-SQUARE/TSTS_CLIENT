@@ -2,6 +2,7 @@
   "LOGO": "جامعة حلوان",
   "LOGO_ALTER": "جامعة حلوان",
   "HOME": "الصفحة الرئيسية",
+  "DASHBOARD": "لوحة التحكم",
   "CONTACT_US": "اتصل بنا",
   "Services": "الخدمات",
   "LOGIN": "تسجيل الدخول",
@@ -403,6 +404,22 @@
     "resolved": "مكتمل",
     "re_open": "مفتوحة مرة اخرى"
   },
+  "dashboard": {
+    "welcome": "لوحة البيانات",
+    "trends": "اتجاهات توزيع التذاكر",
+    "reports_overview": "مكتبة التقارير",
+    "ticket_trends": "اتجاهات التذاكر",
+    "no_reports": "لا توجد تقارير متاحة."
+  },
+  "period": {
+    "daily": "يومياً",
+    "monthly": "شهرياً",
+    "yearly": "سنوياً"
+  },
+  "report": {
+    "choose_format": "اختر نوع التقرير",
+    "details": "تفاصيل التقرير"
+  },
   "common": {
     "reset": "إعادة تعيين",
     "reset_layout": "اعادة تعيين التخطيط",
@@ -429,14 +446,18 @@
     "new": "جديد",
     "showHideColumns": "اظهار / اخفاء الاعمدة",
     "columns": "الاعمدة",
-    "confirmUpdate": "هل انت متاكد من تحديث التذكرة؟"
+    "confirmUpdate": "هل انت متاكد من تحديث التذكرة؟",
+    "search_placeholder": "بحث بالعنوان أو الوصف...",
+    "no_data": "لا توجد بيانات",
+    "last_updated": "اخر تحديث"
   },
   "success": {
     "created": "تم إنشاء التذكرة بنجاح",
     "updated": "تم تحديث التذكرة بنجاح",
     "saved": "تم حفظ التذكرة بنجاح",
     "reviewSuccess": "تم تقييم التذكرة بنجاح",
-    "bulk_upload": "تم رفع الملفات بنجاح"
+    "bulk_upload": "تم رفع الملفات بنجاح",
+    "download_complete": "تم التحميل بنجاح"
   },
   "validation": {
     "required": "هذا الحقل مطلوب"
@@ -454,7 +475,8 @@
     "updateFailed": "فشل تحديث التذكرة. يرجى المحاولة مرة اخرى.",
     "sample_fetch_failed": "فشل في استرداد ملف النموذج.",
     "upload_failed": "فشل الرفع الجماعي. يرجى التحقق من تنسيق الملف.",
-    "problemRequired": "المشكلة مطلوبة"
+    "problemRequired": "المشكلة مطلوبة",
+    "download_error": "خطأ في التحميل. يرجى المحاولة مرة أخرى."
   },
   "Email_Is_Required": "البريد الإلكتروني مطلوب",
   "Invalid_email_address_format": "صيغ البريد الإلكتروني غير صالح",

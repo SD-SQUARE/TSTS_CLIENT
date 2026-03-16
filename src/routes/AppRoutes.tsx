@@ -44,6 +44,8 @@ import ProblemsPage from "../features/Problems/components/ProblemsPage.tsx";
 import TrustedDevicesPage from "../features/trusted-devices/pages/TrustedDevicesPage.tsx";
 import AuditLogList from "../features/AuditLogs/Components/AuditLogsList.tsx";
 import AuditLogView from "../features/AuditLogs/Components/AuditLogView.tsx";
+import DashboardPage from "../features/Reports/Components/DashboardPage.tsx";
+import ReportViewPage from "../features/Reports/Components/ReportPage.tsx";
 
 export const AppRoutes = () => {
     const { t } = useTranslation();
@@ -217,6 +219,8 @@ export const AppRoutes = () => {
                 <Route path=":id/edit" element={<PageLayout><TicketForm /></PageLayout>} />
             </Route>
 
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/reports/:id" element={<ReportViewPage />} />
 
             <Route path="knowledge-base" element={<PageLayout><KnowledgeBasePage /> </PageLayout>} />
 
