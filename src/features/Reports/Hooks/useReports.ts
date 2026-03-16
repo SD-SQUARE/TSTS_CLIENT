@@ -12,3 +12,11 @@ export const useDashboardCharts = (
         ...options,
     });
 };
+
+export const useReportsList = (search?: string) => {
+    return useQuery<ReportItem[]>({
+        queryKey: ['reports', search],
+        queryFn: async () => (await api.get('/v1/reports', { params: { search } })).data,
+    });
+};
+
