@@ -12,6 +12,8 @@ interface Props {
     dates: [string | undefined, string | undefined];
     onDateChange: (dates: [string, string] | [undefined, undefined]) => void;
     onPeriodChange: (value: string) => void;
+    onDownload: () => void;
+    downloadLoading?: boolean;
 }
 
 const ReportFilterBar: React.FC<Props> = ({
@@ -19,6 +21,8 @@ const ReportFilterBar: React.FC<Props> = ({
     dates,
     onDateChange,
     onPeriodChange,
+    onDownload,
+    downloadLoading
 }) => {
     const { t } = useTranslation();
 
@@ -62,6 +66,16 @@ const ReportFilterBar: React.FC<Props> = ({
                     </Space>
                 </Col>
 
+                <Col>
+                    <Button
+                        type="primary"
+                        icon={<DownloadOutlined />}
+                        onClick={onDownload}
+                        loading={downloadLoading}
+                    >
+                        {t('common.download')}
+                    </Button>
+                </Col>
             </Row>
         </Card>
     );
