@@ -20,3 +20,10 @@ export const useReportsList = (search?: string) => {
     });
 };
 
+export const useReportDetail = (id: string, params: ReportQueryParams) => {
+    return useQuery<ReportDetail>({
+        queryKey: ['reportDetail', id, params],
+        queryFn: async () => (await api.get(`/v1/reports/${id}`, { params })).data,
+        enabled: !!id,
+    });
+};
