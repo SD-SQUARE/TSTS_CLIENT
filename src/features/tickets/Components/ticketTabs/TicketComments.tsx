@@ -92,7 +92,7 @@ const TicketComments: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =
         setTempFiles(prev => prev.filter(item => item.id !== id));
     };
 
-    const allMessages = [...(messages || []), ...optimisticMessages];
+    const allMessages = [...(messages || []), ...optimisticMessages].reverse();
 
     return (
         <Flex vertical style={{ height: 'calc(100vh - 100px)', backgroundColor: '#fff', borderRadius: '12px', overflow: 'hidden' }}>
