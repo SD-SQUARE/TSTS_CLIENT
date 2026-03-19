@@ -19,6 +19,7 @@ const DomainsPage: React.FC = () => {
   const {
     data,
     total,
+    useGetOne,
     isLoading,
     createMutation,
     updateMutation,
@@ -30,6 +31,7 @@ const DomainsPage: React.FC = () => {
       page: pagination.current,
       page_size: pagination.pageSize
     }),
+    fetchOneFn: (id) => domainApi.getById(id),
     createFn: (data) => domainApi.create(data),
     updateFn: ({ id, data }) => domainApi.update(id, data),
     deleteFn: (id) => domainApi.delete(id),
@@ -104,13 +106,13 @@ const DomainsPage: React.FC = () => {
 
     {
       title: t("university"),
-    dataIndex: "university",
+      dataIndex: "university",
       key: "university",
-        render: (_: number, record) => {
-            const university = record.university;
-            const universityName = i18n.language === "ar" ? university.name.ar : university.name.en;
-            return universityName;
-      },
+      render: (_: number, record: any) => {
+        const university = record.university;
+        if (!university) return "-";
+        return i18n.language === "ar" ? university.name_ar : university.name_en;
+    },
     },
   ];
 
@@ -192,6 +194,7 @@ const DomainsPage: React.FC = () => {
         setPagination(prev => ({ ...prev, current: 1 })); 
       }}
       isLoading={isLoading}
+      useGetOne={useGetOne}
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}

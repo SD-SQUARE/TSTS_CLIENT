@@ -17,6 +17,7 @@ const DepartmentsPage: React.FC = () => {
   const {
     data,
     total,
+    useGetOne,
     isLoading,
     createMutation,
     updateMutation,
@@ -28,6 +29,7 @@ const DepartmentsPage: React.FC = () => {
       page: pagination.current,
       page_size: pagination.pageSize
     }),
+    fetchOneFn: (id) => departmentApi.getById(id),
     createFn: (data) => departmentApi.create(data),
     updateFn: ({ id, data }) => departmentApi.update(id, data),
     deleteFn: (id) => departmentApi.delete(id),
@@ -102,11 +104,11 @@ const {
       title: t("domain"),
       dataIndex: "domain",
       key: "domain",
-      render: (_: number, record) => {
-          const domain = record.domain;
-          const domainName = i18n.language === "ar" ? domain.name.ar : domain.name.en;
-          return domainName;
-      },
+      render: (_: number, record: any) => {
+        const domain = record.domain;
+        if (!domain) return "-";
+        return i18n.language === "ar" ? domain.name_ar : domain.name_en;
+    },
     },
   ];
 
@@ -179,6 +181,7 @@ const nestedFieldMappers = {
       formItems={formItems}
       data={data}
       total={total}
+      useGetOne={useGetOne}
       pageIndex={pagination.current}
       pageSize={pagination.pageSize}
       onPageChange={(page, size) => setPagination({ current: page, pageSize: size })}

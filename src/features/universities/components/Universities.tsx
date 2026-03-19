@@ -14,6 +14,7 @@ const UniversitiesPage: React.FC = () => {
   const {
     data,
     total,
+    useGetOne,
     isLoading,
     createMutation,
     updateMutation,
@@ -25,6 +26,7 @@ const UniversitiesPage: React.FC = () => {
       page: pagination.current, 
       page_size: pagination.pageSize 
     }),
+    fetchOneFn: (id) => universityApi.getById(id),
     createFn: (data) => universityApi.create(data),
     updateFn: ({ id, data }) => universityApi.update(id, data),
     deleteFn: (id) => universityApi.delete(id),
@@ -103,6 +105,7 @@ const UniversitiesPage: React.FC = () => {
       formItems={formItems}
       data={data ?? []}
       total={total}
+      useGetOne={useGetOne}
       isLoading={isLoading}
       pageIndex={pagination.current}
       pageSize={pagination.pageSize}
