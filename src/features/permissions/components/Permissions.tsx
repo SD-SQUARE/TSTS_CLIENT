@@ -211,7 +211,9 @@ const PermissionsPage: React.FC = () => {
         setPagination(prev => ({ ...prev, current: 1 })); 
       }}
       viewExtraNode={renderViewExtra}
-      nestedFieldMappers={nestedFieldMappers}
+          nestedFieldMappers={nestedFieldMappers}
+
+          useGetOne={useGetOne}
     />
   );
 };
