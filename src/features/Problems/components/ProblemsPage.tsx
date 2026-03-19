@@ -25,6 +25,7 @@ const ProblemsPage: React.FC = () => {
   const {
     data,
     total,
+    useGetOne,
     isLoading,
     createMutation,
     updateMutation,
@@ -37,6 +38,7 @@ const ProblemsPage: React.FC = () => {
       page: pagination.current,
       page_size: pagination.pageSize
     }),
+    fetchOneFn: (id) => problemsApi.getById(id),
     createFn: (data) => problemsApi.create(data),
     updateFn: ({ id, data }) => problemsApi.update(id, data),
     deleteFn: (id) => problemsApi.delete(id),
@@ -77,18 +79,13 @@ const ProblemsPage: React.FC = () => {
     <FilterOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
   ),
   filterDropdown: ({ confirm, clearFilters }: any) => (
-    /* Add dir attribute to the container for CSS-level alignment */
     <div style={{ padding: 8 }} dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
       <Select
         key={specializationsArray.length} 
         showSearch
-        /* Set placement based on language:
-           bottomRight usually works best for RTL filters 
-        */
         placement={i18n.language === 'ar' ? "bottomRight" : "bottomLeft"}
         placeholder={t("filter_by_spec")}
         value={selectedSpecId}
-        /* Ensure the search/text follows the language direction */
         style={{ width: 180, direction: i18n.language === 'ar' ? 'rtl' : 'ltr' }}
         onChange={(val) => {
           setSelectedSpecId(val);
@@ -190,6 +187,9 @@ const ProblemsPage: React.FC = () => {
       </Form.Item>
     </>
   );
+  const nestedFieldMappers = {
+    specialization: (record: Problem) => record.specialization?.id ?? null,
+  };
 
   return (
     <GenericCrudPage<Problem>
@@ -198,6 +198,8 @@ const ProblemsPage: React.FC = () => {
       formItems={formItems}
       data={data ?? []}
       total={total}
+      useGetOne={useGetOne} 
+      nestedFieldMappers={nestedFieldMappers}
       isLoading={isLoading}
       pageIndex={pagination.current}
       pageSize={pagination.pageSize}

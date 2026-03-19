@@ -17,14 +17,16 @@ const SpecializationsPage: React.FC = () => {
   const {
     data,
     total,
+    useGetOne,
     isLoading,
     createMutation,
     updateMutation,
     deleteMutation,
   } = useGenericCrud<Specialization, CreateSpecializationDto, UpdateSpecializationDto>({
     queryKey: ['specializations', searchTerm,pagination.current, pagination.pageSize],
-      fetchFn: () => specializationApi.getAll({ name: searchTerm , page: pagination.current, 
+    fetchFn: () => specializationApi.getAll({ name: searchTerm , page: pagination.current, 
         page_size: pagination.pageSize}),
+    fetchOneFn: (id) => specializationApi.getById(id),
     createFn: (data) => specializationApi.create(data),
     updateFn: ({ id, data }) => specializationApi.update(id, data),
     deleteFn: (id) => specializationApi.delete(id),
@@ -124,6 +126,7 @@ const SpecializationsPage: React.FC = () => {
       formItems={formItems}
       data={data}
       total={total}
+      useGetOne={useGetOne}
       isLoading={isLoading}
       createMutation={createMutation}
       updateMutation={updateMutation}

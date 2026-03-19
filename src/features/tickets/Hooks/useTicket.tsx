@@ -99,8 +99,11 @@ export const useChangeTicketStatus = (id: string) => {
             });
             return data;
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['ticket', id] });
+        onSuccess: async() => {
+            await queryClient.invalidateQueries({ queryKey: ['ticket', id] });
+            await queryClient.invalidateQueries({ queryKey: ['tickets'] });
+            await queryClient.invalidateQueries({ queryKey: ['ticketActivities', id] });
+            await queryClient.invalidateQueries({ queryKey: ['ticketReviews', id] });
         },
     });
 };

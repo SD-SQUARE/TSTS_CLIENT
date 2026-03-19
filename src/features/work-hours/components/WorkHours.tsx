@@ -20,6 +20,7 @@ const WorkHoursPage: React.FC = () => {
     data,
     isLoading,
     total, 
+    useGetOne,
     createMutation,
     updateMutation,
     deleteMutation,
@@ -30,6 +31,7 @@ const WorkHoursPage: React.FC = () => {
       page: pagination.current, 
       page_size: pagination.pageSize 
     }),
+    fetchOneFn: (id) => workHoursApi.getById(id),
 
     createFn: (values: any) => {
       const payload = {
@@ -126,6 +128,7 @@ const WorkHoursPage: React.FC = () => {
       data={data ?? []}
       isLoading={isLoading}
       total={total}
+      useGetOne={useGetOne}
       pageIndex={pagination.current}
       pageSize={pagination.pageSize}
       onPageChange={(page, size) => setPagination({ current: page, pageSize: size })}

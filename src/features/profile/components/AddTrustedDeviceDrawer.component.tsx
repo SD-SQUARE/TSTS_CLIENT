@@ -79,7 +79,10 @@ const AddTrustedDeviceDrawer = ({ open, onClose, onSubmit }: Props) => {
 
             console.error("WebAuthn error:", err);
             console.error(err?.name || "WebAuthn failed");
-            message.error(t("profile.trustedDevices.messages.verifyError"));
+            if(err?.name === "SecurityError")
+                message.error(t("profile.trustedDevices.messages.SecurityError"));
+            else
+                message.error(t("profile.trustedDevices.messages.verifyError"));
             // message.error("Failed to verify device, please make sure you did not verified this device before and try again");
         }
     };

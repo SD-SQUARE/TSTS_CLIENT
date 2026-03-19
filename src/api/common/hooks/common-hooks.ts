@@ -31,6 +31,7 @@ function extractTotal(result: any): number {
 interface UseGenericCrudProps<T, CreateDto, UpdateDto> {
     queryKey: QueryKey;
     fetchFn: () => Promise<any>;
+    fetchOneFn?: (id: string | number) => Promise<T>;
     createFn: (data: CreateDto) => Promise<T>;
     updateFn: (params: { id: string | number; data: UpdateDto }) => Promise<T>;
     deleteFn: (id: string | number) => Promise<void>;
@@ -45,6 +46,7 @@ export const useGenericCrud = <
 >({
     queryKey,
     fetchFn,
+    fetchOneFn,
     createFn,
     updateFn,
     deleteFn,
@@ -61,6 +63,15 @@ export const useGenericCrud = <
         queryKey,
         queryFn: fetchFn,
     });
+
+    const useGetOne = (id?: string | number) => {
+        return useQuery({
+            queryKey: [...queryKey, 'detail', id],
+            queryFn: () => fetchOneFn!(id!),
+            enabled: !!id && !!fetchOneFn, 
+            staleTime: 5000, 
+        });
+    };
 
     const data = extractArray<T>(rawData);
     const total = extractTotal(rawData);
@@ -109,6 +120,7 @@ export const useGenericCrud = <
         total, 
         isLoading,
         fetchError,
+        useGetOne,
         createMutation,
         updateMutation,
         deleteMutation,

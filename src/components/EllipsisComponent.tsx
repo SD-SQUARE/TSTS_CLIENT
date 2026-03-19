@@ -67,7 +67,10 @@ const EllipsisComponent: React.FC<EllipsisComponentProps> = ({ content, copyable
                 rows: 1,
                 expandable: 'collapsible',
                 expanded,
-                onExpand: (_, info) => setExpanded(info.expanded)
+                onExpand: (e, info) => {
+                    e.stopPropagation(); 
+                    setExpanded(info.expanded);
+                }
             }}
         >
             {content}

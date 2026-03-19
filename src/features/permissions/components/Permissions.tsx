@@ -17,6 +17,7 @@ const PermissionsPage: React.FC = () => {
     data,
     total,
     isLoading,
+    useGetOne,
     createMutation,
     updateMutation,
     deleteMutation,
@@ -28,7 +29,7 @@ const PermissionsPage: React.FC = () => {
       page_index: pagination.current,
       page_size: pagination.pageSize 
     }),
-
+    fetchOneFn: (id) => permissionApi.getById(id),
     createFn: (values: any) => {
       const payload = {
         name_en: values.name_en,

@@ -3,5 +3,5 @@ import type { PermissionProfile } from "../types/types";
 
 export const permissionApi = new BaseCrudService<PermissionProfile>(
   "/permissions/profile",
-  "/permissions/profile/:id"
+  "/permission/profile/:id"
 );

@@ -43,6 +43,10 @@ import Profile from './../features/profile/Profile.page';
 import { useTranslation } from "react-i18next";
 import ProblemsPage from "../features/Problems/components/ProblemsPage.tsx";
 import TrustedDevicesPage from "../features/trusted-devices/pages/TrustedDevicesPage.tsx";
+import AuditLogList from "../features/AuditLogs/Components/AuditLogsList.tsx";
+import AuditLogView from "../features/AuditLogs/Components/AuditLogView.tsx";
+import DashboardPage from "../features/Reports/Components/DashboardPage.tsx";
+import ReportViewPage from "../features/Reports/Components/ReportPage.tsx";
 
 export const AppRoutes = () => {
     const { t } = useTranslation();
@@ -85,7 +89,8 @@ export const AppRoutes = () => {
         { key: "/settings/problems", label: t('problems'), icon: <IssuesCloseOutlined /> },
 
         { key: "/settings/trusted-devices", label: t("trusted_devices.Trusted Devices"), icon: <SafetyOutlined /> },
-        { key: "/settings/permissions", label: t('Permissions'), icon: <CheckOutlined /> },
+        // { key: "/settings/permissions", label: t('Permissions'), icon: <SafetyOutlined /> },
+        { key: "/settings/logs", label: t('Audit Logs'), icon: <ClockCircleOutlined /> },
     ];
     return (
         <Routes>
@@ -195,6 +200,16 @@ export const AppRoutes = () => {
                 {/* TODO:connect pages later */}
                 <Route path="permissions" element={<PermissionsPage />} />
                 {/* <Route path="work-hours" element={<WorkHoursPage />} /> */}
+                <Route path="logs" element={
+                    <GuardedRoute roles={["superadmin", "admin"]}>
+                        <AuditLogList />
+                    </GuardedRoute>
+                } />
+                <Route path="logs/:id" element={
+                    <GuardedRoute roles={["superadmin", "admin"]}>
+                        <AuditLogView />
+                    </GuardedRoute>
+                } />
 
             </Route>
             {/* Tickets routes */}
@@ -204,6 +219,9 @@ export const AppRoutes = () => {
                 <Route path=":id/*" element={<PageLayout><TicketView /></PageLayout>} />
                 <Route path=":id/edit" element={<PageLayout><TicketForm /></PageLayout>} />
             </Route>
+
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/reports/:id" element={<ReportViewPage />} />
 
             <Route path="knowledge-base" element={<PageLayout><KnowledgeBasePage /> </PageLayout>} />
 

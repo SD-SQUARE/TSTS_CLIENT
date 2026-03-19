@@ -2,6 +2,7 @@
   "LOGO": "جامعة حلوان",
   "LOGO_ALTER": "جامعة حلوان",
   "HOME": "الصفحة الرئيسية",
+  "DASHBOARD": "لوحة التحكم",
   "CONTACT_US": "اتصل بنا",
   "Services": "الخدمات",
   "LOGIN": "تسجيل الدخول",
@@ -18,7 +19,7 @@
   "select_specialization": "اختر التخصص",
   "filter_by_spec": "تصفية حسب التخصص",
   "not_required": "غير مطلوب",
-  "Knowledge-Base": "مركز المعرفة",
+  "Knowledge-Base": "استكشاف المعلومات",
   "forgotPassword": {
     "title": "نسيت كلمة المرور",
     "steps": {
@@ -56,7 +57,7 @@
     "required": "مطلوب"
   },
   "knowledge": {
-    "hub_title": "مركز المعرفة",
+    "hub_title": "استكشاف المعرفة المشتركة",
     "hub_subtitle": "إدارة الوثائق والأدلة والموارد الداخلية.",
     "create_btn": "إنشاء مقال",
     "search_placeholder": "البحث في مركز المعرفة...",
@@ -367,7 +368,26 @@
     "details": "التفاصيل",
     "reviewSubmitted": "شكرا لك! تم تقديم التقييم الخاص بك.",
     "state" : "الحالة",
-    "techs": "الفني"
+    "techs": "الفني",
+    "comments": "التعليقات"
+  },
+  "audit": {
+    "title": "سجلات التدقيق",
+    "summary": "الملخص",
+    "userName": "اسم المستخدم",
+    "role": "الدور",
+    "action": "الإجراء",
+    "status": "الحالة",
+    "createdAt": "تاريخ الإنشاء",
+    "filterByUser": "تصفية حسب المستخدم",
+    "filterByAction": "تصفية حسب الإجراء",
+    "details": "تفاصيل السجل",
+    "username": "اسم المستخدم",
+    "ip": "عنوان IP",
+    "userAgent": "متصفح المستخدم",
+    "resourceType": "نوع المورد",
+    "steps": "خطوات التنفيذ",
+    "metadata": "التغييرات (البيانات الوصفية)"
   },
   "permissionsPage":{
     "add_perm":"إضافة صلاحية"
@@ -386,6 +406,22 @@
     "out_of_service": "خارج الخدمة",
     "resolved": "مكتمل",
     "re_open": "مفتوحة مرة اخرى"
+  },
+  "dashboard": {
+    "welcome": "لوحة البيانات",
+    "trends": "اتجاهات توزيع التذاكر",
+    "reports_overview": "مكتبة التقارير",
+    "ticket_trends": "اتجاهات التذاكر",
+    "no_reports": "لا توجد تقارير متاحة."
+  },
+  "period": {
+    "daily": "يومياً",
+    "monthly": "شهرياً",
+    "yearly": "سنوياً"
+  },
+  "report": {
+    "choose_format": "اختر نوع التقرير",
+    "details": "تفاصيل التقرير"
   },
   "common": {
     "reset": "إعادة تعيين",
@@ -412,14 +448,19 @@
     "old": "قديم",
     "new": "جديد",
     "showHideColumns": "اظهار / اخفاء الاعمدة",
-    "columns": "الاعمدة"
+    "columns": "الاعمدة",
+    "confirmUpdate": "هل انت متاكد من تحديث التذكرة؟",
+    "search_placeholder": "بحث بالعنوان أو الوصف...",
+    "no_data": "لا توجد بيانات",
+    "last_updated": "اخر تحديث"
   },
   "success": {
     "created": "تم إنشاء التذكرة بنجاح",
     "updated": "تم تحديث التذكرة بنجاح",
     "saved": "تم حفظ التذكرة بنجاح",
     "reviewSuccess": "تم تقييم التذكرة بنجاح",
-    "bulk_upload": "تم رفع الملفات بنجاح"
+    "bulk_upload": "تم رفع الملفات بنجاح",
+    "download_complete": "تم التحميل بنجاح"
   },
   "validation": {
     "required": "هذا الحقل مطلوب"
@@ -437,7 +478,8 @@
     "updateFailed": "فشل تحديث التذكرة. يرجى المحاولة مرة اخرى.",
     "sample_fetch_failed": "فشل في استرداد ملف النموذج.",
     "upload_failed": "فشل الرفع الجماعي. يرجى التحقق من تنسيق الملف.",
-    "problemRequired": "المشكلة مطلوبة"
+    "problemRequired": "المشكلة مطلوبة",
+    "download_error": "خطأ في التحميل. يرجى المحاولة مرة أخرى."
   },
   "Email_Is_Required": "البريد الإلكتروني مطلوب",
   "Invalid_email_address_format": "صيغ البريد الإلكتروني غير صالح",
@@ -544,6 +586,7 @@
         "verifiedDesc": "الجهاز جاهز ليكون موثوقاً."
       },
       "messages": {
+        "SecurityError": "فشل التحقق من الجهاز. الموقع غير محمي. يرجى المحاولة مرة أخرى باستخدام اتصال امنية.",
         "verifyError": "فشل التحقق من الجهاز. يرجى التأكد من عدم التحقق منه مسبقاً ثم المحاولة مرة أخرى.",
         "addSuccess": "تمت إضافة الجهاز الموثوق بنجاح",
         "addError": "فشل إضافة الجهاز الموثوق"
