@@ -399,7 +399,8 @@
     "confirmUpdate": "Are you sure you want to update this field?",
     "search_placeholder": "Search by title or description...",
     "no_data": "No data available",
-    "last_updated": "Last Updated"
+    "last_updated": "Last Updated",
+    "user": "User"
   },
   "success": {
     "created": "Ticket created successfully",

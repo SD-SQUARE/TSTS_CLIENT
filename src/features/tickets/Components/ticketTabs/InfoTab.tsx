@@ -42,7 +42,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
     const handleStatusChange = async (newStatus: string) => {
         try {
             const res = await statusMutation.mutateAsync(statusMap[newStatus] || "open");
-            
+
             if (res.is_updated) message.success(t('tickets.statusUpdatedSuccess'));
         } catch (err) {
             message.error(t('errors.connectionError'));
@@ -112,10 +112,6 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
             default: return 'geekblue';
         }
     };
-
-    // ... inside your component ...
-
-    /* --- 1. Define Menus for Dropdowns --- */
 
     // Status Menu
     const statusMenu = {
@@ -214,6 +210,24 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
         }
     }
 
+    const handleUpdateAssignees = (newIds: string[]) => {
+        const formData = new FormData();
+        formData.append('title', ticket.title);
+        formData.append('description', ticket.description);
+        formData.append('problem', ticket?.problem?.id);
+        formData.append('specialization', ticket?.specialization?.id);
+        formData.append('priority', ticket?.priority);
+        formData.append('status', statusMap[ticket?.status]);
+        formData.append('requester', ticket?.requester?.id);
+
+        formData.append('assigneeList', JSON.stringify(newIds));
+
+        coordinateMutation.mutate(formData, {
+            onSuccess: () => message.success(t('success.updated')),
+            onError: () => message.error(t('errors.updateFailed'))
+        });
+    };
+
 
     return (
         <>
@@ -223,16 +237,13 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                     .resolve-btn-success:hover { border-color: #73d13d !important; color: #73d13d !important; }
                 `}
             </style>
-            <Splitter style={{height: 'calc(100vh - 80px)', boxShadow: '0 8px 24px rgba(229, 56, 56, 0.05)' }}>
+            <Splitter style={{ height: 'calc(100vh - 80px)', boxShadow: '0 8px 24px rgba(229, 56, 56, 0.05)' }}>
                 <Splitter.Panel defaultSize="80%" min="45%" style={{ overflowY: 'auto', padding: '16px', height: '100%' }}>
                     <Flex vertical gap="large">
                         <Card style={{
                             borderRightWidth: "2px",
-                            // borderRightColor: "lightgray",
                             borderLeftWidth: "2px",
-                            // borderLeftColor: "lightgray",
                             borderBottomWidth: "2px",
-                            // borderBottomColor: "lightgray",
                             borderTop: '0.3rem solid',
                             borderTopColor: 'var(--color-primary)'
                         }} title={<Typography.Title level={4} style={{ margin: 0 }}>{ticket?.title}</Typography.Title>}>
@@ -250,7 +261,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                     </Flex>
                 </Splitter.Panel>
 
-                <Splitter.Panel defaultSize="30%" min="25%" style={{ overflowY: 'auto', padding: '16px', backgroundColor: '#fafafa',height: '100%' }}>
+                <Splitter.Panel defaultSize="30%" min="25%" style={{ overflowY: 'auto', padding: '16px', backgroundColor: '#fafafa', height: '100%' }}>
                     <Flex vertical gap="large">
                         <Card size="small" title={t('tickets.details')}>
                             <Flex vertical gap="middle">
@@ -262,13 +273,13 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                                         </Tag>
 
                                         {!isRequester && (
-                                        <Dropdown menu={statusMenu} trigger={['click']} disabled={updateMutation.isPending}>
-                                            <Button
-                                                type="text"
-                                                size="small"
-                                                shape="circle"
-                                                icon={updateMutation.isPending ? <Spin size="small" /> : <EditOutlined style={{ fontSize: '12px' }} />}
-                                            />
+                                            <Dropdown menu={statusMenu} trigger={['click']} disabled={updateMutation.isPending}>
+                                                <Button
+                                                    type="text"
+                                                    size="small"
+                                                    shape="circle"
+                                                    icon={updateMutation.isPending ? <Spin size="small" /> : <EditOutlined style={{ fontSize: '12px' }} />}
+                                                />
                                             </Dropdown>
                                         )}
                                     </Space>
@@ -276,22 +287,22 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
 
                                 <Flex justify="space-between" align="center">
                                     <Typography.Text type="secondary">{t('tickets.priority')}</Typography.Text>
-                                        
+
                                     <Space size={4}>
 
                                         <Tag color={getPriorityColor(ticket?.priority)} style={{ margin: 0 }}>
                                             {ticket?.priority}
                                         </Tag>
-                                            
+
                                         {!isRequester && (
-                                        <Dropdown menu={priorityMenu} trigger={['click']} disabled={updateMutation.isPending}>
-                                            <Button
-                                                type="text"
-                                                size="small"
-                                                shape="circle"
-                                                icon={updateMutation.isPending ? <Spin size="small" /> : <EditOutlined style={{ fontSize: '12px' }} />}
-                                            />
-                                        </Dropdown>
+                                            <Dropdown menu={priorityMenu} trigger={['click']} disabled={updateMutation.isPending}>
+                                                <Button
+                                                    type="text"
+                                                    size="small"
+                                                    shape="circle"
+                                                    icon={updateMutation.isPending ? <Spin size="small" /> : <EditOutlined style={{ fontSize: '12px' }} />}
+                                                />
+                                            </Dropdown>
                                         )}
 
                                     </Space>
@@ -303,9 +314,9 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                                         <Tag color="blue" style={{ margin: 0 }}>{ticket?.problem?.name}</Tag>
 
                                         {!isRequester && (
-                                        <Dropdown menu={{ items: problemMenuItems }} trigger={['click']}>
-                                            <Button type="text" size="small" shape="circle" icon={<EditOutlined style={{ fontSize: '12px' }} />} />
-                                        </Dropdown>
+                                            <Dropdown menu={{ items: problemMenuItems }} trigger={['click']}>
+                                                <Button type="text" size="small" shape="circle" icon={<EditOutlined style={{ fontSize: '12px' }} />} />
+                                            </Dropdown>
                                         )}
                                     </Space>
                                 </Flex>
@@ -325,7 +336,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                             </Flex>
                         </Card>
 
-                        <AssigneeList assignees={ticket?.assignee || []} requesterId={ticket?.requester?.id} />
+                        <AssigneeList assignees={ticket?.assignee || []} requesterId={ticket?.requester?.id} onUpdateAssignees={handleUpdateAssignees} isUpdating={coordinateMutation.isPending} />
 
                         {isRequester && (
                             <InlineReview

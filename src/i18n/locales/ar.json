@@ -449,7 +449,8 @@
     "confirmUpdate": "هل انت متاكد من تحديث التذكرة؟",
     "search_placeholder": "بحث بالعنوان أو الوصف...",
     "no_data": "لا توجد بيانات",
-    "last_updated": "اخر تحديث"
+    "last_updated": "اخر تحديث",
+    "user": "المستخدم"
   },
   "success": {
     "created": "تم إنشاء التذكرة بنجاح",
