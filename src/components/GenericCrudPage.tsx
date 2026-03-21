@@ -11,6 +11,7 @@ import {
   Descriptions,
   Card,
   Typography,
+  Spin,
 } from "antd";
 import {
   EditOutlined,
@@ -44,6 +45,9 @@ interface GenericCrudProps<T> {
   tableSize?: "small" | "middle" | "large";
   searchText?: string;
   onSearch?: (value: string) => void;
+  viewExtraNode?: (record: T) => React.ReactNode;
+  // ADDED: Prop for the hook so we can fetch details
+  useGetOne?: (id?: string | number) => { data: any; isLoading: boolean };
 }
 
 export const GenericCrudPage = <T extends { id: string | number }>({
@@ -64,10 +68,13 @@ export const GenericCrudPage = <T extends { id: string | number }>({
   tableSize = "middle",
   searchText = "",
   onSearch,
+  viewExtraNode,
+  useGetOne,
 }: GenericCrudProps<T>) => {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.language === "ar";
 
+  // 1. Declare state first
   const [viewingItem, setViewingItem] = useState<T | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<T | null>(null);
@@ -75,20 +82,23 @@ export const GenericCrudPage = <T extends { id: string | number }>({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
 
+  // 2. Safely call the hook (Provide dummy fallback to avoid React Hook errors if omitted)
+  const defaultUseGetOne = () => ({ data: undefined, isLoading: false });
+  const activeUseGetOne = useGetOne || defaultUseGetOne;
+  const { data: freshItem, isLoading: isFetchingDetail } = activeUseGetOne(viewingItem?.id);
+
   const formStyle: React.CSSProperties = {
     marginTop: 20,
     direction: isRtl ? "rtl" : "ltr",
     textAlign: isRtl ? "right" : "left",
   };
 
+  // 3. Sync fetched data with local viewing item
   useEffect(() => {
-    if (viewingItem) {
-      const updatedItem = data.find((d) => d.id === viewingItem.id);
-      if (updatedItem) {
-        setViewingItem(updatedItem);
-      }
+    if (freshItem) {
+      setViewingItem(freshItem);
     }
-  }, [data]);
+  }, [freshItem]);
 
   const handleApiErrors = (error: any) => {
     if (error.response?.data?.errors) {
@@ -159,7 +169,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
   };
 
   const handleRowClick = (record: T) => {
-    setViewingItem(record);
+    setViewingItem(record); // Sets initial basic data from row
     window.scrollTo(0, 0);
   };
 
@@ -179,6 +189,9 @@ export const GenericCrudPage = <T extends { id: string | number }>({
     setIsEditModalOpen(true);
   };
 
+  // ==============================
+  // DETAIL VIEW
+  // ==============================
   if (viewingItem) {
     return (
       <div className="fade-in-animation" dir={isRtl ? "rtl" : "ltr"}>
@@ -222,34 +235,47 @@ export const GenericCrudPage = <T extends { id: string | number }>({
           </Space>
         </div>
 
+        {/* ADDED: Spin component wraps the Descriptions to show loading state */}
         <Card bordered={false} className="admin-card">
-          <Descriptions
-            bordered
-            column={{ xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }}
-            size="middle"
-            labelStyle={{
-              width: "200px",
-              fontWeight: "bold",
-              backgroundColor: "#fafafa",
-            }}
-          >
-            {columns.map((col: any) => {
-              const value = viewingItem[col.dataIndex as keyof T];
-              const renderedValue = col.render
-                ? col.render(value, viewingItem, 0)
-                : value;
-
-              return (
-                <Descriptions.Item
-                  key={col.key || col.dataIndex}
-                  label={col.title}
-                >
-                  {renderedValue}
-                </Descriptions.Item>
-              );
-            })}
-          </Descriptions>
+          <Spin spinning={isFetchingDetail} tip={t("loading") || "Loading..."}>
+            <Descriptions
+              bordered
+              column={{ xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }}
+              size="middle"
+              labelStyle={{
+                width: "200px",
+                fontWeight: "bold",
+                backgroundColor: "#fafafa",
+              }}
+            >
+              {columns.map((col: any) => {
+                const value = viewingItem[col.dataIndex as keyof T];
+                const renderedValue = col.render
+                  ? col.render(value, viewingItem, 0)
+                  : value;
+                    console.log(renderedValue);
+                return (
+                  <Descriptions.Item
+                    key={col.key || col.dataIndex}
+                    label={col.title}
+                  >
+                    {renderedValue}
+                  </Descriptions.Item>
+                );
+              })}
+            </Descriptions>
+          </Spin>
         </Card>
+
+        {viewExtraNode && (
+          <div style={{ marginTop: '20px' }}>
+            <h2 style={{ margin: 0 }}>{t("Permissions")}</h2>
+            <Spin spinning={isFetchingDetail}>
+              {viewExtraNode(viewingItem)}
+            </Spin>
+          </div>
+        )}
+
         <Button
           icon={
             <ArrowLeftOutlined
@@ -313,6 +339,9 @@ export const GenericCrudPage = <T extends { id: string | number }>({
     );
   }
 
+  // ==============================
+  // LIST VIEW
+  // ==============================
   const skeletonRows = Array.from({ length: 6 }, (_, idx) => ({
     id: `loading-${idx}`,
   })) as T[];

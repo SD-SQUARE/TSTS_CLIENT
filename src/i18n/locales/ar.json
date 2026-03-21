@@ -389,6 +389,9 @@
     "steps": "خطوات التنفيذ",
     "metadata": "التغييرات (البيانات الوصفية)"
   },
+  "permissionsPage":{
+    "add_perm":"إضافة صلاحية"
+  },
   "priority": {
     "important": "مهمة",
     "urgent": "ضرورية",

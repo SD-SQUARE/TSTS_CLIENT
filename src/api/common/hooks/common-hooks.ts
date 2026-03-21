@@ -6,14 +6,12 @@ function extractArray<T>(result: any): T[] {
     if (!result) return [];
     if (Array.isArray(result)) return result;
 
-    // Try known keys
-    const likelyKeys = ['items', 'data', 'result', 'rows', 'universities','users','domains','departments','specializations'];
+    const likelyKeys = ['items', 'data', 'result', 'rows', 'universities', 'users', 'domains', 'departments','work_hours', 'specializations', 'profiles'];
 
     for (const key of likelyKeys) {
         if (Array.isArray(result[key])) return result[key];
     }
 
-    // Fallback — find first array in object
     for (const key of Object.keys(result)) {
         if (Array.isArray(result[key])) return result[key];
     }
@@ -21,9 +19,19 @@ function extractArray<T>(result: any): T[] {
     return [];
 }
 
+function extractTotal(result: any): number {
+    if (!result) return 0;
+    if (typeof result.total === 'number') return result.total;
+    if (result.meta_data?.total !== undefined) return result.meta_data.total; 
+    if (result.meta?.total !== undefined) return result.meta.total;
+    if (result.pagination?.total !== undefined) return result.pagination.total;
+    return 0;
+}
+
 interface UseGenericCrudProps<T, CreateDto, UpdateDto> {
     queryKey: QueryKey;
-    fetchFn: () => Promise<any>;               // CHANGED
+    fetchFn: () => Promise<any>;
+    fetchOneFn?: (id: string | number) => Promise<T>;
     createFn: (data: CreateDto) => Promise<T>;
     updateFn: (params: { id: string | number; data: UpdateDto }) => Promise<T>;
     deleteFn: (id: string | number) => Promise<void>;
@@ -38,6 +46,7 @@ export const useGenericCrud = <
 >({
     queryKey,
     fetchFn,
+    fetchOneFn,
     createFn,
     updateFn,
     deleteFn,
@@ -47,14 +56,25 @@ export const useGenericCrud = <
     const queryClient = useQueryClient();
 
     const {
-        data = [],
+        data: rawData,
         isLoading,
         error: fetchError,
     } = useQuery({
         queryKey,
         queryFn: fetchFn,
-        select: (result) => extractArray<T>(result),
     });
+
+    const useGetOne = (id?: string | number) => {
+        return useQuery({
+            queryKey: [...queryKey, 'detail', id],
+            queryFn: () => fetchOneFn!(id!),
+            enabled: !!id && !!fetchOneFn, 
+            staleTime: 5000, 
+        });
+    };
+
+    const data = extractArray<T>(rawData);
+    const total = extractTotal(rawData);
 
     const createMutation = useMutation({
         mutationFn: createFn,
@@ -96,9 +116,11 @@ export const useGenericCrud = <
     });
 
     return {
-        data: data ,
+        data,
+        total, 
         isLoading,
         fetchError,
+        useGetOne,
         createMutation,
         updateMutation,
         deleteMutation,

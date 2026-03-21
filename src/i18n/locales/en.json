@@ -339,6 +339,9 @@
     "steps": "Execution Steps",
     "metadata": "Changes (Metadata)"
   },
+  "permissionsPage":{
+    "add_perm":"Add Permission"
+  },
   "priority": {
     "important": "Important",
     "urgent": "Urgent",
@@ -662,7 +665,6 @@
   "Domains": "Domains",
   "Departments": "Departments",
   "Specializations": "Specializations",
-  "Permissions": "Permissions",
   "university": "University",
   "domain": "Domain",
   "departments": "Departments",
