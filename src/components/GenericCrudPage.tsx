@@ -253,7 +253,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
                 const renderedValue = col.render
                   ? col.render(value, viewingItem, 0)
                   : value;
-
+                    console.log(renderedValue);
                 return (
                   <Descriptions.Item
                     key={col.key || col.dataIndex}

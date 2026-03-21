@@ -56,65 +56,77 @@ const DomainsPage: React.FC = () => {
     value: u.id,
   })) ?? [];
 
-  const columns = [
-    { title: t("name_en"), dataIndex: "name_en", key: "name_en" },
-    { title: t("name_ar"), dataIndex: "name_ar", key: "name_ar" },
+    const columns = [
+        {
+            title: t("name_en"),
+            key: "name_en",
+            render: (_: any, record: any) => record.name?.en || "-",
+        },
+        {
+            title: t("name_ar"),
+            key: "name_ar",
+            render: (_: any, record: any) => record.name?.ar || "-",
+        },
 
-    {
-      title: t("description_en"),
-      dataIndex: "description_en",
-      key: "description_en",
-      render: (text: string) => (
-        <Tooltip title={text}>
-          <div
-            style={{
-              display: "-webkit-box",
-              WebkitBoxOrient: "vertical",
-              WebkitLineClamp: 1,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {text}
-          </div>
-        </Tooltip>
-      ),
-    },
+        {
+            title: t("description_en"),
+            key: "description_en",
+            render: (_: any, record: any) => {
+                const text = record.description?.en || "";
+                return (
+                    <Tooltip title={text}>
+                        <div
+                            style={{
+                                display: "-webkit-box",
+                                WebkitBoxOrient: "vertical",
+                                WebkitLineClamp: 1,
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                            }}
+                        >
+                            {text || "-"}
+                        </div>
+                    </Tooltip>
+                );
+            },
+        },
 
-    {
-      title: t("description_ar"),
-      dataIndex: "description_ar",
-      key: "description_ar",
-      render: (text: string) => (
-        <Tooltip title={text}>
-          <div
-            style={{
-              display: "-webkit-box",
-              WebkitBoxOrient: "vertical",
-              WebkitLineClamp: 1,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              direction: "rtl",
-              textAlign: "right",
-            }}
-          >
-            {text}
-          </div>
-        </Tooltip>
-      ),
-    },
+        {
+            title: t("description_ar"),
+            key: "description_ar",
+            render: (_: any, record: any) => {
+                const text = record.description?.ar || "";
+                return (
+                    <Tooltip title={text}>
+                        <div
+                            style={{
+                                display: "-webkit-box",
+                                WebkitBoxOrient: "vertical",
+                                WebkitLineClamp: 1,
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                direction: "rtl",
+                                textAlign: "right",
+                            }}
+                        >
+                            {text || "-"}
+                        </div>
+                    </Tooltip>
+                );
+            },
+        },
 
-    {
-      title: t("university"),
-      dataIndex: "university",
-      key: "university",
-      render: (_: number, record: any) => {
-        const university = record.university;
-        if (!university) return "-";
-        return i18n.language === "ar" ? university.name_ar : university.name_en;
-    },
-    },
-  ];
+        {
+            title: t("university"),
+            key: "university",
+            render: (_: any, record: any) => {
+                const uni = record.university?.name;
+                if (!uni) return "-";
+
+                return i18n.language === "ar" ? uni.ar : uni.en;
+            },
+        },
+    ];
 
   const formItems = (
     <>
