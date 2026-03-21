@@ -27,7 +27,7 @@ export const useAuditLookups = () => {
     return useQuery({
         queryKey: ['audit-actions'],
         queryFn: async () => {
-            const { data } = await api.get('/v1/lookups/actions');
+            const { data } = await api.get('/v1/lockups/actions');
             return data; 
         }
     });

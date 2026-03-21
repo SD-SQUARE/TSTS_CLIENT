@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import { useAuditLogs, useAuditLookups, useUserLookup } from '../Hooks/useAuditLogs';
 import { useTranslation } from 'react-i18next';
 import EllipsisComponent from '../../../components/EllipsisComponent';
+import i18next from 'i18next';
 
 const { RangePicker } = DatePicker;
 
@@ -56,6 +57,10 @@ const AuditLogList: React.FC = () => {
         {
             title: t('audit.userName'),
             dataIndex: ['actor', 'full_name'],
+            render: (text: any) => {
+                console.log(text);
+                return `${text.first[i18next.language]} ${text.mid[i18next.language]} ${text.last[i18next.language]}`
+            },
             key: 'actorId',
             filterDropdown: () => (
                 <div style={{ padding: 12 }}>
