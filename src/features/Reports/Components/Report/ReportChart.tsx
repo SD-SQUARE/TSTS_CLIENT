@@ -18,7 +18,8 @@ const ReportChart: React.FC<Props> = ({ data, loading, title }) => {
         xField: 'period',
         yField: 'value',
         smooth: true,
-        point: { size: 5, shape: 'circle' },
+        sizeField: 2,
+        point: { size: 8, shape: 'circle', color: '#0c489b' },
         color: '#1677ff',
         animation: { appear: { animation: 'path-in', duration: 800 } },
     };

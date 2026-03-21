@@ -23,7 +23,7 @@ const items = Object.entries(languages).map(([key, val]) => ({
 
 const LanguageSwitcher = () => {
 
-    const [lang, setLang] = useState(i18n.language)
+    const [lang, setLang] = useState(i18n.language);
     
     const onChange = (key) => {
         i18n.changeLanguage(key);

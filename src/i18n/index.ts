@@ -1,16 +1,20 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
+import LanguageDetector from 'i18next-browser-languagedetector';
 import en from './locales/en.json'
 import ar from './locales/ar.json'
-import { DEFAULT_LANGUAGE } from '../app/config'
 
 i18n
+    .use(LanguageDetector)
     .use(initReactI18next)
     .init({
         resources: { en: { translation: en }, ar: { translation: ar } },
-        lng: DEFAULT_LANGUAGE ?? 'en',
         fallbackLng: 'en',
         interpolation: { escapeValue: false },
+        detection: {
+            order: ['localStorage','cookie', 'navigator'],
+            caches: [ 'localStorage','cookie' ]// this enables writing cookie automatically
+        },
     })
 
 export default i18n

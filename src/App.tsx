@@ -6,7 +6,6 @@ import { BrowserRouter } from "react-router-dom"
 import { AppRoutes } from "./routes/AppRoutes"
 import { APP_BASE_PATH } from "./app/config"
 import { useTranslation } from "react-i18next"
-import i18n from "./i18n"
 import GuardedRoute from "./routes/GuardedRoute"
 import { useEffect, useState } from "react"
 import { getUserData } from "./utils/getUserData.utils"
@@ -31,7 +30,7 @@ function App() {
 
     return (
         <BrowserRouter>
-            <Layout style={{ width: '100%', minHeight: '100vh' }} className="white-bg" dir={i18n.language === "ar" ? "rtl" : "ltr"}>
+            <Layout style={{ width: '100%', minHeight: '100vh' }} className="white-bg" >
                 {/* Navigation bar */}
                 <NavBar>
                     {!user ?

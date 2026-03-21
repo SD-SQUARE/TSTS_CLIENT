@@ -11,4 +11,4 @@ export const APP_PROTOCOL = import.meta.env.VITE_APP_PROTOCOL ?? "http";
 export const APP_BASE_PATH = import.meta.env.VITE_APP_BASE_PATH ?? "";
 
 // language
-export const DEFAULT_LANGUAGE = import.meta.env.VITE_DEFAULT_LANGUAGE ?? 'en'
+export const DEFAULT_LANGUAGE = localStorage.getItem("lang") ?? "en";

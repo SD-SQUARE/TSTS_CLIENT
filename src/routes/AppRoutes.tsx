@@ -220,8 +220,22 @@ export const AppRoutes = () => {
                 <Route path=":id/edit" element={<PageLayout><TicketForm /></PageLayout>} />
             </Route>
 
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/reports/:id" element={<ReportViewPage />} />
+            <Route path="/dashboard" element={
+
+                <GuardedRoute roles={["superadmin", "admin"]}>
+                <PageLayout>
+                    <DashboardPage />
+                    </PageLayout>
+                </GuardedRoute>
+            } />
+            
+            <Route path="/reports/:id" element={
+                <GuardedRoute roles={["superadmin", "admin"]}>
+                <PageLayout>
+                    <ReportViewPage />
+                    </PageLayout>
+                </GuardedRoute>
+            } />
 
             <Route path="knowledge-base" element={<PageLayout><KnowledgeBasePage /> </PageLayout>} />
 

@@ -6,30 +6,17 @@ import { queryClient } from "./app/queryClient";
 import "./index.css";
 import App from './App';
 import "./i18n"
-import { ConfigProvider } from "antd";
-import i18n from "./i18n";
 
-import { getCssVar } from "./utils/get_css_var.utils";
 import { CookiesProvider } from "react-cookie";
-
-const TOKENS = {
-    colorPrimary: getCssVar("--color-primary"),           // main brand color
-    colorPrimaryBorderHover: getCssVar("--color-secondary"), // hover border / accent
-    colorText: getCssVar("--text-black"),
-    colorError: getCssVar("--color-red"),
-    colorBorder: getCssVar("--color-gray"),
-    colorWhite: getCssVar("--color-white"),
-    margin: 0,
-};
+import I18nProvider from "./i18n/I18nProvider";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
     <CookiesProvider>
         <Provider store={store}>
             <QueryClientProvider client={queryClient}>
-                <ConfigProvider direction={i18n.language === "ar" ? "rtl" : "ltr"}
-                    theme={{ token: TOKENS }}>
+                <I18nProvider>
                     <App />
-                </ConfigProvider>
+                </I18nProvider>
             </QueryClientProvider>
         </Provider>
     </CookiesProvider>
