@@ -13,6 +13,7 @@ interface Props {
 const DashboardLineChart: React.FC<Props> = ({ data, loading }) => {
     const { t } = useTranslation();
 
+    
     const flattenedData = useMemo(() => {
         return data?.flatMap(ticket =>
             ticket.statistics.map(stats => ({
@@ -27,19 +28,26 @@ const DashboardLineChart: React.FC<Props> = ({ data, loading }) => {
         data: flattenedData,
         xField: 'period',
         yField: 'value',
+        
+        sizeField: 3,
         colorField: 'category',
         smooth: true,
+        
         animation: {
             appear: { animation: 'path-in', duration: 1000 },
         },
-        color: ['#1677ff', '#52c41a', '#faad14', '#ff4d4f'],
+        color: ['#1677ff', '#52c41a', '#faad14', '#ff4d4f', '#722ed1'],
         point: { size: 4, shape: 'circle' },
-        legend: { position: 'top' as const },
+        // scale: {
+        //     color: {
+        //         domain: categoriesOrder,
+        //     },
+        // },
         label: {
             content: (d: any) => `${d.category}: ${d.value}`,
             style: {
                 fill: '#595959',
-                fontSize: 11,
+                fontSize: 12,
                 fontWeight: 600,
                 textBaseline: 'bottom',
             },
@@ -68,7 +76,7 @@ const DashboardLineChart: React.FC<Props> = ({ data, loading }) => {
     }
 
     return (
-        <div style={{ height: 400 }}>
+        <div style={{ height: 320, direction: 'ltr' }}>
             <Line {...config} />
         </div>
     );
