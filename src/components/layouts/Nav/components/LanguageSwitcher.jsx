@@ -4,6 +4,7 @@ import i18n from "../../../../i18n";
 import { useState } from "react";
 import egFlag from '../../../../assets/lang/eg-flag.svg';
 import ukFlag from '../../../../assets/lang/uk-flag.svg';
+import { useQueryClient } from "@tanstack/react-query";
 
 const languages = {
     en: { label: "English", flag: ukFlag },
@@ -24,10 +25,12 @@ const items = Object.entries(languages).map(([key, val]) => ({
 const LanguageSwitcher = () => {
 
     const [lang, setLang] = useState(i18n.language);
-    
+    const queryClient = useQueryClient();
     const onChange = (key) => {
         i18n.changeLanguage(key);
         setLang(key)
+
+        queryClient.invalidateQueries(); 
     };
 
 
