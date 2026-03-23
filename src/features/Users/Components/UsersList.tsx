@@ -276,14 +276,23 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                 <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />
             ),
             render: (_, record) => {
-                const fullName = record[`full_name_${currentLanguage}`] || "";
+                let name = record[`full_name_${currentLanguage}`] || "";
+
+                if (name == "" || !name)
+                {
+
+                    const firstName = record?.[`first_name_${currentLanguage}`] || '';
+                    const midName = record?.[`mid_name_${currentLanguage}`] || '';
+                    const lastName = record?.[`last_name_${currentLanguage}`] || '';
+                    name = `${firstName} ${midName} ${lastName}`.trim()
+                }
                 return (
                     <Typography.Text strong>
                         <Highlighter
                             highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
                             searchWords={[apiSearchQuery.first_name || '']}
                             autoEscape
-                            textToHighlight={fullName}
+                            textToHighlight={name}
                         />
                     </Typography.Text>
                 );
