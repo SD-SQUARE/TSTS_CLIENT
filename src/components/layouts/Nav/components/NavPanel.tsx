@@ -23,7 +23,9 @@ const NavPanel = ({ children, closeDrawer = () => { } }) => {
                     <div
                         style={{ cursor: "pointer", minWidth: screens.md ? "auto" : "100%", display: "flex", gap: 8 , flexDirection: screens.md ? "row" : "column"}}
                         onClick={() => {
-                            if (!screens.md) closeDrawer();
+                            if (!screens.md) {
+                                setTimeout(() => closeDrawer(), 0);
+                            }
                         }}
                     >
                         {child}
