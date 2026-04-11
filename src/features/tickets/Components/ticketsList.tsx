@@ -19,7 +19,7 @@ import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } 
 import { CSS } from '@dnd-kit/utilities';
 import DOMPurify from "dompurify";
 
-type SearchableDataIndex = `id` | `title` | `problem` | `specialization` | `status` | 'priority'; 
+type SearchableDataIndex = `id` | `title` | `problem` | `specialization` | `status` | 'priority';
 // | 'description';
 
 const getSavedData = (key: string, fallback: any) => {
@@ -57,7 +57,7 @@ const TicketList: React.FC = () => {
     const problemTreeData = hierarchicalProblems?.specializations?.map((spec: any) => {
         const hasProblems = spec.problems && spec.problems.length > 0;
 
-        
+
 
         return {
             title: (
@@ -574,8 +574,8 @@ const TicketList: React.FC = () => {
 
     const handleResetSettings = () => {
         const defaultOrder = columns.map(col => col.key as string);
-        const defaultWidths = { id: 150, status: 140, priority: 120, title: 250,  specialization: 180, problem: 180, requesterName: 180, assignee: 300};
-            // description: 500,};
+        const defaultWidths = { id: 150, status: 140, priority: 120, title: 250, specialization: 180, problem: 180, requesterName: 180, assignee: 300 };
+        // description: 500,};
 
         setColumnOrder(defaultOrder);
         setVisibleColumns(defaultOrder);
@@ -647,8 +647,8 @@ const TicketList: React.FC = () => {
 
     const [colWidths, setColWidths] = useState<{ [key: string]: number }>(() =>
         getSavedData('ticket_column_widths', {
-            id: 150, status: 140, priority: 120, title: 250,  specialization: 180, problem: 180, requesterName: 180, assignee: 300
-        // description: 500,
+            id: 150, status: 140, priority: 120, title: 250, specialization: 180, problem: 180, requesterName: 180, assignee: 300
+            // description: 500,
         })
     );
     useEffect(() => {
@@ -718,6 +718,19 @@ const TicketList: React.FC = () => {
                     height: 100%;
                     cursor: col-resize;
                 }
+                .ant-table-empty .ant-table-body {
+                    max-height: none !important;
+                    height: auto !important;
+                    overflow-y: hidden !important;
+                }
+
+                /* Clean up the placeholder border */
+                .ant-table-placeholder {
+                    height: 200px; /* Optional: adjust the height of the "No Data" area */
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
                 
                 `}
             </style>
@@ -737,11 +750,14 @@ const TicketList: React.FC = () => {
             <Table
                 components={{ header: { cell: ResizableTitle } }}
                 columns={finalColumns}
-                dataSource={data?.data || []}
+                dataSource={ data?.data || []}
                 rowKey="id"
                 loading={isLoading}
                 tableLayout='fixed'
-                scroll={{ x: 'max-content', y: 'calc(100vh - 280px)' }}
+                scroll={{
+                    x: 'max-content',
+                    y: data?.data?.length > 0 ? 'calc(100vh - 280px)' : 'auto'
+                }}
                 pagination={false}
                 onRow={handleRowClick}
             />
