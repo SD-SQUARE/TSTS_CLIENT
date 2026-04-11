@@ -124,9 +124,14 @@ const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor }) 
             dataSource={activities}
             columns={columns}
             rowKey="id"
-            pagination={{ pageSize: 10 }}
             bordered
             size="small"
+            pagination={{ 
+                defaultPageSize: 10,
+                showSizeChanger: true,
+                pageSizeOptions: ['10', '20', '50', '100'],
+                style: { marginTop: '20px' },
+            }}
         />
     );
 };
