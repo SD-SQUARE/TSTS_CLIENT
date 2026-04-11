@@ -24,7 +24,7 @@ const StepAccess: React.FC<Props> = ({
     const { handleSubmit, control, formState: { errors }, reset } =
         useForm<UserFormData>({ defaultValues: initialData, mode: "onChange" });
 
-        const isEdit = !!initialData?.ssn;
+        const isEdit = !!initialData?.email;
 
     useEffect(() => { reset(initialData); }, [initialData, reset]);
 
