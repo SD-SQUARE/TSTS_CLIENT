@@ -673,7 +673,7 @@ const TicketList: React.FC = () => {
                     onResize: handleResize(column.key as string),
                 }),
             }));
-    }, [columnOrder, colWidths, visibleColumns]);
+    }, [columnOrder, colWidths, visibleColumns, t]);
 
 
 
