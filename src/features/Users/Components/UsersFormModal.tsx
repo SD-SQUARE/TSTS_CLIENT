@@ -9,19 +9,12 @@ import StepContacts from "./UsersFormSteps/StepContacts";
 import StepJobLocation from "./UsersFormSteps/StepJobs";
 import StepPermissions from "./UsersFormSteps/StepPermissions";
 import StepAccess from "./UsersFormSteps/StepAccess";
-import { t } from "i18next";
 import type { UserFormData, UserListItem, UserPayload } from "../Types/users";
 import { useAddOrEditUser, useUserDetail } from "../Hooks/useUsers";
 
 
 
-const steps = [
-    { title: t("user_list.info_title"), component: StepInfo },
-    { title: t("user_list.contacts_title"), component: StepContacts },
-    { title: t("user_list.jobLocation_title"), component: StepJobLocation },
-    { title: t("user_list.perm_title"), component: StepPermissions },
-    { title: t("user_list.access_title"), component: StepAccess },
-];
+
 
 const initialFormData: UserFormData = {
     image: null,
@@ -250,6 +243,14 @@ const UserFormModal: React.FC<{
         [formData, userData, addOrEditMutation, t]
     );
 
+    const steps = [
+        { title: t("user_list.info_title"), component: StepInfo },
+        { title: t("user_list.contacts_title"), component: StepContacts },
+        { title: t("user_list.jobLocation_title"), component: StepJobLocation },
+        { title: t("user_list.perm_title"), component: StepPermissions },
+        { title: t("user_list.access_title"), component: StepAccess },
+    ];
+
     const CurrentStepComponent = steps[current].component;
     const isLastStep = current === steps.length - 1;
 
@@ -258,7 +259,7 @@ const UserFormModal: React.FC<{
     const stepItems = useMemo(() => steps.map(item => ({
         key: item.title,
         title: item.title,
-    })), [t]);
+    })), [t, steps]);
 
     return (
         <Modal
@@ -272,15 +273,15 @@ const UserFormModal: React.FC<{
             style={{ top: 20 }}
         >
             <Spin spinning={isModalLoading}>
-            <Steps current={current} style={{ marginBottom: 24 }} items={stepItems}  onChange={ step => setCurrent(step)} />
-        
+                <Steps current={current} style={{ marginBottom: 24 }} items={stepItems} onChange={step => setCurrent(step)} />
 
-            <div className="steps-content">
-                <CurrentStepComponent
-                    initialData={formData}
-                    onNext={next}
-                    onSubmit={handleSubmit}
-                    isSubmitting={addOrEditMutation.isPending}
+
+                <div className="steps-content">
+                    <CurrentStepComponent
+                        initialData={formData}
+                        onNext={next}
+                        onSubmit={handleSubmit}
+                        isSubmitting={addOrEditMutation.isPending}
                     // onTriggerSubmit={handleTriggerSubmit}
                     />
                 </div>
