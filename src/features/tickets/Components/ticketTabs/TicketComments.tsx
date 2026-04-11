@@ -128,7 +128,7 @@ const TicketComments: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =
                     <Typography.Text type="secondary" style={{ fontSize: '12px' }}>{allMessages.length} {t('tickets.comments')}</Typography.Text>
                 </div>
 
-                <div style={{ border: 'none', borderRadius: '12px', overflow: 'hidden', background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                <div dir='ltr' style={{ border: 'none', borderRadius: '12px', overflow: 'hidden', background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
                     <ReactQuill
                         className="quill-chat-editor"
                         theme="snow"

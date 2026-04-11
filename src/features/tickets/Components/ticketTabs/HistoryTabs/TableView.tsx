@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { Avatar, Space, Table, Tag, Typography } from 'antd';
+import { Avatar, Flex, Space, Table, Tag, Typography } from 'antd';
+import { CalendarOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../../../../i18n';
@@ -65,7 +66,18 @@ const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor }) 
             dataIndex: 'createdAt',
             key: 'createdAt',
             width: 160,
-            render: (date: string) => dayjs(date).format('YYYY-MM-DD h:mm A'),
+            render: (date: string) => (
+                <Flex vertical gap={4} dir="ltr" style={{ alignItems: 'flex-start' }}>
+                    <Space size={6} style={{ color: 'rgba(0, 0, 0, 0.45)', fontSize: '12px' }}>
+                        <ClockCircleOutlined />
+                        <span dir='ltr'>{dayjs(date).format('h:mm A')}</span>
+                    </Space>
+                    <Space size={6} style={{ color: 'rgba(0, 0, 0, 0.45)', fontSize: '12px' }}>
+                        <CalendarOutlined />
+                        <span dir='ltr'>{dayjs(date).format('DD-MM-YYYY')}</span>
+                    </Space>
+                </Flex>
+            ),
         },
         {
             title: t('tickets.ipAddress'),
