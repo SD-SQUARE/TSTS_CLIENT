@@ -98,7 +98,11 @@
       "import_success": "تم استيراد المحتوى بنجاح",
       "import_error": "فشل استيراد ملف Word",
       "delete_title": "حذف المقال",
-      "delete_confirm": "هل أنت متأكد من رغبتك في حذف هذا المقال؟"
+      "delete_confirm": "هل أنت متأكد من رغبتك في حذف هذا المقال؟",
+      "delete_success": "تم الحذف بنجاح",
+      "delete_error": "حدث خطأ",
+      "create_success": "تم الإنشاء بنجاح",
+      "update_success": "تم التحديث بنجاح"
     }
   },
   "crud": {

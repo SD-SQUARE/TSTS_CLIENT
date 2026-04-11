@@ -98,7 +98,7 @@ export const useKnowledgeBase = () => {
   const handleDelete = (id: string | number) => {
     Modal.confirm({
       title: t('translation.confirm_delete'), 
-      content: t('knowledge.delete'), 
+      // content: t('knowledge.delete'), 
       okText: t('translation.yes'),
       cancelText: t('translation.no'),
       okType: 'danger',

@@ -650,7 +650,11 @@
       "import_success": "Content imported successfully",
       "import_error": "Failed to import Word document",
       "delete_title": "Delete Article",
-      "delete_confirm": "Are you sure you want to delete this article?"
+      "delete_confirm": "Are you sure you want to delete this article?",
+      "delete_success": "Deleted successfully",
+      "delete_error": "Something went wrong",
+      "create_success": "Created successfully",
+      "update_success": "Updated successfully"
     }
   },
   "Groups": "Groups",

@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Input, Button, Modal, Form, Card, List, Typography,
   Steps, Upload, Tag, Empty
 } from 'antd';
 import {
   SearchOutlined, PlusOutlined, EditOutlined,
-  DeleteOutlined, UploadOutlined, FileWordOutlined,
+  DeleteOutlined, UploadOutlined, InfoCircleOutlined,
   EyeOutlined, ReadOutlined
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -22,18 +22,21 @@ const TagOutlinedIcon = () => (
   </span>
 );
 
+
 const KnowledgeBasePage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.language === 'ar';
 
   const auth = useSelector((state: any) => state.auth);
-  const role: string = auth.user.role.toLowerCase();
+  const role: string = auth?.user?.role?.toLowerCase() || 'admin'; 
   const isPrivileged = role === 'admin' || role === 'technician';
+
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 9 });
 
   const {
     form,
     filteredData,
-    isLoading,
+    isLoading,       
     isModalOpen,
     currentStep,
     searchText,
@@ -53,7 +56,7 @@ const KnowledgeBasePage: React.FC = () => {
   } = useKnowledgeBase();
 
 
-  // Quill Editor Option
+
   const modules = {
     toolbar: {
       container: [
@@ -67,7 +70,7 @@ const KnowledgeBasePage: React.FC = () => {
 
   const stepsConfig = [
     {
-      title: t('user_list.details'),
+      title: t('knowledge.steps.details'),
       fieldsToValidate: ['title', 'specialization', 'description'],
       content: (
         <>
@@ -78,7 +81,7 @@ const KnowledgeBasePage: React.FC = () => {
             <Input size="large" placeholder={t('knowledge.fields.category_placeholder')} prefix={<TagOutlinedIcon />} />
           </Form.Item>
           <Form.Item name="description" label={t('knowledge.fields.summary')} rules={[{ required: true, message: t('validation.required') }]}>
-            <Input.TextArea rows={3} placeholder={t('knowledge.fields.category_placeholder')} showCount maxLength={200} />
+            <Input.TextArea rows={3} placeholder={t('knowledge.fields.summary_placeholder')} showCount maxLength={200} />
           </Form.Item>
         </>
       ),
@@ -91,12 +94,11 @@ const KnowledgeBasePage: React.FC = () => {
           <div style={{
             marginBottom: 16, padding: '12px 16px', background: '#f9f9f9',
             border: '1px dashed #d9d9d9', borderRadius: 8, display: 'flex',
-            justifyContent: 'space-between', alignItems: 'center',
-            flexDirection: isRtl ? 'row-reverse' : 'row'
+            justifyContent: 'space-between', alignItems: 'center'
           }}>
-            <div style={{ textAlign: isRtl ? 'right' : 'left' }}>
+            <div style={{ textAlign: 'start' }}>
               <Text strong>{t('knowledge.fields.import_title')}</Text>
-              <div style={{ fontSize: 12, color: '#888' }}>{isRtl ? 'ارفع ملف .docx للتعبئة التلقائية' : 'Upload a .docx file to auto-fill'}</div>
+              <div style={{ fontSize: 12, color: '#888' }}>{t('knowledge.fields.import_desc')}</div>
             </div>
             <Upload accept=".docx" showUploadList={false} beforeUpload={handleWordImport}>
               <Button icon={<UploadOutlined />} size="small">{t('knowledge.fields.import_btn')}</Button>
@@ -115,12 +117,17 @@ const KnowledgeBasePage: React.FC = () => {
     },
   ];
 
+  const paginatedData = filteredData.slice(
+    (pagination.current - 1) * pagination.pageSize,
+    pagination.current * pagination.pageSize
+  );
+
   return (
     <div style={{ backgroundColor: '#f5f7fa', minHeight: '100vh', paddingBottom: 40, direction: isRtl ? 'rtl' : 'ltr' }}>
       {/* Header */}
       <div style={{ background: 'linear-gradient(135deg, #001529 0%, #003a8c 100%)', padding: '40px 50px 80px', color: 'white', borderRadius: 12 }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
-          <div style={{ textAlign: isRtl ? 'right' : 'left' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}> 
+          <div style={{ textAlign: 'start' }}>
             <Title level={2} style={{ color: 'white', margin: 0 }}>{t('knowledge.hub_title')}</Title>
             <Text style={{ color: 'rgba(255,255,255,0.65)' }}>{t('knowledge.hub_subtitle')}</Text>
           </div>
@@ -128,7 +135,7 @@ const KnowledgeBasePage: React.FC = () => {
           <Button type="primary" size="large" icon={<PlusOutlined />} onClick={() => openModal()} style={{ borderRadius: 6, height: 45 }}>
             {t('knowledge.create_btn')}
           </Button>
-           )}  
+           )}   
         </div>
       </div>
 
@@ -148,8 +155,16 @@ const KnowledgeBasePage: React.FC = () => {
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
         {isLoading ? <Card loading style={{ borderRadius: 12 }} /> : (searchText && searchText.length > 0 && filteredData && filteredData.length === 0) ? <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('knowledge.no_articles')} /> : (
           <List
-            grid={{ gutter: 24, xs: 1, sm: 1, md: 2, lg: 3, xl: 3, xxl: 3 }}
-            dataSource={filteredData}
+            grid={{ gutter: [24, 24], xs: 1, sm: 1, md: 2, lg: 3, xl: 3, xxl: 3 }}
+            dataSource={paginatedData}
+            pagination={{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: filteredData.length,
+              onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
+              position: 'bottom',
+              align: 'center',
+            }}
             renderItem={(item) => (
               <List.Item style={{ height: '100%' }}>
                 <Card
@@ -165,10 +180,9 @@ const KnowledgeBasePage: React.FC = () => {
                     padding: 24,
                     flex: 1,
                   }}
-
                 >
                   {/* Card Header */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, flexDirection: isRtl ? 'row-reverse' : 'row' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
                     <div style={{
                       width: 54, height: 54,
                       background: 'linear-gradient(135deg, #e6f7ff 0%, #ffffff 100%)',
@@ -177,7 +191,7 @@ const KnowledgeBasePage: React.FC = () => {
                       boxShadow: '0 4px 10px rgba(24, 144, 255, 0.15)',
                       flexShrink: 0
                     }}>
-                      <FileWordOutlined style={{ fontSize: 26, color: '#1890ff' }} />
+                      <InfoCircleOutlined style={{ fontSize: 26, color: '#1890ff' }} />
                     </div>
                     <Tag color="blue" style={{
                       margin: 0,
@@ -194,7 +208,7 @@ const KnowledgeBasePage: React.FC = () => {
                     </Tag>
                   </div>
 
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', textAlign: isRtl ? 'right' : 'left' }}>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', textAlign: 'start' }}>
                     <Title level={4} ellipsis={{ rows: 2 }} style={{ marginTop: 0, marginBottom: 12, fontSize: 18, fontWeight: 700, color: '#262626', minHeight: 54 }}>
                       {item.title}
                     </Title>
@@ -214,7 +228,7 @@ const KnowledgeBasePage: React.FC = () => {
                     </Paragraph>
                   </div>
 
-                  <div style={{ marginTop: 24, display: 'flex', gap: 8, alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
+                  <div style={{ marginTop: 24, display: 'flex', gap: 8, alignItems: 'center' }}>
                     {isPrivileged ? (
                     <>
                       <Button
@@ -256,9 +270,9 @@ const KnowledgeBasePage: React.FC = () => {
                       icon={<ReadOutlined />}
                       onClick={() => openViewModal(item)}
                     >
-                      {isRtl ? 'قراءة المقال' : 'Read Article'}
+                      {t('knowledge.read_article')}
                     </Button> 
-                    )}  
+                     )}   
                   </div>
                 </Card>
               </List.Item>
@@ -279,45 +293,47 @@ const KnowledgeBasePage: React.FC = () => {
         maskClosable={false}
         style={{ padding: 0 }}
       >
-        <div style={{ padding: '24px 32px', borderBottom: '1px solid #f0f0f0', background: '#fafafa', borderRadius: '8px 8px 0 0', textAlign: isRtl ? 'right' : 'left' }}>
-          <Title level={4} style={{ margin: 0 }}>{editingId ? t('knowledge.modal_edit') : t('knowledge.modal_draft')}</Title>
-          <Text type="secondary">{isRtl ? 'شارك المعرفة مع فريق العمل' : 'Share your knowledge with the team'}</Text>
-        </div>
+        <div dir={isRtl ? 'rtl' : 'ltr'} style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
+          <div style={{ padding: '24px 32px', borderBottom: '1px solid #f0f0f0', background: '#fafafa', borderRadius: '8px 8px 0 0', textAlign: 'start' }}>
+            <Title level={4} style={{ margin: 0 }}>{editingId ? t('knowledge.modal_edit') : t('knowledge.modal_draft')}</Title>
+            <Text type="secondary">{t('knowledge.modal_subtitle')}</Text>
+          </div>
 
-        <div style={{ padding: '24px 32px' }}>
-          <Steps direction={isRtl ? 'rtl' as any : 'ltr' as any} current={currentStep} size="small" style={{ marginBottom: 32 }} items={stepsConfig.map(s => ({ title: s.title }))} />
+          <div style={{ padding: '24px 32px' }}>
+            <Steps direction={isRtl ? 'rtl' as any : 'ltr' as any} current={currentStep} size="small" style={{ marginBottom: 32 }} items={stepsConfig.map(s => ({ title: s.title }))} />
 
-          <Form form={form} layout="vertical" preserve={true} style={{ textAlign: isRtl ? 'right' : 'left' }}>
-            <div style={{ minHeight: 320 }}>
-              {stepsConfig.map((step, index) => (
-                <div key={index} style={{ display: currentStep === index ? 'block' : 'none', animation: 'fadeIn 0.3s' }}>
-                  {step.content}
-                </div>
-              ))}
-            </div>
+            <Form form={form} layout="vertical" preserve={true} style={{ textAlign: 'start' }}>
+              <div style={{ minHeight: 320 }}>
+                {stepsConfig.map((step, index) => (
+                  <div key={index} style={{ display: currentStep === index ? 'block' : 'none', animation: 'fadeIn 0.3s' }}>
+                    {step.content}
+                  </div>
+                ))}
+              </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 24, paddingTop: 20, borderTop: '1px solid #f0f0f0', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
-              <Button onClick={() => {
-                if (currentStep > 0) {
-                  handlePrevStep();
-                } else {
-                  form.resetFields();
-                }
-              }}>
-                {currentStep > 0 ? t('knowledge.actions.prev') : t('knowledge.actions.reset')}
-              </Button>
-
-              {currentStep < stepsConfig.length - 1 ? (
-                <Button type="primary" onClick={() => handleNextStep(stepsConfig[currentStep].fieldsToValidate)}>
-                  {t('knowledge.actions.next')}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 24, paddingTop: 20, borderTop: '1px solid #f0f0f0' }}> 
+                <Button onClick={() => {
+                  if (currentStep > 0) {
+                    handlePrevStep();
+                  } else {
+                    form.resetFields();
+                  }
+                }}>
+                  {currentStep > 0 ? t('knowledge.actions.prev') : t('knowledge.actions.reset')}
                 </Button>
-              ) : (
-                <Button type="primary" onClick={handleFinish} loading={isSubmitting}>
-                  {editingId ? t('knowledge.actions.save') : t('knowledge.actions.publish')}
-                </Button>
-              )}
-            </div>
-          </Form>
+
+                {currentStep < stepsConfig.length - 1 ? (
+                  <Button type="primary" onClick={() => handleNextStep(stepsConfig[currentStep].fieldsToValidate)}>
+                    {t('knowledge.actions.next')}
+                  </Button>
+                ) : (
+                  <Button type="primary" onClick={handleFinish} loading={isSubmitting}>
+                    {editingId ? t('knowledge.actions.save') : t('knowledge.actions.publish')}
+                  </Button>
+                )}
+              </div>
+            </Form>
+          </div>
         </div>
       </Modal>
 
@@ -333,15 +349,15 @@ const KnowledgeBasePage: React.FC = () => {
         style={{ padding: 0 }}
       >
         {viewingItem && (
-          <>
-            <div style={{ padding: '32px 40px 24px', background: '#fafafa', borderBottom: '1px solid #f0f0f0', borderRadius: '8px 8px 0 0', textAlign: isRtl ? 'right' : 'left' }}>
+          <div dir={isRtl ? 'rtl' : 'ltr'} style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
+            <div style={{ padding: '32px 40px 24px', background: '#fafafa', borderBottom: '1px solid #f0f0f0', borderRadius: '8px 8px 0 0', textAlign: 'start' }}>
               <Tag color="blue" style={{ marginBottom: 12 }}>{viewingItem.specialization}</Tag>
               <Title level={2} style={{ margin: 0 }}>{viewingItem.title}</Title>
               <Text type="secondary" style={{ marginTop: 8, display: 'block', fontSize: 16 }}>
                 {viewingItem.description}
               </Text>
             </div>
-            <div style={{ padding: '32px 40px', maxHeight: '60vh', overflowY: 'auto', textAlign: isRtl ? 'right' : 'left' }}>
+            <div style={{ padding: '32px 40px', maxHeight: '60vh', overflowY: 'auto', textAlign: 'start' }}>
               <div
                 className="ql-editor"
                 dangerouslySetInnerHTML={{ __html: viewingItem.content || '<p>No content available.</p>' }}
@@ -351,7 +367,7 @@ const KnowledgeBasePage: React.FC = () => {
             <div style={{ padding: '16px 40px', borderTop: '1px solid #f0f0f0', display: 'flex', justifyContent: 'flex-end', background: '#fff', borderRadius: '0 0 8px 8px' }}>
               <Button size="large" onClick={closeViewModal}>{t('knowledge.actions.close')}</Button>
             </div>
-          </>
+          </div>
         )}
       </Modal>
     </div>
