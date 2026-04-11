@@ -380,6 +380,7 @@
     "save": "Save Changes",
     "edit": "Edit Ticket",
     "download": "Download",
+    "downloading": "Downloading...",
     "noMedia": "No media files associated with this ticket",
     "collapse": "Collapse",
     "expand": "Expand",
