@@ -549,7 +549,7 @@ const TicketForm: React.FC = () => {
                             <Form.Item
                                 name="problem"
                                 noStyle
-                                rules={[{ required: true, message: t('errors.problemRequired') }]}
+                                // rules={[{ required: true, message: t('errors.problemRequired') }]}
                             >
                                 <Input type="hidden" />
                             </Form.Item>
