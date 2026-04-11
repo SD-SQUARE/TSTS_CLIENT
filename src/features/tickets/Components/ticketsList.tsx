@@ -18,6 +18,9 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from 
 import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import DOMPurify from "dompurify";
+import { ConfigProvider } from 'antd';
+import enUS from 'antd/lib/locale/en_US';
+import arEG from 'antd/lib/locale/ar_EG';
 
 type SearchableDataIndex = `id` | `title` | `problem` | `specialization` | `status` | 'priority';
 // | 'description';
@@ -28,7 +31,8 @@ const getSavedData = (key: string, fallback: any) => {
 };
 
 const TicketList: React.FC = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const currentLanguage = i18n.language;
     const navigate = useNavigate();
     const { role } = useParams();
     const [pagination, setPagination] = useState({ page: 1, pageSize: 50 });
@@ -51,6 +55,7 @@ const TicketList: React.FC = () => {
 
     const { data, isLoading, isError, error } = useTickets(pagination.page, pagination.pageSize, apiSearchQuery);
 
+    const antdLocale = currentLanguage === 'ar' ? arEG : enUS;
 
     const isRequester = role === 'requester';
 
@@ -740,16 +745,23 @@ const TicketList: React.FC = () => {
                 }
             
                 .ant-table-body{
-                    min-height: calc(-220px + 100vh);
+                    min-height: calc(100vh - 270px);
                 }
                 
                 `}
             </style>
 
 
+            <Typography.Title level={2} style={{ margin: 0, marginBottom: 16 }}>{t('tickets.listTitle')}</Typography.Title>
+                <ConfigProvider locale={antdLocale} direction={currentLanguage === 'ar' ? 'rtl' : 'ltr'}>
             <Flex justify="space-between" align="center" style={{ marginBottom: 16 }}>
-                <Typography.Title level={2} style={{ margin: 0 }}>{t('tickets.listTitle')}</Typography.Title>
-
+                    <Pagination
+                        current={pagination.page}
+                        pageSize={pagination.pageSize}
+                        total={data?.total || 0}
+                        onChange={(page, pageSize) => setPagination({ page, pageSize })}
+                        showSizeChanger
+                    />
                 <Space>
                     <Popover content={controlPanel} title={t('common.showHideColumns')} trigger="click">
                         <Button icon={<SettingOutlined />}>{t('common.columns')}</Button>
@@ -757,6 +769,8 @@ const TicketList: React.FC = () => {
                     {isRequester && <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>{t('tickets.new_ticket')}</Button>}
                 </Space>
             </Flex>
+                </ConfigProvider>
+
 
             <Table
                 components={{ header: { cell: ResizableTitle } }}
