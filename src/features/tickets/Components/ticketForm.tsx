@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Input, Select, Button, Upload, Tag, Dropdown, Space, Typography, message, Flex, Card, Steps, Badge, TreeSelect } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
@@ -42,8 +42,8 @@ const TicketForm: React.FC = () => {
 
     const [fileList, setFileList] = useState<any[]>([]);
 
-    const [selectedProblem, setSelectedProblem] = useState<{ id: string, name: string, specId: string } | null>(null);
-
+    const [selectedProblemId, setSelectedProblemId] = useState<string | null>(null);
+    
     const [treeData, setTreeData] = useState<any[]>([]);
 
     const currentStatus = Form.useWatch('status', form);
@@ -274,11 +274,7 @@ const TicketForm: React.FC = () => {
         });
 
         if (ticketData.problem) {
-            setSelectedProblem({
-                id: ticketData.problem.id,
-                name: ticketData.problem.name,
-                specId: ticketData.specialization?.id
-            });
+            setSelectedProblemId(ticketData.problem.id);
         }
 
         if (Array.isArray(ticketData.attachments)) {
@@ -338,9 +334,9 @@ const TicketForm: React.FC = () => {
         formData.append('description', values.description);
         formData.append('requester', user.id);
 
-        if (selectedProblem) {
-            formData.append('problem', selectedProblem.id);
-            formData.append('specialization', selectedProblem.specId);
+        if (selectedProblemData) {
+            formData.append('problem', selectedProblemData.id);
+            formData.append('specialization', selectedProblemData.specId);
         }
 
         fileList.forEach((file) => {
@@ -395,6 +391,16 @@ const TicketForm: React.FC = () => {
             message.error(t('errors.submitFailed'));
         }
     };
+
+    const selectedProblemData = useMemo(() => {
+        if (!selectedProblemId || !groupedData) return null;
+        
+        for (const spec of groupedData.specializations) {
+            const found = spec.problems?.find((p: any) => p.id === selectedProblemId);
+            if (found) return { ...found, specId: spec.id };
+        }
+        return null;
+    }, [selectedProblemId, groupedData]);
 
     const handleCustomReset = () => {
         const currentTitle = form.getFieldValue('title');
@@ -475,11 +481,7 @@ const TicketForm: React.FC = () => {
                         </span>
                     ),
                     onClick: () => {
-                        setSelectedProblem({
-                            id: prob.id,
-                            name: prob.name,
-                            specId: spec.id
-                        });
+                        setSelectedProblemId(prob.id);
                         form.setFieldValue('problem', prob.id);
                     }
                 }))
@@ -534,9 +536,9 @@ const TicketForm: React.FC = () => {
                             <Flex align="center" gap="middle" wrap="wrap" >
                                 <span>{t('tickets.problemType')}</span>
                                 <Space size={8} wrap align="center">
-                                    {selectedProblem ? (
+                                    {selectedProblemData ? (
                                         <Tag color="blue" variant='outlined' style={{ marginInlineEnd: 0 }}>
-                                            {selectedProblem.name}
+                                            {selectedProblemData.name}
                                         </Tag>
                                     ) : (
                                         <Tag color="red" variant='outlined' style={{ marginInlineEnd: 0 }}>{t('tickets.autoAssignPlaceholder')}</Tag>
