@@ -4,6 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 
 import { t } from "i18next";
 import type { UserFormData } from "../../Types/users";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { usePermissionProfiles, useSpecializations } from "../../Hooks/useUsers";
 import RequiredTag from "../../../../components/RequiredTag";
 

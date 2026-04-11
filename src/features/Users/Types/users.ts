@@ -17,7 +17,7 @@
     export interface UserListItem {
         id: string;
         image: string; 
-        email: string;
+        email?: string;
         user_type: string;
         first_name_en: string;
         first_name_ar: string;
@@ -31,7 +31,7 @@
         university?: any;
         domain?: any;
         departments: any[];
-        contacts: { phones: string[]; mobiles: string[] };
+        contacts: { phones?: string[]; mobiles?: string[] };
         status: "Active" | "InActive";
         job_en: string;
         job_ar: string;
@@ -52,7 +52,7 @@
         full_name_en?: string;
         full_name_ar?: string;
         ssn: string;
-        contacts: { phones: string[]; mobiles: string[] };
+        contacts: { phones?: string[]; mobiles?: string[] };
         job_en: string;
         job_ar: string;
         university: Lookup | null;
@@ -60,8 +60,8 @@
         departments: Lookup[];
         permission_profile: Lookup | null;
         specializations: Lookup[];
-        email: string;
-        password: string;
+        email?: string;
+        password?: string;
         status: "Active" | "InActive";
         user_type?: string;
     }
@@ -79,11 +79,11 @@
         full_name_en?: string;
         full_name_ar?: string;
         ssn: string;
-        contacts: { phones: string[]; mobiles: string[] };
+        contacts: { phones?: string[]; mobiles?: string[] };
         job_en: string;
         job_ar: string;
-        email: string;
-        password: string;
+        email?: string;
+        password?: string;
         status: "Active" | "InActive";
         user_type?: string;
         departments: string[];

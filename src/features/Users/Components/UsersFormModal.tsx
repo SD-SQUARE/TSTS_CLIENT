@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useCallback, useEffect, useMemo } from "react";
-import { Modal, Steps, Button, Space, message, Spin } from "antd";
+import { Modal, Steps, Button,  message, Spin, Flex } from "antd";
 import { useTranslation } from "react-i18next";
 import { ExclamationCircleFilled } from '@ant-design/icons';
 
@@ -63,10 +63,10 @@ const UserFormModal: React.FC<{
 
 
     const { data: fetchedUserDetail, isLoading: isFetchingDetail } = useUserDetail(role, userData?.id);
-    const isModalLoading = isFetchingDetail; 
+    const isModalLoading = isFetchingDetail;
     useEffect(() => {
 
-        if(!isVisible){
+        if (!isVisible) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setCurrent(0);
             setFormData(initialFormData);
@@ -74,7 +74,7 @@ const UserFormModal: React.FC<{
         }
         if (userData) {
             //FIXME : fix this Render warning properly
-            if(fetchedUserDetail) {
+            if (fetchedUserDetail) {
                 // eslint-disable-next-line react-hooks/set-state-in-effect
                 setFormData({
                     user_type: role,
@@ -96,13 +96,13 @@ const UserFormModal: React.FC<{
                     departments: fetchedUserDetail.departments ?? [],
                     permission_profile: fetchedUserDetail.permission_profile ?? null,
                     specializations: fetchedUserDetail.specializations ?? [],
-                    email: fetchedUserDetail.email,
+                    email: fetchedUserDetail.email || '',
                     password: "",
                     status: fetchedUserDetail.status,
                 });
                 setCurrent(0);
             }
-        } else{
+        } else {
             setFormData(initialFormData);
             setCurrent(0);
         }
@@ -163,6 +163,7 @@ const UserFormModal: React.FC<{
 
     const cleanPayload = (data: UserFormData) => {
 
+        const isEdit = !!userData;
         const payload: Partial<UserPayload> = {
             first_name_en: data.first_name_en,
             first_name_ar: data.first_name_ar,
@@ -175,8 +176,6 @@ const UserFormModal: React.FC<{
             ssn: data.ssn,
             job_en: data.job_en,
             job_ar: data.job_ar,
-            email: data.email,
-            password: data.password,
             status: data.status,
             image: data.image,
             user_type: role,
@@ -192,6 +191,15 @@ const UserFormModal: React.FC<{
             departments: data.departments.map(item => item.id),
             specializations: data.specializations.map(item => item.id),
         };
+
+        if (data.email && data.email.trim() !== "") {
+            payload.email = data.email;
+        }
+        if (data.password && data.password.trim() !== "") {
+            payload.password = isEdit? data.password : '';
+        } else if (isEdit) {
+            delete payload.password;
+        }
 
         return payload;
     };
@@ -210,7 +218,7 @@ const UserFormModal: React.FC<{
                 if (key === "image") {
                     if (typeof val === "string") {
                         formPayload.append(key, "");
-                    }else if (val instanceof File) {
+                    } else if (val instanceof File) {
                         formPayload.append(key, finalData.image);
                     }
                 }
@@ -238,7 +246,7 @@ const UserFormModal: React.FC<{
                 message.error(t("user_list.submit_error"));
             }
         },
-        
+
         [formData, userData, addOrEditMutation, t]
     );
 
