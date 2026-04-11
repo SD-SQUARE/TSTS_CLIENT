@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import type { Lookup, UserFormData } from "../../Types/users";
 import { useDepartments, useDomains, useUniversities } from "../../Hooks/useUsers";
 import RequiredTag from "../../../../components/RequiredTag";
+import { useLocation } from "react-router-dom";
 
 
 const ENGLISH_REGEX = /^[A-Za-z\s.,!?'"()@&$-]+$/;
@@ -33,9 +34,10 @@ const StepJobLocation: React.FC<Props> = ({ initialData, onNext }) => {
     const { data: domains, isLoading: domainLoading } = useDomains(universityId);
     const { data: departments, isLoading: depLoading } = useDepartments(domainId);
 
-    const isStaff = initialData.user_type?.toLowerCase().includes('admin') || 
-    initialData.user_type?.toLowerCase().includes('technician');
-    
+    const { pathname } = useLocation();
+
+    const isStaff = pathname.includes('admins') || pathname.includes('technicians');
+
     useEffect(() => {
         if (initialData.university?.id !== universityId) {
             setValue('domain', null, { shouldValidate: true });
