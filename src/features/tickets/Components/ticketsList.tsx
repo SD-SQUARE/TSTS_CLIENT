@@ -370,6 +370,7 @@ const TicketList: React.FC = () => {
             },
             ...getColumnSelectProps('status', 'tickets.status', [
                 { label: t('status.open'), value: 'open' },
+                { label: t('status.re_open'), value: 're_open' },
                 { label: t('status.in_progress'), value: 'in_progress' },
                 { label: t('status.pending'), value: 'pending' },
                 { label: t('status.out_of_service'), value: 'out_of_service' },
