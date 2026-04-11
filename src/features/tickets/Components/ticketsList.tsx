@@ -724,12 +724,23 @@ const TicketList: React.FC = () => {
                     overflow-y: hidden !important;
                 }
 
-                /* Clean up the placeholder border */
                 .ant-table-placeholder {
-                    height: 200px; /* Optional: adjust the height of the "No Data" area */
                     display: flex;
                     align-items: center;
                     justify-content: center;
+                    border-bottom: none;
+                }
+                
+                .ant-table-placeholder .ant-table-expanded-row-fixed {
+                    min-height: calc(100vh - 200px) !important;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-bottom: none;
+                }
+            
+                .ant-table-body{
+                    min-height: calc(-220px + 100vh);
                 }
                 
                 `}
@@ -750,7 +761,7 @@ const TicketList: React.FC = () => {
             <Table
                 components={{ header: { cell: ResizableTitle } }}
                 columns={finalColumns}
-                dataSource={ data?.data || []}
+                dataSource={data?.data || []}
                 rowKey="id"
                 loading={isLoading}
                 tableLayout='fixed'
