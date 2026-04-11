@@ -38,7 +38,9 @@ function App() {
                         : (
                         
                         < >
-                            <NavItem to={`${APP_BASE_PATH}/dashboard`}>{t('DASHBOARD')}</NavItem>
+                            <GuardedRoute roles={["admin"]} allowNavigation={false}>
+                                <NavItem to={`${APP_BASE_PATH}/dashboard`}>{t('DASHBOARD')}</NavItem>
+                            </GuardedRoute>    
                             <NavItem to={`${APP_BASE_PATH}/knowledge-base`}>{t('Knowledge-Base')}</NavItem>
                             <NavItem to={`/${user.role.toLowerCase()}/tickets`}>{t('Tickets')}</NavItem>
                             <GuardedRoute roles={["admin"]} allowNavigation={false}>
