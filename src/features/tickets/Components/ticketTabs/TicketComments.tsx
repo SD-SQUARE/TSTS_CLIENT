@@ -26,7 +26,7 @@ const TicketComments: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =
     const { user } = useSelector((state: any) => state.auth);
     const [optimisticMessages, setOptimisticMessages] = useState<any[]>([]);
 
-    useEffect(() => { refetch(); }, [refetch]);
+    useEffect(() => { refetch(); }, [refetch, t]);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     useEffect(() => { if (messages && messages.length > 0) setOptimisticMessages([]); }, [messages]);
 
