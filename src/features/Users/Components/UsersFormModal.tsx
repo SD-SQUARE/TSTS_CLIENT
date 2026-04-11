@@ -271,30 +271,50 @@ const UserFormModal: React.FC<{
                     onSubmit={handleSubmit}
                     isSubmitting={addOrEditMutation.isPending}
                     // onTriggerSubmit={handleTriggerSubmit}
-                />
-            </div>
+                    />
+                </div>
 
-            <div className="steps-action" style={{ marginTop: 24, textAlign: "right" }}>
-                <Space>
-                    {current > 0 && (
-                        <Button onClick={prev} disabled={addOrEditMutation.isPending}>{t("user_list.previous")}</Button>
-                    )}
-                    {!isLastStep && (
-                        <Button form="step-form" type="primary" htmlType="submit" disabled={addOrEditMutation.isPending}>
-                            {t("user_list.next")}
-                        </Button>
-                    )}
-                    {isLastStep && (
-                        <Button form="step-form" htmlType="submit" type="primary" loading={addOrEditMutation.isPending}
+                <div className="steps-action" style={{ marginTop: 24 }}>
+                    <Flex gap="middle">
+                        {current > 0 && (
+                            <Button
+                                size="large"
+                                onClick={prev}
+                                disabled={addOrEditMutation.isPending}
+                                style={{ flex: 1 }} // Takes 50% if another button exists, 100% if alone
+                            >
+                                {t("user_list.previous")}
+                            </Button>
+                        )}
+
+                        {!isLastStep ? (
+                            <Button
+                                form="step-form"
+                                type="primary"
+                                size="large"
+                                htmlType="submit"
+                                disabled={addOrEditMutation.isPending}
+                                style={{ flex: 1 }} // Automatically takes remaining space
+                            >
+                                {t("user_list.next")}
+                            </Button>
+                        ) : (
+                            <Button
+                                form="step-form"
+                                htmlType="submit"
+                                type="primary"
+                                size="large"
+                                loading={addOrEditMutation.isPending}
+                                style={{ flex: 1 }}
                             // onClick={() => {
                             //     if (stepSubmitTrigger) stepSubmitTrigger();
                             // }}
                             >
-                            {t("user_list.submit")}
-                        </Button>
-                    )}
-                </Space>
-            </div>
+                                {t("user_list.submit")}
+                            </Button>
+                        )}
+                    </Flex>
+                </div>
             </Spin>
         </Modal>
     );
