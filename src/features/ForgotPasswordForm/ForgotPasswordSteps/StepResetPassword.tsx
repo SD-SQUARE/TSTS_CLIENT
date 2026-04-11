@@ -24,7 +24,7 @@ const StepResetPassword: React.FC<StepResetPasswordProps> = ({ setStep, email, t
         mutationFn: async (payload: { password: string }) => {
             
             console.log(token)
-            const response = await api.post('v1/auth/forget-password/reset-password', {
+            const response = await api.post('v2/auth/forget-password/reset-password', {
                 email,
                 reset_token: token,
                 password: payload.password,
