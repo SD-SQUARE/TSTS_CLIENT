@@ -25,6 +25,8 @@
         mid_name_ar: string;
         last_name_en: string;
         last_name_ar: string;
+        full_name_en?: string;
+        full_name_ar?: string;
         ssn: string;
         university?: any;
         domain?: any;
@@ -74,6 +76,8 @@
         mid_name_ar: string;
         last_name_en: string;
         last_name_ar: string;
+        full_name_en?: string;
+        full_name_ar?: string;
         ssn: string;
         contacts: { phones: string[]; mobiles: string[] };
         job_en: string;
