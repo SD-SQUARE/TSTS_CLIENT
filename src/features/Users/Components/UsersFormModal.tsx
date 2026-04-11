@@ -34,7 +34,7 @@ const initialFormData: UserFormData = {
     full_name_en: "",
     full_name_ar: "",
     ssn: "",
-    contacts: { phones: [""], mobiles: [""] },
+    contacts: { phones: [], mobiles: [] },
     job_ar: "",
     job_en: "",
     university: null,
@@ -88,7 +88,7 @@ const UserFormModal: React.FC<{
                     full_name_en: fetchedUserDetail.full_name_en,
                     full_name_ar: fetchedUserDetail.full_name_ar,
                     ssn: fetchedUserDetail.ssn,
-                    contacts: { phones: fetchedUserDetail.contacts.phones, mobiles: fetchedUserDetail.contacts.mobiles },
+                    contacts: { phones: fetchedUserDetail.contacts?.phones || [], mobiles: fetchedUserDetail.contacts?.mobiles || []},
                     job_en: fetchedUserDetail.job_en,
                     job_ar: fetchedUserDetail.job_ar,
                     university: fetchedUserDetail.university ?? null,
@@ -180,7 +180,10 @@ const UserFormModal: React.FC<{
             status: data.status,
             image: data.image,
             user_type: role,
-            contacts: data.contacts,
+            contacts: {
+                phones: data.contacts?.phones?.filter(p => p && p.trim() !== '') || [],
+                mobiles: data.contacts?.mobiles?.filter(m => m && m.trim() !== '') || []
+            },
 
             university: data.university?.id || null,
             domain: data.domain?.id || null,
