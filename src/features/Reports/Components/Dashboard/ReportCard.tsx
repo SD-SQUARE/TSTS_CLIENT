@@ -26,40 +26,48 @@ const ReportCard: React.FC<ReportCardProps> = ({ report }) => {
                     
                 }
             `}</style>
-            <Card
-                className='dark-hover-card'
-                hoverable
-                onClick={() => navigate(`/reports/${report.id}`)}
-                style={{
-                    height: '100%',
-                    borderRadius: '12px',
-                    borderTop: '4px solid #1677ff',
-                    transition: 'all 0.3s ease',
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.067)'
-                }}
-            >
-                <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                    <Flex align="center" gap="small">
-                        <div style={{
-                            padding: '8px',
-                            backgroundColor: '#e6f4ff',
-                            borderRadius: '8px',
-                            display: 'flex'
-                        }}>
-                            <BarChartOutlined style={{ color: '#1677ff', fontSize: '20px' }} />
-                        </div>
-                        <Typography.Title level={5} style={{ margin: 0 }}>
-                            {report.title}
-                        </Typography.Title>
-                    </Flex>
+            
+        <Card
+            className='dark-hover-card'
+            hoverable
+            onClick={() => navigate(`/reports/${report.id}`)}
+            style={{
+                height: '220px', 
+                borderRadius: '12px',
+                borderTop: '4px solid #1677ff',
+                display: 'flex',
+                flexDirection: 'column',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.067)'
+            }}
+            bodyStyle={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+        >
+            <Space direction="vertical" size="middle" style={{ width: '100%', flex: 1 }}>
+                <Flex align="center" gap="small">
+                    <div style={{
+                        padding: '8px',
+                        backgroundColor: '#e6f4ff',
+                        borderRadius: '8px',
+                        display: 'flex'
+                    }}>
+                        <BarChartOutlined style={{ color: '#1677ff', fontSize: '20px' }} />
+                    </div>
+                    <Typography.Title level={5} style={{ margin: 0 }} ellipsis={{ tooltip: report.title }}>
+                        {report.title}
+                    </Typography.Title>
+                </Flex>
 
-                    <Paragraph ellipsis={{ rows: 3 }} type="secondary">
-                        {report.description}
-                    </Paragraph>
-                </Space>
-            </Card>
+                <Paragraph 
+                    ellipsis={{ rows: 3 }} 
+                    type="secondary" 
+                    style={{ marginBottom: 0 }}
+                >
+                    {report.description}
+                </Paragraph>
+            </Space>
+        </Card>
         </>
     );
+
 };
 
 export default ReportCard;
