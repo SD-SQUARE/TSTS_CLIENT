@@ -33,6 +33,9 @@ const StepJobLocation: React.FC<Props> = ({ initialData, onNext }) => {
     const { data: domains, isLoading: domainLoading } = useDomains(universityId);
     const { data: departments, isLoading: depLoading } = useDepartments(domainId);
 
+    const isStaff = initialData.user_type?.toLowerCase().includes('admin') || 
+    initialData.user_type?.toLowerCase().includes('technician');
+    
     useEffect(() => {
         if (initialData.university?.id !== universityId) {
             setValue('domain', null, { shouldValidate: true });
@@ -131,6 +134,7 @@ const StepJobLocation: React.FC<Props> = ({ initialData, onNext }) => {
                         )}
                     />
                 </Form.Item>
+                { !isStaff &&
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.department")}</span></Flex>}
                     validateStatus={errors.departments ? "error" : ""} help={errors.departments?.message} required>
                     <Controller name="departments" control={control}
@@ -153,6 +157,7 @@ const StepJobLocation: React.FC<Props> = ({ initialData, onNext }) => {
                         )}
                     />
                 </Form.Item>
+}
             </Form>
         </Card>
     );
