@@ -189,7 +189,7 @@ const UserFormModal: React.FC<{
             payload.email = data.email;
         }
         if (data.password && data.password.trim() !== "") {
-            payload.password = isEdit? data.password : '';
+            payload.password = data.password ;
         } else if (isEdit) {
             delete payload.password;
         }
