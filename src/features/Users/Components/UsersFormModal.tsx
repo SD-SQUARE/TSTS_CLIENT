@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useCallback, useEffect, useMemo } from "react";
-import { Modal, Steps, Button, Space, message, Spin } from "antd";
+import { Modal, Steps, Button,  message, Spin, Flex } from "antd";
 import { useTranslation } from "react-i18next";
 import { ExclamationCircleFilled } from '@ant-design/icons';
 
@@ -9,19 +9,12 @@ import StepContacts from "./UsersFormSteps/StepContacts";
 import StepJobLocation from "./UsersFormSteps/StepJobs";
 import StepPermissions from "./UsersFormSteps/StepPermissions";
 import StepAccess from "./UsersFormSteps/StepAccess";
-import { t } from "i18next";
 import type { UserFormData, UserListItem, UserPayload } from "../Types/users";
 import { useAddOrEditUser, useUserDetail } from "../Hooks/useUsers";
 
 
 
-const steps = [
-    { title: t("user_list.info_title"), component: StepInfo },
-    { title: t("user_list.contacts_title"), component: StepContacts },
-    { title: t("user_list.jobLocation_title"), component: StepJobLocation },
-    { title: t("user_list.perm_title"), component: StepPermissions },
-    { title: t("user_list.access_title"), component: StepAccess },
-];
+
 
 const initialFormData: UserFormData = {
     image: null,
@@ -34,7 +27,7 @@ const initialFormData: UserFormData = {
     full_name_en: "",
     full_name_ar: "",
     ssn: "",
-    contacts: { phones: [""], mobiles: [""] },
+    contacts: { phones: [], mobiles: [] },
     job_ar: "",
     job_en: "",
     university: null,
@@ -63,10 +56,10 @@ const UserFormModal: React.FC<{
 
 
     const { data: fetchedUserDetail, isLoading: isFetchingDetail } = useUserDetail(role, userData?.id);
-    const isModalLoading = isFetchingDetail; 
+    const isModalLoading = isFetchingDetail;
     useEffect(() => {
 
-        if(!isVisible){
+        if (!isVisible) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setCurrent(0);
             setFormData(initialFormData);
@@ -74,7 +67,7 @@ const UserFormModal: React.FC<{
         }
         if (userData) {
             //FIXME : fix this Render warning properly
-            if(fetchedUserDetail) {
+            if (fetchedUserDetail) {
                 // eslint-disable-next-line react-hooks/set-state-in-effect
                 setFormData({
                     user_type: role,
@@ -88,7 +81,7 @@ const UserFormModal: React.FC<{
                     full_name_en: fetchedUserDetail.full_name_en,
                     full_name_ar: fetchedUserDetail.full_name_ar,
                     ssn: fetchedUserDetail.ssn,
-                    contacts: { phones: fetchedUserDetail.contacts.phones, mobiles: fetchedUserDetail.contacts.mobiles },
+                    contacts: { phones: fetchedUserDetail.contacts?.phones || [], mobiles: fetchedUserDetail.contacts?.mobiles || []},
                     job_en: fetchedUserDetail.job_en,
                     job_ar: fetchedUserDetail.job_ar,
                     university: fetchedUserDetail.university ?? null,
@@ -96,13 +89,13 @@ const UserFormModal: React.FC<{
                     departments: fetchedUserDetail.departments ?? [],
                     permission_profile: fetchedUserDetail.permission_profile ?? null,
                     specializations: fetchedUserDetail.specializations ?? [],
-                    email: fetchedUserDetail.email,
+                    email: fetchedUserDetail.email || '',
                     password: "",
                     status: fetchedUserDetail.status,
                 });
                 setCurrent(0);
             }
-        } else{
+        } else {
             setFormData(initialFormData);
             setCurrent(0);
         }
@@ -163,6 +156,7 @@ const UserFormModal: React.FC<{
 
     const cleanPayload = (data: UserFormData) => {
 
+        const isEdit = !!userData;
         const payload: Partial<UserPayload> = {
             first_name_en: data.first_name_en,
             first_name_ar: data.first_name_ar,
@@ -175,12 +169,13 @@ const UserFormModal: React.FC<{
             ssn: data.ssn,
             job_en: data.job_en,
             job_ar: data.job_ar,
-            email: data.email,
-            password: data.password,
             status: data.status,
             image: data.image,
             user_type: role,
-            contacts: data.contacts,
+            contacts: {
+                phones: data.contacts?.phones?.filter(p => p && p.trim() !== '') || [],
+                mobiles: data.contacts?.mobiles?.filter(m => m && m.trim() !== '') || []
+            },
 
             university: data.university?.id || null,
             domain: data.domain?.id || null,
@@ -189,6 +184,15 @@ const UserFormModal: React.FC<{
             departments: data.departments.map(item => item.id),
             specializations: data.specializations.map(item => item.id),
         };
+
+        if (data.email && data.email.trim() !== "") {
+            payload.email = data.email;
+        }
+        if (data.password && data.password.trim() !== "") {
+            payload.password = data.password ;
+        } else if (isEdit) {
+            delete payload.password;
+        }
 
         return payload;
     };
@@ -207,7 +211,7 @@ const UserFormModal: React.FC<{
                 if (key === "image") {
                     if (typeof val === "string") {
                         formPayload.append(key, "");
-                    }else if (val instanceof File) {
+                    } else if (val instanceof File) {
                         formPayload.append(key, finalData.image);
                     }
                 }
@@ -235,9 +239,17 @@ const UserFormModal: React.FC<{
                 message.error(t("user_list.submit_error"));
             }
         },
-        
+
         [formData, userData, addOrEditMutation, t]
     );
+
+    const steps = [
+        { title: t("user_list.info_title"), component: StepInfo },
+        { title: t("user_list.contacts_title"), component: StepContacts },
+        { title: t("user_list.jobLocation_title"), component: StepJobLocation },
+        { title: t("user_list.perm_title"), component: StepPermissions },
+        { title: t("user_list.access_title"), component: StepAccess },
+    ];
 
     const CurrentStepComponent = steps[current].component;
     const isLastStep = current === steps.length - 1;
@@ -247,7 +259,7 @@ const UserFormModal: React.FC<{
     const stepItems = useMemo(() => steps.map(item => ({
         key: item.title,
         title: item.title,
-    })), [t]);
+    })), [t, steps]);
 
     return (
         <Modal
@@ -261,40 +273,60 @@ const UserFormModal: React.FC<{
             style={{ top: 20 }}
         >
             <Spin spinning={isModalLoading}>
-            <Steps current={current} style={{ marginBottom: 24 }} items={stepItems}  onChange={ step => setCurrent(step)} />
-        
+                <Steps current={current} style={{ marginBottom: 24 }} items={stepItems} onChange={step => setCurrent(step)} />
 
-            <div className="steps-content">
-                <CurrentStepComponent
-                    initialData={formData}
-                    onNext={next}
-                    onSubmit={handleSubmit}
-                    isSubmitting={addOrEditMutation.isPending}
+
+                <div className="steps-content">
+                    <CurrentStepComponent
+                        initialData={formData}
+                        onNext={next}
+                        onSubmit={handleSubmit}
+                        isSubmitting={addOrEditMutation.isPending}
                     // onTriggerSubmit={handleTriggerSubmit}
-                />
-            </div>
+                    />
+                </div>
 
-            <div className="steps-action" style={{ marginTop: 24, textAlign: "right" }}>
-                <Space>
-                    {current > 0 && (
-                        <Button onClick={prev} disabled={addOrEditMutation.isPending}>{t("user_list.previous")}</Button>
-                    )}
-                    {!isLastStep && (
-                        <Button form="step-form" type="primary" htmlType="submit" disabled={addOrEditMutation.isPending}>
-                            {t("user_list.next")}
-                        </Button>
-                    )}
-                    {isLastStep && (
-                        <Button form="step-form" htmlType="submit" type="primary" loading={addOrEditMutation.isPending}
+                <div className="steps-action" style={{ marginTop: 24 }}>
+                    <Flex gap="middle">
+                        {current > 0 && (
+                            <Button
+                                size="large"
+                                onClick={prev}
+                                disabled={addOrEditMutation.isPending}
+                                style={{ flex: 1 }} // Takes 50% if another button exists, 100% if alone
+                            >
+                                {t("user_list.previous")}
+                            </Button>
+                        )}
+
+                        {!isLastStep ? (
+                            <Button
+                                form="step-form"
+                                type="primary"
+                                size="large"
+                                htmlType="submit"
+                                disabled={addOrEditMutation.isPending}
+                                style={{ flex: 1 }} // Automatically takes remaining space
+                            >
+                                {t("user_list.next")}
+                            </Button>
+                        ) : (
+                            <Button
+                                form="step-form"
+                                htmlType="submit"
+                                type="primary"
+                                size="large"
+                                loading={addOrEditMutation.isPending}
+                                style={{ flex: 1 }}
                             // onClick={() => {
                             //     if (stepSubmitTrigger) stepSubmitTrigger();
                             // }}
                             >
-                            {t("user_list.submit")}
-                        </Button>
-                    )}
-                </Space>
-            </div>
+                                {t("user_list.submit")}
+                            </Button>
+                        )}
+                    </Flex>
+                </div>
             </Spin>
         </Modal>
     );

@@ -10,6 +10,7 @@ import InlineReview from '../InlineReview';
 import AssigneeList from '../AssigneesList';
 import DOMPurify from "dompurify";
 import { useTicketMutations, useTicketProblems } from '../../Hooks/useTicketForm';
+import { useState } from 'react';
 
 interface TicketInfoTabProps {
     ticket: any;
@@ -20,6 +21,8 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
     const { t } = useTranslation();
     const { role } = useParams();
     const isRequester = role === 'requester';
+
+    const [isExpanded, setIsExpanded] = useState(false);
 
     const statusMutation = useChangeTicketStatus(ticket?.id);
 
@@ -240,18 +243,47 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
             <Splitter style={{ height: 'calc(100vh - 80px)', boxShadow: '0 8px 24px rgba(229, 56, 56, 0.05)' }}>
                 <Splitter.Panel defaultSize="80%" min="45%" style={{ overflowY: 'auto', padding: '16px', height: '100%' }}>
                     <Flex vertical gap="large">
-                        <Card style={{
-                            borderRightWidth: "2px",
-                            borderLeftWidth: "2px",
-                            borderBottomWidth: "2px",
-                            borderTop: '0.3rem solid',
-                            borderTopColor: 'var(--color-primary)'
-                        }} title={<Typography.Title level={4} style={{ margin: 0 }}>{ticket?.title}</Typography.Title>}>
+                        <Card
+                            style={{
+                                borderRightWidth: "2px",
+                                borderLeftWidth: "2px",
+                                borderBottomWidth: "2px",
+                                borderTop: '0.3rem solid',
+                                borderTopColor: 'var(--color-primary)'
+                            }}
+                            headStyle={{ whiteSpace: 'normal', wordBreak: 'break-word' }}
+                            title={<Typography.Title level={4} style={{
+                                margin: 0,
+                                paddingTop: '4px',
+                                paddingBottom: '4px',
+                                whiteSpace: 'normal',
+                                wordBreak: 'break-word',
+                                lineHeight: '1.4'
+                            }} >{ticket?.title}</Typography.Title>}
+                        >
                             <div
                                 className="quill-content"
-                                style={{ color: '#595959', fontSize: '14px', wordBreak: 'break-word' }}
+                                style={{
+                                    color: '#595959',
+                                    fontSize: '14px',
+                                    wordBreak: 'break-word',
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: isExpanded ? 'unset' : 5,
+                                    WebkitBoxOrient: 'vertical',
+                                    overflow: 'hidden',
+                                }}
                                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(ticket?.description || '') }}
                             />
+
+                            {ticket?.description && (
+                                <Button
+                                    type="link"
+                                    onClick={() => setIsExpanded(!isExpanded)}
+                                    style={{ padding: 0, marginTop: 8 }}
+                                >
+                                    {isExpanded ? t('common.collapse') : t('common.expand')}
+                                </Button>
+                            )}
                         </Card>
 
                         <div >

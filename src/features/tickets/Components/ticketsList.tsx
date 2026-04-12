@@ -18,8 +18,11 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from 
 import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import DOMPurify from "dompurify";
+import { ConfigProvider } from 'antd';
+import enUS from 'antd/lib/locale/en_US';
+import arEG from 'antd/lib/locale/ar_EG';
 
-type SearchableDataIndex = `id` | `title` | `problem` | `specialization` | `status` | 'priority'; 
+type SearchableDataIndex = `id` | `title` | `problem` | `specialization` | `status` | 'priority';
 // | 'description';
 
 const getSavedData = (key: string, fallback: any) => {
@@ -28,7 +31,8 @@ const getSavedData = (key: string, fallback: any) => {
 };
 
 const TicketList: React.FC = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const currentLanguage = i18n.language;
     const navigate = useNavigate();
     const { role } = useParams();
     const [pagination, setPagination] = useState({ page: 1, pageSize: 50 });
@@ -51,13 +55,14 @@ const TicketList: React.FC = () => {
 
     const { data, isLoading, isError, error } = useTickets(pagination.page, pagination.pageSize, apiSearchQuery);
 
+    const antdLocale = currentLanguage === 'ar' ? arEG : enUS;
 
     const isRequester = role === 'requester';
 
     const problemTreeData = hierarchicalProblems?.specializations?.map((spec: any) => {
         const hasProblems = spec.problems && spec.problems.length > 0;
 
-        
+
 
         return {
             title: (
@@ -365,6 +370,7 @@ const TicketList: React.FC = () => {
             },
             ...getColumnSelectProps('status', 'tickets.status', [
                 { label: t('status.open'), value: 'open' },
+                { label: t('status.re_open'), value: 're_open' },
                 { label: t('status.in_progress'), value: 'in_progress' },
                 { label: t('status.pending'), value: 'pending' },
                 { label: t('status.out_of_service'), value: 'out_of_service' },
@@ -574,8 +580,8 @@ const TicketList: React.FC = () => {
 
     const handleResetSettings = () => {
         const defaultOrder = columns.map(col => col.key as string);
-        const defaultWidths = { id: 150, status: 140, priority: 120, title: 250,  specialization: 180, problem: 180, requesterName: 180, assignee: 300};
-            // description: 500,};
+        const defaultWidths = { id: 150, status: 140, priority: 120, title: 250, specialization: 180, problem: 180, requesterName: 180, assignee: 300 };
+        // description: 500,};
 
         setColumnOrder(defaultOrder);
         setVisibleColumns(defaultOrder);
@@ -647,8 +653,8 @@ const TicketList: React.FC = () => {
 
     const [colWidths, setColWidths] = useState<{ [key: string]: number }>(() =>
         getSavedData('ticket_column_widths', {
-            id: 150, status: 140, priority: 120, title: 250,  specialization: 180, problem: 180, requesterName: 180, assignee: 300
-        // description: 500,
+            id: 150, status: 140, priority: 120, title: 250, specialization: 180, problem: 180, requesterName: 180, assignee: 300
+            // description: 500,
         })
     );
     useEffect(() => {
@@ -673,7 +679,7 @@ const TicketList: React.FC = () => {
                     onResize: handleResize(column.key as string),
                 }),
             }));
-    }, [columnOrder, colWidths, visibleColumns]);
+    }, [columnOrder, colWidths, visibleColumns, t]);
 
 
 
@@ -718,14 +724,45 @@ const TicketList: React.FC = () => {
                     height: 100%;
                     cursor: col-resize;
                 }
+                .ant-table-empty .ant-table-body {
+                    max-height: none !important;
+                    height: auto !important;
+                    overflow-y: hidden !important;
+                }
+
+                .ant-table-placeholder {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-bottom: none;
+                }
+                
+                .ant-table-placeholder .ant-table-expanded-row-fixed {
+                    min-height: calc(100vh - 200px) !important;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-bottom: none;
+                }
+            
+                .ant-table-body{
+                    min-height: calc(100vh - 270px);
+                }
                 
                 `}
             </style>
 
 
+            <Typography.Title level={2} style={{ margin: 0, marginBottom: 16 }}>{t('tickets.listTitle')}</Typography.Title>
+                <ConfigProvider locale={antdLocale} direction={currentLanguage === 'ar' ? 'rtl' : 'ltr'}>
             <Flex justify="space-between" align="center" style={{ marginBottom: 16 }}>
-                <Typography.Title level={2} style={{ margin: 0 }}>{t('tickets.listTitle')}</Typography.Title>
-
+                    <Pagination
+                        current={pagination.page}
+                        pageSize={pagination.pageSize}
+                        total={data?.total || 0}
+                        onChange={(page, pageSize) => setPagination({ page, pageSize })}
+                        showSizeChanger
+                    />
                 <Space>
                     <Popover content={controlPanel} title={t('common.showHideColumns')} trigger="click">
                         <Button icon={<SettingOutlined />}>{t('common.columns')}</Button>
@@ -733,6 +770,8 @@ const TicketList: React.FC = () => {
                     {isRequester && <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>{t('tickets.new_ticket')}</Button>}
                 </Space>
             </Flex>
+                </ConfigProvider>
+
 
             <Table
                 components={{ header: { cell: ResizableTitle } }}
@@ -741,7 +780,10 @@ const TicketList: React.FC = () => {
                 rowKey="id"
                 loading={isLoading}
                 tableLayout='fixed'
-                scroll={{ x: 'max-content', y: 'calc(100vh - 280px)' }}
+                scroll={{
+                    x: 'max-content',
+                    y: data?.data?.length > 0 ? 'calc(100vh - 280px)' : 'auto'
+                }}
                 pagination={false}
                 onRow={handleRowClick}
             />

@@ -24,7 +24,7 @@ const StepAccess: React.FC<Props> = ({
     const { handleSubmit, control, formState: { errors }, reset } =
         useForm<UserFormData>({ defaultValues: initialData, mode: "onChange" });
 
-        const isEdit = !!initialData?.id;
+        const isEdit = !!initialData?.email;
 
     useEffect(() => { reset(initialData); }, [initialData, reset]);
 
@@ -60,15 +60,18 @@ const StepAccess: React.FC<Props> = ({
                     <Controller name="password" control={control} disabled={isSubmitting}
                         rules={{
                             required:isEdit ? false : t("required"),
-                            minLength: {
+                            minLength: isEdit ? {
+                                value: 8,
+                                message: t("password_8_chars"),
+                            } : {
                                 value: 8,
                                 message: t("password_8_chars"),
                             },
                             validate: {
-                                hasUpperCase: (v) => /[A-Z]/.test(v) || t("password_uppercase"),
-                                hasNumber: (v) => /[0-9]/.test(v) || t("password_number"),
-                                hasSpecialChar: (v) => /[^A-Za-z0-9\s]/.test(v) || t("password_special"),
-                                hasLowerCase: (v) => /[a-z]/.test(v) || t("password_lowercase"),
+                                hasUpperCase: (v) => !v || /[A-Z]/.test(v) || t("password_uppercase"),
+                                hasNumber: (v) => !v || /[0-9]/.test(v) || t("password_number"),
+                                hasSpecialChar: (v) => !v || /[^A-Za-z0-9\s]/.test(v) || t("password_special"),
+                                hasLowerCase: (v) => !v || /[a-z]/.test(v) || t("password_lowercase"),
                             },
                         }}
                         render={({ field }) => <Input.Password {...field} />} />

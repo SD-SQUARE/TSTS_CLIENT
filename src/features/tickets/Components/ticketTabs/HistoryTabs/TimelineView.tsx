@@ -1,6 +1,6 @@
 import React from 'react';
-import { Timeline, Card, Typography, FloatButton } from 'antd';
-import { ZoomInOutlined, ZoomOutOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Timeline, Card, Typography, FloatButton, Flex, Space } from 'antd';
+import { ZoomInOutlined, ZoomOutOutlined, ReloadOutlined, CalendarOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
 interface Props {
@@ -31,7 +31,14 @@ const TicketHistoryTimeline: React.FC<Props> = ({ activities, zoom, handlers, ge
                                     {item.title}
                                 </Typography.Text>
                                 <Typography.Paragraph type="secondary" style={{ fontSize: `${12 * zoom}px`, marginBottom: 8 * zoom }}>
-                                    {dayjs(item.createdAt).format('YYYY-MM-DD h:mm A')}
+                                    <Flex vertical gap={4} dir="ltr" style={{ alignItems: 'flex-start' }}>
+                                        <Space size={6} style={{ color: 'rgba(0, 0, 0, 0.45)', fontSize: '12px' }}>
+                                            <CalendarOutlined />
+                                            <span dir='ltr'>{dayjs(item.date).format('DD-MM-YYYY')}</span>
+                                            <ClockCircleOutlined />
+                                            <span dir='ltr'>{dayjs(item.date).format('h:mm A')}</span>
+                                        </Space>
+                                    </Flex>
                                 </Typography.Paragraph>
                                 <Typography.Text style={{ fontSize: `${14 * zoom}px` }}>
                                     {item.content}

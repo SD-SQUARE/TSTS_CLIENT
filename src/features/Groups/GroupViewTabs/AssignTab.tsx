@@ -35,6 +35,7 @@ const AssignTab: React.FC<AssignTabProps> = ({ groupId, t }) => {
     useEffect(() => {
         if (!technicians || !assignedMembers) return;
         const newKeys = assignedMembers.map((m) => m.id).filter(Boolean); // <- filter null/undefined
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setTargetKeys(newKeys);
     }, [technicians, assignedMembers]);
 
@@ -95,7 +96,7 @@ const AssignTab: React.FC<AssignTabProps> = ({ groupId, t }) => {
     console.log('Final targetKeys:', targetKeys);
 
     return (
-        <Space direction="vertical" style={{ width: '100%' }} size="large">
+        <Space direction="vertical" style={{ width: '100%', marginTop: 24 }} size="large">
             <Transfer
                 dataSource={transferData}
                 targetKeys={targetKeys}

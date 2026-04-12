@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import type { Lookup, UserFormData } from "../../Types/users";
 import { useDepartments, useDomains, useUniversities } from "../../Hooks/useUsers";
 import RequiredTag from "../../../../components/RequiredTag";
+import { useLocation } from "react-router-dom";
 
 
 const ENGLISH_REGEX = /^[A-Za-z\s.,!?'"()@&$-]+$/;
@@ -32,6 +33,10 @@ const StepJobLocation: React.FC<Props> = ({ initialData, onNext }) => {
     const { data: universities, isLoading: uniLoading } = useUniversities();
     const { data: domains, isLoading: domainLoading } = useDomains(universityId);
     const { data: departments, isLoading: depLoading } = useDepartments(domainId);
+
+    const { pathname } = useLocation();
+
+    const isStaff = pathname.includes('admins') || pathname.includes('technicians');
 
     useEffect(() => {
         if (initialData.university?.id !== universityId) {
@@ -131,6 +136,7 @@ const StepJobLocation: React.FC<Props> = ({ initialData, onNext }) => {
                         )}
                     />
                 </Form.Item>
+                { !isStaff &&
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.department")}</span></Flex>}
                     validateStatus={errors.departments ? "error" : ""} help={errors.departments?.message} required>
                     <Controller name="departments" control={control}
@@ -153,6 +159,7 @@ const StepJobLocation: React.FC<Props> = ({ initialData, onNext }) => {
                         )}
                     />
                 </Form.Item>
+}
             </Form>
         </Card>
     );

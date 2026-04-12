@@ -173,6 +173,7 @@ const UserViewPage: React.FC = () => {
         );
     }
 
+    const isStaff = role === 'admins' || role === 'technicians';
 
     const allItems = [
         { key: 'full_name', label: t('user_list.full_name'), children: fullName, span: 2 },
@@ -188,7 +189,7 @@ const UserViewPage: React.FC = () => {
         { key: 'phone', label: t('user_list.phone'), children: renderContactList(user.contacts?.phones), span: 1 },
         { key: 'mobile', label: t('user_list.mobile'), children: renderContactList(user.contacts?.mobiles), span: 1 },
 
-        { key: 'departments', label: t('user_list.department'), children: renderDepartmentList(user.departments, currentLanguage) },
+        { key: 'departments', label: t('user_list.department'), children: renderDepartmentList(user.departments, currentLanguage), condition: !isStaff },
         { key: 'groups', label: t('user_list.group'), children: renderLookupList(user.groups, currentLanguage), condition: role !== 'requesters' }, // Passing color for consistency
         // { key: 'specializations', label: t('user_list.specializations'), children: renderLookupList(user.specializations, currentLanguage) },
         // { key: 'permission_profile', label: t('user_list.perm_prof'), children: user.permission_profile?.name ?? '-' },

@@ -42,7 +42,7 @@ const StepOtp: React.FC<StepOtpProps> = ({ setStep, email, setOtp, setToken, uid
     const verifyOtpMutation = useMutation({
         mutationFn: async (otp: string) => {
             console.log(uid)
-            const response = await api.post('v1/auth/forget-password/verify-otp', { oid: uid, otp });
+            const response = await api.post('v2/auth/forget-password/verify-otp', { oid: uid, otp });
             return response.data; 
         },
         onSuccess: (data) => {
@@ -66,7 +66,7 @@ const StepOtp: React.FC<StepOtpProps> = ({ setStep, email, setOtp, setToken, uid
 
     const resendOtpMutation = useMutation({
         mutationFn: async () => {
-            const response = await api.post('v1/auth/forget-password/', { email });
+            const response = await api.post('v2/auth/forget-password/', { email });
             return response.data;
         },
         onSuccess: (data) => {

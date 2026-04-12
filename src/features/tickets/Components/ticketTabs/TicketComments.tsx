@@ -26,7 +26,7 @@ const TicketComments: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =
     const { user } = useSelector((state: any) => state.auth);
     const [optimisticMessages, setOptimisticMessages] = useState<any[]>([]);
 
-    useEffect(() => { refetch(); }, [refetch]);
+    useEffect(() => { refetch(); }, [refetch, t]);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     useEffect(() => { if (messages && messages.length > 0) setOptimisticMessages([]); }, [messages]);
 
@@ -128,7 +128,7 @@ const TicketComments: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =
                     <Typography.Text type="secondary" style={{ fontSize: '12px' }}>{allMessages.length} {t('tickets.comments')}</Typography.Text>
                 </div>
 
-                <div style={{ border: 'none', borderRadius: '12px', overflow: 'hidden', background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                <div dir='ltr' style={{ border: 'none', borderRadius: '12px', overflow: 'hidden', background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
                     <ReactQuill
                         className="quill-chat-editor"
                         theme="snow"
