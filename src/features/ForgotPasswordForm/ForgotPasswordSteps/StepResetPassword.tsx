@@ -32,12 +32,12 @@ const StepResetPassword: React.FC<StepResetPasswordProps> = ({ setStep, email, t
             return response.data;
         },
         onSuccess: (data) => {
-            message.success(data.message || t('forgotPassword.resetSuccess'));
+            message.success( t('forgotPassword.resetSuccess') || data.message);
             navigate(`${APP_BASE_PATH}/auth/login`)
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
-            message.error(error.response?.data?.message || t('forgotPassword.resetFailed'));
+            message.error( t('forgotPassword.resetFailed') || error.response?.data?.message);
         },
     });
 
