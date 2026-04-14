@@ -403,6 +403,8 @@ const TicketList: React.FC = () => {
             ellipsis: true,
             render: (status: string) => {
                 let displayStatus = status;
+                const statusKey = status.toLowerCase().replace(/\s+/g, '_');     
+                const translatedStatus = t(`status.${statusKey}`, { defaultValue: status });
                 switch (status) {
                     case openstate: displayStatus = openstate; break;
                     case reopenstate: displayStatus = reopenstate; break;
@@ -413,7 +415,7 @@ const TicketList: React.FC = () => {
                     case resolved_status: displayStatus = resolved_status; break;
                     default: displayStatus = openstate;
                 }
-                return <span>{renderHighlightedText(displayStatus, 'status')}</span>;
+                return <span>{renderHighlightedText(translatedStatus, 'status')}</span>;
             },
             ...getColumnSelectProps('status', 'tickets.status', [
                 { label: t('status.open'), value: 'open' },
@@ -430,11 +432,11 @@ const TicketList: React.FC = () => {
             key: 'priority',
             width: 120,
             ellipsis: true,
-            render: (priority: string) => (
-                <span>
-                    {renderHighlightedText(priority, 'priority')}
-                </span>
-            ),
+            render: (priority: string) => {
+                const translatedPriority = t(`priority.${priority}`, { defaultValue: priority });
+                
+                return <span>{renderHighlightedText(translatedPriority, 'priority')}</span>;
+            },
             ...getColumnSelectProps('priority', 'tickets.priority', [
                 { label: t('priority.important/urgent'), value: 'important/urgent' },
                 { label: t('priority.important'), value: 'important' },
