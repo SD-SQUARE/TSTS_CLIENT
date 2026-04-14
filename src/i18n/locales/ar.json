@@ -370,7 +370,11 @@
     "reviewSubmitted": "شكرا لك! تم تقديم التقييم الخاص بك.",
     "state" : "الحالة",
     "techs": "الفني",
-    "comments": "التعليقات"
+    "comments": "التعليقات",
+    "requesterInfo": "معلومات صاحب الطلب",
+    "requesterFullDetails": "المعلومات الكاملة لصاحب الطلب",
+    "contact_info": "معلومات الاتصال",
+    "organization_details": "معلومات الجهة"
   },
   "audit": {
     "title": "سجلات التدقيق",

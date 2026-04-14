@@ -11,6 +11,7 @@ import AssigneeList from '../AssigneesList';
 import DOMPurify from "dompurify";
 import { useTicketMutations, useTicketProblems } from '../../Hooks/useTicketForm';
 import { useState } from 'react';
+import RequesterDetails from '../RequesterDetails';
 
 interface TicketInfoTabProps {
     ticket: any;
@@ -367,6 +368,10 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                                 </Flex>
                             </Flex>
                         </Card>
+
+                        {!isRequester && ( 
+                            <RequesterDetails requesterId={ticket?.requester.id} />
+                        )}
 
                         <AssigneeList assignees={ticket?.assignee || []} requesterId={ticket?.requester?.id} onUpdateAssignees={handleUpdateAssignees} isUpdating={coordinateMutation.isPending} />
 

@@ -320,7 +320,11 @@
     "reviewSubmitted": "Thank you! Your review has been submitted.",
     "state" : "State",
     "techs": "Technician",
-    "comments": "Comments"
+    "comments": "Comments",
+    "requesterInfo": "Requester Info",
+    "requesterFullDetails": "Requester Full Details",
+    "contact_info": "Contact Information",
+    "organization_details": "Organization Details"
   },
   "audit": {
     "title": "Audit Logs",
