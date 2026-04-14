@@ -330,7 +330,7 @@
     "coordinationSection": "تنسيق عرض الطلب (للاستخدام الداخلي فقط)",
     "priority": "الأولوية",
     "status": "حالة الطلب",
-    "assignee": "تعيين الفنيين",
+    "assignee": "الفني المكلف",
     "selectTechs": "ابحث واختر الفنيين",
     "ticketDetails": "تفاصيل عرض الطلب",
     "tabInfo": "المعلومات",

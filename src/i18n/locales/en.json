@@ -280,7 +280,7 @@
     "coordinationSection": "Ticket Coordination (Internal Only)",
     "priority": "Priority",
     "status": "Ticket Status",
-    "assignee": "Assign Technicians",
+    "assignee": "Assigned Technician",
     "selectTechs": "Search and select technicians",
     "ticketDetails": "Ticket Details",
     "tabInfo": "Info",

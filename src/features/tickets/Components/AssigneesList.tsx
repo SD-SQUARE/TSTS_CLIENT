@@ -198,7 +198,7 @@ const AssigneeList: React.FC<AssigneeListProps> = ({ assignees, requesterId, onU
                 header={
                     <Flex justify="space-between" align="center" style={{ width: '100%' }}>
                         <Typography.Text strong>
-                            {t('tickets.participants')} ({(requesterId ? 1 : 0) + (assignees?.length || 0)})
+                            {t('tickets.assignee')} ({(requesterId ? 1 : 0) + (assignees?.length || 0)})
                         </Typography.Text>
                         {!isRequester && (
                             <Button
@@ -226,6 +226,7 @@ const AssigneeList: React.FC<AssigneeListProps> = ({ assignees, requesterId, onU
                                 multiple
                                 treeCheckable
                                 showCheckedStrategy={TreeSelect.SHOW_CHILD}
+                                treeExpandAction="click"
                             />
                             <Flex gap="small" justify="end">
                                 <Button size="small" onClick={() => setIsEditing(false)}>{t('common.cancel')}</Button>
@@ -237,9 +238,9 @@ const AssigneeList: React.FC<AssigneeListProps> = ({ assignees, requesterId, onU
                     </Card>
                 ) : (
                     <>
-                        {requesterId && (
+                        {/* {requesterId && (
                             <AssigneeItem id={requesterId} roleLabel={t('tickets.requester')} isRequester={true} />
-                        )}
+                        )} */}
                         <List
                             dataSource={assignees}
                             renderItem={(item) => <AssigneeItem id={item.id} roleLabel={t('tickets.techs')} />}
