@@ -145,10 +145,22 @@ const TicketList: React.FC = () => {
         dataIndex: SearchableDataIndex,
     ) => {
         confirm();
-        const newSearchText = selectedKeys[0];
-        setSearchText(newSearchText);
+        
+        const queryValue = selectedKeys.length > 0 ? selectedKeys : undefined;
+    
+        setSearchText(selectedKeys[0] || ''); 
         setSearchedColumn(dataIndex);
-        setApiSearchQuery(prev => ({ ...prev, [dataIndex]: newSearchText }));
+        
+        setApiSearchQuery(prev => {
+            const next = { ...prev };
+            if (queryValue) {
+                next[dataIndex] = queryValue as any; 
+            } else {
+                delete next[dataIndex];
+            }
+            return next;
+        });
+        
         setPagination(prev => ({ ...prev, page: 1 }));
     };
 
@@ -189,15 +201,18 @@ const TicketList: React.FC = () => {
                 <TreeSelect
                     style={{ width: 250, marginBottom: 8 }}
                     dropdownClassName="tree-select-no-scroll"
-                    dropdownStyle={{ maxHeight: 400, overflow: 'hidden', maxWidth: 250 }}
+                    dropdownStyle={{ maxHeight: 400, overflow: 'auto', maxWidth: 250 }}
                     placeholder={`${t('common.select')} ${t(titleKey)}`}
                     treeData={treeData}
                     treeNodeFilterProp="title"
-                    value={selectedKeys[0]}
-                    onChange={(value) => setSelectedKeys(value ? [value] : [])}
+                    value={selectedKeys}
+                    onChange={(value) => setSelectedKeys(value)}
                     treeDefaultExpandAll={false}
                     showSearch
                     allowClear
+                    multiple
+                    treeCheckable
+                    showCheckedStrategy={TreeSelect.SHOW_CHILD}
                     treeExpandAction="click"
                 />
                 <Flex gap="small">
@@ -278,11 +293,17 @@ const TicketList: React.FC = () => {
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
             <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
                 <Select
-                    style={{ width: 200, marginBottom: 8 }}
+                    mode="multiple"
+                    allowClear
+                    showArrow
+                    style={{ width: 250, marginBottom: 8 }}
                     placeholder={`${t('common.select')} ${t(titleKey)}`}
-                    value={selectedKeys[0]}
-                    onChange={(value) => setSelectedKeys(value ? [value] : [])}
+                    value={selectedKeys}
+                    onChange={(value) => setSelectedKeys(value)}
                     options={options}
+                    maxTagCount="responsive" 
+                    listHeight={250}
+                    dropdownStyle={{ minWidth: 200 }}
                 />
                 <Flex gap="small">
                     <Button
@@ -311,14 +332,14 @@ const TicketList: React.FC = () => {
     const columns: ColumnsType<Ticket> = [
         {
             title: t('tickets.ticket_number'),
-            dataIndex: 'id', 
+            dataIndex: 'id',
             key: 'id',
             width: 150,
             fixed: 'left',
             ...getColumnSearchProps('id' as any, 'tickets.id'),
             render: (id: string, record: Ticket) => {
                 const displayValue = record.ticket_number || id;
-        
+
                 return (
                     <Popover
                         title={t('tickets.ticket_number')}
@@ -326,9 +347,9 @@ const TicketList: React.FC = () => {
                         trigger="hover"
                         placement="topLeft"
                     >
-                        <EllipsisComponent 
-                            content={renderHighlightedText(displayValue, 'id')} 
-                            copyable 
+                        <EllipsisComponent
+                            content={renderHighlightedText(displayValue, 'id')}
+                            copyable
                         />
                     </Popover>
                 );
@@ -742,8 +763,8 @@ const TicketList: React.FC = () => {
 
 
             <Typography.Title level={2} style={{ margin: 0, marginBottom: 16 }}>{t('tickets.listTitle')}</Typography.Title>
-                <ConfigProvider locale={antdLocale} direction={currentLanguage === 'ar' ? 'rtl' : 'ltr'}>
-            <Flex justify="space-between" align="center" style={{ marginBottom: 16 }}>
+            <ConfigProvider locale={antdLocale} direction={currentLanguage === 'ar' ? 'rtl' : 'ltr'}>
+                <Flex justify="space-between" align="center" style={{ marginBottom: 16 }}>
                     <Pagination
                         current={pagination.page}
                         pageSize={pagination.pageSize}
@@ -751,14 +772,14 @@ const TicketList: React.FC = () => {
                         onChange={(page, pageSize) => setPagination({ page, pageSize })}
                         showSizeChanger
                     />
-                <Space>
-                    <Popover content={controlPanel} title={t('common.showHideColumns')} trigger="click">
-                        <Button icon={<SettingOutlined />}>{t('common.columns')}</Button>
-                    </Popover>
-                    {isRequester && <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>{t('tickets.new_ticket')}</Button>}
-                </Space>
-            </Flex>
-                </ConfigProvider>
+                    <Space>
+                        <Popover content={controlPanel} title={t('common.showHideColumns')} trigger="click">
+                            <Button icon={<SettingOutlined />}>{t('common.columns')}</Button>
+                        </Popover>
+                        {isRequester && <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>{t('tickets.new_ticket')}</Button>}
+                    </Space>
+                </Flex>
+            </ConfigProvider>
 
 
             <Table
