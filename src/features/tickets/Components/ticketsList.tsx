@@ -335,6 +335,23 @@ const TicketList: React.FC = () => {
             },
         },
 
+        {
+            title: t('tickets.title'),
+            dataIndex: 'title',
+            key: 'title',
+            width: 350,
+            render: (text: string) => (
+                <Popover
+                    title={t('translation.title_ar')}
+                    content={<div style={{ maxWidth: 400 }}>{text}</div>}
+                    trigger="hover"
+                    placement="topLeft"
+                >
+                    <EllipsisComponent content={renderHighlightedText(text, 'title')} />
+                </Popover>
+            ),
+            ...getColumnSearchProps('title', 'tickets.title'),
+        },
 
         {
             title: t('tickets.status'),
@@ -383,23 +400,6 @@ const TicketList: React.FC = () => {
                 { label: t('priority.NA'), value: 'NA' },
             ]),
         },
-        {
-            title: t('tickets.title'),
-            dataIndex: 'title',
-            key: 'title',
-            width: 250,
-            render: (text: string) => (
-                <Popover
-                    title={t('translation.title_ar')}
-                    content={<div style={{ maxWidth: 400 }}>{text}</div>}
-                    trigger="hover"
-                    placement="topLeft"
-                >
-                    <EllipsisComponent content={renderHighlightedText(text, 'title')} />
-                </Popover>
-            ),
-            ...getColumnSearchProps('title', 'tickets.title'),
-        },
         // {
         //     title: t('tickets.description'),
         //     dataIndex: 'description',
@@ -430,6 +430,41 @@ const TicketList: React.FC = () => {
         //     ),
         //     ...getColumnSearchProps('description', 'tickets.description'),
         // },
+        {
+            title: t('tickets.assignee'),
+            dataIndex: 'assignee',
+            key: 'assignee',
+            width: 100,
+
+            render: (assignees: any[]) => {
+                if (!assignees || assignees.length === 0) {
+                    return <Typography.Text type="secondary" italic>{t('tickets.unassigned')}</Typography.Text>;
+                }
+
+                const tagElements = assignees.map((a) => (
+                    <span
+                        key={a.id}
+                        color="cyan"
+                        style={{ display: 'inline-block', margin: '2px' }}
+                    >
+                        {a.name || `${a.first_name} ${a.last_name}`}
+                    </span>
+                ));
+
+                return (
+                    <Popover
+                        title={t('tickets.assignee')}
+                        content={<div style={{ maxWidth: 300 }}>{tagElements}</div>}
+                        trigger="hover"
+                        placement="topLeft"
+                    >
+                        <div className="assignee-ellipsis-wrapper">
+                            <EllipsisComponent content={tagElements} />
+                        </div>
+                    </Popover>
+                );
+            }
+        },
         {
             title: t('tickets.specialization'),
             dataIndex: 'specialization',
@@ -466,41 +501,6 @@ const TicketList: React.FC = () => {
             dataIndex: ['requester', 'name'],
             key: 'requesterName',
             width: 180,
-        },
-        {
-            title: t('tickets.assignee'),
-            dataIndex: 'assignee',
-            key: 'assignee',
-            width: 300,
-
-            render: (assignees: any[]) => {
-                if (!assignees || assignees.length === 0) {
-                    return <Typography.Text type="secondary" italic>{t('tickets.unassigned')}</Typography.Text>;
-                }
-
-                const tagElements = assignees.map((a) => (
-                    <Tag
-                        key={a.id}
-                        color="cyan"
-                        style={{ display: 'inline-block', margin: '2px' }}
-                    >
-                        {a.name || `${a.first_name} ${a.last_name}`}
-                    </Tag>
-                ));
-
-                return (
-                    <Popover
-                        title={t('tickets.assignee')}
-                        content={<div style={{ maxWidth: 300 }}>{tagElements}</div>}
-                        trigger="hover"
-                        placement="topLeft"
-                    >
-                        <div className="assignee-ellipsis-wrapper">
-                            <EllipsisComponent content={tagElements} />
-                        </div>
-                    </Popover>
-                );
-            }
         },
     ];
 
