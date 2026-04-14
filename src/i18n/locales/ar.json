@@ -329,7 +329,7 @@
     "upload": "رفع ملفات",
     "coordinationSection": "تنسيق عرض الطلب (للاستخدام الداخلي فقط)",
     "priority": "الأولوية",
-    "status": "حالة عرض الطلب",
+    "status": "حالة الطلب",
     "assignee": "تعيين الفنيين",
     "selectTechs": "ابحث واختر الفنيين",
     "ticketDetails": "تفاصيل عرض الطلب",
@@ -457,7 +457,8 @@
     "last_updated": "اخر تحديث",
     "user": "المستخدم",
     "select_statuses": "حدد الحالات",
-    "row_highlighting": "تحديد الصفوف"
+    "row_highlighting": "تحديد الصفوف",
+    "staff": "الموظفين"
   },
   "success": {
     "created": "تم إنشاء التذكرة بنجاح",
@@ -642,7 +643,9 @@
   "Groups": "المجموعات",
   "Users": "المستخدمين",
   "Admins": "المسؤولين",
+  "admin": "المسئول",
   "Technicians": "الفنيين",
+  "technician": "الفني",
   "team_leader": "الرئيس",
   "heads": "الرئيسين",
   "Requesters": "المتقدمين",

@@ -288,7 +288,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
 
                         <div >
                             <Typography.Title level={5}><MessageOutlined /> {t('tickets.commentSection')}</Typography.Title>
-                            <TicketComments assigneeName={ticket?.assignee?.map((a: any) => a.name).join(', ')} />
+                            <TicketComments requesterId={ticket?.requester?.id} assigneeName={ticket?.assignee?.map((a: any) => a.name).join(', ')} />
                         </div>
                     </Flex>
                 </Splitter.Panel>

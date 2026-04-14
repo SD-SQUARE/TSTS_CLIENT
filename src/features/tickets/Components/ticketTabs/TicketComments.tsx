@@ -13,7 +13,7 @@ import DOMPurify from 'dompurify';
 import 'react-quill-new/dist/quill.snow.css';
 import i18next from 'i18next';
 
-const TicketComments: React.FC<{ assigneeName?: string }> = ({ assigneeName }) => {
+const TicketComments: React.FC<{ assigneeName?: string, requesterId?: string }> = ({ assigneeName, requesterId }) => {
     const { t } = useTranslation();
     const { id: ticketId } = useParams();
     const { data: messages, isLoading, refetch } = useGetChatMessagesQuery(ticketId!);
@@ -42,7 +42,7 @@ const TicketComments: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =
 
     const handleSend = async () => {
         if (isEditorEmpty(text)) return;
-        
+
         const messageContent = text;
         const mediaIdsToSend = [...pendingMediaIds];
         const tempId = `temp-${Date.now()}`;
@@ -53,7 +53,7 @@ const TicketComments: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =
             createdAt: new Date().toISOString(),
             sender: {
                 id: user?.id,
-                name: user?.name.first[i18next.language] + ' ' + user?.name.mid[i18next.language] +' ' + user?.name.last[i18next.language] || t('common.me'),
+                name: user?.name.first[i18next.language] + ' ' + user?.name.mid[i18next.language] + ' ' + user?.name.last[i18next.language] || t('common.me'),
                 image: user?.image
             },
             media: tempFiles.map(f => ({ id: f.id, fileName: f.name, url: '#' })),
@@ -118,6 +118,57 @@ const TicketComments: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =
                 .quill-chat-editor .ql-editor::-webkit-scrollbar { display: none; }
                 .quill-chat-editor .ql-toolbar { border: none !important; border-bottom: 1px solid #f0f0f0 !important; background: #fff; padding: 4px 8px !important; }
                 .quill-chat-editor .ql-editor p { margin: 0 !important; }
+
+                /* Styling for Admin comments */
+                .comment-collapse .ant-collapse-item.is-admin-comment {
+                    border-inline-start: 5px solid #d12e2e !important;
+                }
+
+                /* Styling for Technician/Staff comments */
+                .comment-collapse .ant-collapse-item.is-staff-comment {
+                    border-inline-start: 5px solid #d1bb2e !important;
+                }
+
+                /* Styling for Requester comments */
+                .comment-collapse .ant-collapse-item.is-requester-comment {
+                    border-inline-start: 5px solid #52c41a !important; 
+                }
+
+                .comment-collapse .ant-collapse-header {
+                    background-color: #FAFAFA !important;
+                    border-bottom: none !important;
+                }
+
+                /* Force the header to be transparent or white so the border shows correctly */
+                .comment-collapse .is-requester-comment > .ant-collapse-header{
+                    background-color: #FAFAFA !important;
+                }
+                    
+                .comment-collapse .is-admin-comment > .ant-collapse-header,
+                .comment-collapse .is-staff-comment > .ant-collapse-header {
+                    background-color: #FAFAFA !important;
+                }
+                
+                .comment-collapse > .ant-collapse-header {
+                    background-color: #FAFAFA !important;
+                }
+
+                .comment-collapse .ant-collapse-item {
+                    border-bottom: 1px solid #f0f0f0 !important;
+                }
+
+                .comment-collapse .ant-collapse-panel-active {
+                    background-color: #fafafa !important; /* Soft off-white */
+                }
+
+                .comment-collapse .ant-collapse-panel-active {
+                    background-color: #fafafa !important; 
+                }
+
+                .comment-collapse .ant-collapse-header {
+                    background-color: #ffffff !important;
+                    border-bottom: none !important;
+                }
             `}</style>
 
             <div style={{ padding: '16px 16px 8px 16px' }}>
@@ -165,41 +216,66 @@ const TicketComments: React.FC<{ assigneeName?: string }> = ({ assigneeName }) =
             <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '8px 16px 16px 16px' }}>
                 {isLoading ? <Flex justify="center" style={{ marginTop: 40 }}><Spin /></Flex> : (
                     <Collapse className="comment-collapse" expandIconPosition="end" ghost>
-                        {allMessages.map((item) => (
-                            <Collapse.Panel key={item.id} header={
-                                <Flex align="center" gap="middle">
-                                    <Avatar src={item.sender.image} icon={<UserOutlined />} size="large" style={{ border: '2px solid #f0f0f0' }} />
-                                    <Flex vertical>
-                                    <Flex align="center" gap="small">
-                                            <Typography.Text strong style={{ color: '#262626' }}>{item.sender.name}</Typography.Text>
-                                            {item.isSending && <Spin indicator={antIcon} />}
+                        {allMessages.map((item) => {
+                            const isRequesterSender = item.sender.id === requesterId;
+                            const userType = item.sender.user_type?.toLowerCase() || '';
+
+                            const isAdmin = !isRequesterSender && userType === 'admin';
+                            const isTech = !isRequesterSender && (userType === 'technician' || userType === 'tech');
+
+                            let containerClass = 'is-requester-comment';
+                            if (isAdmin) containerClass = 'is-admin-comment';
+                            else if (isTech || !isRequesterSender) containerClass = 'is-staff-comment';
+
+
+                            return (
+                                <Collapse.Panel key={item.id} className={containerClass} header={
+                                    <Flex align="center" gap="middle">
+                                        <Avatar
+                                            src={item.sender.image}
+                                            icon={<UserOutlined />}
+                                            size="large"
+                                            style={{
+                                                border: isAdmin ? '2px solid #d12e2e' : (isTech || !isRequesterSender) ? '2px solid #d1bb2e' : '2px solid #52c41a'
+                                            }} />
+                                        <Flex vertical>
+                                            <Flex align="center" gap="small">
+                                                <Typography.Text strong style={{ color: '#262626' }}>{item.sender.name}</Typography.Text>
+                                                {isAdmin && <Tag color="error" >{t('roles.admin')}</Tag>}
+                                                {(isTech || (!isRequesterSender && !isAdmin)) && (
+                                                    <Tag color="warning" >
+                                                        {item.sender.user_type || t('common.staff')}
+                                                    </Tag>
+                                                )}
+                                                {item.isSending && <Spin indicator={antIcon} />}
+                                            </Flex>
+                                            <Typography.Text type="secondary" style={{ fontSize: '11px' }}>
+                                                <ClockCircleOutlined style={{ marginRight: 4 }} />
+                                                {dayjs(item.createdAt).format('MMM DD, YYYY - h:mm A')}
+                                            </Typography.Text>
                                         </Flex>
-                                        <Typography.Text type="secondary" style={{ fontSize: '11px' }}>
-                                            <ClockCircleOutlined style={{ marginRight: 4 }} />
-                                            {dayjs(item.createdAt).format('MMM DD, YYYY - h:mm A')}
-                                        </Typography.Text>
                                     </Flex>
-                                </Flex>
-                            }>
-                                <div className="message-content" style={{ color: '#595959' }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.message) }} />
-                                {item.media?.length > 0 && (
-                                    <Flex gap="small" wrap="wrap" style={{ borderTop: '1px solid #f0f0f0', paddingTop: 12 }}>
-                                        {item.media.map((m: any) => (
-                                            <Button 
-                                                key={m.id} 
-                                                icon={<PaperClipOutlined />} 
-                                                href={m.url} 
-                                                target="_blank" 
-                                                size="small"
-                                                shape="round"
-                                            >
-                                                {m.fileName}
-                                            </Button>
-                                        ))}
-                                    </Flex>
-                                )}
-                            </Collapse.Panel>
-                        ))}
+                                }>
+                                    <div className="message-content" style={{ color: '#595959' }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.message) }} />
+                                    {item.media?.length > 0 && (
+                                        <Flex gap="small" wrap="wrap" style={{ borderTop: '1px solid #f0f0f0', paddingTop: 12 }}>
+                                            {item.media.map((m: any) => (
+                                                <Button
+                                                    key={m.id}
+                                                    icon={<PaperClipOutlined />}
+                                                    href={m.url}
+                                                    target="_blank"
+                                                    size="small"
+                                                    shape="round"
+                                                >
+                                                    {m.fileName}
+                                                </Button>
+                                            ))}
+                                        </Flex>
+                                    )}
+                                </Collapse.Panel>
+                            )
+                        })}
                     </Collapse>
                 )}
             </div>

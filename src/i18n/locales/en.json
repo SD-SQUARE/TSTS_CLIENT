@@ -407,7 +407,8 @@
     "last_updated": "Last Updated",
     "user": "User",
     "select_statuses": "Select Statuses",
-    "row_highlighting": "Row Highlighting"
+    "row_highlighting": "Row Highlighting",
+    "staff": "Staff"
   },
   "success": {
     "created": "Ticket created successfully",
@@ -661,7 +662,9 @@
   "Groups": "Groups",
   "Users": "Users",
   "Admins": "Admins",
+  "admin": "Admin",
   "Technicians": "Technicians",
+  "technician": "Technician",
   "team_leader": "Team Leader",
   "heads": "Heads",
   "Requesters": "Requesters",
