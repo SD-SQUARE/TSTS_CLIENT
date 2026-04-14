@@ -455,7 +455,9 @@
     "search_placeholder": "بحث بالعنوان أو الوصف...",
     "no_data": "لا توجد بيانات",
     "last_updated": "اخر تحديث",
-    "user": "المستخدم"
+    "user": "المستخدم",
+    "select_statuses": "حدد الحالات",
+    "row_highlighting": "تحديد الصفوف"
   },
   "success": {
     "created": "تم إنشاء التذكرة بنجاح",

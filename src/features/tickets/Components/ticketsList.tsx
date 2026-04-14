@@ -3,7 +3,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Resizable } from 'react-resizable';
-import { Table, Tag, Typography, Spin, Alert, Pagination, Space, Button, Flex, Popover, type InputRef, Input, type TableColumnType, Select, TreeSelect, Tooltip, Checkbox } from 'antd';
+import { Table, Tag, Typography, Spin, Alert, Pagination, Space, Button, Flex, Popover, type InputRef, Input, type TableColumnType, Select, TreeSelect, Tooltip, Checkbox, Switch } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { FilterOutlined, HolderOutlined, PlusOutlined, SearchOutlined, SettingOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -56,6 +56,19 @@ const TicketList: React.FC = () => {
     const { data, isLoading, isError, error } = useTickets(pagination.page, pagination.pageSize, apiSearchQuery);
 
     const antdLocale = currentLanguage === 'ar' ? arEG : enUS;
+
+    const [showRowColors, setShowRowColors] = useState<boolean>(() =>
+        getSavedData('ticket_show_row_colors', false)
+    );
+
+    const [highlightedStatuses, setHighlightedStatuses] = useState<string[]>(() =>
+        getSavedData('ticket_highlighted_statuses', [closestate])
+    );
+
+    useEffect(() => {
+        localStorage.setItem('ticket_show_row_colors', JSON.stringify(showRowColors));
+        localStorage.setItem('ticket_highlighted_statuses', JSON.stringify(highlightedStatuses));
+    }, [showRowColors, highlightedStatuses]);
 
     const isRequester = role === 'requester';
 
@@ -126,18 +139,18 @@ const TicketList: React.FC = () => {
         navigate(`/${role}/tickets/${id}`);
     };
 
-    const handleRowClick = (record: Ticket) => {
-        return {
-            onClick: (event: React.MouseEvent<HTMLElement>) => {
-                const target = event.target as HTMLElement;
-                const isInteractive = target.closest('button, a, .ant-popconfirm, .ant-dropdown, .ant-tag, .ant-typography-copy');
-                if (!isInteractive) {
-                    handleView(record.id);
-                }
-            },
-            style: { cursor: 'pointer' },
-        };
-    };
+    // const handleRowClick = (record: Ticket) => {
+    //     return {
+    //         onClick: (event: React.MouseEvent<HTMLElement>) => {
+    //             const target = event.target as HTMLElement;
+    //             const isInteractive = target.closest('button, a, .ant-popconfirm, .ant-dropdown, .ant-tag, .ant-typography-copy');
+    //             if (!isInteractive) {
+    //                 handleView(record.id);
+    //             }
+    //         },
+    //         style: { cursor: 'pointer' },
+    //     };
+    // };
 
     const handleSearch = (
         selectedKeys: string[],
@@ -145,22 +158,22 @@ const TicketList: React.FC = () => {
         dataIndex: SearchableDataIndex,
     ) => {
         confirm();
-        
+
         const queryValue = selectedKeys.length > 0 ? selectedKeys : undefined;
-    
-        setSearchText(selectedKeys[0] || ''); 
+
+        setSearchText(selectedKeys[0] || '');
         setSearchedColumn(dataIndex);
-        
+
         setApiSearchQuery(prev => {
             const next = { ...prev };
             if (queryValue) {
-                next[dataIndex] = queryValue as any; 
+                next[dataIndex] = queryValue as any;
             } else {
                 delete next[dataIndex];
             }
             return next;
         });
-        
+
         setPagination(prev => ({ ...prev, page: 1 }));
     };
 
@@ -301,7 +314,7 @@ const TicketList: React.FC = () => {
                     value={selectedKeys}
                     onChange={(value) => setSelectedKeys(value)}
                     options={options}
-                    maxTagCount="responsive" 
+                    maxTagCount="responsive"
                     listHeight={250}
                     dropdownStyle={{ minWidth: 200 }}
                 />
@@ -466,7 +479,7 @@ const TicketList: React.FC = () => {
                     <span
                         key={a.id}
                         color="cyan"
-                        style={{ display: 'inline-block', margin: '2px' }}
+                        style={{ margin: '2px' }}
                     >
                         {a.name || `${a.first_name} ${a.last_name}`}
                     </span>
@@ -480,7 +493,7 @@ const TicketList: React.FC = () => {
                         placement="topLeft"
                     >
                         <div className="assignee-ellipsis-wrapper">
-                            <EllipsisComponent content={tagElements} />
+                            <Typography.Text ellipsis> {tagElements}</Typography.Text>
                         </div>
                     </Popover>
                 );
@@ -589,7 +602,7 @@ const TicketList: React.FC = () => {
 
     const handleResetSettings = () => {
         const defaultOrder = columns.map(col => col.key as string);
-        const defaultWidths = { id: 150, status: 140, priority: 120, title: 250, specialization: 180, problem: 180, requesterName: 180, assignee: 300 };
+        const defaultWidths = { id: 150, status: 140, priority: 120, title: 350, specialization: 180, problem: 180, requesterName: 180, assignee: 100 };
         // description: 500,};
 
         setColumnOrder(defaultOrder);
@@ -601,35 +614,81 @@ const TicketList: React.FC = () => {
         localStorage.removeItem('ticket_column_widths');
     };
 
+    const statusOptions = [
+        { label: t('status.open'), value: openstate },
+        { label: t('status.re_open'), value: reopenstate },
+        { label: t('status.in_progress'), value: in_progress_state },
+        { label: t('status.pending'), value: pending_state },
+        { label: t('status.closed'), value: closestate },
+        { label: t('status.resolved'), value: resolved_status },
+    ];
+
     const controlPanel = (
-        <div style={{ padding: '8px', width: '220px' }}>
-            <div style={{ marginBottom: 12, borderBottom: '1px solid #f0f0f0', paddingBottom: 8 }}>
-                <Button type="link" size="small" onClick={handleResetSettings} danger style={{ padding: 0 }}>
+        <div style={{ padding: '4px', width: '260px' }}>
+            {/* Row Highlighting Section */}
+            <div style={{ marginBottom: 12, paddingBottom: 8, borderBottom: '1px solid #f0f0f0' }}>
+                <Flex justify="space-between" align="center" style={{ marginBottom: showRowColors ? 8 : 0 }}>
+                    <Typography.Text strong>{t('common.row_highlighting')}</Typography.Text>
+                    <Switch 
+                        size="small" 
+                        checked={showRowColors} 
+                        onChange={(checked) => setShowRowColors(checked)} 
+                    />
+                </Flex>
+                
+                {showRowColors && (
+                    <Checkbox.Group
+                        options={statusOptions}
+                        value={highlightedStatuses}
+                        onChange={(list) => setHighlightedStatuses(list as string[])}
+                        style={{ 
+                            display: 'grid', 
+                            gridTemplateColumns: '1fr 1fr', // Two columns to save vertical space
+                            gap: '4px',
+                            fontSize: '12px' 
+                        }}
+                    />
+                )}
+            </div>
+    
+            {/* Column Reset & Sort Section */}
+            <Flex justify="space-between" align="center" style={{ marginBottom: 8 }}>
+                <Typography.Text strong>{t('common.columns')}</Typography.Text>
+                <Button 
+                    type="link" 
+                    size="small" 
+                    onClick={handleResetSettings} 
+                    danger 
+                    style={{ padding: 0, fontSize: '12px' }}
+                >
                     {t('common.reset_layout')}
                 </Button>
+            </Flex>
+    
+            <div style={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '4px' }}>
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+                    <SortableContext items={columnOrder} strategy={verticalListSortingStrategy}>
+                        <Flex vertical gap={2}>
+                            {columnOrder.map((key) => {
+                                const col = columns.find(c => c.key === key);
+                                return (
+                                    <SortableItem
+                                        key={key}
+                                        id={key}
+                                        label={col?.title as string}
+                                        isChecked={visibleColumns.includes(key)}
+                                        onCheck={(id: string) => {
+                                            setVisibleColumns(prev =>
+                                                prev.includes(id) ? prev.filter(k => k !== id) : [...prev, id]
+                                            );
+                                        }}
+                                    />
+                                );
+                            })}
+                        </Flex>
+                    </SortableContext>
+                </DndContext>
             </div>
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-                <SortableContext items={columnOrder} strategy={verticalListSortingStrategy}>
-                    <Flex vertical gap="small">
-                        {columnOrder.map((key) => {
-                            const col = columns.find(c => c.key === key);
-                            return (
-                                <SortableItem
-                                    key={key}
-                                    id={key}
-                                    label={col?.title as string}
-                                    isChecked={visibleColumns.includes(key)}
-                                    onCheck={(id: string) => {
-                                        setVisibleColumns(prev =>
-                                            prev.includes(id) ? prev.filter(k => k !== id) : [...prev, id]
-                                        );
-                                    }}
-                                />
-                            );
-                        })}
-                    </Flex>
-                </SortableContext>
-            </DndContext>
         </div>
     );
 
@@ -757,6 +816,55 @@ const TicketList: React.FC = () => {
                 .ant-table-body{
                     min-height: calc(100vh - 270px);
                 }
+
+                .closed-row {
+                    background-color: #f6ffed !important; /* Ant Design light green */
+                }
+
+                .closed-row:hover > td {
+                    background-color: #f4fceb !important;
+                }
+
+                /* Main Row Highlights */
+                .row-highlight-open { background-color: #e6f4ff !important; }
+                .row-highlight-closed, .row-highlight-resolved { background-color: #f6ffed !important; }
+                .row-highlight-in-progress { background-color: #fff7e6 !important; }
+                .row-highlight-pending { background-color: #fffbe6 !important; }
+                .row-highlight-out-of-service { background-color: #fff1f0 !important; }
+
+                /* Fix for Open Status */
+                .ant-table-tbody > tr.row-highlight-open > td.ant-table-cell-fix-start,
+                .ant-table-tbody > tr.row-highlight-open > td.ant-table-cell-fix-left {
+                    background-color: #e6f4ff !important;
+                }
+
+                /* Fix for Closed / Resolved Status */
+                .ant-table-tbody > tr.row-highlight-closed > td.ant-table-cell-fix-start,
+                .ant-table-tbody > tr.row-highlight-closed > td.ant-table-cell-fix-left,
+                .ant-table-tbody > tr.row-highlight-resolved > td.ant-table-cell-fix-start,
+                .ant-table-tbody > tr.row-highlight-resolved > td.ant-table-cell-fix-left {
+                    background-color: #f6ffed !important;
+                }
+
+                /* Fix for In Progress Status */
+                .ant-table-tbody > tr.row-highlight-in-progress > td.ant-table-cell-fix-start,
+                .ant-table-tbody > tr.row-highlight-in-progress > td.ant-table-cell-fix-left {
+                    background-color: #fff7e6 !important;
+                }
+
+                /* Fix for Pending Status */
+                .ant-table-tbody > tr.row-highlight-pending > td.ant-table-cell-fix-start,
+                .ant-table-tbody > tr.row-highlight-pending > td.ant-table-cell-fix-left {
+                    background-color: #fffbe6 !important;
+                }
+
+                /* Fix for Out of Service Status */
+                .ant-table-tbody > tr.row-highlight-out-of-service > td.ant-table-cell-fix-start,
+                .ant-table-tbody > tr.row-highlight-out-of-service > td.ant-table-cell-fix-left {
+                    background-color: #fff1f0 !important;
+                }
+                /* Hover Brightness Fix */
+                [class^="row-highlight-"]:hover > td { filter: brightness(0.97); }
                 
                 `}
             </style>
@@ -773,7 +881,7 @@ const TicketList: React.FC = () => {
                         showSizeChanger
                     />
                     <Space>
-                        <Popover content={controlPanel} title={t('common.showHideColumns')} trigger="click">
+                        <Popover content={controlPanel}  trigger="click">
                             <Button icon={<SettingOutlined />}>{t('common.columns')}</Button>
                         </Popover>
                         {isRequester && <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>{t('tickets.new_ticket')}</Button>}
@@ -789,12 +897,23 @@ const TicketList: React.FC = () => {
                 rowKey="id"
                 loading={isLoading}
                 tableLayout='fixed'
+                rowClassName={(record) => {
+                    if (!showRowColors) return '';
+                
+                    const isHighlighted = highlightedStatuses.some(
+                        s => s.toLowerCase().trim() === record.status.toLowerCase().trim()
+                    );
+                
+                    if (isHighlighted) {
+                        return `row-highlight-${record.status.toLowerCase().replace(/\s+/g, '-')}`;
+                    }
+                    return '';
+                }}
                 scroll={{
                     x: 'max-content',
                     y: data?.data?.length > 0 ? 'calc(100vh - 280px)' : 'auto'
                 }}
                 pagination={false}
-                onRow={handleRowClick}
             />
         </div>
     );

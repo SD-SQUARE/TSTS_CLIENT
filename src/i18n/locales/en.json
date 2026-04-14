@@ -405,7 +405,9 @@
     "search_placeholder": "Search by title or description...",
     "no_data": "No data available",
     "last_updated": "Last Updated",
-    "user": "User"
+    "user": "User",
+    "select_statuses": "Select Statuses",
+    "row_highlighting": "Row Highlighting"
   },
   "success": {
     "created": "Ticket created successfully",
