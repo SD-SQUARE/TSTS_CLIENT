@@ -374,15 +374,23 @@ const TicketList: React.FC = () => {
             dataIndex: 'title',
             key: 'title',
             width: 350,
-            render: (text: string) => (
+            render: (text: string, record: Ticket) => (
                 <Popover
-                    title={t('translation.title_ar')}
+                    title={t('tickets.title')}
                     content={<div style={{ maxWidth: 400 }}>{text}</div>}
                     trigger="hover"
                     placement="topLeft"
                 >
-                    <EllipsisComponent content={renderHighlightedText(text, 'title')} />
-                </Popover>
+                    <div
+                        onClick={() => handleView(record.id)}
+                        style={{
+                            cursor: 'pointer',
+                            color: 'var(--color-primary, #1677ff)',
+                            display: 'inline-block'
+                        }}
+                    >
+                        <EllipsisComponent content={renderHighlightedText(text, 'title')} />
+                    </div>                </Popover>
             ),
             ...getColumnSearchProps('title', 'tickets.title'),
         },
