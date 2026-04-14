@@ -400,3 +400,7 @@ body{
 :where(.css-3uaqrl).ant-avatar>img {
   object-fit: contain !important;
 }
+
+.--ant-layout-body-bg{
+    background-color: transparent !important;
+}

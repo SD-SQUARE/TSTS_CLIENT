@@ -30,7 +30,7 @@ function App() {
 
     return (
         <BrowserRouter>
-            <Layout style={{ width: '100%', minHeight: '100vh' }} className="white-bg" >
+            <Layout style={{ width: '100%', minHeight: '100vh' }}  >  
                 {/* Navigation bar */}
                 <NavBar>
                     {!user ?

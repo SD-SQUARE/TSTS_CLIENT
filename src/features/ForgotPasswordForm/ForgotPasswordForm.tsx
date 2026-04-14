@@ -37,7 +37,7 @@ const ForgotPasswordForm = () => {
 
     return (
         <PageLayout>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: "center", height: "50vh" }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: "center", height: 'max-content', marginTop: '2rem' }}>
                 <Card
                     title={location.pathname.includes('/forgot-password') ? t('forgotPassword.title') : t('First_time_Title')} 
                     style={{ width: "50%",height: "auto" , borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', textAlign: isArabic? 'right' : 'left' }}

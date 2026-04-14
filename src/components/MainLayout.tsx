@@ -57,7 +57,11 @@ const MainLayout = ({ menuItems }) => {
                 </Drawer>
 
                 {/* Main Layout */}
-                <Layout style={{ padding: '0 16px 24px', background: '#f5f6fa', overflow: 'auto', }}>
+                <Layout style={{
+                    padding: '0 16px 24px',
+                    // background: '#f5f6fa',
+                    overflow: 'auto',
+                }}>
                     <Content style={{ padding: '24px 0', margin: 0 }}>
                         <Outlet />
                     </Content>

@@ -11,7 +11,11 @@ const PageLayout = ({children}) => {
             <Layout style={{ minHeight: '100%' }}>
                 
                 {/* Main Layout */}
-                <Layout style={{ padding: '0 16px 0.4rem', background: '#f5f6fa', overflow: 'auto', }}>
+                <Layout style={{
+                    padding: '0 16px 0.4rem',
+                    // background: '#f5f6fa',
+                    overflow: 'auto',
+                }}>
                     <Content style={{ padding: '0.2rem 0', margin: 0 }}>
                         {children}
                     </Content>
