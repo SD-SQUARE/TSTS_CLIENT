@@ -46,14 +46,14 @@ const StepOtp: React.FC<StepOtpProps> = ({ setStep, email, setOtp, setToken, uid
             return response.data; 
         },
         onSuccess: (data) => {
-            message.success(data.message || t('forgotPassword.otpVerified'));
+            message.success( t('forgotPassword.otpVerified') || data.message);
             console.log(data)
             setOtp(data.otp);
             setToken(data.reset_token);
             setTimeout(() => setStep(2), 600);
         },
         onError: (error: any) => {
-            message.error(error.response?.data?.message || t('forgotPassword.otpInvalid'));
+            message.error(t('forgotPassword.otpInvalid') || error.response?.data?.message);
         },
     });
 
@@ -70,12 +70,12 @@ const StepOtp: React.FC<StepOtpProps> = ({ setStep, email, setOtp, setToken, uid
             return response.data;
         },
         onSuccess: (data) => {
-            message.success(data?.message || t('forgotPassword.otpResend'));
+            message.success(t('forgotPassword.otpResend') || data?.message);
             setUid(data.oid);
             setCountdown(30);
         },
         onError: (error: any) => {
-            message.error(error.response?.data?.message || t('forgotPassword.otpResendError'));
+            message.error(t('forgotPassword.otpResendError') || error.response?.data?.message);
         },
     });
 
