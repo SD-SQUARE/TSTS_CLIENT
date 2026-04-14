@@ -161,8 +161,8 @@ const TicketComments: React.FC<{ assigneeName?: string, requesterId?: string }> 
                     background-color: #fafafa !important; /* Soft off-white */
                 }
 
-                .comment-collapse .ant-collapse-panel-active {
-                    background-color: #fafafa !important; 
+                .comment-collapse .ant-collapse-body{
+                    padding-top: 0 !important; 
                 }
 
                 .comment-collapse .ant-collapse-header {
@@ -182,6 +182,20 @@ const TicketComments: React.FC<{ assigneeName?: string, requesterId?: string }> 
                     /* Ensure the flex container inside the header stretches to the edges */
                 .comment-collapse .ant-collapse-header-text {
                     flex: 1 !important;
+                }
+
+                .message-content {
+                word-break: normal; 
+                overflow-wrap: break-word; 
+                white-space: normal; 
+                display: block;
+                max-width: 100%;
+            }
+
+
+                .message-content img {
+                    max-width: 100%;
+                    height: auto;
                 }
             `}</style>
 
@@ -256,33 +270,37 @@ const TicketComments: React.FC<{ assigneeName?: string, requesterId?: string }> 
                                         />
                                         <Flex vertical style={{ flex: 1 }}>
                                             <Flex justify="space-between" align="center" style={{ width: '100%' }}>
-                                                <Flex align="center" gap="small">
-                                                    <Typography.Text strong style={{ color: '#262626' }}>
-                                                        {item.sender.name}
-                                                    </Typography.Text>
+                                                <Flex vertical gap={0}>
+                                                    <Flex align="center" gap="small">
+                                                        <Typography.Text strong style={{ color: '#262626' }}>
+                                                            {item.sender.name}
+                                                        </Typography.Text>
 
-                                                    {isAdmin && <Tag color="error" style={{ fontSize: '10px' }}>{t('roles.admin')}</Tag>}
-                                                    {(isTech || (!isRequesterSender && !isAdmin)) && (
-                                                        <Tag color="warning" style={{ fontSize: '10px' }}>
-                                                            {item.sender.user_type || t('common.staff')}
-                                                        </Tag>
+                                                        {isAdmin && <Tag color="error" style={{ fontSize: '10px' }}>{t('roles.admin')}</Tag>}
+                                                        {(isTech || (!isRequesterSender && !isAdmin)) && (
+                                                            <Tag color="warning" style={{ fontSize: '10px' }}>
+                                                                {item.sender.user_type || t('common.staff')}
+                                                            </Tag>
+                                                        )}
+                                                    </Flex>
+
+                                                    {!isRequesterSender && item.sender.job_title && (
+                                                        <Typography.Text type="secondary" style={{ fontSize: '12px', marginTop: '-2px' }}>
+                                                            {item.sender.job}
+                                                        </Typography.Text>
                                                     )}
-                                                    {item.isSending && <Spin indicator={antIcon} />}
                                                 </Flex>
 
                                                 <Flex align="center" gap="small">
                                                     <span dir='ltr'>
-                                                    <Typography.Text type="secondary" style={{ fontSize: '11px', whiteSpace: 'wrap' }}>
-                                                        <ClockCircleOutlined style={{ marginRight: 4 }} />
-                                                        {dayjs(item.createdAt).format('MMM DD, YYYY - h:mm A')}
-                                                    </Typography.Text>
+                                                        <Typography.Text type="secondary" style={{ fontSize: '11px', whiteSpace: 'nowrap' }}>
+                                                            <ClockCircleOutlined style={{ marginRight: 4 }} />
+                                                            {dayjs(item.createdAt).format('MMM DD, YYYY - h:mm A')}
+                                                        </Typography.Text>
                                                     </span>
-
-                                                    {/* 2. Manual Arrow that stays next to the date */}
                                                     <div style={{ marginLeft: '8px', color: '#bfbfbf', fontSize: '12px' }}>
-                                                        {/* This replicates the antd arrow look */}
                                                         <span className="ant-collapse-arrow">
-                                                            <svg viewBox="64 64 896 896" focusable="false" data-icon="right" width="1em" height="1em" fill="currentColor" aria-hidden="true" style={{ transform: 'rotate(90deg)' }}><path d="M765.7 486.8L314.9 134.7A8 8 0 00302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 000-50.4z"></path></svg>
+                                                            <svg viewBox="64 64 896 896" focusable="false" width="1em" height="1em" fill="currentColor" style={{ transform: 'rotate(90deg)' }}><path d="M765.7 486.8L314.9 134.7A8 8 0 00302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 000-50.4z"></path></svg>
                                                         </span>
                                                     </div>
                                                 </Flex>
