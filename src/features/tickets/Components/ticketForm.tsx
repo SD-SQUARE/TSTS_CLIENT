@@ -11,7 +11,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import RequiredTag from '../../../components/RequiredTag';
 import { useSelector } from 'react-redux';
-import { fetchAdmins, fetchGroups, fetchGroupUsers,  useTicketDetails, useTicketMutations, useTicketProblems } from '../Hooks/useTicketForm';
+import { fetchAdmins, fetchGroups, fetchGroupUsers, useTicketDetails, useTicketMutations, useTicketProblems } from '../Hooks/useTicketForm';
 import { queryClient } from '../../../app/queryClient';
 import ReactQuill from 'react-quill-new';
 import i18next from 'i18next';
@@ -43,7 +43,7 @@ const TicketForm: React.FC = () => {
     const [fileList, setFileList] = useState<any[]>([]);
 
     const [selectedProblemId, setSelectedProblemId] = useState<string | null>(null);
-    
+
     const [treeData, setTreeData] = useState<any[]>([]);
 
     const currentStatus = Form.useWatch('status', form);
@@ -192,7 +192,7 @@ const TicketForm: React.FC = () => {
         } else if (middleStates.includes(currentStatus)) {
             currentStepIndex = 1;
         } else {
-            currentStepIndex = 0; 
+            currentStepIndex = 0;
         }
 
         return { steps, currentStepIndex };
@@ -394,7 +394,7 @@ const TicketForm: React.FC = () => {
 
     const selectedProblemData = useMemo(() => {
         if (!selectedProblemId || !groupedData) return null;
-        
+
         for (const spec of groupedData.specializations) {
             const found = spec.problems?.find((p: any) => p.id === selectedProblemId);
             if (found) return { ...found, specId: spec.id };
@@ -433,14 +433,14 @@ const TicketForm: React.FC = () => {
     // const handleCustomReset = () => {
     //     const currentTitle = form.getFieldValue('title');
     //     const currentDescription = form.getFieldValue('description');
-    
+
     //     form.resetFields();
-    
+
     //     form.setFieldsValue({
     //         title: currentTitle,
     //         description: currentDescription,
     //     });
-    
+
     //     if (isEdit && ticketData?.attachments) {
     //         setFileList(ticketData.attachments.map((file: any) => ({
     //             uid: file.id,
@@ -533,20 +533,32 @@ const TicketForm: React.FC = () => {
                     <Form form={form} layout="vertical" onFinish={onFinish} requiredMark={false} style={{ width: '100%' }} >
 
                         <Form.Item style={{ marginBottom: 14 }} >
-                            <Flex align="center" gap="middle" wrap="wrap" >
-                                <span>{t('tickets.problemType')}</span>
-                                <Space size={8} wrap align="center">
+                            <Flex align="center" gap="middle" wrap="wrap">
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <span>{t('tickets.problemType')}</span>
                                     {selectedProblemData ? (
-                                        <Tag color="blue" variant='outlined' style={{ marginInlineEnd: 0 }}>
-                                            {selectedProblemData.name}
-                                        </Tag>
+                                        <span style={{ marginInlineStart: '4px' }}>
+                                            : {selectedProblemData.name}
+                                        </span>
                                     ) : (
-                                        <Tag color="red" variant='outlined' style={{ marginInlineEnd: 0 }}>{t('tickets.autoAssignPlaceholder')}</Tag>
+                                        <Tag
+                                            color="red"
+                                            variant='outlined'
+                                            style={{ marginInlineStart: '8px' }}
+                                        >
+                                            {t('tickets.autoAssignPlaceholder')}
+                                        </Tag>
                                     )}
-                                    <Dropdown menu={{ items: problemMenuItems }} trigger={['click']}>
-                                        <Button type="dashed" shape="circle" size="small" icon={<PlusOutlined />} style={{ marginLeft: 4 }} />
-                                    </Dropdown>
-                                </Space>
+                                </div>
+
+                                <Dropdown menu={{ items: problemMenuItems }} trigger={['click']}>
+                                    <Button
+                                        type="dashed"
+                                        shape="circle"
+                                        size="small"
+                                        icon={<PlusOutlined />}
+                                    />
+                                </Dropdown>
                             </Flex>
                             <Form.Item
                                 name="problem"
@@ -738,7 +750,7 @@ const TicketForm: React.FC = () => {
                                     {t('common.back')}
                                 </Button>
 
-                                
+
                             </Flex>
                         </Form.Item>
                         {/* <Form.Item >

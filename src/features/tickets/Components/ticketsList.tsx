@@ -343,37 +343,18 @@ const TicketList: React.FC = () => {
             width: 140,
             ellipsis: true,
             render: (status: string) => {
-
+                let displayStatus = status;
                 switch (status) {
-                    case openstate:
-                        status = openstate;
-                        break;
-                    case reopenstate:
-                        status = reopenstate;
-                        break;
-                    case closestate:
-                        status = closestate;
-                        break;
-                    case in_progress_state:
-                        status = in_progress_state;
-                        break;
-                    case pending_state:
-                        status = pending_state;
-                        break;
-                    case out_of_service_state:
-                        status = out_of_service_state;
-                        break;
-                    case resolved_status:
-                        status = resolved_status;
-                        break;
-                    default:
-                        status = openstate;
+                    case openstate: displayStatus = openstate; break;
+                    case reopenstate: displayStatus = reopenstate; break;
+                    case closestate: displayStatus = closestate; break;
+                    case in_progress_state: displayStatus = in_progress_state; break;
+                    case pending_state: displayStatus = pending_state; break;
+                    case out_of_service_state: displayStatus = out_of_service_state; break;
+                    case resolved_status: displayStatus = resolved_status; break;
+                    default: displayStatus = openstate;
                 }
-                return (
-                    <Tag variant='outlined' color={status === openstate || status === reopenstate ? 'green' : status === in_progress_state ? 'blue' : status === closestate ? 'red' : status === pending_state ? 'gold' : status === out_of_service_state ? 'volcano' : status === resolved_status ? 'lime' : 'geekblue'}>
-                        {renderHighlightedText(status, 'status')}
-                    </Tag>
-                )
+                return <span>{renderHighlightedText(displayStatus, 'status')}</span>;
             },
             ...getColumnSelectProps('status', 'tickets.status', [
                 { label: t('status.open'), value: 'open' },
@@ -391,9 +372,9 @@ const TicketList: React.FC = () => {
             width: 120,
             ellipsis: true,
             render: (priority: string) => (
-                <Tag variant='outlined' color={priority === 'important/urgent' ? 'volcano' : priority === 'important' ? 'orange' : priority === 'urgent' ? 'red' : 'geekblue'}>
+                <span>
                     {renderHighlightedText(priority, 'priority')}
-                </Tag>
+                </span>
             ),
             ...getColumnSelectProps('priority', 'tickets.priority', [
                 { label: t('priority.important/urgent'), value: 'important/urgent' },
@@ -456,9 +437,9 @@ const TicketList: React.FC = () => {
             width: 180,
             ellipsis: true,
             render: (specialization: Specialization | null) => (
-                <Tag color={specialization?.name ? 'blue' : 'red'} variant="outlined">
+                <span>
                     {renderHighlightedText(specialization?.name ?? t('tickets.noSpecialization'), 'specialization')}
-                </Tag>
+                </span>
             ),
             ...getColumnSelectProps('specialization', 'tickets.specialization',
                 (Array.isArray(specs) ? specs : []).map((s: any) => ({
@@ -474,9 +455,9 @@ const TicketList: React.FC = () => {
             width: 180,
             ellipsis: true,
             render: (problem: Problem | null) => (
-                <Tag color={problem?.name ? 'blue' : 'red'} variant="outlined">
+                <span>
                     {renderHighlightedText(problem?.name ?? t('tickets.noType'), 'problem')}
-                </Tag>
+                </span>
             ),
             ...getColumnTreeProps('problem', 'tickets.problemType', problemTreeData),
         },

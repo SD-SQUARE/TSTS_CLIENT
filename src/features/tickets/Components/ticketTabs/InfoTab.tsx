@@ -300,9 +300,9 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                                 <Flex justify="space-between" align="center">
                                     <Typography.Text type="secondary">{t('tickets.status')}</Typography.Text>
                                     <Space size={4}>
-                                        <Tag color={getStatusColor(ticket?.status)} style={{ margin: 0 }}>
+                                        <span>
                                             {ticket?.status}
-                                        </Tag>
+                                        </span>
 
                                         {!isRequester && (
                                             <Dropdown menu={statusMenu} trigger={['click']} disabled={updateMutation.isPending}>
@@ -322,9 +322,9 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
 
                                     <Space size={4}>
 
-                                        <Tag color={getPriorityColor(ticket?.priority)} style={{ margin: 0 }}>
+                                        <span>
                                             {ticket?.priority}
-                                        </Tag>
+                                        </span>
 
                                         {!isRequester && (
                                             <Dropdown menu={priorityMenu} trigger={['click']} disabled={updateMutation.isPending}>
@@ -343,7 +343,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                                 <Flex justify="space-between" align="center">
                                     <Typography.Text type="secondary">{t('tickets.problemType')}</Typography.Text>
                                     <Space size={4}>
-                                        <Tag color="blue" style={{ margin: 0 }}>{ticket?.problem?.name}</Tag>
+                                        <span>{ticket?.problem?.name}</span>
 
                                         {!isRequester && (
                                             <Dropdown menu={{ items: problemMenuItems }} trigger={['click']}>
