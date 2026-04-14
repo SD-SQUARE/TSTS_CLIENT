@@ -530,12 +530,12 @@ const TicketList: React.FC = () => {
             ),
             ...getColumnTreeProps('problem', 'tickets.problemType', problemTreeData),
         },
-        {
+        ...(!isRequester ? [{
             title: t('tickets.requester'),
             dataIndex: ['requester', 'name'],
             key: 'requesterName',
             width: 180,
-        },
+        }] : []),
     ];
 
 
