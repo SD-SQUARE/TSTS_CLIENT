@@ -11,9 +11,6 @@ const fetchTickets = async (page: number, pageSize: number, searchQuery: { [key:
         params: { page, page_size: pageSize, ...query },
     });
 
-
-
-
     return {
         data: response.data.tickets,
         total: Math.floor(response.data.meta.total)
@@ -50,13 +47,14 @@ export interface TicketActivity {
 }
 
 
-export const useTicketActivities = (ticketId: string | undefined) => {
-    return useQuery<TicketActivity[]>({
-        queryKey: ['ticketActivities', ticketId],
+export const useTicketActivities = (ticketId: string | undefined, params?: any) => {
+    return useQuery({
+        queryKey: ['ticketActivities', ticketId, params],
         queryFn: async () => {
-            if (!ticketId) return [];
-            const response = await api.get(`/v1/tickets/${ticketId}/activities`);
-            return response.data;
+            const { data } = await api.get(`/v1/tickets/${ticketId}/activities`, { 
+                params 
+            });
+            return data;
         },
         enabled: !!ticketId,
     });
@@ -116,5 +114,27 @@ export const useUserProfile = (id: string) => {
             return data;
         },
         enabled: !!id,
+    });
+};
+
+export const useUsersLookup = () => {
+    return useQuery({
+        queryKey: ['lookup', 'users'],
+        queryFn: async () => {
+            const { data } = await api.get('/v1/lockups/users');
+            return data; 
+        },
+        staleTime: 5 * 60 * 1000, 
+    });
+};
+
+export const useActionsLookup = () => {
+    return useQuery({
+        queryKey: ['lookup', 'actions'],
+        queryFn: async () => {
+            const { data } = await api.get('/v1/lookups/actions/history');
+            return data; 
+        },
+        staleTime: 5 * 60 * 1000,
     });
 };

@@ -324,7 +324,9 @@
     "requesterInfo": "Requester Info",
     "requesterFullDetails": "Requester Full Details",
     "contact_info": "Contact Information",
-    "organization_details": "Organization Details"
+    "organization_details": "Organization Details",
+    "searchAction": "Search Actions",
+    "searchUser": "Search Users"
   },
   "audit": {
     "title": "Audit Logs",

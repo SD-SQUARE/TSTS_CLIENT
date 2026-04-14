@@ -1,27 +1,61 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { Avatar, Flex, Space, Table, Tag, Typography } from 'antd';
-import { CalendarOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { Avatar, Flex, Select, Space, Table, Tag, Typography } from 'antd';
+import { CalendarOutlined, ClockCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../../../../i18n';
+import { useActionsLookup, useUsersLookup } from '../../../Hooks/useTicket';
 
 interface Props {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     activities: any[];
     getIcon: (type: string, size?: number) => React.ReactNode;
     getColor: (type: string) => string;
+    onUserSearch: (val: string | undefined) => void;
+    onActionSearch: (val: string | undefined) => void;
+    currentFilters: { user?: string; action?: string };
 }
 
-const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor }) => {
+const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor, onUserSearch, onActionSearch, currentFilters }) => {
     const { t } = useTranslation();
+
+    const { data: usersData } = useUsersLookup();
+    const { data: actionsData } = useActionsLookup();
 
     const columns: any[] = [
         {
             title: t('tickets.user'),
             dataIndex: 'meta',
             key: 'user',
-            width: 150,
+            width: 180,
+            filterDropdown: () => (
+                <div style={{ padding: 8, width: 250 }} onKeyDown={(e) => e.stopPropagation()}>
+                    <Select
+                        showSearch
+                        allowClear
+                        placeholder={t('tickets.searchUser')}
+                        style={{ width: 220 }}
+                        value={currentFilters.user}
+                        onChange={onUserSearch} 
+                        optionFilterProp="label"
+                    >
+                        {usersData?.users?.map((u: any) => (
+                            <Select.Option 
+                                key={u.id} 
+                                value={u.id} 
+                                label={`${u.first_name} ${u.last_name}`}
+                            >
+                                <Flex align="center" gap="small">
+                                    <Avatar size="small" src={u.image} />
+                                    <Typography.Text >{u.first_name} {u.last_name}</Typography.Text>
+                                </Flex>
+                            </Select.Option>
+                        ))}
+                    </Select>
+                </div>
+            ),
+            filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
             render: (meta: any) => {
                 if (!meta?.user) return '-';
     
@@ -41,7 +75,24 @@ const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor }) 
             title: t('tickets.type'),
             dataIndex: 'type',
             key: 'type',
-            width: 120,
+            width: 150,
+            filterDropdown: () => (
+                <div style={{ padding: 8, width: 200 }} onKeyDown={(e) => e.stopPropagation()}>
+                    <Select
+                        showSearch
+                        allowClear
+                        placeholder={t('tickets.searchAction')}
+                        style={{ width: 180 }}
+                        value={currentFilters.action}
+                        onChange={onActionSearch} 
+                    >
+                        {actionsData?.actions?.map((a: any) => (
+                            <Select.Option key={a.id} value={a.name}>{a.name}</Select.Option>
+                        ))}
+                    </Select>
+                </div>
+            ),
+            filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
             render: (type: string) => (
                 <Tag color={getColor(type)} icon={getIcon(type, 12)}>
                     {type.toUpperCase()}

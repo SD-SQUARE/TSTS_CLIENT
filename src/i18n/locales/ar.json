@@ -374,7 +374,9 @@
     "requesterInfo": "معلومات صاحب الطلب",
     "requesterFullDetails": "المعلومات الكاملة لصاحب الطلب",
     "contact_info": "معلومات الاتصال",
-    "organization_details": "معلومات الجهة"
+    "organization_details": "معلومات الجهة",
+    "searchAction": "بحث عن عملية",
+    "searchUser": "بحث عن مستخدم"
   },
   "audit": {
     "title": "سجلات التدقيق",
