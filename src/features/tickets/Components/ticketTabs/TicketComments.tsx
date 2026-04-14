@@ -169,6 +169,20 @@ const TicketComments: React.FC<{ assigneeName?: string, requesterId?: string }> 
                     background-color: #ffffff !important;
                     border-bottom: none !important;
                 }
+                /* Rotate our manual arrow when the parent panel is active */
+                .ant-collapse-item-active .ant-collapse-arrow svg {
+                    transform: rotate(270deg) !important; /* Adjust based on your starting rotation */
+                    transition: transform 0.3s;
+                }
+
+                /* Remove default padding where the arrow used to be */
+                .comment-collapse .ant-collapse-header {
+                    padding-inline-end: 16px !important; 
+                }
+                    /* Ensure the flex container inside the header stretches to the edges */
+                .comment-collapse .ant-collapse-header-text {
+                    flex: 1 !important;
+                }
             `}</style>
 
             <div style={{ padding: '16px 16px 8px 16px' }}>
@@ -215,7 +229,7 @@ const TicketComments: React.FC<{ assigneeName?: string, requesterId?: string }> 
 
             <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '8px 16px 16px 16px' }}>
                 {isLoading ? <Flex justify="center" style={{ marginTop: 40 }}><Spin /></Flex> : (
-                    <Collapse className="comment-collapse" expandIconPosition="end" ghost>
+                    <Collapse className="comment-collapse" expandIcon={() => null} ghost>
                         {allMessages.map((item) => {
                             const isRequesterSender = item.sender.id === requesterId;
                             const userType = item.sender.user_type?.toLowerCase() || '';
@@ -230,29 +244,49 @@ const TicketComments: React.FC<{ assigneeName?: string, requesterId?: string }> 
 
                             return (
                                 <Collapse.Panel key={item.id} className={containerClass} header={
-                                    <Flex align="center" gap="middle">
+                                    <Flex align="center" gap="middle" style={{ width: '100%' }}>
                                         <Avatar
                                             src={item.sender.image}
                                             icon={<UserOutlined />}
                                             size="large"
                                             style={{
-                                                border: isAdmin ? '2px solid #d12e2e' : (isTech || !isRequesterSender) ? '2px solid #d1bb2e' : '2px solid #52c41a'
-                                            }} />
-                                        <Flex vertical>
-                                            <Flex align="center" gap="small">
-                                                <Typography.Text strong style={{ color: '#262626' }}>{item.sender.name}</Typography.Text>
-                                                {isAdmin && <Tag color="error" >{t('roles.admin')}</Tag>}
-                                                {(isTech || (!isRequesterSender && !isAdmin)) && (
-                                                    <Tag color="warning" >
-                                                        {item.sender.user_type || t('common.staff')}
-                                                    </Tag>
-                                                )}
-                                                {item.isSending && <Spin indicator={antIcon} />}
+                                                border: isAdmin ? '2px solid #d12e2e' : (isTech || !isRequesterSender) ? '2px solid #d1bb2e' : '2px solid #52c41a',
+                                                flexShrink: 0
+                                            }}
+                                        />
+                                        <Flex vertical style={{ flex: 1 }}>
+                                            <Flex justify="space-between" align="center" style={{ width: '100%' }}>
+                                                <Flex align="center" gap="small">
+                                                    <Typography.Text strong style={{ color: '#262626' }}>
+                                                        {item.sender.name}
+                                                    </Typography.Text>
+
+                                                    {isAdmin && <Tag color="error" style={{ fontSize: '10px' }}>{t('roles.admin')}</Tag>}
+                                                    {(isTech || (!isRequesterSender && !isAdmin)) && (
+                                                        <Tag color="warning" style={{ fontSize: '10px' }}>
+                                                            {item.sender.user_type || t('common.staff')}
+                                                        </Tag>
+                                                    )}
+                                                    {item.isSending && <Spin indicator={antIcon} />}
+                                                </Flex>
+
+                                                <Flex align="center" gap="small">
+                                                    <span dir='ltr'>
+                                                    <Typography.Text type="secondary" style={{ fontSize: '11px', whiteSpace: 'wrap' }}>
+                                                        <ClockCircleOutlined style={{ marginRight: 4 }} />
+                                                        {dayjs(item.createdAt).format('MMM DD, YYYY - h:mm A')}
+                                                    </Typography.Text>
+                                                    </span>
+
+                                                    {/* 2. Manual Arrow that stays next to the date */}
+                                                    <div style={{ marginLeft: '8px', color: '#bfbfbf', fontSize: '12px' }}>
+                                                        {/* This replicates the antd arrow look */}
+                                                        <span className="ant-collapse-arrow">
+                                                            <svg viewBox="64 64 896 896" focusable="false" data-icon="right" width="1em" height="1em" fill="currentColor" aria-hidden="true" style={{ transform: 'rotate(90deg)' }}><path d="M765.7 486.8L314.9 134.7A8 8 0 00302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 000-50.4z"></path></svg>
+                                                        </span>
+                                                    </div>
+                                                </Flex>
                                             </Flex>
-                                            <Typography.Text type="secondary" style={{ fontSize: '11px' }}>
-                                                <ClockCircleOutlined style={{ marginRight: 4 }} />
-                                                {dayjs(item.createdAt).format('MMM DD, YYYY - h:mm A')}
-                                            </Typography.Text>
                                         </Flex>
                                     </Flex>
                                 }>
