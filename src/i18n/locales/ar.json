@@ -311,6 +311,7 @@
     "participants": "المشاركين",
     "listTitle": "عروض الطلب",
     "id": "الرقم التسلسلي",
+    "ticket_number": "رقم الطلب",
     "title": "العنوان",
     "problemType": "نوع المشكلة",
     "specialization": "التخصص",

@@ -18,6 +18,7 @@ export interface Requester {
   
   export interface Ticket {
     id: string;
+    ticket_number: string;
     title: string;
     description: string;
     requester: Requester;

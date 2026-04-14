@@ -310,22 +310,29 @@ const TicketList: React.FC = () => {
 
     const columns: ColumnsType<Ticket> = [
         {
-            title: "#",
-            dataIndex: 'id',
+            title: t('tickets.ticket_number'),
+            dataIndex: 'id', 
             key: 'id',
             width: 150,
             fixed: 'left',
             ...getColumnSearchProps('id' as any, 'tickets.id'),
-            render: (id: string) => (
-                <Popover
-                    title={t('tickets.id')}
-                    content={<div style={{ maxWidth: 400, fontFamily: 'monospace' }}>{id}</div>}
-                    trigger="hover"
-                    placement="topLeft"
-                >
-                    <EllipsisComponent content={renderHighlightedText(id, 'id')} copyable />
-                </Popover>
-            ),
+            render: (id: string, record: Ticket) => {
+                const displayValue = record.ticket_number || id;
+        
+                return (
+                    <Popover
+                        title={t('tickets.ticket_number')}
+                        content={<div style={{ maxWidth: 400, fontFamily: 'monospace' }}>{displayValue}</div>}
+                        trigger="hover"
+                        placement="topLeft"
+                    >
+                        <EllipsisComponent 
+                            content={renderHighlightedText(displayValue, 'id')} 
+                            copyable 
+                        />
+                    </Popover>
+                );
+            },
         },
 
 

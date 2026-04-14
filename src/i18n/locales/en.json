@@ -261,6 +261,7 @@
     "participants": "Participants",
     "listTitle": "Tickets Overview",
     "id": "ID",
+    "ticket_number": "Ticket Number",
     "title": "Title",
     "problemType": "Problem Type",
     "specialization": "Specialization",
