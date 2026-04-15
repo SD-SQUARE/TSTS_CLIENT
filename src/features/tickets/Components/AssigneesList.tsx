@@ -198,7 +198,7 @@ const AssigneeList: React.FC<AssigneeListProps> = ({ assignees, requesterId, onU
                 header={
                     <Flex justify="space-between" align="center" style={{ width: '100%' }}>
                         <Typography.Text strong>
-                            {t('tickets.assignee')} ({(requesterId ? 1 : 0) + (assignees?.length || 0)})
+                            {t('tickets.assignee')} ({(assignees?.length || 0)})
                         </Typography.Text>
                         {!isRequester && (
                             <Button

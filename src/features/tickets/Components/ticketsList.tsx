@@ -8,7 +8,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { FilterOutlined, HolderOutlined, PlusOutlined, SearchOutlined, SettingOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import type { Problem, Specialization, Ticket } from '../Types/tickets';
-import { useTickets } from '../Hooks/useTicket';
+import { useTickets, type TicketSearchQuery } from '../Hooks/useTicket';
 import { useNavigate, useParams } from 'react-router-dom';
 import EllipsisComponent from '../../../components/EllipsisComponent';
 import Highlighter from 'react-highlight-words';
@@ -25,10 +25,15 @@ import arEG from 'antd/lib/locale/ar_EG';
 type SearchableDataIndex = `id` | `title` | `problem` | `specialization` | `status` | 'priority';
 // | 'description';
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 const getSavedData = (key: string, fallback: any) => {
     const saved = localStorage.getItem(key);
     return saved ? JSON.parse(saved) : fallback;
 };
+
+const getTicketIdentifierSearchKey = (value: string) =>
+    UUID_PATTERN.test(value.trim()) ? 'id' : 'ticket_number';
 
 const TicketList: React.FC = () => {
     const { t, i18n } = useTranslation();
@@ -51,7 +56,7 @@ const TicketList: React.FC = () => {
     const { data: specs } = useSpecializations();
     const { data: hierarchicalProblems } = useTicketProblems();
 
-    const [apiSearchQuery, setApiSearchQuery] = useState<{ [key: string]: string }>({});
+    const [apiSearchQuery, setApiSearchQuery] = useState<TicketSearchQuery>({});
 
     const { data, isLoading, isError, error } = useTickets(pagination.page, pagination.pageSize, apiSearchQuery);
 
@@ -166,7 +171,14 @@ const TicketList: React.FC = () => {
 
         setApiSearchQuery(prev => {
             const next = { ...prev };
-            if (queryValue) {
+            if (dataIndex === 'id') {
+                delete next.id;
+                delete next.ticket_number;
+
+                if (queryValue && selectedKeys[0]) {
+                    next[getTicketIdentifierSearchKey(selectedKeys[0])] = selectedKeys[0];
+                }
+            } else if (queryValue) {
                 next[dataIndex] = queryValue as any;
             } else {
                 delete next[dataIndex];
@@ -182,7 +194,12 @@ const TicketList: React.FC = () => {
         setSearchText('');
         setApiSearchQuery(prev => {
             const newState = { ...prev };
-            delete newState[dataIndex];
+            if (dataIndex === 'id') {
+                delete newState.id;
+                delete newState.ticket_number;
+            } else {
+                delete newState[dataIndex];
+            }
             return newState;
         });
         setPagination(prev => ({ ...prev, page: 1 }));
@@ -293,7 +310,9 @@ const TicketList: React.FC = () => {
             </div>
         ),
         filterIcon: (filtered: boolean) => {
-            const isFilteredByApi = !!apiSearchQuery[dataIndex];
+            const isFilteredByApi = dataIndex === 'id'
+                ? !!apiSearchQuery.id || !!apiSearchQuery.ticket_number
+                : !!apiSearchQuery[dataIndex];
             return <SearchOutlined style={{ color: isFilteredByApi ? '#1677ff' : undefined }} />
         },
     });
@@ -347,9 +366,9 @@ const TicketList: React.FC = () => {
             title: t('tickets.ticket_number'),
             dataIndex: 'id',
             key: 'id',
-            width: 150,
+            width: 80,
             fixed: 'left',
-            ...getColumnSearchProps('id' as any, 'tickets.id'),
+            ...getColumnSearchProps('id' as any, 'tickets.ticket_number'),
             render: (id: string, record: Ticket) => {
                 const displayValue = record.ticket_number || id;
 
@@ -373,7 +392,7 @@ const TicketList: React.FC = () => {
             title: t('tickets.title'),
             dataIndex: 'title',
             key: 'title',
-            width: 350,
+            width: 450,
             render: (text: string, record: Ticket) => (
                 <Popover
                     title={t('tickets.title')}
@@ -386,11 +405,13 @@ const TicketList: React.FC = () => {
                         style={{
                             cursor: 'pointer',
                             color: 'var(--color-primary, #1677ff)',
-                            display: 'inline-block'
+                            display: 'block',
+                            width: '100%'
                         }}
                     >
                         <EllipsisComponent content={renderHighlightedText(text, 'title')} />
-                    </div>                </Popover>
+                    </div>
+                </Popover>
             ),
             ...getColumnSearchProps('title', 'tickets.title'),
         },
@@ -479,32 +500,25 @@ const TicketList: React.FC = () => {
             dataIndex: 'assignee',
             key: 'assignee',
             width: 100,
+            ellipsis: true,
 
             render: (assignees: any[]) => {
                 if (!assignees || assignees.length === 0) {
                     return <Typography.Text type="secondary" italic>{t('tickets.unassigned')}</Typography.Text>;
                 }
 
-                const tagElements = assignees.map((a) => (
-                    <span
-                        key={a.id}
-                        color="cyan"
-                        style={{ margin: '2px' }}
-                    >
-                        {a.name || `${a.first_name} ${a.last_name}`}
-                    </span>
-                ));
+                const assigneeNames = assignees
+                    .map((a) => a.name || `${a.first_name} ${a.last_name}`.trim())
+                    .filter(Boolean);
 
                 return (
                     <Popover
                         title={t('tickets.assignee')}
-                        content={<div style={{ maxWidth: 300 }}>{tagElements}</div>}
+                        content={<div style={{ maxWidth: 300 }}>{assigneeNames.join(', ')}</div>}
                         trigger="hover"
                         placement="topLeft"
                     >
-                        <div className="assignee-ellipsis-wrapper">
-                            <Typography.Text ellipsis> {tagElements}</Typography.Text>
-                        </div>
+                        <EllipsisComponent content={assigneeNames.join(', ')} />
                     </Popover>
                 );
             }
@@ -545,6 +559,17 @@ const TicketList: React.FC = () => {
             dataIndex: ['requester', 'name'],
             key: 'requesterName',
             width: 180,
+            ellipsis: true,
+            render: (requesterName: string) => (
+                <Popover
+                    title={t('tickets.requester')}
+                    content={<div style={{ maxWidth: 300 }}>{requesterName || t('common.empty')}</div>}
+                    trigger="hover"
+                    placement="topLeft"
+                >
+                    <EllipsisComponent content={requesterName || t('common.empty')} />
+                </Popover>
+            ),
         }] : []),
     ];
 
@@ -610,9 +635,12 @@ const TicketList: React.FC = () => {
         }
     };
 
+    const colWidth = {
+        id: 120, status: 60, priority: 80, title: 450, specialization: 80, problem: 80, requesterName: 100, assignee: 60
+    };
     const handleResetSettings = () => {
         const defaultOrder = columns.map(col => col.key as string);
-        const defaultWidths = { id: 150, status: 140, priority: 120, title: 350, specialization: 180, problem: 180, requesterName: 180, assignee: 100 };
+        const defaultWidths = colWidth;
         // description: 500,};
 
         setColumnOrder(defaultOrder);
@@ -731,7 +759,7 @@ const TicketList: React.FC = () => {
 
     const [colWidths, setColWidths] = useState<{ [key: string]: number }>(() =>
         getSavedData('ticket_column_widths', {
-            id: 150, status: 140, priority: 120, title: 250, specialization: 180, problem: 180, requesterName: 180, assignee: 300
+            ...colWidth
             // description: 500,
         })
     );

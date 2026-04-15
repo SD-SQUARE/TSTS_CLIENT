@@ -122,6 +122,11 @@
     "delete_prompt_user": "Are you sure you want to delete this user?",
     "delete_name_mismatch_warning_user": "The name entered does not match the user name. Are you sure you want to proceed?"
   },
+  "roles":
+  {
+    "admin": "Admin"
+  }
+  ,
   "group_form": {
     "add_title": "Add New Group",
     "edit_title": "Edit Group",
@@ -261,7 +266,7 @@
     "participants": "Participants",
     "listTitle": "Tickets Overview",
     "id": "ID",
-    "ticket_number": "Ticket Number",
+    "ticket_number": "Ticket No.",
     "title": "Title",
     "problemType": "Problem Type",
     "specialization": "Specialization",

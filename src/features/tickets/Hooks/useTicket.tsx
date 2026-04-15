@@ -4,11 +4,30 @@ import api from '../../../api/http';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
-const fetchTickets = async (page: number, pageSize: number, searchQuery: { [key: string]: string }): Promise<{ data: Ticket[], total: number }> => {
+export type TicketSearchValue = string | string[];
+export type TicketSearchQuery = Record<string, TicketSearchValue>;
 
-    const query = Object.entries(searchQuery).filter(([, value]) => value).reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+const fetchTickets = async (page: number, pageSize: number, searchQuery: TicketSearchQuery): Promise<{ data: Ticket[], total: number }> => {
+
+    const query = Object.entries(searchQuery).reduce<Record<string, TicketSearchValue>>((acc, [key, value]) => {
+        if (Array.isArray(value)) {
+            if (value.length > 0) {
+                acc[key] = value;
+            }
+            return acc;
+        }
+
+        if (value) {
+            acc[key] = value;
+        }
+
+        return acc;
+    }, {});
     const response = await api.get<TicketsResponse>(`/v1/tickets/`, {
-        params: { page, page_size: pageSize, ...query },
+        params: { page_index: page, page_size: pageSize, ...query },
+        paramsSerializer: {
+            indexes: null,
+        },
     });
 
     return {
@@ -18,7 +37,7 @@ const fetchTickets = async (page: number, pageSize: number, searchQuery: { [key:
     };
 };
 
-export const useTickets = (page: number, pageSize: number, searchQuery: { [key: string]: string } = {}) => {
+export const useTickets = (page: number, pageSize: number, searchQuery: TicketSearchQuery = {}) => {
     return useQuery({
         queryKey: ['tickets', page, pageSize, searchQuery],
         queryFn: () => fetchTickets(page, pageSize, searchQuery),
@@ -128,13 +147,14 @@ export const useUsersLookup = () => {
     });
 };
 
-export const useActionsLookup = () => {
+export const useActionsLookup = (ticketId?: string) => {
     return useQuery({
-        queryKey: ['lookup', 'actions'],
+        queryKey: ['lookup', 'actions', ticketId],
         queryFn: async () => {
-            const { data } = await api.get('/v1/lookups/actions/history');
+            const { data } = await api.get(`/v1/lockups/ticket/${ticketId}/activities`);
             return data; 
         },
+        enabled: !!ticketId,
         staleTime: 5 * 60 * 1000,
     });
 };

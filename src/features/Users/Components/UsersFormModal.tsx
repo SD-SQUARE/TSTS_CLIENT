@@ -181,7 +181,7 @@ const UserFormModal: React.FC<{
             domain: data.domain?.id || null,
             permission_profile: data.permission_profile?.id || null,
 
-            departments: data.departments.map(item => item.id),
+            departments: data.departments?.map(item => item.id),
             specializations: data.specializations.map(item => item.id),
         };
 

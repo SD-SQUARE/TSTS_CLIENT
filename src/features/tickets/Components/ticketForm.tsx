@@ -541,13 +541,17 @@ const TicketForm: React.FC = () => {
                                             : {selectedProblemData.name}
                                         </span>
                                     ) : (
-                                        <Tag
-                                            color="red"
-                                            variant='outlined'
-                                            style={{ marginInlineStart: '8px' }}
-                                        >
-                                            {t('tickets.autoAssignPlaceholder')}
-                                        </Tag>
+                                        // <Tag
+                                        //     color="red"
+                                        //     variant='outlined'
+                                        //     style={{ marginInlineStart: '8px' }}
+                                        // >
+                                        //     {t('tickets.autoAssignPlaceholder')}
+                                            // </Tag>
+                                            <div style={{"margin": "0 0.5em" }}> 
+                                                
+                                                <RequiredTag />
+                                            </div>
                                     )}
                                 </div>
 

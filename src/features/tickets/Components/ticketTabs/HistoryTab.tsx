@@ -121,6 +121,7 @@ const TicketHistoryTab: React.FC = () => {
                 />
             ) : (
                 <TicketHistoryTable
+                    ticketId={ticketId}
                     activities={filteredActivities}
                     getIcon={getActivityIcon}
                     getColor={getActivityColor}

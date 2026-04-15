@@ -8,6 +8,7 @@ import i18n from '../../../../../i18n';
 import { useActionsLookup, useUsersLookup } from '../../../Hooks/useTicket';
 
 interface Props {
+    ticketId?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     activities: any[];
     getIcon: (type: string, size?: number) => React.ReactNode;
@@ -17,11 +18,73 @@ interface Props {
     currentFilters: { user?: string; action?: string };
 }
 
-const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor, onUserSearch, onActionSearch, currentFilters }) => {
+const formatHistoryValue = (value: unknown): string | undefined => {
+    if (value === null || value === undefined || value === '') return undefined;
+    return String(value);
+};
+
+const extractStatusPair = (value: any) => {
+    if (!value || typeof value !== 'object') {
+        return { oldValue: undefined, newValue: undefined };
+    }
+
+    return {
+        oldValue: formatHistoryValue(value.oldStatus ?? value.oldValue),
+        newValue: formatHistoryValue(value.newStatus ?? value.newValue),
+    };
+};
+
+const getStatusChangeValues = (meta: any) => {
+    if (!meta || typeof meta !== 'object') {
+        return { oldValue: undefined, newValue: undefined };
+    }
+
+    const directMetaPair = {
+        oldValue: formatHistoryValue(meta.oldStatus ?? meta.oldValue),
+        newValue: formatHistoryValue(meta.newStatus ?? meta.newValue),
+    };
+    if (directMetaPair.oldValue || directMetaPair.newValue) {
+        return directMetaPair;
+    }
+
+    const directStatusChangePair = extractStatusPair(meta?.statusChange);
+    if (directStatusChangePair.oldValue || directStatusChangePair.newValue) {
+        return directStatusChangePair;
+    }
+
+    const nestedContainers = [meta?.change, meta?.changes, meta?.statusChange];
+    for (const container of nestedContainers) {
+        if (!container || typeof container !== 'object') continue;
+
+        for (const entry of Object.values(container)) {
+            const { oldValue, newValue } = extractStatusPair(entry);
+            if (oldValue || newValue) {
+                return { oldValue, newValue };
+            }
+        }
+    }
+
+    return { oldValue: undefined, newValue: undefined };
+};
+
+const renderChangeTag = (value: string | undefined, color?: string) => {
+    if (!value) return '-';
+
+    return (
+        <Tag color={color}>
+            {value}
+        </Tag>
+    );
+};
+
+const TicketHistoryTable: React.FC<Props> = ({ ticketId, activities, getIcon, getColor, onUserSearch, onActionSearch, currentFilters }) => {
     const { t } = useTranslation();
 
     const { data: usersData } = useUsersLookup();
-    const { data: actionsData } = useActionsLookup();
+    const { data: actionsData } = useActionsLookup(ticketId);
+    const actionOptions = Array.isArray(actionsData)
+        ? actionsData
+        : actionsData?.actions ?? [];
 
     const columns: any[] = [
         {
@@ -84,11 +147,20 @@ const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor, on
                         placeholder={t('tickets.searchAction')}
                         style={{ width: 180 }}
                         value={currentFilters.action}
-                        onChange={onActionSearch} 
+                        onChange={onActionSearch}
+                        optionFilterProp="label"
                     >
-                        {actionsData?.actions?.map((a: any) => (
-                            <Select.Option key={a.id} value={a.name}>{a.name}</Select.Option>
-                        ))}
+                        {actionOptions.map((action: any) => {
+                            const actionType = action?.type ?? action?.name;
+
+                            if (!actionType) return null;
+
+                            return (
+                                <Select.Option key={actionType} value={actionType} label={actionType}>
+                                    {actionType}
+                                </Select.Option>
+                            );
+                        })}
                     </Select>
                 </div>
             ),
@@ -111,6 +183,14 @@ const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor, on
             dataIndex: 'content',
             key: 'content',
             width: 250,
+            render: (text: string) => (
+                <Typography.Paragraph
+                    ellipsis={{ rows: 2, tooltip: text || '-' }}
+                    style={{ marginBottom: 0, maxWidth: 250 }}
+                >
+                    {text || '-'}
+                </Typography.Paragraph>
+            ),
         },
         {
             title: t('tickets.date'),
@@ -118,7 +198,7 @@ const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor, on
             key: 'createdAt',
             width: 160,
             render: (date: string) => (
-                <Flex vertical gap={4} dir="ltr" style={{ alignItems: 'flex-start' }}>
+                <Flex vertical gap={4} dir="ltr" style={{ alignItems: 'flex-start' }}> 
                     <Space size={6} style={{ color: 'rgba(0, 0, 0, 0.45)', fontSize: '12px' }}>
                         <ClockCircleOutlined />
                         <span dir='ltr'>{dayjs(date).format('h:mm A')}</span>
@@ -152,9 +232,10 @@ const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor, on
                     key: 'old_state',
                     width: 100,
                     align: 'center',
-                    render: (meta: any) => meta?.previousStatus ? (
-                        <Tag>{t(`status.${meta.previousStatus.toLowerCase().replace(' ', '_')}`, { defaultValue: meta.previousStatus })}</Tag>
-                    ) : '-',
+                    render: (meta: any) => {
+                        const { oldValue } = getStatusChangeValues(meta);
+                        return renderChangeTag(oldValue);
+                    },
                 },
                 {
                     title: t('common.new'),
@@ -162,9 +243,10 @@ const TicketHistoryTable: React.FC<Props> = ({ activities, getIcon, getColor, on
                     key: 'newStatus',
                     width: 100,
                     align: 'center',
-                    render: (meta: any) => meta?.newStatus ? (
-                        <Tag color="blue">{t(`status.${meta.newStatus.toLowerCase().replace(' ', '_')}`, { defaultValue: meta.newStatus })}</Tag>
-                    ) : '-',
+                    render: (meta: any) => {
+                        const { newValue } = getStatusChangeValues(meta);
+                        return renderChangeTag(newValue, 'blue');
+                    },
                 },
             ],
         },
