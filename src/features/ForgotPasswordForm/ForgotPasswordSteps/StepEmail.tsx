@@ -24,13 +24,13 @@ const StepEmail: React.FC<StepEmailProps> = ({ setStep, setEmail, setUid }) => {
             return response.data; 
         },
         onSuccess: (data) => {
-            message.success(data.message || t('forgotPassword.otpSent'));
+            message.success( t('forgotPassword.otpSent') || data.message);
             setUid(data.oid); 
             setStep(1);
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
-            message.error(error.response?.data?.message || t('forgotPassword.sendOtpError'));
+            message.error( t('forgotPassword.sendOtpError') || error.response?.data?.message);
         },
     });
 
