@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { DatePicker, Card, Tag, Flex, Pagination, Select, Typography, Popover } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { CalendarOutlined, ClockCircleOutlined, FilterOutlined, SearchOutlined } from '@ant-design/icons';
@@ -15,7 +15,7 @@ const { RangePicker } = DatePicker;
 const AuditLogList: React.FC = () => {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
-    const isAr = i18n.language === 'ar';
+    const rangePickerRef = useRef<any>(null);
 
     const [filters, setFilters] = useState({
         page: 1,
@@ -59,7 +59,7 @@ const AuditLogList: React.FC = () => {
             title: t('audit.userName'),
             dataIndex: ['actor', 'full_name'],
             render: (text: any) => {
-                console.log(text);
+                // console.log(text);
                 return `${text.first[i18next.language]} ${text.mid[i18next.language]} ${text.last[i18next.language]}`
             },
             key: 'actorId',
@@ -89,9 +89,11 @@ const AuditLogList: React.FC = () => {
             filterDropdown: () => (
                 <div style={{ padding: 12 }}>
                     <Select
+                        showSearch
                         placeholder={t('audit.filterByAction')}
                         style={{ width: 200 }}
                         allowClear
+                        optionFilterProp="label"
                         value={filters.action}
                         onChange={(val) => handleFilterChange('action', val)}
                         options={actions?.map((a: any) => ({
@@ -164,16 +166,27 @@ const AuditLogList: React.FC = () => {
                     />
 
                     <RangePicker
+                        ref={rangePickerRef}
                         showTime={{ format: 'HH:mm A' }}
                         format="YYYY-MM-DD / HH:mm A"
                         placeholder={[t('common.startDate'), t('common.endDate')]}
+                        onCalendarChange={(values, _, info) => {
+                            if (info.range === 'start' && values?.[0] && !values?.[1]) {
+                                setTimeout(() => rangePickerRef.current?.focus(1), 0);
+                            }
+                        }}
                         onChange={(values) => {
                             setFilters(prev => ({
                                 ...prev,
-                                from: values ? values[0]!.format('hh:mm A / DD-mm-YYYY') : undefined,
-                                to: values ? values[1]!.format('hh:mm A / DD-mm-YYYY') : undefined,
+                                from: values?.[0] ? values[0].toISOString() : undefined,
+                                to: values?.[1] ? values[1].toISOString() : undefined,
                                 page: 1
                             }));
+                        }}
+                        onOk={() => {
+                            if (rangePickerRef.current) {
+                                rangePickerRef.current.blur();
+                            }
                         }}
                     />
                 </Flex>

@@ -10,8 +10,58 @@ interface AuditLogDetailsProps {
     data: any;
 }
 
+const formatHistoryValue = (value: unknown): string | undefined => {
+    if (value === null || value === undefined || value === '') return undefined;
+    return String(value);
+};
+
+const extractStatusPair = (value: any) => {
+    if (!value || typeof value !== 'object') {
+        return { oldValue: undefined, newValue: undefined };
+    }
+
+    return {
+        oldValue: formatHistoryValue(value.oldStatus ?? value.oldValue),
+        newValue: formatHistoryValue(value.newStatus ?? value.newValue),
+    };
+};
+
+const getMetadataChangeValues = (meta: any) => {
+    if (!meta || typeof meta !== 'object') {
+        return { oldValue: undefined, newValue: undefined };
+    }
+
+    const directMetaPair = {
+        oldValue: formatHistoryValue(meta.oldStatus ?? meta.oldValue),
+        newValue: formatHistoryValue(meta.newStatus ?? meta.newValue),
+    };
+    if (directMetaPair.oldValue || directMetaPair.newValue) {
+        return directMetaPair;
+    }
+
+    const directStatusChangePair = extractStatusPair(meta?.statusChange);
+    if (directStatusChangePair.oldValue || directStatusChangePair.newValue) {
+        return directStatusChangePair;
+    }
+
+    const nestedContainers = [meta?.change, meta?.changes, meta?.statusChange];
+    for (const container of nestedContainers) {
+        if (!container || typeof container !== 'object') continue;
+
+        for (const entry of Object.values(container)) {
+            const { oldValue, newValue } = extractStatusPair(entry);
+            if (oldValue || newValue) {
+                return { oldValue, newValue };
+            }
+        }
+    }
+
+    return { oldValue: undefined, newValue: undefined };
+};
+
 const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({ data }) => {
     const { t } = useTranslation();
+    const { oldValue, newValue } = getMetadataChangeValues(data?.metadata);
 
     return (
         <Card title={t('audit.details')}>
@@ -51,7 +101,7 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({ data }) => {
                             <Typography.Text type="secondary" style={{ fontSize: '10px', display: 'block', textTransform: 'uppercase' }}>
                                 {t('common.old')}
                             </Typography.Text>
-                            <Typography.Text strong>{data?.metadata?.oldValue || '-'}</Typography.Text>
+                            <Typography.Text strong>{oldValue || '-'}</Typography.Text>
                         </Card>
 
                         <Flex align="center" style={{ padding: '0 8px' }}>
@@ -62,7 +112,7 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({ data }) => {
                             <Typography.Text type="secondary" style={{ fontSize: '10px', display: 'block', textTransform: 'uppercase' }}>
                                 {t('common.new')}
                             </Typography.Text>
-                            <Typography.Text strong>{data?.metadata?.newValue || '-'}</Typography.Text>
+                            <Typography.Text strong>{newValue || '-'}</Typography.Text>
                         </Card>
                     </Flex>
                 </Descriptions.Item>
