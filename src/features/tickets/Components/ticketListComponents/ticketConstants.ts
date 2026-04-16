@@ -18,7 +18,7 @@ export const DEFAULT_COL_WIDTHS: Record<string, number> = {
     specialization: 100,
     problem: 80,
     requesterName: 100,
-    assignee: 60,
+    assignee: 160,
 };
 
 export const UUID_PATTERN =

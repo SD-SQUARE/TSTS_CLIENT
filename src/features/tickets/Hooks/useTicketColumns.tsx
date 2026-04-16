@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useRef, useState } from 'react';
-import { Button, Flex, Input, Popover, Select, Space, TreeSelect, Typography } from 'antd';
+import { Button, Flex, Input, Popover, Select, Space, TreeSelect } from 'antd';
 import { FilterOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import Highlighter from 'react-highlight-words';
@@ -11,6 +11,7 @@ import type { TicketSearchQuery } from './useTicket';
 import { getTicketIdentifierSearchKey } from '../Components/ticketListComponents/storageUtils';
 import type { Problem, Specialization, Ticket } from '../Types/tickets';
 import EllipsisComponent from '../../../components/EllipsisComponent';
+import AssigneeColumnCell from '../Components/ticketListComponents/AssigneeColumnCell';
 
 
 type SearchableDataIndex = 'id' | 'title' | 'problem' | 'specialization' | 'status' | 'priority';
@@ -330,30 +331,11 @@ export const useTicketColumns = ({
             title: t('tickets.assignee'),
             dataIndex: 'assignee',
             key: 'assignee',
-            width: 100,
-            ellipsis: true,
-            render: (assignees: any[]) => {
-                if (!assignees || assignees.length === 0) {
-                    return (
-                        <Typography.Text type="secondary" italic>
-                            {t('tickets.unassigned')}
-                        </Typography.Text>
-                    );
-                }
-                const assigneeNames = assignees
-                    .map((a) => a.name || `${a.first_name} ${a.last_name}`.trim())
-                    .filter(Boolean);
-                return (
-                    <Popover
-                        title={t('tickets.assignee')}
-                        content={<div style={{ maxWidth: 300 }}>{assigneeNames.join(', ')}</div>}
-                        trigger="hover"
-                        placement="topLeft"
-                    >
-                        <EllipsisComponent content={assigneeNames.join(', ')} />
-                    </Popover>
-                );
-            },
+            width: 160,
+            render: (assignees: any[], record: any) => {
+
+                return <AssigneeColumnCell record={record} assignees={assignees} />;
+            }
         },
         {
             title: t('tickets.specialization'),
@@ -388,28 +370,28 @@ export const useTicketColumns = ({
         },
         ...(!isRequester
             ? [
-                  {
-                      title: t('tickets.requester'),
-                      dataIndex: ['requester', 'name'],
-                      key: 'requesterName',
-                      width: 180,
-                      ellipsis: true,
-                      render: (requesterName: string) => (
-                          <Popover
-                              title={t('tickets.requester')}
-                              content={
-                                  <div style={{ maxWidth: 300 }}>
-                                      {requesterName || t('common.empty')}
-                                  </div>
-                              }
-                              trigger="hover"
-                              placement="topLeft"
-                          >
-                              <EllipsisComponent content={requesterName || t('common.empty')} />
-                          </Popover>
-                      ),
-                  },
-              ]
+                {
+                    title: t('tickets.requester'),
+                    dataIndex: ['requester', 'name'],
+                    key: 'requesterName',
+                    width: 180,
+                    ellipsis: true,
+                    render: (requesterName: string) => (
+                        <Popover
+                            title={t('tickets.requester')}
+                            content={
+                                <div style={{ maxWidth: 300 }}>
+                                    {requesterName || t('common.empty')}
+                                </div>
+                            }
+                            trigger="hover"
+                            placement="topLeft"
+                        >
+                            <EllipsisComponent content={requesterName || t('common.empty')} />
+                        </Popover>
+                    ),
+                },
+            ]
             : []),
     ];
 
