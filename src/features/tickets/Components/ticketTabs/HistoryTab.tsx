@@ -68,7 +68,7 @@ const TicketHistoryTab: React.FC = () => {
 
 
     if (isLoading) return <Spin style={{ display: 'block', margin: '50px auto' }} />;
-    if (!activities || activities.length === 0) return <Empty description={t('common.noHistory')} />;
+    // if (!activities || activities.length === 0) return <Empty description={t('common.noHistory')} />;
 
     
 
@@ -112,6 +112,10 @@ const TicketHistoryTab: React.FC = () => {
 
             {viewType === 'timeline' ? (
 
+                (!filteredActivities || filteredActivities.length === 0) ? (
+                <Empty description={t('common.empty')} style={{ marginTop: 60 }} />
+            ) : (
+
                 <TicketHistoryTimeline
                     activities={filteredActivities}
                     zoom={zoom}
@@ -119,6 +123,7 @@ const TicketHistoryTab: React.FC = () => {
                     getIcon={getActivityIcon}
                     getColor={getActivityColor}
                 />
+            )
             ) : (
                 <TicketHistoryTable
                     ticketId={ticketId}
