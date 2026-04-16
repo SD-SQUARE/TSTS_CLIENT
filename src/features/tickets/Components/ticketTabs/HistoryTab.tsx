@@ -27,7 +27,7 @@ const TicketHistoryTab: React.FC = () => {
     const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
 
     const { zoom, handleZoomIn, handleZoomOut, handleResetZoom } = useTimelineZoom(1);
-    const { data: activities, isLoading, refetch } = useTicketActivities(ticketId, {user_id: userSearch,
+    const { data: activities, isLoading, refetch } = useTicketActivities(ticketId, {userId: userSearch,
         type: actionSearch,});
 
     useEffect(() => {
