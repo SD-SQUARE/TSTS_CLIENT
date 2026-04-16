@@ -22,8 +22,8 @@ const TicketListStyles: React.FC = () => (
 
         .row-highlight-open, 
         .row-highlight-re-open         { background-color: #e6f4ff !important; }
-        .row-highlight-closed         { background-color: #e6ffe6 !important; }
-        .row-highlight-resolved       { background-color: #90ee90 !important; }
+        .row-highlight-closed         { background-color: #abf6ab !important; }
+        .row-highlight-resolved       { background-color: #65c165 !important; }
         .row-highlight-in-progress    { background-color: #bfcfff !important; }
         .row-highlight-pending        { background-color: #ffffbf !important; }
         .row-highlight-out-of-service { background-color: #fff1f0 !important; }
@@ -33,9 +33,9 @@ const TicketListStyles: React.FC = () => (
         .ant-table-tbody > tr.row-highlight-re-open > td.ant-table-cell-fix-start,
         .ant-table-tbody > tr.row-highlight-re-open > td.ant-table-cell-fix-left         { background-color: #e6f4ff !important; }
         .ant-table-tbody > tr.row-highlight-closed > td.ant-table-cell-fix-start,
-        .ant-table-tbody > tr.row-highlight-closed > td.ant-table-cell-fix-left       { background-color: #e6ffe6 !important; }
+        .ant-table-tbody > tr.row-highlight-closed > td.ant-table-cell-fix-left       { background-color: #abf6ab !important; }
         .ant-table-tbody > tr.row-highlight-resolved > td.ant-table-cell-fix-start,
-        .ant-table-tbody > tr.row-highlight-resolved > td.ant-table-cell-fix-left     { background-color: #90ee90 !important; }
+        .ant-table-tbody > tr.row-highlight-resolved > td.ant-table-cell-fix-left     { background-color: #65c165 !important; }
         .ant-table-tbody > tr.row-highlight-in-progress > td.ant-table-cell-fix-start,
         .ant-table-tbody > tr.row-highlight-in-progress > td.ant-table-cell-fix-left  { background-color: #bfcfff !important; }
         .ant-table-tbody > tr.row-highlight-pending > td.ant-table-cell-fix-start,
