@@ -22,8 +22,8 @@ const TicketListStyles: React.FC = () => (
 
         .row-highlight-open, 
         .row-highlight-re-open         { background-color: #e6f4ff !important; }
-        .row-highlight-closed         { background-color: #e6ffe6 !important; }
-        .row-highlight-resolved       { background-color: #90ee90 !important; }
+        .row-highlight-closed         { background-color: #abf6ab !important; }
+        .row-highlight-resolved       { background-color: #65c165 !important; }
         .row-highlight-in-progress    { background-color: #bfcfff !important; }
         .row-highlight-pending        { background-color: #ffffbf !important; }
         .row-highlight-out-of-service { background-color: #fff1f0 !important; }
@@ -33,9 +33,9 @@ const TicketListStyles: React.FC = () => (
         .ant-table-tbody > tr.row-highlight-re-open > td.ant-table-cell-fix-start,
         .ant-table-tbody > tr.row-highlight-re-open > td.ant-table-cell-fix-left         { background-color: #e6f4ff !important; }
         .ant-table-tbody > tr.row-highlight-closed > td.ant-table-cell-fix-start,
-        .ant-table-tbody > tr.row-highlight-closed > td.ant-table-cell-fix-left       { background-color: #e6ffe6 !important; }
+        .ant-table-tbody > tr.row-highlight-closed > td.ant-table-cell-fix-left       { background-color: #abf6ab !important; }
         .ant-table-tbody > tr.row-highlight-resolved > td.ant-table-cell-fix-start,
-        .ant-table-tbody > tr.row-highlight-resolved > td.ant-table-cell-fix-left     { background-color: #90ee90 !important; }
+        .ant-table-tbody > tr.row-highlight-resolved > td.ant-table-cell-fix-left     { background-color: #65c165 !important; }
         .ant-table-tbody > tr.row-highlight-in-progress > td.ant-table-cell-fix-start,
         .ant-table-tbody > tr.row-highlight-in-progress > td.ant-table-cell-fix-left  { background-color: #bfcfff !important; }
         .ant-table-tbody > tr.row-highlight-pending > td.ant-table-cell-fix-start,
@@ -44,8 +44,11 @@ const TicketListStyles: React.FC = () => (
         .ant-table-tbody > tr.row-highlight-out-of-service > td.ant-table-cell-fix-left { background-color: #fff1f0 !important; }
 
         [class^="row-highlight-"]:hover > td { filter: brightness(0.97); }
-        [dir='rtl'] .react-resizable-handle { left: 0 !important; right: auto !important; cursor: col-resize; }
-        [dir='ltr'] .react-resizable-handle { right: 0 !important; left: auto !important; cursor: col-resize; }
+        [dir='rtl'] .ant-table-filter-column { flex-direction: row; }
+        [dir='rtl'] .ant-table-filter-column-title { text-align: right; }
+        [dir='rtl'] .ant-table-filter-trigger { margin-right: 8px; margin-left: 0; }
+        .react-resizable-handle-w { left: -10px !important; right: auto !important; cursor: col-resize; }
+        .react-resizable-handle-e { right: -10px !important; left: auto !important; cursor: col-resize; }
         .react-resizable-handle-active { z-index: 1000; }
     `}</style>
 );
