@@ -20,23 +20,26 @@ const TicketListStyles: React.FC = () => (
         }
         .ant-table-body { min-height: calc(100vh - 270px); }
 
-        .row-highlight-open           { background-color: #e6f4ff !important; }
-        .row-highlight-closed,
-        .row-highlight-resolved       { background-color: #f6ffed !important; }
-        .row-highlight-in-progress    { background-color: #fff7e6 !important; }
-        .row-highlight-pending        { background-color: #fffbe6 !important; }
+        .row-highlight-open, 
+        .row-highlight-re-open         { background-color: #e6f4ff !important; }
+        .row-highlight-closed         { background-color: #e6ffe6 !important; }
+        .row-highlight-resolved       { background-color: #90ee90 !important; }
+        .row-highlight-in-progress    { background-color: #bfcfff !important; }
+        .row-highlight-pending        { background-color: #ffffbf !important; }
         .row-highlight-out-of-service { background-color: #fff1f0 !important; }
 
         .ant-table-tbody > tr.row-highlight-open > td.ant-table-cell-fix-start,
         .ant-table-tbody > tr.row-highlight-open > td.ant-table-cell-fix-left         { background-color: #e6f4ff !important; }
+        .ant-table-tbody > tr.row-highlight-re-open > td.ant-table-cell-fix-start,
+        .ant-table-tbody > tr.row-highlight-re-open > td.ant-table-cell-fix-left         { background-color: #e6f4ff !important; }
         .ant-table-tbody > tr.row-highlight-closed > td.ant-table-cell-fix-start,
-        .ant-table-tbody > tr.row-highlight-closed > td.ant-table-cell-fix-left,
+        .ant-table-tbody > tr.row-highlight-closed > td.ant-table-cell-fix-left       { background-color: #e6ffe6 !important; }
         .ant-table-tbody > tr.row-highlight-resolved > td.ant-table-cell-fix-start,
-        .ant-table-tbody > tr.row-highlight-resolved > td.ant-table-cell-fix-left     { background-color: #f6ffed !important; }
+        .ant-table-tbody > tr.row-highlight-resolved > td.ant-table-cell-fix-left     { background-color: #90ee90 !important; }
         .ant-table-tbody > tr.row-highlight-in-progress > td.ant-table-cell-fix-start,
-        .ant-table-tbody > tr.row-highlight-in-progress > td.ant-table-cell-fix-left  { background-color: #fff7e6 !important; }
+        .ant-table-tbody > tr.row-highlight-in-progress > td.ant-table-cell-fix-left  { background-color: #bfcfff !important; }
         .ant-table-tbody > tr.row-highlight-pending > td.ant-table-cell-fix-start,
-        .ant-table-tbody > tr.row-highlight-pending > td.ant-table-cell-fix-left      { background-color: #fffbe6 !important; }
+        .ant-table-tbody > tr.row-highlight-pending > td.ant-table-cell-fix-left      { background-color: #ffffbf !important; }
         .ant-table-tbody > tr.row-highlight-out-of-service > td.ant-table-cell-fix-start,
         .ant-table-tbody > tr.row-highlight-out-of-service > td.ant-table-cell-fix-left { background-color: #fff1f0 !important; }
 
