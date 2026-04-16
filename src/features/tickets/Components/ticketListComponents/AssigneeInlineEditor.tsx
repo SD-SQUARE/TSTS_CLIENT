@@ -13,7 +13,6 @@ interface InlineEditorProps {
 
 const AssigneeInlineEditor: React.FC<InlineEditorProps> = ({ record, onSuccess }) => {
     const { t } = useTranslation();
-    
     const { coordinateMutation } = useTicketMutations(record.id);
 
     const handleUpdate = (newIds: string[]) => {
@@ -36,9 +35,9 @@ const AssigneeInlineEditor: React.FC<InlineEditorProps> = ({ record, onSuccess }
                 requesterId={record.requester?.id}
                 onUpdateAssignees={handleUpdate}
                 isUpdating={coordinateMutation.isPending}
+                forceEdit={true} 
             />
         </div>
     );
 };
-
 export default AssigneeInlineEditor;

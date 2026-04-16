@@ -97,15 +97,22 @@ interface AssigneeListProps {
 }
 
 
-const AssigneeList: React.FC<AssigneeListProps> = ({ assignees, requesterId, onUpdateAssignees, isUpdating }) => {
+const AssigneeList: React.FC<AssigneeListProps & { forceEdit?: boolean }> = ({ 
+    assignees, 
+    requesterId, 
+    onUpdateAssignees, 
+    isUpdating,
+    forceEdit = false 
+}) => {
     const { t } = useTranslation();
     const { role } = useParams();
     const isRequester = role === 'requester';
     const defaultOpenKey = role !== 'requester' ? ['1'] : [];
 
-    const [isEditing, setIsEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState(forceEdit);
     const [treeData, setTreeData] = useState<any[]>([]);
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
 
     useEffect(() => {
         if (assignees) setSelectedIds(assignees.map(a => a.id));
@@ -196,6 +203,7 @@ const AssigneeList: React.FC<AssigneeListProps> = ({ assignees, requesterId, onU
         <Collapse ghost expandIconPosition="end" defaultActiveKey={defaultOpenKey}>
             <Collapse.Panel
                 header={
+                    !forceEdit && (
                     <Flex justify="space-between" align="center" style={{ width: '100%' }}>
                         <Typography.Text strong>
                             {t('tickets.assignee')} ({(assignees?.length || 0)})
@@ -209,8 +217,10 @@ const AssigneeList: React.FC<AssigneeListProps> = ({ assignees, requesterId, onU
                             />
                         )}
                     </Flex>
+                    )
                 }
                 key="1"
+                showArrow={!forceEdit}
             >
                 {isEditing ? (
                     <Card size="small" style={{ marginBottom: 16, border: '1px dashed #1677ff' }}>
