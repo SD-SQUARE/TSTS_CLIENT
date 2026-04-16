@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { Avatar, Flex, Select, Space, Table, Tag, Typography } from 'antd';
+import { Avatar, Flex, Select, Space, Tag, Typography } from 'antd';
 import { CalendarOutlined, ClockCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../../../../i18n';
+import AppTable from '../../../../../components/AppTable';
 import { useActionsLookup, useTicketActivityUsersLookup } from '../../../Hooks/useTicket';
 
 interface Props {
@@ -300,7 +301,7 @@ const TicketHistoryTable: React.FC<Props> = ({ ticketId, activities, getIcon, ge
     ];
 
     return (
-        <Table
+        <AppTable
             dataSource={activities}
             columns={columns}
             rowKey="id"

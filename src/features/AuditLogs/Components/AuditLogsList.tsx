@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
-import { Table, DatePicker, Card, Tag, Flex, Pagination, Select, Typography, Popover } from 'antd';
+import { DatePicker, Card, Tag, Flex, Pagination, Select, Typography, Popover } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { CalendarOutlined, ClockCircleOutlined, FilterOutlined, SearchOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useAuditLogs, useAuditLookups, useUserLookup } from '../Hooks/useAuditLogs';
 import { useTranslation } from 'react-i18next';
 import EllipsisComponent from '../../../components/EllipsisComponent';
+import AppTable from '../../../components/AppTable';
 import i18next from 'i18next';
 
 const { RangePicker } = DatePicker;
@@ -177,10 +178,10 @@ const AuditLogList: React.FC = () => {
                     />
                 </Flex>
 
-                <Table
+                <AppTable
                     dataSource={data?.data || []}
                     columns={columns}
-                    loading={isLoading}
+                    skeletonLoading={isLoading}
                     rowKey="id"
                     pagination={false}
                     onRow={(record: any) => ({

@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import {
-  Table,
   Button,
   Modal,
   Form,
   Space,
   message,
   Input,
-  Skeleton,
   Descriptions,
   Card,
   Typography,
@@ -22,6 +20,7 @@ import {
   ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
+import AppTable from "./AppTable";
 import { mapRecordToFormValues, type FieldMapper } from "../utils/mapper";
 import { useTranslation } from "react-i18next";
 
@@ -253,7 +252,6 @@ export const GenericCrudPage = <T extends { id: string | number }>({
                 const renderedValue = col.render
                   ? col.render(value, viewingItem, 0)
                   : value;
-                    console.log(renderedValue);
                 return (
                   <Descriptions.Item
                     key={col.key || col.dataIndex}
@@ -342,17 +340,6 @@ export const GenericCrudPage = <T extends { id: string | number }>({
   // ==============================
   // LIST VIEW
   // ==============================
-  const skeletonRows = Array.from({ length: 6 }, (_, idx) => ({
-    id: `loading-${idx}`,
-  })) as T[];
-
-  const skeletonColumns = columns.map((col) => ({
-    ...col,
-    render: () => (
-      <Skeleton.Input style={{ width: "100%", height: 12 }} active />
-    ),
-  }));
-
   return (
     <div dir={isRtl ? "rtl" : "ltr"}>
       <div
@@ -391,17 +378,18 @@ export const GenericCrudPage = <T extends { id: string | number }>({
       </div>
 
       <div className="admin-card compact-table-wrapper">
-        <Table
+        <AppTable
           title={() => <Typography.Title level={3}>{title}</Typography.Title>}
           className="super-compact-table"
           size={tableSize}
-          columns={isLoading ? skeletonColumns : columns}
-          dataSource={isLoading ? skeletonRows : data}
+          skeletonLoading={isLoading}
+          columns={columns}
+          dataSource={data}
           rowKey="id"
           scroll={{ x: 800 }}
           onRow={(record) => ({
-            onClick: () => !isLoading && handleRowClick(record),
-            style: { cursor: isLoading ? "default" : "pointer" },
+            onClick: () => handleRowClick(record),
+            style: { cursor: "pointer" },
           })}
           pagination={
             isLoading

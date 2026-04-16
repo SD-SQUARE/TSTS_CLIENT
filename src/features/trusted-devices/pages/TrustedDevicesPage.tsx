@@ -1,10 +1,11 @@
 // features/trusted-devices/pages/TrustedDevicesPage.tsx
-import { Table, Input, Button, Space, Tag, Modal, Typography } from "antd";
+import { Input, Button, Space, Tag, Modal, Typography } from "antd";
 import { useState } from "react";
 import { useTrustedDevices, useDeleteTrustedDevice } from "../hooks/useTrustedDevices";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { DeleteOutlined } from "@ant-design/icons";
+import AppTable from "../../../components/AppTable";
 
 const { Text } = Typography;
 
@@ -88,10 +89,10 @@ const TrustedDevicesPage = () => {
                 />
             </Space>
 
-            <Table
+            <AppTable
                 title={() => <Typography.Title level={3}>{t("trusted_devices.Trusted Devices")}</Typography.Title>}
                 rowKey="id"
-                loading={isLoading}
+                skeletonLoading={isLoading}
                 columns={columns}
                 dataSource={data?.data?.data}
                 pagination={{

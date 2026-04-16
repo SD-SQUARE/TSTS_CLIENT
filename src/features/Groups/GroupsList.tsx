@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Table, Button, Space,   Pagination,  Popover, Typography, Tag, Input } from 'antd';
+import { Button, Space,   Pagination,  Popover, Typography, Tag, Input } from 'antd';
 import {    PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
@@ -10,6 +10,7 @@ import Highlighter from 'react-highlight-words';
 import GroupFormModal from './GroupFormModal';
 import type { Group, NamedObject } from './Types/groups';
 import AvatarDisplay from '../../components/AvatarDisplay';
+import AppTable from '../../components/AppTable';
 import { useDeleteGroup, useGroups } from './Hooks/useGroups';
 import { useNavigate } from 'react-router-dom';
 import EllipsisComponent from '../../components/EllipsisComponent';
@@ -334,11 +335,12 @@ const GroupsList: React.FC = () => {
 
             </Space>
 
-            <Table
+            <AppTable
                 columns={columns}
                 dataSource={data?.data || []}
                 rowKey="id"
-                loading={isLoading || deleteMutation.isPending}
+                skeletonLoading={isLoading}
+                loading={deleteMutation.isPending}
                 scroll={{ x: 'max-content', y: "calc(100vh - 200px)" }}
                 pagination={false}
                 onRow={handleRowClick}

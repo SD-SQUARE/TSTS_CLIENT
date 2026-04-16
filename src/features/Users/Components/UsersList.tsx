@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useRef, useState } from "react";
-import { Table, Button, Space, Popconfirm, message, Pagination, Tooltip, Badge, Tag, Popover, Input, Typography } from "antd";
+import { Button, Space, Popconfirm, message, Pagination, Tooltip, Badge, Tag, Popover, Input, Typography } from "antd";
 import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined, DownOutlined, SearchOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import type { ColumnsType } from "antd/es/table";
@@ -12,6 +12,7 @@ import Highlighter from 'react-highlight-words';
 import type { UserListItem } from "../Types/users";
 import { useDeleteUser, useUsers } from "../Hooks/useUsers";
 import AvatarDisplay from "../../../components/AvatarDisplay";
+import AppTable from "../../../components/AppTable";
 import UserFormModal from "./UsersFormModal";
 import { useNavigate } from "react-router-dom";
 import BulkCreateModal from "./BulkCreateModal";
@@ -450,11 +451,12 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                 </Space>
             </Space>
 
-            <Table
+            <AppTable
                 columns={columns}
                 dataSource={data?.data || []}
                 rowKey="id"
-                loading={isLoading || deleteMutation.isPending}
+                skeletonLoading={isLoading}
+                loading={deleteMutation.isPending}
                 scroll={{ x: "max-content", y: "calc(100vh - 200px)" }}
                 pagination={false}
                 onRow={handleRowClick}

@@ -20,11 +20,11 @@ export const useRowHighlighting = () => {
         if (!showRowColors) return '';
 
         const isHighlighted = highlightedStatuses.some(
-            (s) => s.toLowerCase().trim() === status.toLowerCase().trim()
+            (s) => s?.toLowerCase().trim() === status?.toLowerCase().trim()
         );
 
         return isHighlighted
-            ? `row-highlight-${status.toLowerCase().replace(/\s+/g, '-')}`
+            ? `row-highlight-${status?.toLowerCase().replace(/\s+/g, '-')}`
             : '';
     };
 

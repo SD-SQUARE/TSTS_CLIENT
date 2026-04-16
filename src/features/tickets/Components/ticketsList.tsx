@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useMemo, useState } from 'react';
 import {
-    Table, Typography, Spin, Alert, Pagination, Space, Button, Flex, Popover, Tooltip, Tag,
+    Typography, Alert, Pagination, Space, Button, Flex, Popover, Tooltip, Tag,
 } from 'antd';
 import { PlusOutlined, SettingOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,7 @@ import { ConfigProvider } from 'antd';
 import enUS from 'antd/lib/locale/en_US';
 import arEG from 'antd/lib/locale/ar_EG';
 
+import AppTable from '../../../components/AppTable';
 import { useTickets, type TicketSearchQuery } from '../Hooks/useTicket';
 import { useSpecializations, useTicketProblems } from '../Hooks/useTicketForm';
 import { useRowHighlighting } from '../Hooks/useRowHighlighting';
@@ -153,8 +154,6 @@ const TicketList: React.FC = () => {
     );
 
     // ─── Render ──────────────────────────────────────────────────────────────
-    if (isLoading) return <Spin size="large" style={{ display: 'block', margin: '50px auto' }} />;
-
     if (isError)
         return (
             <Alert
@@ -218,12 +217,12 @@ const TicketList: React.FC = () => {
                     </Space>
                 </Flex>
 
-                <Table
+                <AppTable
                     components={{ header: { cell: ResizableTitle } }}
                     columns={finalColumns}
                     dataSource={data?.data || []}
                     rowKey="id"
-                    loading={isLoading}
+                    skeletonLoading={isLoading}
                     tableLayout="auto"
                     rowClassName={(record) => getRowClassName(record.status)}
                     scroll={{

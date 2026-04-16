@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useCallback, useMemo } from 'react';
-import { Card, Table } from 'antd';
+import { Card } from 'antd';
 import type { DynamicColumn } from '../../Types/reports';
+import AppTable from '../../../../components/AppTable';
 import { getColumnSearchProps } from '../../utils/TableFilters';
 
 interface Props {
@@ -48,10 +49,10 @@ const ReportTable: React.FC<Props> = ({ columns, records, loading, title, filter
 
     return (
         <Card title={title}>
-            <Table
+            <AppTable
                 dataSource={records}
                 columns={mappedColumns}
-                loading={loading}
+                skeletonLoading={loading}
                 rowKey={(record, index) => record.id || index}
                 pagination={{ pageSize: 10, showSizeChanger: true }}
             />
