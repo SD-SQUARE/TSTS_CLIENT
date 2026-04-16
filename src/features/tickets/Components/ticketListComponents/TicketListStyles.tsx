@@ -18,7 +18,6 @@ const TicketListStyles: React.FC = () => (
             min-height: calc(100vh - 200px) !important;
             display: flex; align-items: center; justify-content: center; border-bottom: none;
         }
-        .ant-table-body { min-height: calc(100vh - 270px); }
 
         .row-highlight-open, 
         .row-highlight-re-open         { background-color: #e6f4ff !important; }

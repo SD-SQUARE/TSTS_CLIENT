@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Layout, Menu, Drawer} from 'antd';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import Body from './layouts/Body';
@@ -13,7 +13,7 @@ const MainLayout = ({ menuItems }) => {
 
     return (
         <Body>
-            <Layout style={{ minHeight: '100vh' }}>
+            <Layout style={{ minHeight: '100%', flex: 1 }}>
                 {/* Desktop Sider */}
                 <Sider
                     width={220}
@@ -58,9 +58,9 @@ const MainLayout = ({ menuItems }) => {
 
                 {/* Main Layout */}
                 <Layout style={{
+                    flex: 1,
                     padding: '0 16px 24px',
                     // background: '#f5f6fa',
-                    overflow: 'auto',
                 }}>
                     <Content style={{ padding: '24px 0', margin: 0 }}>
                         <Outlet />

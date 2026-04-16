@@ -25,7 +25,7 @@ const TicketReviewsTab: React.FC<Props> = ({ reviews, isLoading }) => {
 
     if (!reviews || reviews.length === 0) {
         return (
-            <Flex justify="center" align="center" style={{ minHeight: '200px' }}>
+            <Flex justify="center" align="center" style={{ minHeight: '200px',marginTop: "5rem"}}>
                 <Empty description={t('tickets.noReviews')} />
             </Flex>
         );

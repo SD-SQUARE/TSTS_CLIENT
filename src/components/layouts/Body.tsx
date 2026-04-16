@@ -1,42 +1,26 @@
-import { useEffect, useRef, useState } from "react";
-import { Content } from "antd/es/layout/layout";
+import { Layout } from "antd";
 import AppFooter from "./AppFooter";
 
 const Body = ({ children }) => {
-    const contentRef = useRef(null);
-    const [isOverflowing, setIsOverflowing] = useState(false);
-
-    useEffect(() => {
-        const checkOverflow = () => {
-            if (!contentRef.current) return;
-            const el = contentRef.current;
-            setIsOverflowing(el.scrollHeight > el.clientHeight);
-        };
-
-        checkOverflow();
-        window.addEventListener("resize", checkOverflow);
-
-        return () => window.removeEventListener("resize", checkOverflow);
-    }, [children]);
-
     return (
-        <>
-            <Content
-                ref={contentRef}
+        <Layout
+            style={{
+                minHeight: "calc(100vh - 64px)",
+                display: "flex",
+                flexDirection: "column",
+            }}
+        >
+            <Layout.Content
                 style={{
-                    height: "100%",
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
                 }}
             >
-                {/* Main content */}
                 {children}
-
-                {/* If overflow → footer inside */}
-                {isOverflowing && <AppFooter />}
-            </Content>
-
-            {/* If no overflow → footer outside */}
-            {!isOverflowing && <AppFooter />}
-        </>
+            </Layout.Content>
+            <AppFooter />
+        </Layout>
     );
 };
 

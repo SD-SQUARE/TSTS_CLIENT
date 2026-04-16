@@ -9,7 +9,6 @@ import {
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import api from '../../../../api/http';
 import { useTicketMedia } from '../../Hooks/useTicket';
 
 interface TicketMediaTabProps {

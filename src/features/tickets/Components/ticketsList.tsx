@@ -228,8 +228,8 @@ const TicketList: React.FC = () => {
                     rowClassName={(record) => getRowClassName(record.status)}
                     scroll={{
                         x: 'max-content',
-                        y: data?.data?.length > 0 ? 'calc(100vh - 280px)' : 'auto',
                     }}
+                    sticky
                     pagination={false}
                 />
             </ConfigProvider>
