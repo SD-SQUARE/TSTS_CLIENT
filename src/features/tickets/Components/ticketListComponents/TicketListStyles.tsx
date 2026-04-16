@@ -44,8 +44,11 @@ const TicketListStyles: React.FC = () => (
         .ant-table-tbody > tr.row-highlight-out-of-service > td.ant-table-cell-fix-left { background-color: #fff1f0 !important; }
 
         [class^="row-highlight-"]:hover > td { filter: brightness(0.97); }
-        [dir='rtl'] .react-resizable-handle { left: 0 !important; right: auto !important; cursor: col-resize; }
-        [dir='ltr'] .react-resizable-handle { right: 0 !important; left: auto !important; cursor: col-resize; }
+        [dir='rtl'] .ant-table-filter-column { flex-direction: row; }
+        [dir='rtl'] .ant-table-filter-column-title { text-align: right; }
+        [dir='rtl'] .ant-table-filter-trigger { margin-right: 8px; margin-left: 0; }
+        .react-resizable-handle-w { left: -10px !important; right: auto !important; cursor: col-resize; }
+        .react-resizable-handle-e { right: -10px !important; left: auto !important; cursor: col-resize; }
         .react-resizable-handle-active { z-index: 1000; }
     `}</style>
 );

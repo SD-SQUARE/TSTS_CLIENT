@@ -8,7 +8,7 @@ import type { ColumnsType } from 'antd/es/table';
 import type { Ticket } from '../../Types/tickets';
 import { TICKET_STATUS } from './ticketConstants';
 import SortableItem from './sortableItem';
-
+ 
 interface ColumnControlPanelProps {
     columns: ColumnsType<Ticket>;
     columnOrder: string[];

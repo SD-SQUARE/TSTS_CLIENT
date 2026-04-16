@@ -217,22 +217,22 @@ const TicketList: React.FC = () => {
                         )}
                     </Space>
                 </Flex>
-            </ConfigProvider>
 
-            <Table
-                components={{ header: { cell: ResizableTitle } }}
-                columns={finalColumns}
-                dataSource={data?.data || []}
-                rowKey="id"
-                loading={isLoading}
-                tableLayout="auto"
-                rowClassName={(record) => getRowClassName(record.status)}
-                scroll={{
-                    x: 'max-content',
-                    y: data?.data?.length > 0 ? 'calc(100vh - 280px)' : 'auto',
-                }}
-                pagination={false}
-            />
+                <Table
+                    components={{ header: { cell: ResizableTitle } }}
+                    columns={finalColumns}
+                    dataSource={data?.data || []}
+                    rowKey="id"
+                    loading={isLoading}
+                    tableLayout="auto"
+                    rowClassName={(record) => getRowClassName(record.status)}
+                    scroll={{
+                        x: 'max-content',
+                        y: data?.data?.length > 0 ? 'calc(100vh - 280px)' : 'auto',
+                    }}
+                    pagination={false}
+                />
+            </ConfigProvider>
         </div>
     );
 };

@@ -23,12 +23,13 @@ const ResizableTitle: React.FC<ResizableTitleProps> = ({ onResize, width, ...res
         <Resizable
             width={tempWidth!}
             height={0}
-            handle={
+            resizeHandles={[isRtl ? 'w' : 'e']}
+            handle={(resizeHandle, ref) => (
                 <span
-                    className="react-resizable-handle"
+                    ref={ref as React.RefObject<HTMLSpanElement>}
+                    className={`react-resizable-handle react-resizable-handle-${resizeHandle}`}
                     style={{
                         position: 'absolute',
-                        [isRtl ? 'left' : 'right']: 0,
                         top: 0,
                         height: '100%',
                         width: '10px',
@@ -37,7 +38,7 @@ const ResizableTitle: React.FC<ResizableTitleProps> = ({ onResize, width, ...res
                     }}
                     onClick={(e) => e.stopPropagation()}
                 />
-            }
+            )}
             onResize={(_, { size }) => setTempWidth(size.width)}
             onResizeStop={onResize}
             draggableOpts={{ enableUserSelectHack: false }}
