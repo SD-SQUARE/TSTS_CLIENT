@@ -23,16 +23,17 @@ const fetchTickets = async (page: number, pageSize: number, searchQuery: TicketS
 
         return acc;
     }, {});
-    const response = await api.get<TicketsResponse>(`/v1/tickets/`, {
+    const response = await api.get(`/v1/tickets/`, {
         params: { page_index: page, page_size: pageSize, ...query },
         paramsSerializer: {
             indexes: null,
         },
     });
+    const data = response.data as TicketsResponse;
 
     return {
-        data: response.data.tickets,
-        total: Math.floor(response.data.meta.total)
+        data: data.tickets,
+        total: Math.floor(data.meta.total)
 
     };
 };
@@ -144,6 +145,18 @@ export const useUsersLookup = () => {
             return data; 
         },
         staleTime: 5 * 60 * 1000, 
+    });
+};
+
+export const useTicketActivityUsersLookup = (ticketId?: string) => {
+    return useQuery({
+        queryKey: ['lookup', 'ticket-activity-users', ticketId],
+        queryFn: async () => {
+            const { data } = await api.get(`/v1/lockups/ticket/${ticketId}/activity-users`);
+            return data;
+        },
+        enabled: !!ticketId,
+        staleTime: 5 * 60 * 1000,
     });
 };
 

@@ -5,17 +5,26 @@ import { CalendarOutlined, ClockCircleOutlined, SearchOutlined } from '@ant-desi
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../../../../i18n';
-import { useActionsLookup, useUsersLookup } from '../../../Hooks/useTicket';
+import { useActionsLookup, useTicketActivityUsersLookup } from '../../../Hooks/useTicket';
 
 interface Props {
     ticketId?: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     activities: any[];
     getIcon: (type: string, size?: number) => React.ReactNode;
     getColor: (type: string) => string;
     onUserSearch: (val: string | undefined) => void;
     onActionSearch: (val: string | undefined) => void;
     currentFilters: { user?: string; action?: string };
+}
+
+interface LookupUser {
+    id: string;
+    name?: string;
+    full_name?: string;
+    fullName?: string;
+    first_name?: string;
+    last_name?: string;
+    image?: string;
 }
 
 const formatHistoryValue = (value: unknown): string | undefined => {
@@ -77,15 +86,43 @@ const renderChangeTag = (value: string | undefined, color?: string) => {
     );
 };
 
+const normalizeLookupUsers = (data: any): LookupUser[] => {
+    if (Array.isArray(data)) {
+        return data as LookupUser[];
+    }
+
+    if (Array.isArray(data?.users)) {
+        return data.users as LookupUser[];
+    }
+
+    return [];
+};
+
+const getLookupUserName = (user?: LookupUser) => {
+    const name = user?.name
+        ?? user?.full_name
+        ?? user?.fullName
+        ?? [user?.first_name, user?.last_name].filter(Boolean).join(' ');
+
+    return name || undefined;
+};
+
 const TicketHistoryTable: React.FC<Props> = ({ ticketId, activities, getIcon, getColor, onUserSearch, onActionSearch, currentFilters }) => {
     const { t } = useTranslation();
 
-    const { data: usersData } = useUsersLookup();
+    const { data: usersData } = useTicketActivityUsersLookup(ticketId);
     const { data: actionsData } = useActionsLookup(ticketId);
+    const userOptions = normalizeLookupUsers(usersData);
+    const usersMap: Record<string, LookupUser> = userOptions.reduce((acc, user) => {
+        if (user?.id) {
+            acc[user.id] = user;
+        }
+        return acc;
+    }, {} as Record<string, LookupUser>);
     const actionOptions = Array.isArray(actionsData)
         ? actionsData
         : actionsData?.actions ?? [];
-
+ 
     const columns: any[] = [
         {
             title: t('tickets.user'),
@@ -103,32 +140,43 @@ const TicketHistoryTable: React.FC<Props> = ({ ticketId, activities, getIcon, ge
                         onChange={onUserSearch} 
                         optionFilterProp="label"
                     >
-                        {usersData?.users?.map((u: any) => (
+                        {userOptions.map((u: any) => {
+                            const displayName = getLookupUserName(u);
+
+                            if (!u?.id || !displayName) return null;
+
+                            return (
                             <Select.Option 
                                 key={u.id} 
                                 value={u.id} 
-                                label={`${u.first_name} ${u.last_name}`}
+                                label={displayName}
                             >
                                 <Flex align="center" gap="small">
                                     <Avatar size="small" src={u.image} />
-                                    <Typography.Text >{u.first_name} {u.last_name}</Typography.Text>
+                                    <Typography.Text>{displayName}</Typography.Text>
                                 </Flex>
                             </Select.Option>
-                        ))}
+                            );
+                        })}
                     </Select>
                 </div>
             ),
             filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
             render: (meta: any) => {
-                if (!meta?.user) return '-';
-    
-                const displayName = i18n.language === 'ar'
+                const lookupUserId = meta?.userId ?? meta?.user?.id;
+                const lookupUser = lookupUserId ? usersMap[lookupUserId] : undefined;
+                const displayName = meta?.user
+                    ? (i18n.language === 'ar'
                     ? meta.user.full_name_ar
-                    : meta.user.full_name_en;
-    
+                    : meta.user.full_name_en)
+                    : getLookupUserName(lookupUser);
+                const image = meta?.user?.image || lookupUser?.image;
+
+                if (!displayName) return '-';
+
                 return (
                     <Space>
-                        <Avatar size="small" src={meta.user.image} />
+                        <Avatar size="small" src={image} />
                         <Typography.Text>{displayName || '-'}</Typography.Text>
                     </Space>
                 );
@@ -139,7 +187,17 @@ const TicketHistoryTable: React.FC<Props> = ({ ticketId, activities, getIcon, ge
             dataIndex: 'type',
             key: 'type',
             width: 150,
-            filterDropdown: () => (
+            render: (type: string) => (
+                <Tag color={getColor(type)} icon={getIcon(type, 12)}>
+                    {type.toUpperCase()}
+                </Tag>
+            ),
+        },
+        {
+            title: t('tickets.title'),
+            dataIndex: 'title',
+            key: 'title',
+            width: 170, filterDropdown: () => (
                 <div style={{ padding: 8, width: 200 }} onKeyDown={(e) => e.stopPropagation()}>
                     <Select
                         showSearch
@@ -165,17 +223,6 @@ const TicketHistoryTable: React.FC<Props> = ({ ticketId, activities, getIcon, ge
                 </div>
             ),
             filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
-            render: (type: string) => (
-                <Tag color={getColor(type)} icon={getIcon(type, 12)}>
-                    {type.toUpperCase()}
-                </Tag>
-            ),
-        },
-        {
-            title: t('tickets.title'),
-            dataIndex: 'title',
-            key: 'title',
-            width: 170,
             render: (text: string) => <Typography.Text strong>{text}</Typography.Text>,
         },
         {
