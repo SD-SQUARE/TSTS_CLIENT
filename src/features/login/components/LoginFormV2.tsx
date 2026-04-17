@@ -3,7 +3,7 @@ import { Form, Input, Button, Typography, Alert, Image, Space, Avatar } from "an
 import { loginSchema } from "../schema/LoginSchema";
 import loginImage from "../../../assets/HU-bg-clear.png";
 import { APP_BASE_PATH } from "../../../app/config";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { useDispatch } from "react-redux";
@@ -21,6 +21,7 @@ const LoginFormV2 = () => {
     const [form] = Form.useForm();
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [isHovered, setIsHovered] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -34,8 +35,13 @@ const LoginFormV2 = () => {
     const loginV2 = useLoginV2();
     const trustedAuth = useTrustedDeviceAuth();
 
+    const redirectPath =
+        typeof location.state?.from === "string"
+            ? location.state.from
+            : `${APP_BASE_PATH}/`;
+
     const gotoMainPage = () => {
-        navigate(`${APP_BASE_PATH}/`);
+        navigate(redirectPath, { replace: true });
     };
 
     const goBackToCredentials = () => {

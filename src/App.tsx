@@ -7,7 +7,7 @@ import { AppRoutes } from "./routes/AppRoutes"
 import { APP_BASE_PATH } from "./app/config"
 import { useTranslation } from "react-i18next"
 import GuardedRoute from "./routes/GuardedRoute"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { getUserData } from "./utils/getUserData.utils"
 import { authInitialized, loginSuccess } from "./features/login/store/authSlice"
 import { useDispatch, useSelector } from "react-redux"
@@ -17,6 +17,7 @@ function App() {
     const { t } = useTranslation();
     const dispatch = useDispatch();
     const { user } = useSelector((state: any) => state.auth);
+    const userRole = typeof user?.role === "string" ? user.role.toLowerCase() : "";
     
     useEffect(() => {
         loadCsrfToken().catch(console.error);
@@ -42,7 +43,7 @@ function App() {
                                 <NavItem to={`${APP_BASE_PATH}/dashboard`}>{t('DASHBOARD')}</NavItem>
                             </GuardedRoute>    
                             <NavItem to={`${APP_BASE_PATH}/knowledge-base`}>{t('Knowledge-Base')}</NavItem>
-                            <NavItem to={`/${user.role.toLowerCase()}/tickets`}>{t('Tickets')}</NavItem>
+                            {userRole && <NavItem to={`/${userRole}/tickets`}>{t('Tickets')}</NavItem>}
                             <GuardedRoute roles={["admin"]} allowNavigation={false}>
                                 <NavItem to={`/identities/groups`}>{t('Personnel')}</NavItem>
                             </GuardedRoute>    

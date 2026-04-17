@@ -214,10 +214,10 @@ export const AppRoutes = () => {
             </Route>
             {/* Tickets routes */}
             <Route path={`${APP_BASE_PATH}/:role/tickets`}>
-                <Route index element={<PageLayout ><TicketList /></PageLayout>} />
-                <Route path="new-ticket" element={<PageLayout><TicketForm /></PageLayout>} />
-                <Route path=":id/*" element={<PageLayout><TicketView /></PageLayout>} />
-                <Route path=":id/edit" element={<PageLayout><TicketForm /></PageLayout>} />
+                <Route index element={<GuardedRoute roles={["*"]}><PageLayout ><TicketList /></PageLayout></GuardedRoute>} />
+                <Route path="new-ticket" element={<GuardedRoute roles={["*"]}><PageLayout><TicketForm /></PageLayout></GuardedRoute>} />
+                <Route path=":id/*" element={<GuardedRoute roles={["*"]}><PageLayout><TicketView /></PageLayout></GuardedRoute>} />
+                <Route path=":id/edit" element={<GuardedRoute roles={["*"]}><PageLayout><TicketForm /></PageLayout></GuardedRoute>} />
             </Route>
 
             <Route path="/dashboard" element={
@@ -237,7 +237,7 @@ export const AppRoutes = () => {
                 </GuardedRoute>
             } />
 
-            <Route path="knowledge-base" element={<PageLayout><KnowledgeBasePage /> </PageLayout>} />
+            <Route path="knowledge-base" element={<GuardedRoute roles={["*"]}><PageLayout><KnowledgeBasePage /> </PageLayout></GuardedRoute>} />
 
             {/* Complmentary Paths */}
             <Route path={`${APP_BASE_PATH}/server-error`} element={<PageLayout><ServerError /> </PageLayout>} />

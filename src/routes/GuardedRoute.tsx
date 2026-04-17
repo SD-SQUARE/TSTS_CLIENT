@@ -1,8 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { APP_BASE_PATH } from "../app/config";
 import { useSelector } from "react-redux";
-import { notification } from "antd";
-import { useEffect, useRef } from "react";
+import { notification, Spin } from "antd";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { BrokenSecurityShieldIcon, SecurityShieldIcon } from "../assets/icons";
@@ -22,11 +21,15 @@ export default function GuardedRoute({
 }: GuardedRouteProps) {
     const { t } = useTranslation();
     const notificationDirection = i18next.language === "ar" ? "topLeft" : "topRight";
-    const { user } = useSelector((state: any) => state.auth);
+    const { user, initialized } = useSelector((state: any) => state.auth);
     const location = useLocation();
 
     if (location.pathname === `${APP_BASE_PATH}/auth/login` || location.pathname === `${APP_BASE_PATH}/not-allowed`)
         return children;
+
+    if (!initialized) {
+        return <Spin fullscreen size="large" />;
+    }
     
     // console.log(user);
     // console.log(roles);
@@ -64,7 +67,7 @@ export default function GuardedRoute({
             <Navigate
                 to={`${APP_BASE_PATH}/auth/login`}
                 replace
-                state={{ from: location }}
+                state={{ from: `${location.pathname}${location.search}${location.hash}` }}
             />
         );
     }
