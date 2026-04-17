@@ -631,28 +631,44 @@
     "create_btn": "Create Article",
     "search_placeholder": "Search knowledge base...",
     "no_articles": "No articles found.",
+    "no_content": "No content available.",
+    "card_label": "Knowledge article",
     "view": "View",
+    "share": "Share",
     "edit": "Edit",
     "delete": "Del",
     "read_article": "Read Article",
     "modal_draft": "Draft New Article",
     "modal_edit": "Edit Article",
     "modal_subtitle": "Share your knowledge with the team",
+    "languages": {
+      "english": "English",
+      "arabic": "Arabic"
+    },
     "steps": {
       "details": "Details",
       "content": "Content"
     },
     "fields": {
-      "title": "Article Title",
-      "title_placeholder": "e.g. Setting up the Development Environment",
-      "category": "Category",
-      "category_placeholder": "e.g. React Development",
-      "summary": "Short Summary",
-      "summary_placeholder": "A brief overview...",
+      "title_en": "Article Title (English)",
+      "title_en_placeholder": "e.g. Setting up the Development Environment",
+      "title_ar": "Article Title (Arabic)",
+      "title_ar_placeholder": "Enter the Arabic article title",
+      "category_en": "Category (English)",
+      "category_en_placeholder": "e.g. React Development",
+      "category_ar": "Category (Arabic)",
+      "category_ar_placeholder": "Enter the Arabic category",
+      "summary_en": "Short Summary (English)",
+      "summary_en_placeholder": "A brief overview in English...",
+      "summary_ar": "Short Summary (Arabic)",
+      "summary_ar_placeholder": "A brief overview in Arabic...",
       "import_title": "Import Content",
       "import_desc": "Upload a .docx file to auto-fill",
       "import_btn": "Select File",
-      "content_placeholder": "Write content..."
+      "content_en": "Article Content (English)",
+      "content_en_placeholder": "Write the English content...",
+      "content_ar": "Article Content (Arabic)",
+      "content_ar_placeholder": "Write the Arabic content..."
     },
     "actions": {
       "prev": "Previous",
@@ -662,10 +678,13 @@
       "publish": "Publish Article",
       "close": "Close"
     },
+    "share_hint": "Share this article with your team using a direct link.",
     "messages": {
       "import_loading": "Converting file...",
       "import_success": "Content imported successfully",
       "import_error": "Failed to import Word document",
+      "share_success": "Article link copied successfully",
+      "share_error": "Failed to copy article link",
       "delete_title": "Delete Article",
       "delete_confirm": "Are you sure you want to delete this article?"
     }

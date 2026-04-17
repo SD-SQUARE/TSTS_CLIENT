@@ -63,30 +63,46 @@
     "hub_title": "استكشاف المعرفة المشتركة",
     "hub_subtitle": "إدارة الوثائق والأدلة والموارد الداخلية.",
     "create_btn": "إنشاء مقال",
-    "search_placeholder": "البحث في مركز المعرفة...",
+    "search_placeholder": "البحث في قاعدة المعرفة...",
     "no_articles": "لم يتم العثور على مقالات.",
+    "no_content": "لا يوجد محتوى متاح.",
+    "card_label": "مقال معرفي",
     "view": "عرض",
+    "share": "مشاركة",
     "edit": "تعديل",
     "delete": "حذف",
     "read_article": "قراءة المقال",
     "modal_draft": "مسودة مقال جديد",
     "modal_edit": "تعديل المقال",
     "modal_subtitle": "شارك معرفتك مع فريق العمل",
+    "languages": {
+      "english": "الإنجليزية",
+      "arabic": "العربية"
+    },
     "steps": {
       "details": "التفاصيل",
       "content": "المحتوى"
     },
     "fields": {
-      "title": "عنوان المقال",
-      "title_placeholder": "مثال: إعداد بيئة العمل",
-      "category": "التخصص / الفئة",
-      "category_placeholder": "اختر تخصص المقال...",
-      "summary": "ملخص الوصف",
-      "summary_placeholder": "نظرة عامة موجزة عن المقال...",
+      "title_en": "عنوان المقال (بالإنجليزية)",
+      "title_en_placeholder": "أدخل عنوان المقال بالإنجليزية",
+      "title_ar": "عنوان المقال (بالعربية)",
+      "title_ar_placeholder": "مثال: إعداد بيئة العمل",
+      "category_en": "الفئة (بالإنجليزية)",
+      "category_en_placeholder": "أدخل الفئة بالإنجليزية",
+      "category_ar": "الفئة (بالعربية)",
+      "category_ar_placeholder": "أدخل الفئة بالعربية",
+      "summary_en": "ملخص قصير (بالإنجليزية)",
+      "summary_en_placeholder": "اكتب نبذة مختصرة بالإنجليزية...",
+      "summary_ar": "ملخص قصير (بالعربية)",
+      "summary_ar_placeholder": "اكتب نبذة مختصرة بالعربية...",
       "import_title": "استيراد المحتوى",
       "import_desc": "ارفع ملف .docx للتعبئة التلقائية",
       "import_btn": "رفع ملف",
-      "content_placeholder": "اكتب محتوى المقال هنا..."
+      "content_en": "محتوى المقال (بالإنجليزية)",
+      "content_en_placeholder": "اكتب محتوى المقال بالإنجليزية...",
+      "content_ar": "محتوى المقال (بالعربية)",
+      "content_ar_placeholder": "اكتب محتوى المقال بالعربية..."
     },
     "actions": {
       "prev": "السابق",
@@ -96,10 +112,13 @@
       "publish": "نشر المقال",
       "close": "إغلاق"
     },
+    "share_hint": "قم بمشاركة هذا المقال مع فريقك عبر رابط مباشر.",
     "messages": {
       "import_loading": "جاري تحويل الملف...",
       "import_success": "تم استيراد المحتوى بنجاح",
       "import_error": "فشل استيراد ملف Word",
+      "share_success": "تم نسخ رابط المقال بنجاح",
+      "share_error": "فشل نسخ رابط المقال",
       "delete_title": "حذف المقال",
       "delete_confirm": "هل أنت متأكد من رغبتك في حذف هذا المقال؟"
     }
@@ -699,3 +718,4 @@
     "cancel": "إلغاء"
   }
 }
+
