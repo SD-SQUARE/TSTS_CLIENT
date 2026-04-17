@@ -8,7 +8,7 @@ export interface ChatMessage {
     media: {
         id: string;
         fileName: string;
-        mime: string;
+        mime: string | null;
         url: string;
     }[];
     sender: {
@@ -20,8 +20,19 @@ export interface ChatMessage {
     createdAt: string;
 }
 
+export interface QuickMessage {
+    id: string;
+    title_en: string;
+    title_ar: string;
+    content_en: string;
+    content_ar: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
 export const chatApi = createApi({
     reducerPath: 'chatApi',
+    tagTypes: ['TicketChat', 'QuickMessages'],
     baseQuery: async ({ url, method, data, params, headers }) => {
         
         try {
@@ -43,6 +54,7 @@ export const chatApi = createApi({
                 url: `/v1/tickets/${ticketId}/chat`,
                 method: 'GET',
             }),
+            providesTags: (_result, _error, ticketId) => [{ type: 'TicketChat', id: ticketId }],
             // TODO: Use Socket.IO with chat 
             // async onCacheEntryAdded(ticketId, { updateCachedData, cacheDataLoaded, cacheEntryRemoved }) {
             //     const ws = new WebSocket(`ws://localhost:5000/ws/tickets/${ticketId}`);
@@ -80,6 +92,7 @@ export const chatApi = createApi({
                 },
                 
             }),
+            invalidatesTags: (_result, _error, { ticketId }) => [{ type: 'TicketChat', id: ticketId }],
         }),
         
         uploadChatMedia: builder.mutation<any[], { ticketId: string; formData: FormData }>({
@@ -92,11 +105,43 @@ export const chatApi = createApi({
                 },
             }),
         }),
+
+        getQuickMessages: builder.query<QuickMessage[], void>({
+            query: () => ({
+                url: '/v1/tickets/quick-messages',
+                method: 'GET',
+            }),
+            providesTags: ['QuickMessages'],
+        }),
+
+        createQuickMessage: builder.mutation<
+            QuickMessage,
+            {
+                title_en?: string;
+                title_ar?: string;
+                content_en: string;
+                content_ar: string;
+            }
+        >({
+            query: ({ title_en, title_ar, content_en, content_ar }) => ({
+                url: '/v1/tickets/quick-messages',
+                method: 'POST',
+                data: {
+                    title_en,
+                    title_ar,
+                    content_en,
+                    content_ar,
+                },
+            }),
+            invalidatesTags: ['QuickMessages'],
+        }),
     }),
 });
 
 export const { 
     useGetChatMessagesQuery, 
     useUploadChatMediaMutation, 
-    useSendMessageMutation
+    useSendMessageMutation,
+    useGetQuickMessagesQuery,
+    useCreateQuickMessageMutation,
 } = chatApi;

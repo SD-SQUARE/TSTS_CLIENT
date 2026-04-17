@@ -331,7 +331,41 @@
     "contact_info": "Contact Information",
     "organization_details": "Organization Details",
     "searchAction": "Search Actions",
-    "searchUser": "Search Users"
+    "searchUser": "Search Users",
+    "tools": {
+      "button": "Tools",
+      "title": "Comment Tools",
+      "attachments": "Attachments",
+      "attachmentsDescription": "Upload files now and send them together with your comment.",
+      "attachmentsUpload": "Upload files",
+      "attachmentsEmpty": "No files selected yet.",
+      "attachmentsUploaded": "Files added to the comment",
+      "attachmentsOpen": "Open file",
+      "attachmentsFile": "File attachment",
+      "attachmentsPreviewUnavailable": "Preview is not available for this file type.",
+      "quickMessages": {
+        "title": "Quick Messages",
+        "description": "Save reusable replies and insert them into the editor with one click.",
+        "new": "New Message",
+        "modalTitle": "Create Quick Message",
+        "titlePlaceholderEn": "Optional English title",
+        "contentPlaceholderEn": "Write the English quick message...",
+        "titlePlaceholderAr": "Optional Arabic title",
+        "contentPlaceholderAr": "Write the Arabic quick message...",
+        "save": "Save Quick Message",
+        "saved": "Quick message saved",
+        "inserted": "Quick message added to the comment",
+        "empty": "No quick messages yet.",
+        "validation": "Please write the quick message in both English and Arabic.",
+        "defaultTitle": "Quick message"
+      },
+      "solutions": {
+        "title": "Solutions",
+        "searchPlaceholder": "Search knowledge base solutions",
+        "empty": "No matching knowledge-base articles found.",
+        "inserted": "Article link added to the comment"
+      }
+    }
   },
   "audit": {
     "title": "Audit Logs",

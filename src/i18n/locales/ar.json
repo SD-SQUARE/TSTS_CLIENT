@@ -399,6 +399,41 @@
     "organization_details": "معلومات الجهة",
     "searchAction": "بحث عن عملية",
     "searchUser": "بحث عن مستخدم"
+    ,
+    "tools": {
+      "button": "الأدوات",
+      "title": "أدوات التعليق",
+      "attachments": "الملفات",
+      "attachmentsDescription": "ارفع الملفات الآن ثم أرسلها مع التعليق عند الضغط على إرسال.",
+      "attachmentsUpload": "رفع ملفات",
+      "attachmentsEmpty": "لا توجد ملفات محددة بعد.",
+      "attachmentsUploaded": "تمت إضافة الملفات إلى التعليق",
+      "attachmentsOpen": "فتح الملف",
+      "attachmentsFile": "ملف مرفق",
+      "attachmentsPreviewUnavailable": "المعاينة غير متاحة لهذا النوع من الملفات.",
+      "quickMessages": {
+        "title": "الرسائل السريعة",
+        "description": "احفظ الردود المتكررة وأدرجها في المحرر بضغطة واحدة.",
+        "new": "رسالة جديدة",
+        "modalTitle": "إنشاء رسالة سريعة",
+        "titlePlaceholderEn": "عنوان إنجليزي اختياري",
+        "contentPlaceholderEn": "اكتب محتوى الرسالة السريعة بالإنجليزية...",
+        "titlePlaceholderAr": "عنوان عربي اختياري",
+        "contentPlaceholderAr": "اكتب محتوى الرسالة السريعة بالعربية...",
+        "save": "حفظ الرسالة السريعة",
+        "saved": "تم حفظ الرسالة السريعة",
+        "inserted": "تمت إضافة الرسالة السريعة إلى التعليق",
+        "empty": "لا توجد رسائل سريعة بعد.",
+        "validation": "يرجى كتابة الرسالة السريعة باللغتين العربية والإنجليزية.",
+        "defaultTitle": "رسالة سريعة"
+      },
+      "solutions": {
+        "title": "الحلول",
+        "searchPlaceholder": "ابحث في حلول قاعدة المعرفة",
+        "empty": "لا توجد مقالات مطابقة في قاعدة المعرفة.",
+        "inserted": "تمت إضافة رابط المقال إلى التعليق"
+      }
+    }
   },
   "audit": {
     "title": "سجلات التدقيق",
