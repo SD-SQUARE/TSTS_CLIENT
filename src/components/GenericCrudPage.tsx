@@ -30,6 +30,10 @@ interface GenericCrudProps<T> {
   title: string;
   columns: ColumnsType<T>;
   formItems: React.ReactNode;
+  renderFormItems?: (context: {
+    mode: "create" | "edit";
+    record: T | null;
+  }) => React.ReactNode;
   data: T[];
   isLoading: boolean;
   total?: number;
@@ -53,6 +57,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
   title,
   columns,
   formItems,
+  renderFormItems,
   data = [],
   isLoading,
   total = 0,
@@ -299,7 +304,12 @@ export const GenericCrudPage = <T extends { id: string | number }>({
           centered
         >
           <Form form={form} layout="vertical" style={formStyle}>
-            {formItems}
+            {renderFormItems
+              ? renderFormItems({
+                  mode: editingItem ? "edit" : "create",
+                  record: editingItem,
+                })
+              : formItems}
           </Form>
         </Modal>
 
@@ -409,8 +419,8 @@ export const GenericCrudPage = <T extends { id: string | number }>({
         />
       </div>
 
-      <Modal
-        title={t("crud.add_new", { title })}
+        <Modal
+          title={t("crud.add_new", { title })}
         open={isEditModalOpen}
         onOk={handleEditOk}
         onCancel={() => setIsEditModalOpen(false)}
@@ -418,12 +428,17 @@ export const GenericCrudPage = <T extends { id: string | number }>({
         cancelText={t("common.cancel")}
         width="90%"
         style={{ maxWidth: 600 }}
-        centered
-      >
-        <Form form={form} layout="vertical" style={formStyle}>
-          {formItems}
-        </Form>
-      </Modal>
+          centered
+        >
+          <Form form={form} layout="vertical" style={formStyle}>
+            {renderFormItems
+              ? renderFormItems({
+                  mode: editingItem ? "edit" : "create",
+                  record: editingItem,
+                })
+              : formItems}
+          </Form>
+        </Modal>
     </div>
   );
 };

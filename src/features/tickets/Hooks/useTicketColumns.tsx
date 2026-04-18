@@ -14,12 +14,28 @@ import EllipsisComponent from '../../../components/EllipsisComponent';
 import AssigneeColumnCell from '../Components/ticketListComponents/AssigneeColumnCell';
 
 
-type SearchableDataIndex = 'id' | 'title' | 'problem' | 'specialization' | 'status' | 'priority';
+type SearchableDataIndex =
+    | 'id'
+    | 'title'
+    | 'problem'
+    | 'specialization'
+    | 'status'
+    | 'priority'
+    | 'requester'
+    | 'assignee'
+    | 'university'
+    | 'domain'
+    | 'department';
 
 interface UseTicketColumnsOptions {
     role: string | undefined;
     specs: any[];
     problemTreeData: any[];
+    requesters: { label: string; value: string }[];
+    assignees: { label: string; value: string }[];
+    universities: { label: string; value: string }[];
+    domains: { label: string; value: string }[];
+    departments: { label: string; value: string }[];
     apiSearchQuery: TicketSearchQuery;
     setApiSearchQuery: React.Dispatch<React.SetStateAction<TicketSearchQuery>>;
     setPagination: React.Dispatch<React.SetStateAction<{ page: number; pageSize: number }>>;
@@ -30,6 +46,11 @@ export const useTicketColumns = ({
     role,
     specs,
     problemTreeData,
+    requesters,
+    assignees,
+    universities,
+    domains,
+    departments,
     apiSearchQuery,
     setApiSearchQuery,
     setPagination,
@@ -335,7 +356,8 @@ export const useTicketColumns = ({
             render: (assignees: any[], record: any) => {
 
                 return <AssigneeColumnCell record={record} assignees={assignees} />;
-            }
+            },
+            ...getColumnSelectProps('assignee', 'tickets.assignee', assignees),
         },
         {
             title: t('tickets.specialization'),
@@ -390,6 +412,49 @@ export const useTicketColumns = ({
                             <EllipsisComponent content={requesterName || t('common.empty')} />
                         </Popover>
                     ),
+                    ...getColumnSelectProps('requester', 'tickets.requester', requesters),
+                },
+                {
+                    title: t('university'),
+                    dataIndex: ['requester', 'university', 'name'],
+                    key: 'requesterUniversity',
+                    width: 180,
+                    ellipsis: true,
+                    render: (_: string, record: Ticket) => (
+                        <EllipsisComponent
+                            content={record.requester?.university?.name || t('common.empty')}
+                        />
+                    ),
+                    ...getColumnSelectProps('university', 'university', universities),
+                },
+                {
+                    title: t('domain'),
+                    dataIndex: ['requester', 'domain', 'name'],
+                    key: 'requesterDomain',
+                    width: 180,
+                    ellipsis: true,
+                    render: (_: string, record: Ticket) => (
+                        <EllipsisComponent
+                            content={record.requester?.domain?.name || t('common.empty')}
+                        />
+                    ),
+                    ...getColumnSelectProps('domain', 'domain', domains),
+                },
+                {
+                    title: t('department'),
+                    dataIndex: ['requester', 'departments'],
+                    key: 'requesterDepartments',
+                    width: 220,
+                    ellipsis: true,
+                    render: (_: unknown, record: Ticket) => (
+                        <EllipsisComponent
+                            content={
+                                record.requester?.departments?.map((department) => department.name).join(', ') ||
+                                t('common.empty')
+                            }
+                        />
+                    ),
+                    ...getColumnSelectProps('department', 'department', departments),
                 },
             ]
             : []),

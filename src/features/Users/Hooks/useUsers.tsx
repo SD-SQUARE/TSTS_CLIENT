@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../../../api/http";
-import type { Lookup, ProfileLookup, UserListItem } from "../Types/users";
+import type { Lookup, PermissionLookup, ProfileLookup, UserListItem } from "../Types/users";
 
 
 export const useUsers = (
@@ -105,6 +105,23 @@ export const usePermissionProfiles = () =>
         queryKey: ["permissionProfiles"],
         queryFn: async () => (await api.get("v1/permissions/profile")).data.profiles as ProfileLookup[],
         staleTime: Infinity,
+    });
+
+export const useUserPermissionsProfile = (id?: string) =>
+    useQuery({
+        queryKey: ["userPermissionsProfile", id],
+        queryFn: async () => {
+            if (!id) return null;
+
+            const res = await api.get(`v1/users/${id}/permissions`);
+            const profile = (res.data?.[0] ?? null) as (ProfileLookup & {
+                permissions?: PermissionLookup[];
+            }) | null;
+
+            return profile;
+        },
+        enabled: !!id,
+        staleTime: 5 * 60 * 1000,
     });
 
 

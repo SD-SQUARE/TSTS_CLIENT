@@ -1,8 +1,9 @@
-import { Card, Tabs, Tour } from "antd";
+import { Card, Input, Tabs, Tour } from "antd";
 import {
     LockOutlined,
     SafetyOutlined,
     AppstoreOutlined,
+    SearchOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import ResetPassword from "../ResetPassword.component";
@@ -21,9 +22,10 @@ const SettingsTab = ({ forceDevices, onTourReady }: any) => {
     const { devicesQuery } = useTrustedDevices(userId);
 
     const [activeTab, setActiveTab] = useState("password");
+    const [searchTerm, setSearchTerm] = useState("");
     const [tourOpen, setTourOpen] = useState(false);
     const [skip, setskip] = useState(false);
-    const [ cookie , setCookie, removeCookie ] = useCookies(['showTrustedDeviceTour', 'skipTrustedDeviceTour-for-week']);
+    const [ cookie , setCookie ] = useCookies(['showTrustedDeviceTour', 'skipTrustedDeviceTour-for-week']);
 
     useEffect(() => {
         if (cookie["skipTrustedDeviceTour-for-week"]) {
@@ -93,6 +95,18 @@ const SettingsTab = ({ forceDevices, onTourReady }: any) => {
                         setActiveTab(key);
                         if (key === "devices") devicesQuery.refetch();
                     }}
+                    tabBarExtraContent={{
+                        right: (
+                            <Input
+                                allowClear
+                                value={searchTerm}
+                                onChange={(event) => setSearchTerm(event.target.value)}
+                                prefix={<SearchOutlined />}
+                                placeholder={t("profile.settings.searchPlaceholder")}
+                                style={{ width: 280, maxWidth: "100%" }}
+                            />
+                        ),
+                    }}
                     tabPlacement="start"
                     items={[
                         {
@@ -102,7 +116,7 @@ const SettingsTab = ({ forceDevices, onTourReady }: any) => {
                                     <LockOutlined /> {t("profile.settings.password")}
                                 </span>
                             ),
-                            children: <ResetPassword />,
+                            children: <ResetPassword searchTerm={searchTerm} />,
                         },
                         {
                             key: "devices",
@@ -111,7 +125,7 @@ const SettingsTab = ({ forceDevices, onTourReady }: any) => {
                                     <SafetyOutlined /> {t("profile.settings.devices")}
                                 </span>
                             ),
-                            children: <TrustedDevices />,
+                            children: <TrustedDevices searchTerm={searchTerm} />,
                         },
                         {
                             key: "extension",
@@ -120,7 +134,7 @@ const SettingsTab = ({ forceDevices, onTourReady }: any) => {
                                     <AppstoreOutlined /> {t("profile.settings.extension")}
                                 </span>
                             ),
-                            children: <Extension />,
+                            children: <Extension searchTerm={searchTerm} />,
                         },
                     ]}
                 />

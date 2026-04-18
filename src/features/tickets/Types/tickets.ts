@@ -2,6 +2,14 @@ export interface Requester {
     id: string;
     name: string;
     image: string;
+    university?: LookupItem | null;
+    domain?: LookupItem | null;
+    departments?: LookupItem[];
+  }
+
+  export interface LookupItem {
+    id: string;
+    name: string;
   }
 
   export interface Specialization {

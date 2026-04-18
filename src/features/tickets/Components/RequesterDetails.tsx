@@ -32,6 +32,7 @@ const RequesterDetails: React.FC<RequesterDetailsProps> = ({ requesterId }) => {
 
     const mobile = profile?.contacts?.mobiles?.[0];
     const phone = profile?.contacts?.phones?.[0];
+    const departments = profile?.departments || [];
 
     return (
         <Collapse 
@@ -128,12 +129,16 @@ const RequesterDetails: React.FC<RequesterDetailsProps> = ({ requesterId }) => {
                                     </Typography.Text>
                                 </Flex>
                             )}
-                            {profile?.department?.name && (
+                            {departments.length > 0 && (
                                 <Flex gap={8} align="center">
                                     <ApartmentOutlined style={{ color: '#8c8c8c' }} />
-                                    <Typography.Text style={{ fontSize: '13px' }}>
-                                        {profile.department}
-                                    </Typography.Text>
+                                    <Flex wrap="wrap" gap={6}>
+                                        {departments.map((department: any) => (
+                                            <Tag key={department.id}>
+                                                {department.name}
+                                            </Tag>
+                                        ))}
+                                    </Flex>
                                 </Flex>
                             )}
                         </Flex>

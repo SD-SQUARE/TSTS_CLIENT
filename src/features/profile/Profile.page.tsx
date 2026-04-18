@@ -8,7 +8,6 @@ import i18next from "i18next";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useCookies } from 'react-cookie';
-import { set } from "zod";
 
 const Profile = () => {
     const { t } = useTranslation();
@@ -16,7 +15,7 @@ const Profile = () => {
 
     const [activeMainTab, setActiveMainTab] = useState("profile");
     const [forceSettingsDevices, setForceSettingsDevices] = useState(false);
-    const [ cookie , setCookie, _ ] = useCookies(['showTrustedDeviceTour', 'skipTrustedDeviceTour-for-week']);
+    const [ cookie , setCookie ] = useCookies(['showTrustedDeviceTour', 'skipTrustedDeviceTour-for-week']);
 
     useEffect(() => {
         if (cookie["showTrustedDeviceTour"]) {

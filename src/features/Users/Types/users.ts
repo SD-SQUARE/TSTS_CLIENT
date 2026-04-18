@@ -6,11 +6,18 @@
         color?: string;
     }
     
-    export interface ProfileLookup extends Lookup {
+export interface ProfileLookup extends Lookup {
         name_en: string;
         name_ar: string;
         description_en?: string;
         description_ar?: string;
+        permissions?: PermissionLookup[];
+    }
+
+    export interface PermissionLookup {
+        key: string;
+        name_en: string;
+        name_ar: string;
     }
     
     

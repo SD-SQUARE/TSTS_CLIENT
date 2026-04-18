@@ -11,6 +11,7 @@ import TicketMediaTab from './ticketTabs/MediaTab';
 import TicketHistoryTab from './ticketTabs/HistoryTab';
 import { useGetChatMessagesQuery } from '../store/services/chatApi';
 import TicketReviewsTab from './ticketTabs/ReviewTab';
+import TicketFinalReportTab from './ticketTabs/FinalReportTab';
 
 const TicketView: React.FC = () => {
     const { t } = useTranslation();
@@ -26,7 +27,10 @@ const TicketView: React.FC = () => {
 
     const pathParts = location.pathname.split('/');
     const lastPart = pathParts[pathParts.length - 1];
-    const activeKey = ['media', 'chat', 'history', 'reviews'].includes(lastPart) ? lastPart : 'info';
+    const activeKey = ['media', 'chat', 'history', 'reviews', 'final-report'].includes(lastPart)
+        ? lastPart
+        : 'info';
+    const canManageFinalReport = ['admin', 'technician', 'superadmin'].includes(role || '');
 
     useEffect(() => {
         if (activeKey === 'info') {
@@ -89,6 +93,11 @@ const TicketView: React.FC = () => {
             label: t('tickets.tabReviews'),
             children: <TicketReviewsTab reviews={reviewsData?.data || []} isLoading={reviewsLoading} />,
         },
+        ...(canManageFinalReport ? [{
+            key: 'final-report',
+            label: t('tickets.tabFinalReport'),
+            children: <TicketFinalReportTab />,
+        }] : []),
         ...(role === 'admin' ? [{
             key: 'history',
             label: t('tickets.tabHistory'),

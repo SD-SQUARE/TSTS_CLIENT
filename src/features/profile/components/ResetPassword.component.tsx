@@ -1,5 +1,5 @@
 // tabs/settings/ResetPassword.tsx
-import { Button, Card, Form, Input, Typography, message } from "antd";
+import { Button, Card, Empty, Form, Input, Typography, message } from "antd";
 import { LockOutlined, SafetyOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { useResetPassword } from "../hooks/useResetPassword.hook";
@@ -8,13 +8,25 @@ import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;
 
-const ResetPassword = () => {
+const ResetPassword = ({ searchTerm = "" }: { searchTerm?: string }) => {
     const [loading, setLoading] = useState(false);
     const { t } = useTranslation();
     const auth = useSelector((state: any) => state.auth);
     const userId = auth.user?.id ?? "";
     const resetPassword = useResetPassword(userId);
     const [form] = Form.useForm();
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const matchesSearch =
+        !normalizedSearch ||
+        [
+            t("profile.settings.reset.title"),
+            t("profile.settings.reset.description"),
+            t("profile.settings.reset.newPassword"),
+            t("profile.settings.reset.confirmPassword"),
+        ]
+            .join(" ")
+            .toLowerCase()
+            .includes(normalizedSearch);
 
     const handleSubmit = async (values: {
         password: string;
@@ -32,6 +44,15 @@ const ResetPassword = () => {
             form.resetFields();
         // }, 1200);
     };
+
+    if (!matchesSearch) {
+        return (
+            <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={t("profile.settings.noSearchResults")}
+            />
+        );
+    }
 
     return (
         <Card

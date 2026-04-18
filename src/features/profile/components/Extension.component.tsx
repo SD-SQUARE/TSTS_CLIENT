@@ -21,10 +21,22 @@ const { Title, Text } = Typography;
 const EXTENSION_FILE_URL = "/extension.zip";
 const VIDEO_URL = "/extension-guide.mp4";
 
-const Extension = () => {
+const Extension = ({ searchTerm = "" }: { searchTerm?: string }) => {
     const {t} = useTranslation();
     const [videoError, setVideoError] = useState(false);
     const [downloading, setDownloading] = useState(false);
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const matchesSearch =
+        !normalizedSearch ||
+        [
+            t('profile.settings.extensionSection.title'),
+            t('profile.settings.extensionSection.description'),
+            t('profile.settings.extensionSection.supportedBrowsers'),
+            t('profile.settings.extensionSection.secure'),
+        ]
+            .join(" ")
+            .toLowerCase()
+            .includes(normalizedSearch);
 
     const handleDownload = () => {
         if (!EXTENSION_FILE_URL) {
@@ -40,6 +52,15 @@ const Extension = () => {
             window.open(EXTENSION_FILE_URL, "_blank");
         }, 500);
     };
+
+    if (!matchesSearch) {
+        return (
+            <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={t("profile.settings.noSearchResults")}
+            />
+        );
+    }
 
     return (
         <Row gutter={[24, 24]}>

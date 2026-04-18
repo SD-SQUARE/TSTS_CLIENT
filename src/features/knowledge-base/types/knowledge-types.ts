@@ -1,5 +1,12 @@
 import type { BaseEntity } from "../../../api/common/types/common-types";
 
+export interface KnowledgeBaseAttachment {
+  id: string;
+  fileName: string;
+  mime: string | null;
+  url: string;
+}
+
 export interface KnowledgeBaseItem extends BaseEntity {
   title?: string;
   description?: string;
@@ -13,6 +20,7 @@ export interface KnowledgeBaseItem extends BaseEntity {
   specialization_ar?: string;
   content_en?: string;
   content_ar?: string;
+  attachments?: KnowledgeBaseAttachment[];
 }
 
 export interface KnowledgeBaseFormValues {

@@ -3,7 +3,7 @@ import { Card, Descriptions, Space, Typography, Spin, Button, Result, Tag, Avata
 import { ArrowLeftOutlined, MailOutlined, IdcardOutlined, PhoneOutlined, HomeOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useDeleteUser, useUserDetail } from '../Hooks/useUsers';
+import { useDeleteUser, useUserDetail, useUserPermissionsProfile } from '../Hooks/useUsers';
 import type { Lookup } from '../Types/users';
 import AvatarDisplay from '../../../components/AvatarDisplay';
 import UserFormModal from './UsersFormModal';
@@ -91,6 +91,7 @@ const UserViewPage: React.FC = () => {
     const userId = id;
 
     const { data: user, isLoading, isError, refetch } = useUserDetail(role!, userId);
+    const { data: permissionsProfile } = useUserPermissionsProfile(userId);
 
     const currentLanguage = i18n.language;
     const deleteMutation = useDeleteUser(role!);
@@ -192,7 +193,15 @@ const UserViewPage: React.FC = () => {
         { key: 'departments', label: t('user_list.department'), children: renderDepartmentList(user.departments, currentLanguage), condition: !isStaff },
         { key: 'groups', label: t('user_list.group'), children: renderLookupList(user.groups, currentLanguage), condition: role !== 'requesters' }, // Passing color for consistency
         // { key: 'specializations', label: t('user_list.specializations'), children: renderLookupList(user.specializations, currentLanguage) },
-        // { key: 'permission_profile', label: t('user_list.perm_prof'), children: user.permission_profile?.name ?? '-' },
+        {
+            key: 'permission_profile',
+            label: t('user_list.perm_prof'),
+            children:
+                user.permission_profile?.name ||
+                (user.permission_profile as any)?.name_en ||
+                (user.permission_profile as any)?.name_ar ||
+                '-',
+        },
     ];
     const items = allItems.filter(item => item.condition === undefined || item.condition);
 
@@ -261,6 +270,22 @@ const UserViewPage: React.FC = () => {
                             </Descriptions.Item>
                         ))}
                     </Descriptions>
+
+                    <Card title={t('user_list.perm_title')}>
+                        {!permissionsProfile?.permissions?.length ? (
+                            <Text type="secondary">-</Text>
+                        ) : (
+                            <Space size="small" wrap>
+                                {permissionsProfile.permissions.map((permission) => (
+                                    <Tag key={permission.key}>
+                                        {currentLanguage === 'ar'
+                                            ? permission.name_ar || permission.name_en
+                                            : permission.name_en || permission.name_ar}
+                                    </Tag>
+                                ))}
+                            </Space>
+                        )}
+                    </Card>
                 </Space>
 
             </Card>

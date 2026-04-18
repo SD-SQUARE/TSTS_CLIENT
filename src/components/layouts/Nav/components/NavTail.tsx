@@ -8,6 +8,8 @@ import { logout } from "../../../../features/login/store/authSlice";
 import { Button } from 'antd';
 import { useTranslation } from "react-i18next";
 import "./navTail.css";
+import NotificationBell from "../../../../features/communications/components/NotificationBell";
+import ChatLauncher from "../../../../features/communications/components/ChatLauncher";
 
 const NavTail = () => {
 
@@ -43,6 +45,8 @@ const NavTail = () => {
                 <Space size={"large"}>
                     {token ?
                         <Space size={"middle"} >
+                            <NotificationBell />
+                            <ChatLauncher />
                             <div id='profile-trusted-devices'>
                                 <Avatar
                                 style={{ cursor: "pointer" }}

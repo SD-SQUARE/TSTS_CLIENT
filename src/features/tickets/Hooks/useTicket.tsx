@@ -138,7 +138,7 @@ export const useUserProfile = (id: string) => {
 };
 
 export const useUsersLookup = () => {
-    return useQuery({
+  return useQuery({
         queryKey: ['lookup', 'users'],
         queryFn: async () => {
             const { data } = await api.get('/v1/lockups/users');
@@ -147,6 +147,61 @@ export const useUsersLookup = () => {
         staleTime: 5 * 60 * 1000, 
     });
 };
+
+export interface TicketFilterLookupItem {
+    id: string;
+    name: string;
+    name_en?: string;
+    name_ar?: string;
+    email?: string;
+}
+
+export const useRequestersLookup = (enabled = true) =>
+    useQuery({
+        queryKey: ['lookup', 'requesters'],
+        queryFn: async () => {
+            const { data } = await api.get('/v1/lockups/requesters');
+            return (data.users || []).map((user: any) => ({
+                id: user.id,
+                name: user.name_en || user.name_ar || user.email || '',
+                name_en: user.name_en,
+                name_ar: user.name_ar,
+                email: user.email,
+            })) as TicketFilterLookupItem[];
+        },
+        enabled,
+        staleTime: 5 * 60 * 1000,
+    });
+
+export const useTicketUniversitiesLookup = () =>
+    useQuery({
+        queryKey: ['lookup', 'ticket-universities'],
+        queryFn: async () => {
+            const { data } = await api.get('/v1/lockups/universities');
+            return data.universities || [];
+        },
+        staleTime: 5 * 60 * 1000,
+    });
+
+export const useTicketDomainsLookup = () =>
+    useQuery({
+        queryKey: ['lookup', 'ticket-domains'],
+        queryFn: async () => {
+            const { data } = await api.get('/v1/lockups/domains');
+            return data.domains || [];
+        },
+        staleTime: 5 * 60 * 1000,
+    });
+
+export const useTicketDepartmentsLookup = () =>
+    useQuery({
+        queryKey: ['lookup', 'ticket-departments'],
+        queryFn: async () => {
+            const { data } = await api.get('/v1/lockups/departments');
+            return data.departments || [];
+        },
+        staleTime: 5 * 60 * 1000,
+    });
 
 export const useTicketActivityUsersLookup = (ticketId?: string) => {
     return useQuery({

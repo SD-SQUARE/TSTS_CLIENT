@@ -12,8 +12,15 @@ import enUS from 'antd/lib/locale/en_US';
 import arEG from 'antd/lib/locale/ar_EG';
 
 import AppTable from '../../../components/AppTable';
-import { useTickets, type TicketSearchQuery } from '../Hooks/useTicket';
-import { useSpecializations, useTicketProblems } from '../Hooks/useTicketForm';
+import {
+    useRequestersLookup,
+    useTicketDepartmentsLookup,
+    useTicketDomainsLookup,
+    useTicketUniversitiesLookup,
+    useTickets,
+    type TicketSearchQuery,
+} from '../Hooks/useTicket';
+import { useSpecializations, useTechnicians, useTicketProblems } from '../Hooks/useTicketForm';
 import { useRowHighlighting } from '../Hooks/useRowHighlighting';
 import { useTicketColumns } from '../Hooks/useTicketColumns';
 import { useColumnSettings } from '../Hooks/useColumnSettings';
@@ -38,8 +45,23 @@ const TicketList: React.FC = () => {
     );
     const { data: specs } = useSpecializations();
     const { data: hierarchicalProblems } = useTicketProblems();
+    const { data: technicians } = useTechnicians();
+    const { data: requesters } = useRequestersLookup(role !== 'requester');
+    const { data: universities } = useTicketUniversitiesLookup();
+    const { data: domains } = useTicketDomainsLookup();
+    const { data: departments } = useTicketDepartmentsLookup();
 
     const antdLocale = currentLanguage === 'ar' ? arEG : enUS;
+
+    const localizedUserLabel = (item: any) =>
+        currentLanguage === 'ar'
+            ? item?.name_ar || item?.name_en || item?.name || item?.email || ''
+            : item?.name_en || item?.name_ar || item?.name || item?.email || '';
+
+    const localizedLookupLabel = (item: any) =>
+        currentLanguage === 'ar'
+            ? item?.name_ar || item?.name_en || item?.name || ''
+            : item?.name_en || item?.name_ar || item?.name || '';
 
     // ─── Row highlighting ────────────────────────────────────────────────────
     const {
@@ -114,6 +136,26 @@ const TicketList: React.FC = () => {
         role,
         specs: Array.isArray(specs) ? specs : [],
         problemTreeData,
+        requesters: (requesters || []).map((item) => ({
+            value: item.id,
+            label: localizedUserLabel(item),
+        })),
+        assignees: (technicians || []).map((item: any) => ({
+            value: item.id,
+            label: localizedUserLabel(item),
+        })),
+        universities: (universities || []).map((item: any) => ({
+            value: item.id,
+            label: localizedLookupLabel(item),
+        })),
+        domains: (domains || []).map((item: any) => ({
+            value: item.id,
+            label: localizedLookupLabel(item),
+        })),
+        departments: (departments || []).map((item: any) => ({
+            value: item.id,
+            label: localizedLookupLabel(item),
+        })),
         apiSearchQuery,
         setApiSearchQuery,
         setPagination,

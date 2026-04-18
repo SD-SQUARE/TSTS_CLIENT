@@ -1,17 +1,22 @@
 import type { BaseEntity } from "../../../api/common/types/common-types";
 
+export interface PermissionProfilePermission {
+  key?: string;
+  name_en: string;
+  name_ar: string;
+}
 
 export interface PermissionProfile extends BaseEntity {
   code: string;
-  permissions: string[];
+  permissions: PermissionProfilePermission[];
   isSystem?: boolean;
 }
 
 export interface SystemPermission {
   id: string | number;
-  code: string;
-  label: string;
-  group: string;
+  key?: string;
+  name_en: string;
+  name_ar: string;
 }
 
 export type CreatePermissionProfileDto = Omit<PermissionProfile, 'id'>;

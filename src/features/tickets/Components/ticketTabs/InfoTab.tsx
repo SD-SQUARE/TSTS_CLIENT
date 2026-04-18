@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Tag, Typography, Card, Button, Flex, message, Splitter, Select, Dropdown, Space, Popconfirm, Spin } from 'antd';
+import { Typography, Card, Button, Flex, message, Splitter, Dropdown, Space, Popconfirm, Spin } from 'antd';
 import { CheckCircleOutlined, EditOutlined, ToolOutlined, ReloadOutlined, CloseCircleOutlined, MessageOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -298,6 +298,16 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                     <Flex vertical gap="large">
                         <Card size="small" title={t('tickets.details')}>
                             <Flex vertical gap="middle">
+                                <Flex justify="space-between" align="center">
+                                    <Typography.Text type="secondary">{t('tickets.ticket_number')}</Typography.Text>
+                                    <Typography.Text copyable>{ticket?.ticket_number || '-'}</Typography.Text>
+                                </Flex>
+
+                                <Flex justify="space-between" align="center">
+                                    <Typography.Text type="secondary">{t('translation.id')}</Typography.Text>
+                                    <Typography.Text copyable>{ticket?.id || '-'}</Typography.Text>
+                                </Flex>
+
                                 <Flex justify="space-between" align="center">
                                     <Typography.Text type="secondary">{t('tickets.status')}</Typography.Text>
                                     <Space size={4}>

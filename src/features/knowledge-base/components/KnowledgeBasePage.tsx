@@ -19,7 +19,6 @@ import {
   EditOutlined,
   DeleteOutlined,
   UploadOutlined,
-  FileWordOutlined,
   EyeOutlined,
   ReadOutlined,
   ShareAltOutlined,
@@ -30,8 +29,10 @@ import { useTranslation } from 'react-i18next';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { useKnowledgeBase } from '../hooks/useKnowledgeBase';
 import type { KnowledgeBaseItem } from '../types/knowledge-types';
+import KnowledgeAttachmentGallery from './KnowledgeAttachmentGallery';
 
 const { Title, Text } = Typography;
 
@@ -43,12 +44,13 @@ const TagOutlinedIcon = () => (
 
 const KnowledgeBasePage: React.FC = () => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const isRtl = i18n.language === 'ar';
   const activeLanguage = isRtl ? 'ar' : 'en';
 
   const auth = useSelector((state: any) => state.auth);
   const role = typeof auth?.user?.role === 'string' ? auth.user.role.toLowerCase() : '';
-  const isPrivileged = role === 'admin' || role === 'technician';
+  const isPrivileged = role === 'admin' || role === 'technician' || role === 'superadmin';
 
   const {
     form,
@@ -226,9 +228,20 @@ const KnowledgeBasePage: React.FC = () => {
             <Text style={{ color: 'rgba(255,255,255,0.65)' }}>{t('knowledge.hub_subtitle')}</Text>
           </div>
           {isPrivileged && (
-            <Button type="primary" size="large" icon={<PlusOutlined />} onClick={() => openModal()} style={{ borderRadius: 6, height: 45 }}>
-              {t('knowledge.create_btn')}
-            </Button>
+            <div style={{ display: 'flex', gap: 12, flexDirection:  'row' }}>
+              <Button
+                size="large"
+                icon={<ReadOutlined />}
+                onClick={() => navigate('/knowledge-base/generator')}
+                style={{ borderRadius: 6, height: 45 }}
+                className='primary-color'              
+              >
+                {t('knowledge.generator.open')}
+              </Button>
+              <Button type="primary" size="large" icon={<PlusOutlined />} onClick={() => openModal()} style={{ borderRadius: 6, height: 45 }}>
+                {t('knowledge.create_btn')}
+              </Button>
+            </div>
           )}
         </div>
       </div>
@@ -574,6 +587,16 @@ const KnowledgeBasePage: React.FC = () => {
                 dangerouslySetInnerHTML={{ __html: contentMeta.value || `<p>${t('knowledge.no_content')}</p>` }}
                 style={{ fontSize: '16px', lineHeight: '1.9', color: '#334155', direction: contentMeta.direction, textAlign: contentMeta.textAlign, padding: 0 }}
               />
+              {(viewingItem.attachments?.length ?? 0) > 0 && (
+                <div style={{ marginTop: 28 }}>
+                  <Divider>{t('tickets.finalReport.attachments')}</Divider>
+                  <KnowledgeAttachmentGallery
+                    attachments={viewingItem.attachments}
+                    emptyText={t('tickets.finalReport.noAttachments')}
+                    openLabel={t('tickets.tools.attachmentsOpen')}
+                  />
+                </div>
+              )}
             </div>
             <div style={{ padding: '18px 40px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff', borderRadius: '0 0 8px 8px', flexDirection:  'row' }}>
               <Text type="secondary">{t('knowledge.share_hint')}</Text>

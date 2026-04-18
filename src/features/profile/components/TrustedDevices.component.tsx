@@ -7,6 +7,7 @@ import {
     Tag,
     Typography,
     Divider,
+    Empty,
 } from "antd";
 import {
     DesktopOutlined,
@@ -15,9 +16,8 @@ import {
     PlusOutlined,
     DeleteOutlined,
 } from "@ant-design/icons";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import AddTrustedDeviceDrawer from "./AddTrustedDeviceDrawer.component";
-import { trustedDevicesMock } from "../mockups/trustedDevices.mockup";
 import { useSelector } from "react-redux";
 import useTrustedDevices from "../hooks/useTrustedDevices.hook";
 import dayjs from "dayjs";
@@ -37,7 +37,7 @@ const deviceLabel = (type: string) => {
     return "Desktop";
 };
 
-const TrustedDevices = () => {
+const TrustedDevices = ({ searchTerm = "" }: { searchTerm?: string }) => {
     
     const { t } = useTranslation();
     const auth = useSelector((state: any) => state.auth);
@@ -46,13 +46,42 @@ const TrustedDevices = () => {
     const { devicesQuery, removeDevice } = useTrustedDevices(userId);
 
     const devices = devicesQuery.data ?? [];
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const filteredDevices = useMemo(
+        () =>
+            !normalizedSearch
+                ? devices
+                : devices.filter((device: any) =>
+                    [
+                        device.name,
+                        device.browser,
+                        device.os,
+                        device.ipAddress,
+                        device.device_type,
+                    ]
+                        .join(" ")
+                        .toLowerCase()
+                        .includes(normalizedSearch),
+                ),
+        [devices, normalizedSearch],
+    );
+    const showAddCard =
+        !normalizedSearch ||
+        [
+            t("profile.trustedDevices.addTitle"),
+            t("profile.trustedDevices.add"),
+            t("profile.trustedDevices.motive"),
+        ]
+            .join(" ")
+            .toLowerCase()
+            .includes(normalizedSearch);
 
     const [open, setOpen] = useState(false);
 
     return (
         <>
             <Row gutter={[16, 16]} align="stretch">
-                {devices.map(device => (
+                {filteredDevices.map(device => (
                     <Col key={device.id} xs={24} sm={12} md={8}>
                         <Card
                             hoverable
@@ -141,55 +170,65 @@ const TrustedDevices = () => {
                 ))}
 
                 {/* ADD DEVICE CARD */}
-                <Col xs={24} sm={12} md={8}>
-                    <Card
+                {showAddCard && (
+                    <Col xs={24} sm={12} md={8}>
+                        <Card
 
-                        id="add-trusted-device-card"
-                        hoverable
-                        onClick={() => setOpen(true)}
-                        style={{
-                            height: "100%",
-                            borderRadius: 14,
-                            border: "1px dashed #d9d9d9",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            textAlign: "center",
-                        }}
-                        bodyStyle={{ padding: 24 }}
-                    >
-                        <Space direction="vertical" align="center" size="middle">
-                            <div
-                                style={{
-                                    width: 56,
-                                    height: 56,
-                                    borderRadius: "50%",
-                                    background: "#f0f5ff",
-                                    color: "#1677ff",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    fontSize: 28,
-                                }}
-                            >
-                                <PlusOutlined />
-                            </div>
+                            id="add-trusted-device-card"
+                            hoverable
+                            onClick={() => setOpen(true)}
+                            style={{
+                                height: "100%",
+                                borderRadius: 14,
+                                border: "1px dashed #d9d9d9",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                textAlign: "center",
+                            }}
+                            bodyStyle={{ padding: 24 }}
+                        >
+                            <Space direction="vertical" align="center" size="middle">
+                                <div
+                                    style={{
+                                        width: 56,
+                                        height: 56,
+                                        borderRadius: "50%",
+                                        background: "#f0f5ff",
+                                        color: "#1677ff",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        fontSize: 28,
+                                    }}
+                                >
+                                    <PlusOutlined />
+                                </div>
 
-                            <Title level={5} style={{ margin: 0 }}>
-                                {t("profile.trustedDevices.addTitle") }
-                            </Title>
+                                <Title level={5} style={{ margin: 0 }}>
+                                    {t("profile.trustedDevices.addTitle") }
+                                </Title>
 
-                            <Text type="secondary" style={{ textAlign: "center" }}>
-                                {t("profile.trustedDevices.motive") }
-                            </Text>
+                                <Text type="secondary" style={{ textAlign: "center" }}>
+                                    {t("profile.trustedDevices.motive") }
+                                </Text>
 
-                            <Button type="primary">
-                                {t("profile.trustedDevices.add") }
-                            </Button>
-                        </Space>
-                    </Card>
-                </Col>
+                                <Button type="primary">
+                                    {t("profile.trustedDevices.add") }
+                                </Button>
+                            </Space>
+                        </Card>
+                    </Col>
+                )}
             </Row>
+
+            {!filteredDevices.length && !showAddCard && (
+                <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description={t("profile.settings.noSearchResults")}
+                    style={{ marginTop: 32 }}
+                />
+            )}
 
             <AddTrustedDeviceDrawer
                 open={open}

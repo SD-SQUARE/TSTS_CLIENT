@@ -1,5 +1,5 @@
 
-import { Layout, Space } from "antd"
+import { Layout } from "antd"
 import NavBar from "./components/layouts/Nav/NavBar"
 import NavItem from "./components/layouts/Nav/components/NavItem"
 import { BrowserRouter } from "react-router-dom"
@@ -12,6 +12,7 @@ import { getUserData } from "./utils/getUserData.utils"
 import { authInitialized, loginSuccess } from "./features/login/store/authSlice"
 import { useDispatch, useSelector } from "react-redux"
 import { loadCsrfToken } from "./api/http"
+import RealtimeBridge from "./features/communications/components/RealtimeBridge"
 
 function App() {
     const { t } = useTranslation();
@@ -32,6 +33,7 @@ function App() {
     return (
         <BrowserRouter>
             <Layout style={{ width: '100%', minHeight: '100vh' }}  >  
+                <RealtimeBridge />
                 {/* Navigation bar */}
                 <NavBar>
                     {!user ?

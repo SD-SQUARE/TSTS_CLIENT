@@ -18,6 +18,10 @@ import SpecializationsPage from "../features/specializations/components/Speciali
 import WorkHoursPage from "../features/work-hours/components/WorkHours";
 import PermissionsPage from "../features/permissions/components/Permissions";
 import KnowledgeBasePage from "../features/knowledge-base/components/KnowledgeBasePage.tsx";
+import KnowledgeGeneratorPage from "../features/knowledge-base/components/KnowledgeGeneratorPage.tsx";
+import KnowledgeGeneratorDetailPage from "../features/knowledge-base/components/KnowledgeGeneratorDetailPage.tsx";
+import ChatCenterPage from "../features/communications/components/ChatCenterPage.tsx";
+import SystemInfoTab from "../features/profile/components/SystemInfo.component.tsx";
 
 
 import {
@@ -90,6 +94,7 @@ export const AppRoutes = () => {
 
         { key: "/settings/trusted-devices", label: t("trusted_devices.Trusted Devices"), icon: <SafetyOutlined /> },
         { key: "/settings/permissions", label: t('Permissions'), icon: <CheckOutlined /> },
+        { key: "/settings/system-info", label: t("profile.settings.system"), icon: <ProjectOutlined /> },
         { key: "/settings/logs", label: t('Audit Logs'), icon: <ClockCircleOutlined /> },
     ];
     return (
@@ -197,6 +202,11 @@ export const AppRoutes = () => {
                         <TrustedDevicesPage />
                      </GuardedRoute>
                 } />
+                <Route path="system-info" element={
+                     <GuardedRoute roles={["superadmin", "admin"]}>
+                        <SystemInfoTab />
+                     </GuardedRoute>
+                } />
                 {/* TODO:connect pages later */}
                 <Route path="permissions" element={<PermissionsPage />} />
                 {/* <Route path="work-hours" element={<WorkHoursPage />} /> */}
@@ -238,6 +248,30 @@ export const AppRoutes = () => {
             } />
 
             <Route path="knowledge-base" element={<GuardedRoute roles={["*"]}><PageLayout><KnowledgeBasePage /> </PageLayout></GuardedRoute>} />
+            <Route
+                path="chat"
+                element={
+                    <GuardedRoute roles={["admin", "superadmin", "technician"]}>
+                        <PageLayout><ChatCenterPage /></PageLayout>
+                    </GuardedRoute>
+                }
+            />
+            <Route
+                path="knowledge-base/generator"
+                element={
+                    <GuardedRoute roles={["admin", "superadmin", "technician"]}>
+                        <PageLayout><KnowledgeGeneratorPage /></PageLayout>
+                    </GuardedRoute>
+                }
+            />
+            <Route
+                path="knowledge-base/generator/:reportId"
+                element={
+                    <GuardedRoute roles={["admin", "superadmin", "technician"]}>
+                        <PageLayout><KnowledgeGeneratorDetailPage /></PageLayout>
+                    </GuardedRoute>
+                }
+            />
 
             {/* Complmentary Paths */}
             <Route path={`${APP_BASE_PATH}/server-error`} element={<PageLayout><ServerError /> </PageLayout>} />

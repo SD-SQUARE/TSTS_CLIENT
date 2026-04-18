@@ -290,6 +290,7 @@
     "ticketDetails": "Ticket Details",
     "tabInfo": "Info",
     "tabMedia": "Media",
+    "tabFinalReport": "Final Report",
     "commentSection": "Comments",
     "tabHistory": "History",
     "Timeline": "Timeline",
@@ -365,6 +366,25 @@
         "empty": "No matching knowledge-base articles found.",
         "inserted": "Article link added to the comment"
       }
+    },
+    "finalReport": {
+      "title": "Final Report",
+      "subtitle": "Prepare the final bilingual report for this ticket and send it to the knowledge generator when ready.",
+      "published": "Published",
+      "openGenerator": "Open Generator",
+      "attachments": "Report Attachments",
+      "attachmentsHint": "Upload supporting files for the final report. They will also appear in the knowledge generator preview.",
+      "noAttachments": "No final-report attachments yet.",
+      "fields": {
+        "titleEn": "Final report title in English",
+        "titleAr": "Final report title in Arabic",
+        "contentEn": "Final report content in English",
+        "contentAr": "Final report content in Arabic"
+      },
+      "messages": {
+        "saved": "Final report saved successfully",
+        "uploaded": "Attachments uploaded successfully"
+      }
     }
   },
   "audit": {
@@ -386,7 +406,10 @@
     "metadata": "Changes (Metadata)"
   },
   "permissionsPage":{
-    "add_perm":"Add Permission"
+    "add_perm":"Add Permission",
+    "select_existing_permissions": "Search system permissions",
+    "edit_permissions_locked": "Existing permissions are locked in edit mode. You can add more, but you cannot remove current ones here.",
+    "no_permissions": "No permissions selected yet."
   },
   "priority": {
     "important": "Important",
@@ -469,6 +492,53 @@
   "chat": {
     "placeholder": "Type a message..."
   },
+  "notifications": {
+    "title": "Notifications",
+    "newItem": "You have a new notification.",
+    "empty": "No notifications yet.",
+    "markAllRead": "Mark all read",
+    "filters": {
+      "all": "All",
+      "unread": "Unread"
+    },
+    "status": {
+      "read": "Read",
+      "unread": "Unread"
+    },
+    "types": {
+      "system": "System",
+      "ticket": "Ticket",
+      "message": "Message",
+      "other": "Other"
+    }
+  },
+  "messagesCenter": {
+    "nav": "Messages",
+    "title": "Messages",
+    "subtitle": "Stay in touch with teammates and technical groups in one inbox.",
+    "newChat": "New Chat",
+    "search": "Search conversations",
+    "searchUsers": "Search users",
+    "searchGroups": "Search groups",
+    "searchHint": "Start typing to search.",
+    "noResults": "No matching results.",
+    "emptyInbox": "No conversations yet.",
+    "emptyConversation": "No messages in this conversation yet.",
+    "noMessages": "No messages yet.",
+    "selectConversationTitle": "Select a conversation",
+    "selectConversationHint": "Choose a person or group from the inbox, or start a new chat.",
+    "placeholder": "Write your message...",
+    "send": "Send",
+    "attachments": "Attach files",
+    "types": {
+      "personal": "Direct",
+      "group": "Group"
+    },
+    "errors": {
+      "selectConversation": "Select a conversation first.",
+      "emptyMessage": "Write a message before sending."
+    }
+  },
   "errors": {
     "fetchFailed": "Error Loading Data",
     "unknown": "An unexpected error occurred while fetching tickets.",
@@ -544,6 +614,9 @@
       "password": "Password",
       "devices": "Trusted Devices",
       "extension": "Browser Extension",
+      "system": "System Info",
+      "searchPlaceholder": "Search settings",
+      "noSearchResults": "No matching results in this tab.",
 
       "reset": {
         "title": "Reset Password",
@@ -569,6 +642,38 @@
         "guide": "Installation Guide",
         "videoUnavailable": "Video guide is currently unavailable",
         "fileMissing": "Extension file is not available."
+      },
+      "systemInfo": {
+        "title": "System Health",
+        "description": "Live server runtime metrics for CPU, memory, disk, and process health.",
+        "lastUpdated": "Last updated:",
+        "unavailable": "System information is currently unavailable.",
+        "cards": {
+          "cpu": "CPU Usage",
+          "memory": "Memory Usage",
+          "disk": "Disk Usage",
+          "runtime": "Runtime",
+          "cores": "cores"
+        },
+        "details": {
+          "category": "Category",
+          "metric": "Metric",
+          "value": "Value",
+          "cpuModel": "CPU Model",
+          "cpuSpeed": "Clock Speed",
+          "loadAverage": "Load Average",
+          "memoryFree": "Free Memory",
+          "processMemory": "Process RSS",
+          "heapUsed": "Heap Usage",
+          "diskPath": "Disk Path",
+          "diskFree": "Free Disk Space",
+          "hostname": "Hostname",
+          "platform": "Platform",
+          "uptime": "System Uptime",
+          "processUptime": "Process Uptime",
+          "nodeVersion": "Node Version",
+          "processId": "Process ID"
+        }
       }
     },
 
@@ -663,6 +768,7 @@
     "hub_title": "Explore Shared Knowledge",
     "hub_subtitle": "Manage documentation, guides, and internal resources.",
     "create_btn": "Create Article",
+    "view_title": "Article Preview",
     "search_placeholder": "Search knowledge base...",
     "no_articles": "No articles found.",
     "no_content": "No content available.",
@@ -721,6 +827,35 @@
       "share_error": "Failed to copy article link",
       "delete_title": "Delete Article",
       "delete_confirm": "Are you sure you want to delete this article?"
+    },
+    "generator": {
+      "open": "Knowledge Generator",
+      "title": "Knowledge Generator",
+      "subtitle": "Review final ticket reports and turn them into publishable knowledge-base articles.",
+      "detailTitle": "Knowledge Draft",
+      "generateAi": "Generate With AI",
+      "publish": "Publish To Knowledge Base",
+      "previewHint": "This preview reflects the current draft that will be published to the knowledge base.",
+      "messages": {
+        "generated": "Knowledge draft generated successfully",
+        "published": "Knowledge article published successfully"
+      },
+      "filters": {
+        "title": "Filter by title",
+        "author": "Filter by author",
+        "actor": "Filter history by actor"
+      },
+      "columns": {
+        "ticket": "Ticket #",
+        "title": "Report Title",
+        "author": "Author",
+        "status": "Status",
+        "updatedAt": "Updated At"
+      },
+      "status": {
+        "draft": "Draft",
+        "published": "Published"
+      }
     }
   },
   "Groups": "Groups",
