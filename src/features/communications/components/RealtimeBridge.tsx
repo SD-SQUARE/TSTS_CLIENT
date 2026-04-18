@@ -33,7 +33,7 @@ const RealtimeBridge: React.FC = () => {
       return undefined;
     }
 
-    const socket = io(`${API_PROTOCOL}://${API_HOST}:${API_PORT}`, {
+    const socket = io({
       auth: {
         token,
       },
