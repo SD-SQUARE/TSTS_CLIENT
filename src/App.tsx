@@ -50,7 +50,7 @@ function App() {
                                 <NavItem to={`/identities/groups`}>{t('Personnel')}</NavItem>
                             </GuardedRoute>    
                             <GuardedRoute roles={["admin"]} allowNavigation={false}>
-                                <NavItem to={`/settings/domains`}>{t('Settings')}</NavItem>
+                                <NavItem to={`/settings/system-info`}>{t('Settings')}</NavItem>
                             </GuardedRoute>    
                         </>
                     )}

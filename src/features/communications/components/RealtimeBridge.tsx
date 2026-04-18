@@ -37,7 +37,7 @@ const RealtimeBridge: React.FC = () => {
       auth: {
         token,
       },
-      transports: ['websocket'],
+      transports: ['polling', 'websocket'],
     });
 
     socket.on('notification:new', (payload) => {

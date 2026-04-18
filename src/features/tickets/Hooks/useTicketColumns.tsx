@@ -13,7 +13,6 @@ import type { Problem, Specialization, Ticket } from '../Types/tickets';
 import EllipsisComponent from '../../../components/EllipsisComponent';
 import AssigneeColumnCell from '../Components/ticketListComponents/AssigneeColumnCell';
 
-
 type SearchableDataIndex =
     | 'id'
     | 'title'
@@ -32,7 +31,7 @@ interface UseTicketColumnsOptions {
     specs: any[];
     problemTreeData: any[];
     requesters: { label: string; value: string }[];
-    assignees: { label: string; value: string }[];
+    assignees: { label: React.ReactNode; value: string, textLabel?: string }[];
     universities: { label: string; value: string }[];
     domains: { label: string; value: string }[];
     departments: { label: string; value: string }[];
@@ -166,7 +165,7 @@ export const useTicketColumns = ({
     const getColumnSelectProps = (
         dataIndex: SearchableDataIndex,
         titleKey: string,
-        options: { label: string; value: string | number }[],
+        options: { label: React.ReactNode; value: string | number; textLabel?: string }[],
     ): TableColumnType<Ticket> => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
             <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
@@ -182,6 +181,10 @@ export const useTicketColumns = ({
                     maxTagCount="responsive"
                     listHeight={250}
                     dropdownStyle={{ minWidth: 200 }}
+                    filterOption={(input, option: any) => {
+                        const textToSearch = option?.textLabel ?? (typeof option?.label === 'string' ? option?.label : '');
+                        return textToSearch.toString().toLowerCase().includes(input.toLowerCase());
+                    }}
                 />
                 <Flex gap="small">
                     <Button
@@ -265,6 +268,7 @@ export const useTicketColumns = ({
             dataIndex: 'id',
             key: 'id',
             width: 80,
+            ellipsis: true,
             fixed: 'left',
             ...getColumnSearchProps('id' as any, 'tickets.ticket_number'),
             render: (id: string, record: Ticket) => {
@@ -289,6 +293,7 @@ export const useTicketColumns = ({
             dataIndex: 'title',
             key: 'title',
             width: 450,
+            ellipsis: true,
             render: (text: string, record: Ticket) => (
                 <Popover
                     title={t('tickets.title')}
@@ -353,6 +358,7 @@ export const useTicketColumns = ({
             dataIndex: 'assignee',
             key: 'assignee',
             width: 160,
+            ellipsis: true,
             render: (assignees: any[], record: any) => {
 
                 return <AssigneeColumnCell record={record} assignees={assignees} />;
@@ -365,14 +371,16 @@ export const useTicketColumns = ({
             key: 'specialization',
             width: 100,
             ellipsis: true,
-            render: (specialization: Specialization | null) => (
-                <span>
-                    {renderHighlightedText(
-                        specialization?.name ?? t('tickets.noSpecialization'),
-                        'specialization',
-                    )}
-                </span>
-            ),
+            render: (specialization: Specialization | null) => {
+                const text = specialization?.name ?? t('tickets.noSpecialization');
+                return (
+                    <Popover title={t('tickets.specialization')} content={<div style={{ maxWidth: 300 }}>{text}</div>} trigger="hover" placement="topLeft">
+                        <div style={{ width: '100%' }}>
+                            <EllipsisComponent content={renderHighlightedText(text, 'specialization')} />
+                        </div>
+                    </Popover>
+                );
+            },
             ...getColumnSelectProps(
                 'specialization',
                 'tickets.specialization',
@@ -385,9 +393,16 @@ export const useTicketColumns = ({
             key: 'problem',
             width: 180,
             ellipsis: true,
-            render: (problem: Problem | null) => (
-                <span>{renderHighlightedText(problem?.name ?? t('tickets.noType'), 'problem')}</span>
-            ),
+            render: (problem: Problem | null) => {
+                const text = problem?.name ?? t('tickets.noType');
+                return (
+                    <Popover title={t('tickets.problemType')} content={<div style={{ maxWidth: 300 }}>{text}</div>} trigger="hover" placement="topLeft">
+                        <div style={{ width: '100%' }}>
+                            <EllipsisComponent content={renderHighlightedText(text, 'problem')} />
+                        </div>
+                    </Popover>
+                );
+            },
             ...getColumnTreeProps('problem', 'tickets.problemType', problemTreeData),
         },
         ...(!isRequester
@@ -420,11 +435,16 @@ export const useTicketColumns = ({
                     key: 'requesterUniversity',
                     width: 180,
                     ellipsis: true,
-                    render: (_: string, record: Ticket) => (
-                        <EllipsisComponent
-                            content={record.requester?.university?.name || t('common.empty')}
-                        />
-                    ),
+                    render: (_: string, record: Ticket) => {
+                        const text = record.requester?.university?.name || t('common.empty');
+                        return (
+                            <Popover title={t('university')} content={<div style={{ maxWidth: 300 }}>{text}</div>} trigger="hover" placement="topLeft">
+                                <div style={{ width: '100%' }}>
+                                    <EllipsisComponent content={text} />
+                                </div>
+                            </Popover>
+                        );
+                    },
                     ...getColumnSelectProps('university', 'university', universities),
                 },
                 {
@@ -433,11 +453,16 @@ export const useTicketColumns = ({
                     key: 'requesterDomain',
                     width: 180,
                     ellipsis: true,
-                    render: (_: string, record: Ticket) => (
-                        <EllipsisComponent
-                            content={record.requester?.domain?.name || t('common.empty')}
-                        />
-                    ),
+                    render: (_: string, record: Ticket) => {
+                        const text = record.requester?.domain?.name || t('common.empty');
+                        return (
+                            <Popover title={t('domain')} content={<div style={{ maxWidth: 300 }}>{text}</div>} trigger="hover" placement="topLeft">
+                                <div style={{ width: '100%' }}>
+                                    <EllipsisComponent content={text} />
+                                </div>
+                            </Popover>
+                        );
+                    },
                     ...getColumnSelectProps('domain', 'domain', domains),
                 },
                 {
@@ -446,14 +471,16 @@ export const useTicketColumns = ({
                     key: 'requesterDepartments',
                     width: 220,
                     ellipsis: true,
-                    render: (_: unknown, record: Ticket) => (
-                        <EllipsisComponent
-                            content={
-                                record.requester?.departments?.map((department) => department.name).join(', ') ||
-                                t('common.empty')
-                            }
-                        />
-                    ),
+                    render: (_: unknown, record: Ticket) => {
+                        const text = record.requester?.departments?.map((department) => department.name).join(', ') || t('common.empty');
+                        return (
+                            <Popover title={t('department')} content={<div style={{ maxWidth: 300 }}>{text}</div>} trigger="hover" placement="topLeft">
+                                <div style={{ width: '100%' }}>
+                                    <EllipsisComponent content={text} />
+                                </div>
+                            </Popover>
+                        );
+                    },
                     ...getColumnSelectProps('department', 'department', departments),
                 },
             ]

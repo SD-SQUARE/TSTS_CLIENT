@@ -86,6 +86,7 @@ export const AppRoutes = () => {
     ];
     const SettingsMenuItems = [
         // { key: "/settings/work-hours", label: t('Work Hours'), icon: <ClockCircleOutlined /> },
+        { key: "/settings/system-info", label: t("profile.settings.system"), icon: <ProjectOutlined /> },
         { key: "/settings/universities", label: t('Universities'), icon: <BankOutlined /> },
         { key: "/settings/domains", label: t('Domains'), icon: <ProjectOutlined /> },
         { key: "/settings/departments", label: t('Departments'), icon: <ApartmentOutlined /> },
@@ -94,7 +95,6 @@ export const AppRoutes = () => {
 
         { key: "/settings/trusted-devices", label: t("trusted_devices.Trusted Devices"), icon: <SafetyOutlined /> },
         { key: "/settings/permissions", label: t('Permissions'), icon: <CheckOutlined /> },
-        { key: "/settings/system-info", label: t("profile.settings.system"), icon: <ProjectOutlined /> },
         { key: "/settings/logs", label: t('Audit Logs'), icon: <ClockCircleOutlined /> },
     ];
     return (

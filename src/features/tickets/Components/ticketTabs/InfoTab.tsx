@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Typography, Card, Button, Flex, message, Splitter, Dropdown, Space, Popconfirm, Spin } from 'antd';
+import { Typography, Card, Button, Flex, message, Splitter, Dropdown, Space, Popconfirm, Spin, Tag } from 'antd';
 import { CheckCircleOutlined, EditOutlined, ToolOutlined, ReloadOutlined, CloseCircleOutlined, MessageOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -304,16 +304,11 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                                 </Flex>
 
                                 <Flex justify="space-between" align="center">
-                                    <Typography.Text type="secondary">{t('translation.id')}</Typography.Text>
-                                    <Typography.Text copyable>{ticket?.id || '-'}</Typography.Text>
-                                </Flex>
-
-                                <Flex justify="space-between" align="center">
                                     <Typography.Text type="secondary">{t('tickets.status')}</Typography.Text>
                                     <Space size={4}>
-                                        <span>
+                                        <Tag color={getStatusColor(ticket?.status)}>
                                             {ticket?.status}
-                                        </span>
+                                        </Tag>
 
                                         {!isRequester && (
                                             <Dropdown menu={statusMenu} trigger={['click']} disabled={updateMutation.isPending}>
@@ -333,9 +328,9 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
 
                                     <Space size={4}>
 
-                                        <span>
+                                        <Tag color={getPriorityColor(ticket?.priority)}>
                                             {ticket?.priority}
-                                        </span>
+                                        </Tag>
 
                                         {!isRequester && (
                                             <Dropdown menu={priorityMenu} trigger={['click']} disabled={updateMutation.isPending}>

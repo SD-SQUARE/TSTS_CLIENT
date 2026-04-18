@@ -60,21 +60,30 @@ const EllipsisComponent: React.FC<EllipsisComponentProps> = ({ content, copyable
     const [expanded, setExpanded] = useState(false);
 
     return (
-        <Typography.Paragraph
-        copyable={copyable}
-            style={{ margin: 0 }}
-            ellipsis={{
-                rows: 1,
-                expandable: 'collapsible',
-                expanded,
-                onExpand: (e, info) => {
-                    e.stopPropagation(); 
-                    setExpanded(info.expanded);
-                }
-            }}
+        <div 
+            onClick={(e) => {
+                e.stopPropagation();
+                setExpanded(!expanded);
+            }} 
+            style={{ cursor: 'pointer', width: '100%' }}
         >
-            {content}
-        </Typography.Paragraph>
+            <Typography.Paragraph
+                copyable={copyable ? { text: typeof content === 'string' ? content : undefined } : false}
+                style={{ margin: 0, width: '100%' }}
+                ellipsis={{
+                    rows: 1,
+                    expandable: 'collapsible',
+                    expanded,
+                    symbol: null, 
+                    onExpand: (e, info) => {
+                        e.stopPropagation(); 
+                        setExpanded(info.expanded);
+                    }
+                }}
+            >
+                {content}
+            </Typography.Paragraph>
+        </div>
     );
 };
 

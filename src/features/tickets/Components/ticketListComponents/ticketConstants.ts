@@ -12,13 +12,16 @@ export type TicketStatus = (typeof TICKET_STATUS)[keyof typeof TICKET_STATUS];
 
 export const DEFAULT_COL_WIDTHS: Record<string, number> = {
     id: 120,
-    status: 60,
-    priority: 80,
+    status: 123,
+    priority: 150,
     title: 450,
-    specialization: 100,
-    problem: 80,
-    requesterName: 100,
-    assignee: 160,
+    specialization: 252,
+    problem: 255,
+    requesterName: 220,
+    assignee: 231,
+    requesterUniversity: 200,
+    requesterDomain: 296,
+    requesterDepartments: 295,
 };
 
 export const UUID_PATTERN =

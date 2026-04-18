@@ -20,7 +20,7 @@ import {
     useTickets,
     type TicketSearchQuery,
 } from '../Hooks/useTicket';
-import { useSpecializations, useTechnicians, useTicketProblems } from '../Hooks/useTicketForm';
+import { useSpecializations, useTechnicians, useAdmins, useTicketProblems } from '../Hooks/useTicketForm';
 import { useRowHighlighting } from '../Hooks/useRowHighlighting';
 import { useTicketColumns } from '../Hooks/useTicketColumns';
 import { useColumnSettings } from '../Hooks/useColumnSettings';
@@ -46,10 +46,18 @@ const TicketList: React.FC = () => {
     const { data: specs } = useSpecializations();
     const { data: hierarchicalProblems } = useTicketProblems();
     const { data: technicians } = useTechnicians();
+    const { data: admins } = useAdmins();
     const { data: requesters } = useRequestersLookup(role !== 'requester');
     const { data: universities } = useTicketUniversitiesLookup();
     const { data: domains } = useTicketDomainsLookup();
     const { data: departments } = useTicketDepartmentsLookup();
+
+    const possibleAssignees = useMemo(() => {
+        const techList = (technicians || []).map((t: any) => ({ ...t, _userType: 'tech' }));
+        const adminList = (admins || []).map((a: any) => ({ ...a, _userType: 'admin' }));
+        const combined = [...techList, ...adminList];
+        return Array.from(new Map(combined.map(item => [item.id, item])).values());
+    }, [technicians, admins]);
 
     const antdLocale = currentLanguage === 'ar' ? arEG : enUS;
 
@@ -140,10 +148,26 @@ const TicketList: React.FC = () => {
             value: item.id,
             label: localizedUserLabel(item),
         })),
-        assignees: (technicians || []).map((item: any) => ({
-            value: item.id,
-            label: localizedUserLabel(item),
-        })),
+        assignees: possibleAssignees.map((item: any) => {
+            const userLabel = localizedUserLabel(item);
+            return {
+                value: item.id,
+                label: (
+                    <Flex justify="space-between" align="center">
+                        <Typography.Text ellipsis style={{ maxWidth: 140 }}>
+                            {userLabel}
+                        </Typography.Text>
+                        <Tag
+                            color={item._userType === 'admin' ? 'purple' : 'blue'}
+                            style={{ marginInlineEnd: 0 }}
+                        >
+                            {item._userType === 'admin' ? t('roles.admin', 'Admin') : t('roles.technician', 'Tech')}
+                        </Tag>
+                    </Flex>
+                ),
+                textLabel: userLabel,
+            };
+        }),
         universities: (universities || []).map((item: any) => ({
             value: item.id,
             label: localizedLookupLabel(item),
@@ -226,6 +250,8 @@ const TicketList: React.FC = () => {
         />
     );
 
+    const tableWidth = finalColumns.reduce((sum, col) => sum + (col.width as number || 100), 0);
+
     return (
         <div style={{ padding: '24px' }}>
             <TicketListStyles />
@@ -265,10 +291,10 @@ const TicketList: React.FC = () => {
                     dataSource={data?.data || []}
                     rowKey="id"
                     skeletonLoading={isLoading}
-                    tableLayout="auto"
+                    tableLayout="fixed"
                     rowClassName={(record) => getRowClassName(record.status)}
                     scroll={{
-                        x: 'max-content',
+                        x: tableWidth,
                     }}
                     sticky
                     pagination={false}
