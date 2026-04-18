@@ -44,9 +44,11 @@ const LanguageSwitcher = () => {
             arrow
         >
             <Space style={{ cursor: "pointer", userSelect: "none" }}>
-                
-                    <Avatar shape="square"  src={languages[lang].flag} />
-                
+                {(() => {
+                    const currentLang = (lang || 'en').split('-')[0];
+                    const langData = languages[currentLang] || languages['en'];
+                    return <Avatar shape="square" src={langData.flag} />;
+                })()}
             </Space>
         </Dropdown>
     );
