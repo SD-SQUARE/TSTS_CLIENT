@@ -62,7 +62,6 @@ const EllipsisComponent: React.FC<EllipsisComponentProps> = ({ content, copyable
     return (
         <div 
             onClick={(e) => {
-                e.stopPropagation();
                 setExpanded(!expanded);
             }} 
             style={{ cursor: 'pointer', width: '100%' }}

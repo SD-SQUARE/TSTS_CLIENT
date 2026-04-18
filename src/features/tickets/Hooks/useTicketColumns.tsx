@@ -430,7 +430,7 @@ export const useTicketColumns = ({
                     ...getColumnSelectProps('requester', 'tickets.requester', requesters),
                 },
                 {
-                    title: t('university'),
+                    title: t('user_list.university'),
                     dataIndex: ['requester', 'university', 'name'],
                     key: 'requesterUniversity',
                     width: 180,
@@ -438,7 +438,7 @@ export const useTicketColumns = ({
                     render: (_: string, record: Ticket) => {
                         const text = record.requester?.university?.name || t('common.empty');
                         return (
-                            <Popover title={t('university')} content={<div style={{ maxWidth: 300 }}>{text}</div>} trigger="hover" placement="topLeft">
+                            <Popover title={t('user_list.university')} content={<div style={{ maxWidth: 300 }}>{text}</div>} trigger="hover" placement="topLeft">
                                 <div style={{ width: '100%' }}>
                                     <EllipsisComponent content={text} />
                                 </div>
@@ -448,7 +448,7 @@ export const useTicketColumns = ({
                     ...getColumnSelectProps('university', 'university', universities),
                 },
                 {
-                    title: t('domain'),
+                    title: t('user_list.domain'),
                     dataIndex: ['requester', 'domain', 'name'],
                     key: 'requesterDomain',
                     width: 180,
@@ -456,7 +456,7 @@ export const useTicketColumns = ({
                     render: (_: string, record: Ticket) => {
                         const text = record.requester?.domain?.name || t('common.empty');
                         return (
-                            <Popover title={t('domain')} content={<div style={{ maxWidth: 300 }}>{text}</div>} trigger="hover" placement="topLeft">
+                            <Popover title={t('user_list.domain')} content={<div style={{ maxWidth: 300 }}>{text}</div>} trigger="hover" placement="topLeft">
                                 <div style={{ width: '100%' }}>
                                     <EllipsisComponent content={text} />
                                 </div>
@@ -466,7 +466,7 @@ export const useTicketColumns = ({
                     ...getColumnSelectProps('domain', 'domain', domains),
                 },
                 {
-                    title: t('department'),
+                    title: t('user_list.department'),
                     dataIndex: ['requester', 'departments'],
                     key: 'requesterDepartments',
                     width: 220,
@@ -474,7 +474,7 @@ export const useTicketColumns = ({
                     render: (_: unknown, record: Ticket) => {
                         const text = record.requester?.departments?.map((department) => department.name).join(', ') || t('common.empty');
                         return (
-                            <Popover title={t('department')} content={<div style={{ maxWidth: 300 }}>{text}</div>} trigger="hover" placement="topLeft">
+                            <Popover title={t('user_list.department')} content={<div style={{ maxWidth: 300 }}>{text}</div>} trigger="hover" placement="topLeft">
                                 <div style={{ width: '100%' }}>
                                     <EllipsisComponent content={text} />
                                 </div>
