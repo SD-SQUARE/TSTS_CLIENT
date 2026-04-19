@@ -1,22 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, { useEffect, useRef } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { Form, Card, Flex, Input, Button } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { Controller, useForm, useFieldArray } from "react-hook-form";
 
 import { t } from "i18next";
 import type { UserFormData } from "../../Types/users";
+import type { UserFormStepHandle } from "./types";
 
 
 interface Props { initialData: UserFormData; onNext: (data: Partial<UserFormData>) => void; }
 
-const StepContacts: React.FC<Props> = ({ initialData, onNext }) => {
+const StepContacts = forwardRef<UserFormStepHandle, Props>(({ initialData, onNext }, ref) => {
 
     const isInitialLoad = useRef(true);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { handleSubmit, control, formState: { errors }, reset } =
+    const { handleSubmit, control, formState: { errors }, reset, getValues } =
         useForm<UserFormData>({
             defaultValues: {
                 ...initialData,
@@ -59,6 +60,16 @@ const StepContacts: React.FC<Props> = ({ initialData, onNext }) => {
 
         onNext({ contacts: { phones: cleanPhones, mobiles: cleanMobiles } });
     };
+
+    useImperativeHandle(ref, () => ({
+        getValues: () => {
+            const data = getValues();
+            const cleanPhones = data.contacts?.phones?.filter(p => p && p.trim() !== '') || [];
+            const cleanMobiles = data.contacts?.mobiles?.filter(m => m && m.trim() !== '') || [];
+
+            return { contacts: { phones: cleanPhones, mobiles: cleanMobiles } };
+        },
+    }), [getValues]);
 
     return (
         <Card title={t('user_list.contact_info')}>
@@ -119,5 +130,8 @@ const StepContacts: React.FC<Props> = ({ initialData, onNext }) => {
             </Form>
         </Card>
     );
-};
+});
+
+StepContacts.displayName = "StepContacts";
+
 export default StepContacts;

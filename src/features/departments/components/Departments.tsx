@@ -7,12 +7,24 @@ import { useTranslation } from "react-i18next";
 import type { CreateDomainDto, Domain, UpdateDomainDto } from "../../domains/types/types";
 import { domainApi } from "../../domains/services/domainsApi";
 import { departmentApi } from "../services/departmentApi";
+import type { CreateUniversityDto, University, UpdateUniversityDto } from "../../universities/types/types";
+import { universityApi } from "../../universities/services/universityApi";
+import { getServerTextFilterProps, getServerSelectFilterProps } from "../../../components/table/serverFilters";
 
 const DepartmentsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const [selectedUni, setSelectedUni] = useState<number | null>(null);
-  const [searchTerm, setSearchTerm] = useState(""); 
   const [pagination, setPagination] = useState({ current: 1, pageSize: 50 });
+  const [filters, setFilters] = useState({
+    name_en: undefined as string | undefined,
+    name_ar: undefined as string | undefined,
+    description_en: undefined as string | undefined,
+    description_ar: undefined as string | undefined,
+    domain: undefined as string | undefined,
+    university: undefined as string | undefined,
+  });
+
+  const resetToFirstPage = () =>
+    setPagination((prev) => ({ ...prev, current: 1 }));
 
   const {
     data,
@@ -23,11 +35,11 @@ const DepartmentsPage: React.FC = () => {
     updateMutation,
     deleteMutation,
   } = useGenericCrud<Department, CreateDepartmentDto, UpdateDepartmentDto>({
-    queryKey: ['departments', searchTerm, pagination.current, pagination.pageSize],
+    queryKey: ['departments', filters, pagination.current, pagination.pageSize],
     fetchFn: () => departmentApi.getAll({ 
-      name: searchTerm,
       page: pagination.current,
-      page_size: pagination.pageSize
+      page_size: pagination.pageSize,
+      ...filters,
     }),
     fetchOneFn: (id) => departmentApi.getById(id),
     createFn: (data) => departmentApi.create(data),
@@ -48,21 +60,50 @@ const {
     updateFn: ({ id, data }) => domainApi.update(id, data),
     deleteFn: (id) => domainApi.delete(id),
   });
-    const uniOptions = domains?.map((u) => ({
+      const {
+      data: universities,
+    } = useGenericCrud<University, CreateUniversityDto, UpdateUniversityDto>({
+      queryKey: ['universities'],
+      fetchFn: () => universityApi.getAll(),
+      createFn: (data) => universityApi.create(data),
+      updateFn: ({ id, data }) => universityApi.update(id, data),
+      deleteFn:  (id) => universityApi.delete(id),
+    });
+
+    const uniOptions = universities?.map((u) => ({
+      label: i18n.language === "ar" ? u.name_ar : u.name_en,
+      value: u.id,
+    })) ?? [];
+
+    const domainOptions = domains?.map((u) => ({
         label: i18n.language === "ar" ? u.name_ar : u.name_en,
         value: u.id,
-})) ?? [];
+    })) ?? [];
 
-    const columns = [
+    const columns: ColumnsType<Department> = [
         {
             title: t("name_en"),
             key: "name_en",
             render: (_: any, record: any) => record.name?.en || "-",
+            ...getServerTextFilterProps({
+              filterKey: "name_en",
+              filters,
+              setFilters,
+              placeholder: `${t("common.search")} ${t("name_en")}`,
+              onChange: resetToFirstPage,
+            }),
         },
         {
             title: t("name_ar"),
             key: "name_ar",
             render: (_: any, record: any) => record.name?.ar || "-",
+            ...getServerTextFilterProps({
+              filterKey: "name_ar",
+              filters,
+              setFilters,
+              placeholder: `${t("common.search")} ${t("name_ar")}`,
+              onChange: resetToFirstPage,
+            }),
         },
 
         {
@@ -86,6 +127,13 @@ const {
                     </Tooltip>
                 );
             },
+            ...getServerTextFilterProps({
+              filterKey: "description_en",
+              filters,
+              setFilters,
+              placeholder: `${t("common.search")} ${t("description_en")}`,
+              onChange: resetToFirstPage,
+            }),
         },
 
         {
@@ -111,6 +159,31 @@ const {
                     </Tooltip>
                 );
             },
+            ...getServerTextFilterProps({
+              filterKey: "description_ar",
+              filters,
+              setFilters,
+              placeholder: `${t("common.search")} ${t("description_ar")}`,
+              onChange: resetToFirstPage,
+            }),
+        },
+        {
+            title: t("university"),
+            key: "university",
+            render: (_: any, record: any) => {
+                const university = record.domain?.university?.name;
+                if (!university) return "-";
+
+                return i18n.language === "ar" ? university.ar : university.en;
+            },
+            ...getServerSelectFilterProps({
+              filterKey: "university",
+              filters,
+              setFilters,
+              placeholder: `${t("common.search")} ${t("university")}`,
+              options: uniOptions,
+              onChange: resetToFirstPage,
+            }),
         },
 
         {
@@ -122,6 +195,14 @@ const {
 
                 return i18n.language === "ar" ? domain.ar : domain.en;
             },
+            ...getServerSelectFilterProps({
+              filterKey: "domain",
+              filters,
+              setFilters,
+              placeholder: `${t("common.search")} ${t("domain")}`,
+              options: domainOptions,
+              onChange: resetToFirstPage,
+            }),
         },
     ];
 
@@ -176,15 +257,14 @@ const {
       >
         <Select
           placeholder={t("select_domain")}
-          options={uniOptions}
-          onChange={(val) => setSelectedUni(val)}
+          options={domainOptions}
         />
       </Form.Item>
     </>
   );
 
 const nestedFieldMappers = {
-    university: (record: Department) => record.university?.id ?? null,
+    university: (record: Department) => record.domain?.university?.id ?? null,
     domain: (record: Department) => record.domain?.id ?? null
 };
   return (
@@ -198,16 +278,12 @@ const nestedFieldMappers = {
       pageIndex={pagination.current}
       pageSize={pagination.pageSize}
       onPageChange={(page, size) => setPagination({ current: page, pageSize: size })}
-      onSearch={(val) => {
-        setSearchTerm(val);
-        setPagination(prev => ({ ...prev, current: 1 })); 
-      }}
       isLoading={isLoading}
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}
       nestedFieldMappers={nestedFieldMappers}   
-      searchText={searchTerm}
+      showToolbarSearch={false}
     />
   );
 };

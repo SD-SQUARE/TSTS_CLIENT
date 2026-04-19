@@ -1,11 +1,15 @@
 // features/trusted-devices/pages/TrustedDevicesPage.tsx
-import { Input, Button, Space, Tag, Modal, Typography } from "antd";
+import { Input,Button, Tag, Modal, Typography } from "antd";
 import { useState } from "react";
 import { useTrustedDevices, useDeleteTrustedDevice } from "../hooks/useTrustedDevices";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { DeleteOutlined } from "@ant-design/icons";
 import AppTable from "../../../components/AppTable";
+import {
+  getServerSelectFilterProps,
+  getServerTextFilterProps,
+} from "../../../components/table/serverFilters";
 
 const { Text } = Typography;
 
@@ -13,19 +17,27 @@ const CONFIRM_WORD = "DELETE";
 
 const TrustedDevicesPage = () => {
     const { t } = useTranslation();
-    const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
+    const [filters, setFilters] = useState({
+        user: undefined as string | undefined,
+        ipAddress: undefined as string | undefined,
+        name: undefined as string | undefined,
+        deviceType: undefined as string | undefined,
+        browser: undefined as string | undefined,
+        os: undefined as string | undefined,
+    });
 
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [confirmText, setConfirmText] = useState("");
 
     const { data, isLoading } = useTrustedDevices({
-        search,
         page,
         pageSize: 10,
+        ...filters,
     });
 
     const deleteMutation = useDeleteTrustedDevice();
+    const resetToFirstPage = () => setPage(1);
 
     const handleDelete = () => {
         if (!selectedId) return;
@@ -42,27 +54,75 @@ const TrustedDevicesPage = () => {
         {
             title: t("trusted_devices.User"),
             dataIndex: ["user", "email"],
+            ...getServerTextFilterProps({
+                filterKey: "user",
+                filters,
+                setFilters,
+                placeholder: t("trusted_devices.Search by email or SSN"),
+                onChange: resetToFirstPage,
+            }),
         },
         {
             title: t("trusted_devices.ipAddress"),
             dataIndex: "ipAddress",
+            ...getServerTextFilterProps({
+                filterKey: "ipAddress",
+                filters,
+                setFilters,
+                placeholder: `${t("common.search")} ${t("trusted_devices.ipAddress")}`,
+                onChange: resetToFirstPage,
+            }),
         },
         {
             title: t("trusted_devices.Device Name"),
             dataIndex: "name",
+            ...getServerTextFilterProps({
+                filterKey: "name",
+                filters,
+                setFilters,
+                placeholder: `${t("common.search")} ${t("trusted_devices.Device Name")}`,
+                onChange: resetToFirstPage,
+            }),
         },
         {
             title: t("trusted_devices.Type"),
             dataIndex: "deviceType",
             render: (v: string) => <Tag>{v}</Tag>,
+            ...getServerSelectFilterProps({
+                filterKey: "deviceType",
+                filters,
+                setFilters,
+                placeholder: `${t("common.select")} ${t("trusted_devices.Type")}`,
+                options: [
+                    { label: "Desktop", value: "desktop" },
+                    { label: "Laptop", value: "laptop" },
+                    { label: "Mobile", value: "mobile" },
+                    { label: "Tablet", value: "tablet" },
+                ],
+                onChange: resetToFirstPage,
+            }),
         },
         {
             title: t("trusted_devices.Browser"),
             dataIndex: "browser",
+            ...getServerTextFilterProps({
+                filterKey: "browser",
+                filters,
+                setFilters,
+                placeholder: `${t("common.search")} ${t("trusted_devices.Browser")}`,
+                onChange: resetToFirstPage,
+            }),
         },
         {
             title: t("trusted_devices.OS"),
             dataIndex: "os",
+            ...getServerTextFilterProps({
+                filterKey: "os",
+                filters,
+                setFilters,
+                placeholder: `${t("common.search")} ${t("trusted_devices.OS")}`,
+                onChange: resetToFirstPage,
+            }),
         },
         {
             title: t("trusted_devices.Actions"),
@@ -81,14 +141,6 @@ const TrustedDevicesPage = () => {
 
     return (
         <>
-            <Space style={{ marginBottom: 16 , width: "100%", justifyContent: "flex-end"}}>
-                <Input.Search
-                    placeholder={t("trusted_devices.Search by email or SSN")}
-                    onSearch={setSearch}
-                    allowClear
-                />
-            </Space>
-
             <AppTable
                 title={() => <Typography.Title level={3}>{t("trusted_devices.Trusted Devices")}</Typography.Title>}
                 rowKey="id"

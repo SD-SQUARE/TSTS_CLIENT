@@ -1,4 +1,4 @@
-import React, {  useEffect } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle } from "react";
 import { Form, Card, Flex, Input } from "antd";
 import { Controller, useForm } from "react-hook-form";
 
@@ -6,6 +6,7 @@ import { Controller, useForm } from "react-hook-form";
 import { t } from "i18next";
 import type { UserFormData } from "../../Types/users";
 import RequiredTag from "../../../../components/RequiredTag";
+import type { UserFormStepHandle } from "./types";
 
 
 interface Props {
@@ -15,13 +16,13 @@ interface Props {
     // onTriggerSubmit: (submitTrigger: () => void) => void;
 }
 
-const StepAccess: React.FC<Props> = ({
+const StepAccess = forwardRef<UserFormStepHandle, Props>(({
     initialData,
     onSubmit,
     isSubmitting,
     // onTriggerSubmit,
-}) => {
-    const { handleSubmit, control, formState: { errors }, reset } =
+}, ref) => {
+    const { handleSubmit, control, formState: { errors }, reset, getValues } =
         useForm<UserFormData>({ defaultValues: initialData, mode: "onChange" });
 
         const isEdit = !!initialData?.email;
@@ -42,6 +43,16 @@ const StepAccess: React.FC<Props> = ({
     const localHandleSubmit = () => {
         handleSubmit((data) => onSubmit(data))();
     }
+
+    useImperativeHandle(ref, () => ({
+        getValues: () => {
+            const data = getValues();
+            return {
+                email: data.email,
+                password: data.password,
+            };
+        },
+    }), [getValues]);
 
     return (
         <Card title={t("user_list.user_access")}>
@@ -79,5 +90,8 @@ const StepAccess: React.FC<Props> = ({
             </Form>
         </Card>
     );
-};
+});
+
+StepAccess.displayName = "StepAccess";
+
 export default StepAccess;

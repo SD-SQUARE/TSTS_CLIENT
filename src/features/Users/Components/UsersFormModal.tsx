@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useCallback, useEffect, useMemo } from "react";
+import React, { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { Modal, Steps, Button,  message, Spin, Flex } from "antd";
 import { useTranslation } from "react-i18next";
 import { ExclamationCircleFilled } from '@ant-design/icons';
@@ -11,6 +11,7 @@ import StepPermissions from "./UsersFormSteps/StepPermissions";
 import StepAccess from "./UsersFormSteps/StepAccess";
 import type { UserFormData, UserListItem, UserPayload } from "../Types/users";
 import { useAddOrEditUser, useUserDetail } from "../Hooks/useUsers";
+import type { UserFormStepHandle } from "./UsersFormSteps/types";
 
 
 
@@ -50,6 +51,7 @@ const UserFormModal: React.FC<{
     const { t } = useTranslation();
     const [current, setCurrent] = useState(0);
     const [formData, setFormData] = useState<UserFormData>(initialFormData);
+    const currentStepRef = useRef<UserFormStepHandle | null>(null);
     // const [stepSubmitTrigger, setStepSubmitTrigger] = useState<(() => void) | null>(null);
 
     const resetKey = isVisible ? 'visible' : 'hidden';
@@ -110,23 +112,35 @@ const UserFormModal: React.FC<{
         onClose();
     };
 
-    const isFirstStepDirty = () => {
+    const isFirstStepDirty = (data: UserFormData) => {
         return (
-            formData.first_name_ar !== initialFormData.first_name_ar ||
-            formData.first_name_en !== initialFormData.first_name_en ||
-            formData.mid_name_ar !== initialFormData.mid_name_ar ||
-            formData.mid_name_en !== initialFormData.mid_name_en ||
-            formData.last_name_ar !== initialFormData.last_name_ar ||
-            formData.last_name_en !== initialFormData.last_name_en ||
-            formData.full_name_ar !== initialFormData.full_name_ar ||
-            formData.full_name_en !== initialFormData.full_name_en ||
-            formData.ssn !== initialFormData.ssn
+            data.first_name_ar !== initialFormData.first_name_ar ||
+            data.first_name_en !== initialFormData.first_name_en ||
+            data.mid_name_ar !== initialFormData.mid_name_ar ||
+            data.mid_name_en !== initialFormData.mid_name_en ||
+            data.last_name_ar !== initialFormData.last_name_ar ||
+            data.last_name_en !== initialFormData.last_name_en ||
+            data.full_name_ar !== initialFormData.full_name_ar ||
+            data.full_name_en !== initialFormData.full_name_en ||
+            data.ssn !== initialFormData.ssn
         );
     };
 
-    const handleConfirmClose = () => {
+    const syncCurrentStepData = () => {
+        const latestValues = currentStepRef.current?.getValues();
 
-        const isCleanInAddMode = !userData && current === 0 && !isFirstStepDirty();
+        if (latestValues) {
+            setFormData((prev) => ({ ...prev, ...latestValues }));
+        }
+
+        return latestValues;
+    };
+
+    const handleConfirmClose = () => {
+        const latestValues = currentStepRef.current?.getValues();
+        const latestFormData = latestValues ? { ...formData, ...latestValues } : formData;
+
+        const isCleanInAddMode = !userData && current === 0 && !isFirstStepDirty(latestFormData);
 
         if (isCleanInAddMode) {
             resetModalState();
@@ -150,9 +164,21 @@ const UserFormModal: React.FC<{
 
     const next = (data: Partial<UserFormData>) => {
         setFormData((prev) => ({ ...prev, ...data }));
-        setCurrent(current + 1);
+        setCurrent((prev) => prev + 1);
     };
-    const prev = () => setCurrent(current - 1);
+    const prev = () => {
+        syncCurrentStepData();
+        setCurrent((prev) => prev - 1);
+    };
+
+    const handleStepChange = (step: number) => {
+        if (step === current) {
+            return;
+        }
+
+        syncCurrentStepData();
+        setCurrent(step);
+    };
 
     const cleanPayload = (data: UserFormData) => {
 
@@ -251,7 +277,7 @@ const UserFormModal: React.FC<{
         { title: t("user_list.access_title"), component: StepAccess },
     ];
 
-    const CurrentStepComponent = steps[current].component;
+    const CurrentStepComponent = steps[current].component as any;
     const isLastStep = current === steps.length - 1;
 
     // const handleTriggerSubmit = useCallback((trigger: () => void) => setStepSubmitTrigger(() => trigger), []);
@@ -273,11 +299,12 @@ const UserFormModal: React.FC<{
             style={{ top: 20 }}
         >
             <Spin spinning={isModalLoading}>
-                <Steps current={current} style={{ marginBottom: 24 }} items={stepItems} onChange={step => setCurrent(step)} />
+                <Steps current={current} style={{ marginBottom: 24 }} items={stepItems} onChange={handleStepChange} />
 
 
                 <div className="steps-content">
                     <CurrentStepComponent
+                        ref={currentStepRef}
                         initialData={formData}
                         onNext={next}
                         onSubmit={handleSubmit}

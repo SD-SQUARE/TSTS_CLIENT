@@ -1,132 +1,49 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useRef, useState } from "react";
-import { Button, Space, Popconfirm, message, Pagination, Tooltip, Badge, Tag, Popover, Input, Typography } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined, DownOutlined, SearchOutlined } from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
+import { Button, Space, Pagination, Typography, Tag, Popover } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import type { ColumnsType } from "antd/es/table";
-import type { InputRef, TableColumnType } from 'antd';
-import type { FilterDropdownProps } from 'antd/es/table/interface';
 import Highlighter from 'react-highlight-words';
+import { useNavigate } from "react-router-dom";
 
-import type { UserListItem } from "../Types/users";
-import { useDeleteUser, useUsers } from "../Hooks/useUsers";
+import type { UserListItem, Lookup } from "../Types/users";
+import { useDeleteUser, useUsers, useUniversities, useAllDomains, useAllDepartments } from "../Hooks/useUsers";
 import AvatarDisplay from "../../../components/AvatarDisplay";
 import AppTable from "../../../components/AppTable";
 import UserFormModal from "./UsersFormModal";
-import { useNavigate } from "react-router-dom";
 import BulkCreateModal from "./BulkCreateModal";
-
-type SearchableDataIndex = `first_name` | `mid_name` | `last_name` | 'ssn';
-
+import { getServerTextFilterProps, getServerSelectFilterProps } from "../../../components/table/serverFilters";
 
 export const UserList: React.FC<{ role: string }> = ({ role }) => {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
-    const currentLanguage = i18n.language;
+    const currentLanguage = i18n.language as "en" | "ar";
     const [pagination, setPagination] = useState({ page: 1, pageSize: 50 });
 
-    const [searchText, setSearchText] = useState('');
-    const [searchedColumn, setSearchedColumn] = useState<SearchableDataIndex | ''>('');
-    const searchInput = useRef<InputRef>(null);
+    const [apiSearchQuery, setApiSearchQuery] = useState<any>({});
 
-    const [apiSearchQuery, setApiSearchQuery] = useState<{ [key: string]: string }>({});
+    const { data: universities } = useUniversities();
+    const { data: domains } = useAllDomains();
+    const { data: departments } = useAllDepartments();
+
+    const uniOptions = universities?.map((u: Lookup) => ({ label: (currentLanguage === 'ar' ? u.name_ar : u.name_en) || u.name, value: u.id })) || [];
+    const domainOptions = domains?.map((d: Lookup) => ({ label: (currentLanguage === 'ar' ? d.name_ar : d.name_en) || d.name, value: d.id })) || [];
+    const deptOptions = departments?.map((d: Lookup) => ({ label: (currentLanguage === 'ar' ? d.name_ar : d.name_en) || d.name, value: d.id })) || [];
 
     const { data, isLoading } = useUsers(role, pagination.page, pagination.pageSize, apiSearchQuery);
     const deleteMutation = useDeleteUser(role);
+
+    const resetToFirstPage = () => setPagination(prev => ({ ...prev, page: 1 }));
+
+
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [editingUser, setEditingUser] = useState<UserListItem | undefined>();
 
     const [isBulkModalVisible, setIsBulkModalVisible] = useState(false);
 
-    const handleSearch = (
-        selectedKeys: string[],
-        confirm: FilterDropdownProps['confirm'],
-        dataIndex: SearchableDataIndex,
-    ) => {
-        confirm();
-        const newSearchText = selectedKeys[0];
-        setSearchText(newSearchText);
-        setSearchedColumn(dataIndex);
-        setApiSearchQuery(prev => ({ ...prev, [dataIndex]: newSearchText }));
-        setPagination(prev => ({ ...prev, page: 1 }));
-    };
-
-    const handleReset = (clearFilters: () => void, dataIndex: SearchableDataIndex) => {
-        clearFilters();
-        setSearchText('');
-        setApiSearchQuery(prev => {
-            const newState = { ...prev };
-            delete newState[dataIndex];
-            return newState;
-        });
-        setPagination(prev => ({ ...prev, page: 1 }));
-    };
-
-    const getColumnSearchProps = (dataIndex: SearchableDataIndex, titleKey: string): TableColumnType<UserListItem> => ({
-
-        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-            <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-                <Input
-                    ref={searchInput}
-                    placeholder={`Search ${t(titleKey)}`}
-                    value={selectedKeys[0]}
-                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                    onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-                    style={{ marginBottom: 8, display: 'block' }}
-                />
-                <Space>
-                    <Button
-                        type="primary"
-                        onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-                        icon={<SearchOutlined />}
-                        size="small"
-                        style={{ width: 90 }}
-                    >
-                        Search
-                    </Button>
-                    <Button
-                        onClick={() => clearFilters && handleReset(clearFilters, dataIndex)}
-                        size="small"
-                        style={{ width: 90 }}
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            close();
-                        }}
-                    >
-                        Close
-                    </Button>
-                </Space>
-            </div>
-        ),
-        filterIcon: (filtered: boolean) => {
-            const isFilteredByApi = !!apiSearchQuery[dataIndex];
-            return <SearchOutlined style={{ color: isFilteredByApi ? '#1677ff' : undefined }} />
-        },
-        render: (text: string) =>
-            searchedColumn === dataIndex && searchText ? (
-                <Highlighter
-                    highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                    searchWords={[searchText]}
-                    autoEscape
-                    textToHighlight={text ? text.toString() : ''}
-                />
-            ) : (
-                text
-            ),
-    });
-
-
     const handleAdd = () => { setEditingUser(undefined); setIsModalVisible(true); };
     const handleResetAll = () => {
-        setSearchText('');
-        setSearchedColumn(undefined);
         setApiSearchQuery({});
         setPagination(prev => ({ ...prev, page: 1 }));
     };
@@ -151,11 +68,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
             style: { cursor: 'pointer' },
         };
     };
-    const handleEdit = (user: UserListItem) => { setEditingUser(user); setIsModalVisible(true); };
-    const handleDelete = async (id: string) => {
-        try { await deleteMutation.mutateAsync(id); message.success(t("translation.user_deleted_success")); }
-        catch { message.error(t("translation.user_deleted_error")); }
-    };
+
     const handleCloseModal = () => { setIsModalVisible(false); setEditingUser(undefined); };
 
     const renderExpandList = (item: string[], titleKey: string) => {
@@ -216,76 +129,15 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
             key: "full_name",
             fixed: "left",
             width: 250,
-            filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-                <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-                    <Input
-                        placeholder={`${t("common.search")}...`}
-                        value={selectedKeys[0]}
-                        onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                        onPressEnter={() => {
-                            const val = selectedKeys[0] as string;
-                            setApiSearchQuery(prev => ({
-                                ...prev,
-                                first_name: val,
-                                mid_name: val,
-                                last_name: val
-                            }));
-                            confirm();
-                        }}
-                        style={{ marginBottom: 8, display: 'block' }}
-                    />
-                    <Space>
-                        <Button
-                            type="primary"
-                            size="small"
-                            icon={<SearchOutlined />}
-                            style={{ width: 90 }}
-                            onClick={() => {
-                                const val = selectedKeys[0] as string;
-                                setApiSearchQuery(prev => ({
-                                    ...prev,
-                                    first_name: val,
-                                    mid_name: val,
-                                    last_name: val
-                                }));
-                                confirm();
-                            }}
-                        >
-                            {t("common.search")}
-                        </Button>
-                        <Button
-                            size="small"
-                            style={{ width: 90 }}
-                            onClick={() => {
-                                setApiSearchQuery(prev => {
-                                    const newState = { ...prev };
-                                    delete newState.first_name;
-                                    delete newState.mid_name;
-                                    delete newState.last_name;
-                                    return newState;
-                                });
-                                clearFilters?.();
-                                confirm();
-                            }}
-                        >
-                            {t("common.reset")}
-                        </Button>
-                    </Space>
-                </div>
-            ),
-            filterIcon: (filtered: boolean) => (
-                <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />
-            ),
-            render: (_, record) => {
-                let name = record[`full_name_${currentLanguage}`] || "";
+            render: (_: string, record: UserListItem) => {
+                let displayName = record[`full_name_${currentLanguage}`] || "";
 
-                if (name == "" || !name)
+                if (displayName === "" || !displayName)
                 {
-
                     const firstName = record?.[`first_name_${currentLanguage}`] || '';
                     const midName = record?.[`mid_name_${currentLanguage}`] || '';
                     const lastName = record?.[`last_name_${currentLanguage}`] || '';
-                    name = `${firstName} ${midName} ${lastName}`.trim()
+                    displayName = `${firstName} ${midName} ${lastName}`.trim();
                 }
                 return (
                     <Typography.Text strong>
@@ -293,34 +145,89 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                             highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
                             searchWords={[apiSearchQuery.first_name || '']}
                             autoEscape
-                            textToHighlight={name}
+                            textToHighlight={displayName}
                         />
                     </Typography.Text>
                 );
             },
+            ...getServerTextFilterProps<UserListItem, any>({
+                filterKey: "first_name",
+                filters: apiSearchQuery,
+                setFilters: setApiSearchQuery,
+                placeholder: `${t("common.search")} ${t("user_list.name")}`,
+                onChange: resetToFirstPage,
+            }),
+        },
+        {
+            title: t("user_list.email"),
+            dataIndex: "email",
+            key: "email",
+            width: 200,
+            ...getServerTextFilterProps<UserListItem, any>({
+                filterKey: "email",
+                filters: apiSearchQuery,
+                setFilters: setApiSearchQuery,
+                placeholder: `${t("common.search")} ${t("user_list.email")}`,
+                onChange: resetToFirstPage,
+            }),
         },
         {
             title: t("user_list.ssn"),
             dataIndex: "ssn",
             key: "ssn",
-            ...getColumnSearchProps('ssn', "user_list.ssn")
+            width: 150,
+            ...getServerTextFilterProps<UserListItem, any>({
+                filterKey: "ssn",
+                filters: apiSearchQuery,
+                setFilters: setApiSearchQuery,
+                placeholder: `${t("common.search")} ${t("user_list.ssn")}`,
+                onChange: resetToFirstPage,
+            }),
         },
 
         {
             title: t("user_list.phone"),
             dataIndex: ["contacts", "phones"],
             key: "phones",
+            width: 150,
             render: (phones: string[]) =>
                 renderExpandList(phones, t("user_list.phone")),
+            ...getServerTextFilterProps<UserListItem, any>({
+                filterKey: "phone",
+                filters: apiSearchQuery,
+                setFilters: setApiSearchQuery,
+                placeholder: `${t("common.search")} ${t("user_list.phone")}`,
+                onChange: resetToFirstPage,
+            }),
         },
         {
             title: t("user_list.mobile"),
             dataIndex: ["contacts", "mobiles"],
             key: "mobiles",
+            width: 150,
             render: (mobiles: string[]) =>
                 renderExpandList(mobiles, t("user_list.mobile")),
+            ...getServerTextFilterProps<UserListItem, any>({
+                filterKey: "mobile",
+                filters: apiSearchQuery,
+                setFilters: setApiSearchQuery,
+                placeholder: `${t("common.search")} ${t("user_list.mobile")}`,
+                onChange: resetToFirstPage,
+            }),
         },
-        { title: t("user_list.job_title"), dataIndex: `job_${currentLanguage}`, key: "job" },
+        { 
+            title: t("user_list.job_title"), 
+            dataIndex: `job_${currentLanguage}`, 
+            key: "job",
+            width: 150,
+            ...getServerTextFilterProps<UserListItem, any>({
+                filterKey: "job_title",
+                filters: apiSearchQuery,
+                setFilters: setApiSearchQuery,
+                placeholder: `${t("common.search")} ${t("user_list.job_title")}`,
+                onChange: resetToFirstPage,
+            }),
+        },
         ...(role !== "requesters" ? [{
             title: t("user_list.group"),
             dataIndex: "groups",
@@ -348,18 +255,32 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                     </Space>
                 );
             },
-        }] : []),
+        } as any] : []),
         {
             title: t("user_list.university"),
-            dataIndex: ["university", "name"],
             key: "university",
-            render: (_, user) => user.university?.name ?? "-"
+            render: (_: any, user: UserListItem) => user.university?.name ?? "-",
+            ...getServerSelectFilterProps<UserListItem, any>({
+                filterKey: "universities",
+                filters: apiSearchQuery,
+                setFilters: setApiSearchQuery,
+                placeholder: `${t("common.search")} ${t("user_list.university")}`,
+                options: uniOptions,
+                onChange: resetToFirstPage,
+            }),
         },
         {
             title: t("user_list.domain"),
-            dataIndex: ["domain", "name"],
             key: "domain",
-            render: (_, user) => user.domain?.name ?? "-"
+            render: (_: any, user: UserListItem) => user.domain?.name ?? "-",
+            ...getServerSelectFilterProps<UserListItem, any>({
+                filterKey: "domains",
+                filters: apiSearchQuery,
+                setFilters: setApiSearchQuery,
+                placeholder: `${t("common.search")} ${t("user_list.domain")}`,
+                options: domainOptions,
+                onChange: resetToFirstPage,
+            }),
         },
         ...(role !== "requesters" ? [] : [{
             title: t("user_list.department"),
@@ -378,47 +299,44 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
 
                 return renderExpandList(departmentNames, "user_list.department");
             },
-        }]),
-        // {
-        //       title: t("user_list.perm_prof"),
-        //       dataIndex: "permission_profile",
-        //       key: "permission_profile",
-        //       render: (profile: any) => profile ? <AvatarDisplay member={profile} /> : "-",
-        // },
-        {
-            title: t("user_list.email"),
-            dataIndex: "email",
-            key: "email",
-        },
+            ...getServerSelectFilterProps<UserListItem, any>({
+                filterKey: "departments",
+                filters: apiSearchQuery,
+                setFilters: setApiSearchQuery,
+                placeholder: `${t("common.search")} ${t("user_list.department")}`,
+                options: deptOptions,
+                onChange: resetToFirstPage,
+            }),
+        } as any]),
         // {
         //     title: t("user_list.operations"),
         //     key: "operations",
         //     fixed: "right",
         //     width: 125,
-        //     render: (_, record) => (
-
+        //     render: (_: any, record: UserListItem) => (
+        // 
         //         <Space size={4}>
         //             <Tooltip title={t('translation.edit')} placement="topLeft">
         //                 <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-
-
+        // 
+        // 
         //             </Tooltip>
         //             <Tooltip title={t('translation.view')} placement="topLeft">
         //                 <Button icon={<EyeOutlined />} onClick={() => handleView(record.id)} />
         //             </Tooltip>
-
+        // 
         //             <Popconfirm
         //                 title={t('translation.confirm_delete')}
         //                 onConfirm={() => handleDelete(record.id)}
         //                 okText={t('translation.yes')}
         //                 cancelText={t('translation.no')}
-
+        // 
         //                 disabled={deleteMutation.isPending}
         //             >
         //                 <Tooltip title={t('translation.delete')} placement="topLeft">
         //                     <Button icon={<DeleteOutlined />} danger loading={deleteMutation.isPending} />
-
-
+        // 
+        // 
         //                 </Tooltip>
         //             </Popconfirm>
         //         </Space>

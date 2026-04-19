@@ -1,9 +1,8 @@
-import { Card, Input, Tabs, Tour } from "antd";
+import { Card, Tabs, Tour } from "antd";
 import {
     LockOutlined,
     SafetyOutlined,
     AppstoreOutlined,
-    SearchOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import ResetPassword from "../ResetPassword.component";
@@ -22,7 +21,7 @@ const SettingsTab = ({ forceDevices, onTourReady }: any) => {
     const { devicesQuery } = useTrustedDevices(userId);
 
     const [activeTab, setActiveTab] = useState("password");
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm] = useState("");
     const [tourOpen, setTourOpen] = useState(false);
     const [skip, setskip] = useState(false);
     const [ cookie , setCookie ] = useCookies(['showTrustedDeviceTour', 'skipTrustedDeviceTour-for-week']);
@@ -94,18 +93,6 @@ const SettingsTab = ({ forceDevices, onTourReady }: any) => {
                     onChange={(key) => {
                         setActiveTab(key);
                         if (key === "devices") devicesQuery.refetch();
-                    }}
-                    tabBarExtraContent={{
-                        right: (
-                            <Input
-                                allowClear
-                                value={searchTerm}
-                                onChange={(event) => setSearchTerm(event.target.value)}
-                                prefix={<SearchOutlined />}
-                                placeholder={t("profile.settings.searchPlaceholder")}
-                                style={{ width: 280, maxWidth: "100%" }}
-                            />
-                        ),
                     }}
                     tabPlacement="start"
                     items={[

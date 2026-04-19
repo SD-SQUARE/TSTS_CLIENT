@@ -1,21 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useRef, useState } from 'react';
-import { DatePicker, Card, Tag, Flex, Pagination, Select, Typography, Popover } from 'antd';
+import React, { useState } from 'react';
+import { Button, DatePicker, Card, Tag, Flex, Pagination, Typography, Popover, Space } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { CalendarOutlined, ClockCircleOutlined, FilterOutlined, SearchOutlined } from '@ant-design/icons';
+import { CalendarOutlined, ClockCircleOutlined, FilterOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useAuditLogs, useAuditLookups, useUserLookup } from '../Hooks/useAuditLogs';
 import { useTranslation } from 'react-i18next';
 import EllipsisComponent from '../../../components/EllipsisComponent';
 import AppTable from '../../../components/AppTable';
 import i18next from 'i18next';
+import {
+    getServerSelectFilterProps,
+    getServerTextFilterProps,
+} from '../../../components/table/serverFilters';
 
 const { RangePicker } = DatePicker;
 
 const AuditLogList: React.FC = () => {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
-    const rangePickerRef = useRef<any>(null);
 
     const [filters, setFilters] = useState({
         page: 1,
@@ -54,6 +57,13 @@ const AuditLogList: React.FC = () => {
                     </Popover>
                 </div>
             ),
+            ...getServerTextFilterProps({
+                filterKey: 'summary',
+                filters,
+                setFilters,
+                placeholder: `${t('common.search')} ${t('audit.summary')}`,
+                onChange: () => setFilters(prev => ({ ...prev, page: 1 })),
+            }),
         },
         {
             title: t('audit.userName'),
@@ -63,69 +73,50 @@ const AuditLogList: React.FC = () => {
                 return `${text.first[i18next.language]} ${text.mid[i18next.language]} ${text.last[i18next.language]}`
             },
             key: 'actorId',
-            filterDropdown: () => (
-                <div style={{ padding: 12 }}>
-                    <Select
-                        showSearch
-                        placeholder={t('audit.filterByUser')}
-                        style={{ width: 220 }}
-                        allowClear
-                        optionFilterProp="children"
-                        value={filters.actorId}
-                        onChange={(val) => handleFilterChange('actorId', val)}
-                        options={users?.map((u: any) => ({
-                            value: u.id,
-                            label: u.first_name + ' ' + u.mid_name + ' ' + u.last_name 
-                        }))}
-                    />
-                </div>
-            ),
-            filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />
+            ...getServerSelectFilterProps({
+                filterKey: 'actorId',
+                filters,
+                setFilters,
+                placeholder: t('audit.filterByUser'),
+                options: (users || []).map((u: any) => ({
+                    value: u.id,
+                    label: `${u.first_name} ${u.mid_name} ${u.last_name}`,
+                })),
+                onChange: () => setFilters(prev => ({ ...prev, page: 1 })),
+            }),
         },
         {
             title: t('audit.action'),
             dataIndex: 'action',
             key: 'action',
-            filterDropdown: () => (
-                <div style={{ padding: 12 }}>
-                    <Select
-                        showSearch
-                        placeholder={t('audit.filterByAction')}
-                        style={{ width: 200 }}
-                        allowClear
-                        optionFilterProp="label"
-                        value={filters.action}
-                        onChange={(val) => handleFilterChange('action', val)}
-                        options={actions?.map((a: any) => ({
-                            value: a.key,
-                            label: a.name
-                        }))}
-                    />
-                </div>
-            ),
-            filterIcon: (filtered: boolean) => <FilterOutlined style={{ color: filtered ? '#1677ff' : undefined }} />
+            ...getServerSelectFilterProps({
+                filterKey: 'action',
+                filters,
+                setFilters,
+                placeholder: t('audit.filterByAction'),
+                options: (actions || []).map((a: any) => ({
+                    value: a.key,
+                    label: a.name,
+                })),
+                onChange: () => setFilters(prev => ({ ...prev, page: 1 })),
+            }),
         },
         {
             title: t('audit.status'),
             dataIndex: 'status',
             key: 'status',
             render: (status: string) => <Tag color={status === 'SUCCESS' ? 'green' : 'red'}>{status}</Tag>,
-            filterDropdown: () => (
-                <div style={{ padding: 12 }}>
-                    <Select
-                        placeholder={t('audit.status')}
-                        style={{ width: 150 }}
-                        allowClear
-                        value={filters.status}
-                        onChange={(val) => handleFilterChange('status', val)}
-                        options={[
-                            { value: 'SUCCESS', label: 'SUCCESS' },
-                            { value: 'FAILURE', label: 'FAILURE' },
-                        ]}
-                    />
-                </div>
-            ),
-            filterIcon: (filtered: boolean) => <FilterOutlined style={{ color: filtered ? '#1677ff' : undefined }} />
+            ...getServerSelectFilterProps({
+                filterKey: 'status',
+                filters,
+                setFilters,
+                placeholder: t('audit.status'),
+                options: [
+                    { value: 'SUCCESS', label: 'SUCCESS' },
+                    { value: 'FAILURE', label: 'FAILURE' },
+                ],
+                onChange: () => setFilters(prev => ({ ...prev, page: 1 })),
+            }),
         },
         {
             title: t('audit.createdAt'),
@@ -149,6 +140,54 @@ const AuditLogList: React.FC = () => {
                     </Flex>
                 </Flex>
             ),
+            filteredValue: filters.from || filters.to ? [filters.from || filters.to] : null,
+            filterDropdown: ({ confirm, clearFilters }) => (
+                <div style={{ padding: 12 }}>
+                    <RangePicker
+                        showTime={{ format: 'HH:mm A' }}
+                        format="YYYY-MM-DD / HH:mm A"
+                        value={[
+                            filters.from ? dayjs(filters.from) : null,
+                            filters.to ? dayjs(filters.to) : null,
+                        ]}
+                        onChange={(values) => {
+                            setFilters((prev) => ({
+                                ...prev,
+                                from: values?.[0] ? values[0].toISOString() : undefined,
+                                to: values?.[1] ? values[1].toISOString() : undefined,
+                                page: 1,
+                            }));
+                        }}
+                    />
+                    <Space style={{ marginTop: 8 }}>
+                        <Button
+                            type="primary"
+                            size="small"
+                            onClick={() => confirm()}
+                        >
+                            {t('common.filter')}
+                        </Button>
+                        <Button
+                            size="small"
+                            onClick={() => {
+                                clearFilters?.();
+                                setFilters((prev) => ({
+                                    ...prev,
+                                    from: undefined,
+                                    to: undefined,
+                                    page: 1,
+                                }));
+                                confirm();
+                            }}
+                        >
+                            {t('common.reset')}
+                        </Button>
+                    </Space>
+                </div>
+            ),
+            filterIcon: (filtered: boolean) => (
+                <FilterOutlined style={{ color: filtered ? '#1677ff' : undefined }} />
+            ),
         },
     ];
 
@@ -163,31 +202,6 @@ const AuditLogList: React.FC = () => {
                         total={data?.pagination?.total || 0}
                         showSizeChanger
                         onChange={(page, limit) => setFilters(prev => ({ ...prev, page, limit }))}
-                    />
-
-                    <RangePicker
-                        ref={rangePickerRef}
-                        showTime={{ format: 'HH:mm A' }}
-                        format="YYYY-MM-DD / HH:mm A"
-                        placeholder={[t('common.startDate'), t('common.endDate')]}
-                        onCalendarChange={(values, _, info) => {
-                            if (info.range === 'start' && values?.[0] && !values?.[1]) {
-                                setTimeout(() => rangePickerRef.current?.focus(1), 0);
-                            }
-                        }}
-                        onChange={(values) => {
-                            setFilters(prev => ({
-                                ...prev,
-                                from: values?.[0] ? values[0].toISOString() : undefined,
-                                to: values?.[1] ? values[1].toISOString() : undefined,
-                                page: 1
-                            }));
-                        }}
-                        onOk={() => {
-                            if (rangePickerRef.current) {
-                                rangePickerRef.current.blur();
-                            }
-                        }}
                     />
                 </Flex>
 

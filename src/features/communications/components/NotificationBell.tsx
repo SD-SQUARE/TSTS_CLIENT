@@ -40,7 +40,7 @@ const NotificationBell: React.FC = () => {
   const markAllAsReadMutation = useMarkAllNotificationsAsRead();
 
   const items = useMemo(() => {
-    const source = notificationsQuery.data || [];
+    const source = Array.isArray(notificationsQuery.data) ? notificationsQuery.data : [];
     return filter === 'unread' ? source.filter((item) => !item.isRead) : source;
   }, [filter, notificationsQuery.data]);
 

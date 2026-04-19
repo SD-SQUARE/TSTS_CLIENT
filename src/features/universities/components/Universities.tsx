@@ -5,11 +5,20 @@ import { useGenericCrud } from '../../../api/common/hooks/common-hooks';
 import { universityApi } from '../services/universityApi';
 import type { University, CreateUniversityDto, UpdateUniversityDto } from '../types/types';
 import { useTranslation } from "react-i18next";
+import { getServerTextFilterProps } from "../../../components/table/serverFilters";
 
 const UniversitiesPage: React.FC = () => {
   const { t } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState("");
   const [pagination, setPagination] = useState({ current: 1, pageSize: 50 });
+  const [filters, setFilters] = useState({
+    name_en: undefined as string | undefined,
+    name_ar: undefined as string | undefined,
+    description_en: undefined as string | undefined,
+    description_ar: undefined as string | undefined,
+  });
+
+  const resetToFirstPage = () =>
+    setPagination((prev) => ({ ...prev, current: 1 }));
   
   const {
     data,
@@ -20,11 +29,11 @@ const UniversitiesPage: React.FC = () => {
     updateMutation,
     deleteMutation,
   } = useGenericCrud<University, CreateUniversityDto, UpdateUniversityDto>({
-    queryKey: ['universities', searchTerm, pagination.current, pagination.pageSize],
+    queryKey: ['universities', filters, pagination.current, pagination.pageSize],
     fetchFn: () => universityApi.getAll({ 
-      name: searchTerm, 
       page: pagination.current, 
-      page_size: pagination.pageSize 
+      page_size: pagination.pageSize,
+      ...filters,
     }),
     fetchOneFn: (id) => universityApi.getById(id),
     createFn: (data) => universityApi.create(data),
@@ -37,11 +46,25 @@ const UniversitiesPage: React.FC = () => {
             title: t("name_en"),
             key: "name_en",
             render: (_: any, record: any) => record.name?.en || "-",
+            ...getServerTextFilterProps({
+              filterKey: "name_en",
+              filters,
+              setFilters,
+              placeholder: `${t("common.search")} ${t("name_en")}`,
+              onChange: resetToFirstPage,
+            }),
         },
         {
             title: t("name_ar"),
             key: "name_ar",
             render: (_: any, record: any) => record.name?.ar || "-",
+            ...getServerTextFilterProps({
+              filterKey: "name_ar",
+              filters,
+              setFilters,
+              placeholder: `${t("common.search")} ${t("name_ar")}`,
+              onChange: resetToFirstPage,
+            }),
         },
 
         {
@@ -64,6 +87,13 @@ const UniversitiesPage: React.FC = () => {
                     </Tooltip>
                 );
             },
+            ...getServerTextFilterProps({
+              filterKey: "description_en",
+              filters,
+              setFilters,
+              placeholder: `${t("common.search")} ${t("description_en")}`,
+              onChange: resetToFirstPage,
+            }),
         },
 
         {
@@ -88,6 +118,13 @@ const UniversitiesPage: React.FC = () => {
                     </Tooltip>
                 );
             },
+            ...getServerTextFilterProps({
+              filterKey: "description_ar",
+              filters,
+              setFilters,
+              placeholder: `${t("common.search")} ${t("description_ar")}`,
+              onChange: resetToFirstPage,
+            }),
         },
     ];
 
@@ -143,11 +180,7 @@ const UniversitiesPage: React.FC = () => {
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}
-      searchText={searchTerm}
-      onSearch={(val) => {
-        setSearchTerm(val);
-        setPagination(prev => ({ ...prev, current: 1 }));
-      }}
+      showToolbarSearch={false}
     />
   );
 };

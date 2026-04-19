@@ -18,6 +18,21 @@ export interface NotificationUnreadCount {
   unread: number;
 }
 
+export interface NotificationListParams {
+  isRead?: boolean;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface NotificationListResponse {
+  data: NotificationItem[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+  };
+}
+
 export interface ChatParticipant {
   id: string;
   name: string;

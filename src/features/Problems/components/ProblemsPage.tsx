@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Form, Input, Select, Tooltip, Switch, Tag } from "antd";
-import { CheckCircleOutlined, CloseCircleOutlined, FilterOutlined } from "@ant-design/icons"; 
+import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { GenericCrudPage } from "../../../components/GenericCrudPage";
 import { useGenericCrud } from "../../../api/common/hooks/common-hooks";
 import { problemsApi } from '../services/problemsApi';
@@ -8,12 +8,25 @@ import { specializationApi } from '../../specializations/services/specialization
 import type { Problem, CreateProblemDto, UpdateProblemDto } from "../types/types";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
+import {
+  getServerSelectFilterProps,
+  getServerTextFilterProps,
+} from "../../../components/table/serverFilters";
 
 const ProblemsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSpecId, setSelectedSpecId] = useState<string | number | undefined>(undefined);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 50 });
+  const [filters, setFilters] = useState({
+    name_en: undefined as string | undefined,
+    name_ar: undefined as string | undefined,
+    description_en: undefined as string | undefined,
+    description_ar: undefined as string | undefined,
+    specialization: undefined as string | undefined,
+    review_required: undefined as string | undefined,
+  });
+
+  const resetToFirstPage = () =>
+    setPagination((prev) => ({ ...prev, current: 1 }));
 
   const { data: specResponse, isLoading: isLookupsLoading } = useQuery({
     queryKey: ['specializations-lookup'],
@@ -31,12 +44,11 @@ const ProblemsPage: React.FC = () => {
     updateMutation,
     deleteMutation,
   } = useGenericCrud<Problem, CreateProblemDto, UpdateProblemDto>({
-    queryKey: ['problems', searchTerm, selectedSpecId, pagination.current, pagination.pageSize],
+    queryKey: ['problems', filters, pagination.current, pagination.pageSize],
     fetchFn: () => problemsApi.getAll({ 
-      name: searchTerm, 
-      specialization_id: selectedSpecId,
       page: pagination.current,
-      page_size: pagination.pageSize
+      page_size: pagination.pageSize,
+      ...filters,
     }),
     fetchOneFn: (id) => problemsApi.getById(id),
     createFn: (data) => problemsApi.create(data),
@@ -45,8 +57,30 @@ const ProblemsPage: React.FC = () => {
   });
 
   const columns = [
-    { title: t("name_en"), dataIndex: "name_en", key: "name_en" },
-    { title: t("name_ar"), dataIndex: "name_ar", key: "name_ar" },
+    {
+      title: t("name_en"),
+      dataIndex: "name_en",
+      key: "name_en",
+      ...getServerTextFilterProps({
+        filterKey: "name_en",
+        filters,
+        setFilters,
+        placeholder: `${t("common.search")} ${t("name_en")}`,
+        onChange: resetToFirstPage,
+      }),
+    },
+    {
+      title: t("name_ar"),
+      dataIndex: "name_ar",
+      key: "name_ar",
+      ...getServerTextFilterProps({
+        filterKey: "name_ar",
+        filters,
+        setFilters,
+        placeholder: `${t("common.search")} ${t("name_ar")}`,
+        onChange: resetToFirstPage,
+      }),
+    },
     {
       title: t("description_en"),
       dataIndex: "description_en",
@@ -58,6 +92,13 @@ const ProblemsPage: React.FC = () => {
           </div>
         </Tooltip>
       ),
+      ...getServerTextFilterProps({
+        filterKey: "description_en",
+        filters,
+        setFilters,
+        placeholder: `${t("common.search")} ${t("description_en")}`,
+        onChange: resetToFirstPage,
+      }),
     },
     {
       title: t("description_ar"),
@@ -70,46 +111,31 @@ const ProblemsPage: React.FC = () => {
           </div>
         </Tooltip>
       ),
+      ...getServerTextFilterProps({
+        filterKey: "description_ar",
+        filters,
+        setFilters,
+        placeholder: `${t("common.search")} ${t("description_ar")}`,
+        onChange: resetToFirstPage,
+      }),
     }, 
     {
       title: t("specialization_type"),
-  dataIndex: "specialization",
-  key: "specialization",
-  filterIcon: (filtered: boolean) => (
-    <FilterOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
-  ),
-  filterDropdown: ({ confirm, clearFilters }: any) => (
-    <div style={{ padding: 8 }} dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
-      <Select
-        key={specializationsArray.length} 
-        showSearch
-        placement={i18n.language === 'ar' ? "bottomRight" : "bottomLeft"}
-        placeholder={t("filter_by_spec")}
-        value={selectedSpecId}
-        style={{ width: 180, direction: i18n.language === 'ar' ? 'rtl' : 'ltr' }}
-        onChange={(val) => {
-          setSelectedSpecId(val);
-          setPagination(prev => ({ ...prev, current: 1 })); 
-          confirm(); 
-        }}
-        allowClear
-        onClear={() => {
-          setSelectedSpecId(undefined);
-          setPagination(prev => ({ ...prev, current: 1 }));
-          clearFilters();
-          confirm();
-        }}
-      >
-        {specializationsArray.map((spec: any) => (
-          <Select.Option key={spec.id} value={spec.id}>
-            {i18n.language === 'ar' ? spec.name_ar : spec.name_en}
-          </Select.Option>
-        ))}
-      </Select>
-    </div>
-  ),
-  render: (spec: any) => (i18n.language === 'ar' ? spec?.name_ar : spec?.name_en) || "-",
-},
+      dataIndex: "specialization",
+      key: "specialization",
+      render: (spec: any) => (i18n.language === 'ar' ? spec?.name_ar : spec?.name_en) || "-",
+      ...getServerSelectFilterProps({
+        filterKey: "specialization",
+        filters,
+        setFilters,
+        placeholder: t("filter_by_spec"),
+        options: specializationsArray.map((spec: any) => ({
+          label: i18n.language === 'ar' ? spec.name_ar : spec.name_en,
+          value: spec.id,
+        })),
+        onChange: resetToFirstPage,
+      }),
+    },
     {
       title: t("review_required"), 
       dataIndex: "review_required",
@@ -119,6 +145,17 @@ const ProblemsPage: React.FC = () => {
               {checked ? t("yes") : t("no")}
           </Tag>
       ),
+      ...getServerSelectFilterProps({
+        filterKey: "review_required",
+        filters,
+        setFilters,
+        placeholder: `${t("common.select")} ${t("review_required")}`,
+        options: [
+          { label: t("yes"), value: "true" },
+          { label: t("no"), value: "false" },
+        ],
+        onChange: resetToFirstPage,
+      }),
     },
   ];
 
@@ -207,11 +244,7 @@ const ProblemsPage: React.FC = () => {
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}
-      searchText={searchTerm}
-      onSearch={(val) => {
-        setSearchTerm(val);
-        setPagination(prev => ({ ...prev, current: 1 })); 
-      }}
+      showToolbarSearch={false}
     />
   );
 };

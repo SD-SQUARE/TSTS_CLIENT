@@ -13,6 +13,19 @@ import type {
   UpdatePermissionProfileDto,
 } from '../types/types';
 import { useTranslation } from 'react-i18next';
+import {
+  getServerTextFilterProps,
+} from '../../../components/table/serverFilters';
+
+const normalizePermissionValue = (
+  permission: Partial<PermissionProfilePermission> & {
+    name?: { en?: string; ar?: string };
+  },
+): PermissionProfilePermission => ({
+  key: permission.key,
+  name_en: permission.name_en || permission.name?.en || '',
+  name_ar: permission.name_ar || permission.name?.ar || '',
+});
 
 const PermissionPicker: React.FC<{
   mode: 'create' | 'edit';
@@ -20,8 +33,9 @@ const PermissionPicker: React.FC<{
 }> = ({ systemPermissions }) => {
   const { t, i18n } = useTranslation();
   const form = Form.useFormInstance();
-  const selectedPermissions =
-    (Form.useWatch('additional_names', form) as PermissionProfilePermission[] | undefined) || [];
+  const selectedPermissions = (
+    (Form.useWatch('additional_names', form) as PermissionProfilePermission[] | undefined) || []
+  ).map(normalizePermissionValue);
 
   const selectedKeys = useMemo(
     () =>
@@ -56,9 +70,14 @@ const PermissionPicker: React.FC<{
 
   return (
     <Card title={t('user_list.perm_title')} size="small" style={{ marginTop: 20 }}>
-      <Form.List name="additional_names">
-        {(fields, { add, remove }) => {
-          const handleSelectPermission = (value: string) => {
+      <Space direction="vertical" size={16} style={{ width: '100%' }}>
+        <Select
+          showSearch
+          allowClear
+          optionFilterProp="label"
+          placeholder={t('permissionsPage.select_existing_permissions')}
+          options={availableOptions}
+          onSelect={(value) => {
             const selected = systemPermissions.find(
               (permission) => (permission.key || String(permission.id)) === value,
             );
@@ -67,65 +86,67 @@ const PermissionPicker: React.FC<{
               return;
             }
 
-            add({
-              key: selected.key,
-              name_en: selected.name_en,
-              name_ar: selected.name_ar,
-            });
-          };
+            form.setFieldValue('additional_names', [
+              ...selectedPermissions,
+              normalizePermissionValue(selected),
+            ]);
+          }}
+          value={undefined}
+        />
 
-          return (
-            <Space direction="vertical" size={16} style={{ width: '100%' }}>
-              <Select
-                showSearch
-                allowClear
-                optionFilterProp="label"
-                placeholder={t('permissionsPage.select_existing_permissions')}
-                options={availableOptions}
-                onSelect={handleSelectPermission}
-                value={undefined}
-              />
+        {selectedPermissions.length ? (
+          <Space size={[8, 8]} wrap>
+            {selectedPermissions.map((permission, index) => {
+              const label =
+                i18n.language === 'ar'
+                  ? permission.name_ar || permission.name_en
+                  : permission.name_en || permission.name_ar;
 
-              {fields.length ? (
-                <Space size={[8, 8]} wrap>
-                  {fields.map(({ key, name }) => {
-                    const permission = selectedPermissions[name];
-                    const label =
-                      i18n.language === 'ar'
-                        ? permission?.name_ar || permission?.name_en
-                        : permission?.name_en || permission?.name_ar;
-
-                    return (
-                      <Tag
-                        key={key}
-                        color="blue"
-                        closable
-                        onClose={() => remove(name)}
-                        style={{ paddingInline: 10, paddingBlock: 6 }}
-                      >
-                        {label}
-                      </Tag>
-                    );
-                  })}
-                </Space>
-              ) : (
-                <Empty
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description={t('permissionsPage.no_permissions')}
-                />
-              )}
-            </Space>
-          );
-        }}
-      </Form.List>
+              return (
+                <Tag
+                  key={permission.key || `${permission.name_en}-${permission.name_ar}-${index}`}
+                  color="blue"
+                  closable
+                  onClose={() =>
+                    form.setFieldValue(
+                      'additional_names',
+                      selectedPermissions.filter((_, itemIndex) => itemIndex !== index),
+                    )
+                  }
+                  style={{ paddingInline: 10, paddingBlock: 6 }}
+                >
+                  {label}
+                </Tag>
+              );
+            })}
+          </Space>
+        ) : (
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description={t('permissionsPage.no_permissions')}
+          />
+        )}
+      </Space>
+      <Form.Item name="additional_names" hidden>
+        <Input />
+      </Form.Item>
     </Card>
   );
 };
 
 const PermissionsPage: React.FC = () => {
   const { t } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState('');
   const [pagination, setPagination] = useState({ current: 1, pageSize: 50 });
+  const [filters, setFilters] = useState({
+    name_en: undefined as string | undefined,
+    name_ar: undefined as string | undefined,
+    description_en: undefined as string | undefined,
+    description_ar: undefined as string | undefined,
+    permission_name: undefined as string | undefined,
+  });
+
+  const resetToFirstPage = () =>
+    setPagination((prev) => ({ ...prev, current: 1 }));
 
   const permissionsLookupQuery = useQuery<SystemPermission[]>({
     queryKey: ['system-permissions'],
@@ -145,13 +166,13 @@ const PermissionsPage: React.FC = () => {
     updateMutation,
     deleteMutation,
   } = useGenericCrud<PermissionProfile, CreatePermissionProfileDto, UpdatePermissionProfileDto>({
-    queryKey: ['permissionProfiles', searchTerm, pagination.current, pagination.pageSize],
+    queryKey: ['permissionProfiles', filters, pagination.current, pagination.pageSize],
 
     fetchFn: () =>
       permissionApi.getAll({
-        name: searchTerm,
-        page_index: pagination.current,
+        page: pagination.current,
         page_size: pagination.pageSize,
+        ...filters,
       }),
     fetchOneFn: (id) => permissionApi.getById(id),
     createFn: (values: any) => {
@@ -180,8 +201,30 @@ const PermissionsPage: React.FC = () => {
   });
 
   const columns = [
-    { title: t('name_en'), dataIndex: 'name_en', key: 'name_en' },
-    { title: t('name_ar'), dataIndex: 'name_ar', key: 'name_ar' },
+    {
+      title: t('name_en'),
+      dataIndex: 'name_en',
+      key: 'name_en',
+      ...getServerTextFilterProps({
+        filterKey: 'name_en',
+        filters,
+        setFilters,
+        placeholder: `${t('common.search')} ${t('name_en')}`,
+        onChange: resetToFirstPage,
+      }),
+    },
+    {
+      title: t('name_ar'),
+      dataIndex: 'name_ar',
+      key: 'name_ar',
+      ...getServerTextFilterProps({
+        filterKey: 'name_ar',
+        filters,
+        setFilters,
+        placeholder: `${t('common.search')} ${t('name_ar')}`,
+        onChange: resetToFirstPage,
+      }),
+    },
     {
       title: t('description_en'),
       dataIndex: 'description_en',
@@ -200,6 +243,13 @@ const PermissionsPage: React.FC = () => {
           </div>
         </Tooltip>
       ),
+      ...getServerTextFilterProps({
+        filterKey: 'description_en',
+        filters,
+        setFilters,
+        placeholder: `${t('common.search')} ${t('description_en')}`,
+        onChange: resetToFirstPage,
+      }),
     },
     {
       title: t('description_ar'),
@@ -220,6 +270,51 @@ const PermissionsPage: React.FC = () => {
           </div>
         </Tooltip>
       ),
+      ...getServerTextFilterProps({
+        filterKey: 'description_ar',
+        filters,
+        setFilters,
+        placeholder: `${t('common.search')} ${t('description_ar')}`,
+        onChange: resetToFirstPage,
+      }),
+    },
+    {
+      title: t('permissions'),
+      dataIndex: 'permissions',
+      key: 'permissions',
+      render: (permissions: PermissionProfilePermission[] | undefined) => {
+        if (!permissions?.length) {
+          return '-';
+        }
+
+        return (
+          <Tooltip
+            title={permissions
+              .map((permission) => permission.name_en || permission.name_ar || permission.key)
+              .join(', ')}
+          >
+            <div
+              style={{
+                display: '-webkit-box',
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: 1,
+                overflow: 'hidden',
+              }}
+            >
+              {permissions
+                .map((permission) => permission.name_en || permission.name_ar || permission.key)
+                .join(', ')}
+            </div>
+          </Tooltip>
+        );
+      },
+      ...getServerTextFilterProps({
+        filterKey: 'permission_name',
+        filters,
+        setFilters,
+        placeholder: `${t('common.search')} ${t('permissions')}`,
+        onChange: resetToFirstPage,
+      }),
     },
   ];
 
@@ -292,7 +387,8 @@ const PermissionsPage: React.FC = () => {
   );
 
   const nestedFieldMappers = {
-    additional_names: (record: PermissionProfile) => record.permissions || [],
+    additional_names: (record: PermissionProfile) =>
+      (record.permissions || []).map(normalizePermissionValue),
   };
 
   return (
@@ -318,11 +414,7 @@ const PermissionsPage: React.FC = () => {
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}
-      searchText={searchTerm}
-      onSearch={(value) => {
-        setSearchTerm(value);
-        setPagination((prev) => ({ ...prev, current: 1 }));
-      }}
+      showToolbarSearch={false}
       viewExtraNode={renderViewExtra}
       nestedFieldMappers={nestedFieldMappers}
       useGetOne={useGetOne}

@@ -7,14 +7,26 @@ import { useTranslation } from "react-i18next";
 import { domainApi } from "../services/domainsApi";
 import type { CreateUniversityDto, University, UpdateUniversityDto } from "../../universities/types/types";
 import { universityApi } from "../../universities/services/universityApi";
+import {
+  getServerTextFilterProps,
+  getServerSelectFilterProps,
+} from "../../../components/table/serverFilters";
 
 
 
 const DomainsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const [selectedUni, setSelectedUni] = useState<number | null>(null);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 50 });
-  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState({
+    name_en: undefined as string | undefined,
+    name_ar: undefined as string | undefined,
+    description_en: undefined as string | undefined,
+    description_ar: undefined as string | undefined,
+    university: undefined as string | undefined,
+  });
+
+  const resetToFirstPage = () =>
+    setPagination((prev) => ({ ...prev, current: 1 }));
 
   const {
     data,
@@ -25,11 +37,11 @@ const DomainsPage: React.FC = () => {
     updateMutation,
     deleteMutation,
   } = useGenericCrud<Domain, CreateDomainDto, UpdateDomainDto>({
-    queryKey: ['domains', searchTerm, pagination.current, pagination.pageSize],
+    queryKey: ['domains', filters, pagination.current, pagination.pageSize],
     fetchFn: () => domainApi.getAll({ 
-      name: searchTerm,
       page: pagination.current,
-      page_size: pagination.pageSize
+      page_size: pagination.pageSize,
+      ...filters,
     }),
     fetchOneFn: (id) => domainApi.getById(id),
     createFn: (data) => domainApi.create(data),
@@ -56,16 +68,30 @@ const DomainsPage: React.FC = () => {
     value: u.id,
   })) ?? [];
 
-    const columns = [
+    const columns: ColumnsType<Domain> = [
         {
             title: t("name_en"),
             key: "name_en",
             render: (_: any, record: any) => record.name?.en || "-",
+            ...getServerTextFilterProps({
+              filterKey: "name_en",
+              filters,
+              setFilters,
+              placeholder: `${t("common.search")} ${t("name_en")}`,
+              onChange: resetToFirstPage,
+            }),
         },
         {
             title: t("name_ar"),
             key: "name_ar",
             render: (_: any, record: any) => record.name?.ar || "-",
+            ...getServerTextFilterProps({
+              filterKey: "name_ar",
+              filters,
+              setFilters,
+              placeholder: `${t("common.search")} ${t("name_ar")}`,
+              onChange: resetToFirstPage,
+            }),
         },
 
         {
@@ -89,6 +115,13 @@ const DomainsPage: React.FC = () => {
                     </Tooltip>
                 );
             },
+            ...getServerTextFilterProps({
+              filterKey: "description_en",
+              filters,
+              setFilters,
+              placeholder: `${t("common.search")} ${t("description_en")}`,
+              onChange: resetToFirstPage,
+            }),
         },
 
         {
@@ -114,6 +147,13 @@ const DomainsPage: React.FC = () => {
                     </Tooltip>
                 );
             },
+            ...getServerTextFilterProps({
+              filterKey: "description_ar",
+              filters,
+              setFilters,
+              placeholder: `${t("common.search")} ${t("description_ar")}`,
+              onChange: resetToFirstPage,
+            }),
         },
 
         {
@@ -125,6 +165,14 @@ const DomainsPage: React.FC = () => {
 
                 return i18n.language === "ar" ? uni.ar : uni.en;
             },
+            ...getServerSelectFilterProps({
+              filterKey: "university",
+              filters,
+              setFilters,
+              placeholder: `${t("common.search")} ${t("university")}`,
+              options: uniOptions,
+              onChange: resetToFirstPage,
+            }),
         },
     ];
 
@@ -180,7 +228,6 @@ const DomainsPage: React.FC = () => {
         <Select
           placeholder={t("select_university")}
           options={uniOptions}
-          onChange={(val) => setSelectedUni(val)}
         />
       </Form.Item>
     </>
@@ -201,17 +248,13 @@ const DomainsPage: React.FC = () => {
       pageIndex={pagination.current}
       pageSize={pagination.pageSize}
       onPageChange={(page, size) => setPagination({ current: page, pageSize: size })}
-      onSearch={(val) => {
-        setSearchTerm(val);
-        setPagination(prev => ({ ...prev, current: 1 })); 
-      }}
       isLoading={isLoading}
       useGetOne={useGetOne}
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}
       nestedFieldMappers={nestedFieldMappers} 
-      searchText={searchTerm} 
+      showToolbarSearch={false}
     />
   );
 };

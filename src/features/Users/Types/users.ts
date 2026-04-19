@@ -2,6 +2,8 @@
     export interface Lookup {
         id: string;
         name: string;
+        name_en?: string;
+        name_ar?: string;
         description?: string;
         color?: string;
     }

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle } from "react";
 import { Form, Card, Flex, Select } from "antd";
 import { Controller, useForm } from "react-hook-form";
 
@@ -7,12 +7,13 @@ import type { UserFormData } from "../../Types/users";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { usePermissionProfiles, useSpecializations } from "../../Hooks/useUsers";
 import RequiredTag from "../../../../components/RequiredTag";
+import type { UserFormStepHandle } from "./types";
 
 
 interface Props { initialData: UserFormData; onNext: (data: Partial<UserFormData>) => void; }
 
-const StepPermissions: React.FC<Props> = ({ initialData, onNext }) => {
-    const { handleSubmit, control, formState: { errors }, reset } =
+const StepPermissions = forwardRef<UserFormStepHandle, Props>(({ initialData, onNext }, ref) => {
+    const { handleSubmit, control, formState: { errors }, reset, getValues } =
         useForm<UserFormData>({ defaultValues: initialData, mode: "onChange" });
     useEffect(() => { reset(initialData); }, [initialData, reset]);
 
@@ -25,6 +26,16 @@ const StepPermissions: React.FC<Props> = ({ initialData, onNext }) => {
             specializations: data.specializations,
         });
     };
+
+    useImperativeHandle(ref, () => ({
+        getValues: () => {
+            const data = getValues();
+            return {
+                permission_profile: data.permission_profile,
+                specializations: data.specializations,
+            };
+        },
+    }), [getValues]);
     const filterOption = (input: string, option: { value: string; label: string } | undefined) => {
         if (!option || !option.label) return false;
         
@@ -82,5 +93,8 @@ const StepPermissions: React.FC<Props> = ({ initialData, onNext }) => {
             </Form>
         </Card>
     );
-};
+});
+
+StepPermissions.displayName = "StepPermissions";
+
 export default StepPermissions;

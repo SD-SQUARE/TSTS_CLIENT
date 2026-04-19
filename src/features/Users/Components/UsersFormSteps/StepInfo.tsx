@@ -1,17 +1,18 @@
-import React, { useEffect } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle } from "react";
 import { Form, Input, Card, Flex, Upload, Avatar } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import { CameraOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import type { UserFormData } from "../../Types/users";
 import RequiredTag from "../../../../components/RequiredTag";
+import type { UserFormStepHandle } from "./types";
 
 const ENGLISH_REGEX = /^[A-Za-z\s.,!?'"()@&$-]+$/;
 const ARABIC_REGEX = /^[\u0600-\u06FF\s\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF.,!?'"()@&$-]+$/u;
 
 interface Props { initialData: UserFormData; onNext: (data: Partial<UserFormData>) => void; }
 
-const StepInfo: React.FC<Props> = ({ initialData, onNext }) => {
+const StepInfo = forwardRef<UserFormStepHandle, Props>(({ initialData, onNext }, ref) => {
     const { handleSubmit, control, formState: { errors }, reset, setValue,getValues, watch } =
         useForm<UserFormData>({ defaultValues: initialData, mode: "onChange" });
 
@@ -44,6 +45,24 @@ const StepInfo: React.FC<Props> = ({ initialData, onNext }) => {
     const onSubmit = (data: UserFormData) => {
         onNext({ image: data.image, first_name_en: data.first_name_en, first_name_ar: data.first_name_ar, mid_name_en: data.mid_name_en, mid_name_ar: data.mid_name_ar, last_name_en: data.last_name_en, last_name_ar: data.last_name_ar, full_name_en: data.full_name_en, full_name_ar: data.full_name_ar, ssn: data.ssn });
     };
+
+    useImperativeHandle(ref, () => ({
+        getValues: () => {
+            const data = getValues();
+            return {
+                image: data.image,
+                first_name_en: data.first_name_en,
+                first_name_ar: data.first_name_ar,
+                mid_name_en: data.mid_name_en,
+                mid_name_ar: data.mid_name_ar,
+                last_name_en: data.last_name_en,
+                last_name_ar: data.last_name_ar,
+                full_name_en: data.full_name_en,
+                full_name_ar: data.full_name_ar,
+                ssn: data.ssn,
+            };
+        },
+    }), [getValues]);
 
     const hoverStyles = `
         .avatar-wrapper {
@@ -209,5 +228,8 @@ const StepInfo: React.FC<Props> = ({ initialData, onNext }) => {
             </Form>
         </Card>
     );
-};
+});
+
+StepInfo.displayName = "StepInfo";
+
 export default StepInfo;

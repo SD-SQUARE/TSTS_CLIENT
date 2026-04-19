@@ -48,6 +48,7 @@ interface GenericCrudProps<T> {
   tableSize?: "small" | "middle" | "large";
   searchText?: string;
   onSearch?: (value: string) => void;
+  showToolbarSearch?: boolean;
   viewExtraNode?: (record: T) => React.ReactNode;
   // ADDED: Prop for the hook so we can fetch details
   useGetOne?: (id?: string | number) => { data: any; isLoading: boolean };
@@ -72,6 +73,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
   tableSize = "middle",
   searchText = "",
   onSearch,
+  showToolbarSearch = !!onSearch,
   viewExtraNode,
   useGetOne,
 }: GenericCrudProps<T>) => {
@@ -365,14 +367,16 @@ export const GenericCrudPage = <T extends { id: string | number }>({
         <h2 className="page-title"></h2>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-          <Input
-            placeholder={t("crud.search_placeholder")}
-            prefix={<SearchOutlined />}
-            allowClear
-            value={searchText}
-            onChange={(e) => onSearch?.(e.target.value)}
-            style={{ flex: 1, minWidth: 150 }}
-          />
+          {showToolbarSearch && (
+            <Input
+              placeholder={t("crud.search_placeholder")}
+              prefix={<SearchOutlined />}
+              allowClear
+              value={searchText}
+              onChange={(e) => onSearch?.(e.target.value)}
+              style={{ flex: 1, minWidth: 150 }}
+            />
+          )}
 
           {!disableAdd && (
             <Button

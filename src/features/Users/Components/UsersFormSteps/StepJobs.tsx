@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle } from "react";
 import { Form, Card, Flex, Select, Input } from "antd";
 import { Controller, useForm } from "react-hook-form";
 
@@ -9,6 +9,7 @@ import type { Lookup, UserFormData } from "../../Types/users";
 import { useDepartments, useDomains, useUniversities } from "../../Hooks/useUsers";
 import RequiredTag from "../../../../components/RequiredTag";
 import { useLocation } from "react-router-dom";
+import type { UserFormStepHandle } from "./types";
 
 
 const ENGLISH_REGEX = /^[A-Za-z\s.,!?'"()@&$-]+$/;
@@ -17,8 +18,8 @@ const ARABIC_REGEX = /^[\u0600-\u06FF\s\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\u
 
 interface Props { initialData: UserFormData; onNext: (data: Partial<UserFormData>) => void; }
 
-const StepJobLocation: React.FC<Props> = ({ initialData, onNext }) => {
-    const { handleSubmit, control, formState: { errors }, reset, watch, setValue } =
+const StepJobLocation = forwardRef<UserFormStepHandle, Props>(({ initialData, onNext }, ref) => {
+    const { handleSubmit, control, formState: { errors }, reset, watch, setValue, getValues } =
         useForm<UserFormData>({ defaultValues: initialData, mode: "onChange" });
     useEffect(() => { reset(initialData); }, [initialData, reset]);
 
@@ -60,6 +61,19 @@ const StepJobLocation: React.FC<Props> = ({ initialData, onNext }) => {
             departments: data.departments || [data.domain],
         });
     };
+
+    useImperativeHandle(ref, () => ({
+        getValues: () => {
+            const data = getValues();
+            return {
+                job_en: data.job_en,
+                job_ar: data.job_ar,
+                university: data.university,
+                domain: data.domain,
+                departments: data.departments || [data.domain],
+            };
+        },
+    }), [getValues]);
 
     const filterOption = (input: string, option: { value: string; label: string } | undefined) => {
         if (!option || !option.label) return false;
@@ -163,5 +177,8 @@ const StepJobLocation: React.FC<Props> = ({ initialData, onNext }) => {
             </Form>
         </Card>
     );
-};
+});
+
+StepJobLocation.displayName = "StepJobLocation";
+
 export default StepJobLocation;

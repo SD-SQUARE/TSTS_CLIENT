@@ -24,7 +24,7 @@ export const useNotifications = () =>
     queryKey: communicationKeys.notifications,
     queryFn: async () => {
       const { data } = await api.get('/v1/notifications');
-      return data;
+      return data.data || [];
     },
   });
 

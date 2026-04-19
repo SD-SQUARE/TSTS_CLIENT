@@ -87,6 +87,17 @@ export const useDomains = (universityId?: string) =>
         staleTime: Infinity,
     });
 
+export const useAllDomains = () =>
+    useQuery({
+        queryKey: ["domains", "all"],
+        queryFn: async () => {
+            const url = `v1/lockups/domains`;
+            const res = await api.get(url);
+            return res.data.domains as Lookup[];
+        },
+        staleTime: Infinity,
+    });
+
 export const useDepartments = (domainId?: string) =>
     useQuery({
         queryKey: ["departments", domainId],
@@ -97,6 +108,17 @@ export const useDepartments = (domainId?: string) =>
             return res.data.departments as Lookup[];
         },
         enabled: !!domainId,
+        staleTime: Infinity,
+    });
+
+export const useAllDepartments = () =>
+    useQuery({
+        queryKey: ["departments", "all"],
+        queryFn: async () => {
+            const url = `v1/lockups/departments`;
+            const res = await api.get(url);
+            return res.data.departments as Lookup[];
+        },
         staleTime: Infinity,
     });
 

@@ -48,7 +48,7 @@ const ResizableTitle: React.FC<ResizableTitleProps> = ({ onResize, width, ...res
                 style={{
                     ...((restProps.style as React.CSSProperties) || {}),
                     width: tempWidth,
-                    position: 'relative',
+                    position: ((restProps.style as React.CSSProperties) || {}).position,
                     transition: 'none',
                 }}
             />

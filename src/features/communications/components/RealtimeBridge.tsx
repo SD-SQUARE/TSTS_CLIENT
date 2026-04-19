@@ -4,12 +4,10 @@ import { io } from 'socket.io-client';
 import { useSelector } from 'react-redux';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import {
-  API_HOST,
-  API_PORT,
-  API_PROTOCOL,
-} from '../../../app/config';
+import { useNavigate } from 'react-router-dom';
+
 import { communicationKeys } from '../hooks/useCommunicationApi';
+import { CHAT_DRAWER_OPEN_EVENT } from '../events';
 import notificationAudioSrc from '../../../assets/audio/notification.wav';
 
 const RealtimeBridge: React.FC = () => {
@@ -17,6 +15,8 @@ const RealtimeBridge: React.FC = () => {
   const queryClient = useQueryClient();
   const auth = useSelector((state: any) => state.auth);
   const token = auth?.token as string | null;
+  const role = typeof auth?.user?.role === 'string' ? auth.user.role.toLowerCase() : '';
+  const navigate = useNavigate();
   const notificationAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -52,6 +52,14 @@ const RealtimeBridge: React.FC = () => {
           message: incoming.notification.title,
           description: incoming.notification.content || t('notifications.newItem'),
           placement: i18n.language === 'ar' ? 'topLeft' : 'topRight',
+          onClick: () => {
+            if (incoming.notification.type === 'message' && role !== 'requester') {
+                window.dispatchEvent(new CustomEvent(CHAT_DRAWER_OPEN_EVENT));
+            } else if (incoming.notification.type === 'ticket' && incoming.notification.referenceId && role) {
+                navigate(`/${role}/tickets/${incoming.notification.referenceId}`);
+            }
+          },
+          style: { cursor: 'pointer' },
         });
       }
     });
@@ -77,7 +85,7 @@ const RealtimeBridge: React.FC = () => {
     return () => {
       socket.disconnect();
     };
-  }, [i18n.language, queryClient, t, token]);
+  }, [i18n.language, queryClient, t, token, role, navigate]);
 
   return null;
 };

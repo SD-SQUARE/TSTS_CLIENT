@@ -6,7 +6,7 @@ const TicketListStyles: React.FC = () => (
         .tree-select-no-scroll .ant-select-tree-node-content-wrapper { flex: 1 !important; overflow: hidden !important; display: flex !important; }
         .tree-select-no-scroll .ant-select-tree-title { flex: 1 !important; overflow: hidden !important; }
 
-        .react-resizable { position: relative; background-clip: padding-box; }
+        .react-resizable { background-clip: padding-box; }
         .react-resizable-handle {
             position: absolute; right: -10px !important; bottom: 0;
             z-index: 10; width: 20px !important; height: 100%; cursor: col-resize;

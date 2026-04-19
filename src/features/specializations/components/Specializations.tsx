@@ -8,11 +8,24 @@ import type { Specialization, CreateSpecializationDto, UpdateSpecializationDto }
 // import type { Department } from "../../departments/types/types";
 import { useTranslation } from "react-i18next";
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import {
+  getServerSelectFilterProps,
+  getServerTextFilterProps,
+} from "../../../components/table/serverFilters";
 
 const SpecializationsPage: React.FC = () => {
   const { t } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState("");
   const [pagination, setPagination] = useState({ current: 1, pageSize: 50 });
+  const [filters, setFilters] = useState({
+    name_en: undefined as string | undefined,
+    name_ar: undefined as string | undefined,
+    description_en: undefined as string | undefined,
+    description_ar: undefined as string | undefined,
+    review_required: undefined as string | undefined,
+  });
+
+  const resetToFirstPage = () =>
+    setPagination((prev) => ({ ...prev, current: 1 }));
 
   const {
     data,
@@ -23,9 +36,12 @@ const SpecializationsPage: React.FC = () => {
     updateMutation,
     deleteMutation,
   } = useGenericCrud<Specialization, CreateSpecializationDto, UpdateSpecializationDto>({
-    queryKey: ['specializations', searchTerm,pagination.current, pagination.pageSize],
-    fetchFn: () => specializationApi.getAll({ name: searchTerm , page: pagination.current, 
-        page_size: pagination.pageSize}),
+    queryKey: ['specializations', filters, pagination.current, pagination.pageSize],
+    fetchFn: () => specializationApi.getAll({
+        page: pagination.current,
+        page_size: pagination.pageSize,
+        ...filters,
+      }),
     fetchOneFn: (id) => specializationApi.getById(id),
     createFn: (data) => specializationApi.create(data),
     updateFn: ({ id, data }) => specializationApi.update(id, data),
@@ -33,8 +49,30 @@ const SpecializationsPage: React.FC = () => {
   });
 
   const columns = [
-    { title: t("name_en"), dataIndex: "name_en", key: "name_en" },
-    { title: t("name_ar"), dataIndex: "name_ar", key: "name_ar" },
+    {
+      title: t("name_en"),
+      dataIndex: "name_en",
+      key: "name_en",
+      ...getServerTextFilterProps({
+        filterKey: "name_en",
+        filters,
+        setFilters,
+        placeholder: `${t("common.search")} ${t("name_en")}`,
+        onChange: resetToFirstPage,
+      }),
+    },
+    {
+      title: t("name_ar"),
+      dataIndex: "name_ar",
+      key: "name_ar",
+      ...getServerTextFilterProps({
+        filterKey: "name_ar",
+        filters,
+        setFilters,
+        placeholder: `${t("common.search")} ${t("name_ar")}`,
+        onChange: resetToFirstPage,
+      }),
+    },
     {
       title: t("description_en"),
       dataIndex: "description_en",
@@ -46,6 +84,13 @@ const SpecializationsPage: React.FC = () => {
           </div>
         </Tooltip>
       ),
+      ...getServerTextFilterProps({
+        filterKey: "description_en",
+        filters,
+        setFilters,
+        placeholder: `${t("common.search")} ${t("description_en")}`,
+        onChange: resetToFirstPage,
+      }),
     },
     {
       title: t("description_ar"),
@@ -58,6 +103,13 @@ const SpecializationsPage: React.FC = () => {
           </div>
         </Tooltip>
       ),
+      ...getServerTextFilterProps({
+        filterKey: "description_ar",
+        filters,
+        setFilters,
+        placeholder: `${t("common.search")} ${t("description_ar")}`,
+        onChange: resetToFirstPage,
+      }),
     },
     {
       title: t("review_required"), 
@@ -69,6 +121,17 @@ const SpecializationsPage: React.FC = () => {
             {checked ? t("yes") : t("no")}
           </Tag>
       ),
+      ...getServerSelectFilterProps({
+        filterKey: "review_required",
+        filters,
+        setFilters,
+        placeholder: `${t("common.select")} ${t("review_required")}`,
+        options: [
+          { label: t("yes"), value: "true" },
+          { label: t("no"), value: "false" },
+        ],
+        onChange: resetToFirstPage,
+      }),
     },
   ];
 
@@ -131,11 +194,7 @@ const SpecializationsPage: React.FC = () => {
       createMutation={createMutation}
       updateMutation={updateMutation}
       deleteMutation={deleteMutation}
-      searchText={searchTerm}
-      onSearch={(val) => {
-          setSearchTerm(val);
-          setPagination(prev => ({ ...prev, current: 1 })); // Reset to page 1 on search
-      }}
+      showToolbarSearch={false}
       pageIndex={pagination.current}
       pageSize={pagination.pageSize}
       onPageChange={(page, size) => setPagination({ current: page, pageSize: size })}

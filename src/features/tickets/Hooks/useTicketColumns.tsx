@@ -128,7 +128,7 @@ export const useTicketColumns = ({
                     value={selectedKeys[0]}
                     onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
                     onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-                    style={{ marginBottom: 8, display: 'block' }}
+                    style={{ marginBottom: 8,marginRight: 4, marginLeft: 4, display: 'block' }}
                 />
                 <Space>
                     <Button
@@ -267,8 +267,7 @@ export const useTicketColumns = ({
             title: t('tickets.ticket_number'),
             dataIndex: 'id',
             key: 'id',
-            width: 80,
-            ellipsis: true,
+            width: 120,
             fixed: 'left',
             ...getColumnSearchProps('id' as any, 'tickets.ticket_number'),
             render: (id: string, record: Ticket) => {
