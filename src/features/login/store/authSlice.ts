@@ -1,4 +1,4 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { AuthState } from "../interfaces/AuthState.interface";
 import api from "../../../api/http";
 
@@ -8,6 +8,22 @@ const initialState: AuthState = {
     initialized: false,
 };
 
+const clearAuthState = (state: AuthState) => {
+    state.user = null;
+    state.token = null;
+    state.initialized = true;
+
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+};
+
+export const logoutV2 = createAsyncThunk("auth/logoutV2", async () => {
+    try {
+        api.post("v2/auth/logout");
+    } catch (error) {
+        console.warn("Logout request failed", error);
+    }
+});
 
 const authSlice = createSlice({
     name: "auth",
@@ -22,17 +38,17 @@ const authSlice = createSlice({
             sessionStorage.setItem("user", JSON.stringify(action.payload.user));
         },
         logout(state) {
-            state.user = null;
-            state.token = null;
-            state.initialized = true;
-
-            sessionStorage.removeItem("token");
-            sessionStorage.removeItem("user");
-            api.post("v1/auth/logout");
+            clearAuthState(state);
+            logoutV2();
         },
         authInitialized(state) {
             state.initialized = true;
         },
+    },
+    extraReducers: (builder) => {
+        builder.addCase(logoutV2.fulfilled, (state) => {
+            clearAuthState(state);
+        });
     },
 });
 
