@@ -17,6 +17,11 @@ export default ({ mode }) => {
                     target: `${env.VITE_API_PROTOCOL}://${env.VITE_API_HOST}:${env.VITE_API_PORT}` ,
                     changeOrigin: true,
                 },
+                '/socket.io': {
+                    target: `${env.VITE_API_PROTOCOL}://${env.VITE_API_HOST}:${env.VITE_API_PORT}`,
+                    ws: true,
+                    changeOrigin: true,
+                },
             },
             port: (env.VITE_APP_PORT as unknown as number) ?? 3000
         },
