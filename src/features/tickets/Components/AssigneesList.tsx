@@ -115,14 +115,15 @@ const AssigneeList: React.FC<AssigneeListProps & { forceEdit?: boolean }> = ({
 
 
     useEffect(() => {
-        if (assignees) setSelectedIds(assignees.map(a => a.id));
+        if (assignees && Array.isArray(assignees)) setSelectedIds(assignees.map(a => a.id));
     }, [assignees]);
 
     const loadInitialGroups = async () => {
         try {
             const { data } = await fetchGroups();
 
-            const groups = data.groups.map((g: any) => ({
+            const safeGroups = Array.isArray(data?.groups) ? data.groups : [];
+            const groups = safeGroups.map((g: any) => ({
                 id: g.id, pId: 0, value: g.id, title: g.name, isLeaf: false, selectable: false, checkable: false
             }));
 
@@ -140,7 +141,8 @@ const AssigneeList: React.FC<AssigneeListProps & { forceEdit?: boolean }> = ({
                 checkable: false,
             };
 
-            const existingNodes = assignees.map(a => ({
+            const safeAssignees = Array.isArray(assignees) ? assignees : [];
+            const existingNodes = safeAssignees.map(a => ({
                 id: a.id,
                 pId: 'assigned_root',
                 value: a.id,
@@ -164,8 +166,13 @@ const AssigneeList: React.FC<AssigneeListProps & { forceEdit?: boolean }> = ({
             if (treeData.some(node => node.pId === id)) return resolve();
             try {
                 if (id === 'admin_root') {
-                    const response = await queryClient.fetchQuery({ queryKey: ['admins'], queryFn: fetchAdmins });
-                    const adminNodes = (response.data?.users || []).map((u: any) => ({
+                    const response = await queryClient.fetchQuery({ queryKey: ['admins'], queryFn: fetchAdmins }) as any;
+                    let users = [];
+                    if (Array.isArray(response)) users = response;
+                    else if (response && Array.isArray(response.users)) users = response.users;
+                    else if (response && response.data && Array.isArray(response.data.users)) users = response.data.users;
+                    else if (response && Array.isArray(response.data)) users = response.data;
+                    const adminNodes = users.map((u: any) => ({
                         id: u.id, pId: 'admin_root', value: u.id, title: `${u.first_name} ${u.last_name}`, isLeaf: true, selectable: true
                     }));
                     setTreeData(prev => [...prev, ...adminNodes]);
@@ -180,7 +187,8 @@ const AssigneeList: React.FC<AssigneeListProps & { forceEdit?: boolean }> = ({
                     const [groupId, roleType] = id.split('_');
                     const { data } = await fetchGroupUsers(groupId);
                     const usersArray: any[] = roleType === 'tl' ? [data.team_leader] : (roleType === 'heads' ? data.heads : data.technicians) || [];
-                    const userNodes = usersArray.filter(u => u).map((u: any) => ({
+                    const safeUsersArray = Array.isArray(usersArray) ? usersArray : [];
+                    const userNodes = safeUsersArray.filter(u => u).map((u: any) => ({
                         id: u.id, pId: id, value: u.id, title: `${u.first_name} ${u.last_name}`, isLeaf: true, selectable: true
                     }));
                     setTreeData((prev) => {

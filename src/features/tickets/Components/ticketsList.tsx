@@ -53,8 +53,10 @@ const TicketList: React.FC = () => {
     const { data: departments } = useTicketDepartmentsLookup();
 
     const possibleAssignees = useMemo(() => {
-        const techList = (technicians || []).map((t: any) => ({ ...t, _userType: 'tech' }));
-        const adminList = (admins || []).map((a: any) => ({ ...a, _userType: 'admin' }));
+        const safeTechs = Array.isArray(technicians) ? technicians : [];
+        const safeAdmins = Array.isArray(admins) ? admins : [];
+        const techList = safeTechs.map((t: any) => ({ ...t, _userType: 'tech' }));
+        const adminList = safeAdmins.map((a: any) => ({ ...a, _userType: 'admin' }));
         const combined = [...techList, ...adminList];
         return Array.from(new Map(combined.map(item => [item.id, item])).values());
     }, [technicians, admins]);
