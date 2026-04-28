@@ -8,6 +8,7 @@ export interface User {
     image: string | null;
     email: string;
     user_type: string;
+    allow_profile_edit?: boolean;
 
     first_name_en: string;
     first_name_ar: string;

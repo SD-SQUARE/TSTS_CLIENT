@@ -15,7 +15,7 @@
   "NOT_FOUND": "عذراً، لم يتم العثور على الصفحة المطلوبة.",
   "NOT_ALLOWED": "عذراً، ليس لديك الصلاحية للوصول إلى هذه الصفحة.",
   "SERVER_ERROR": "عذراً، حدث خطأ ما. يرجى المحاولة مرة أخرى في وقت لاحق.",
-  "NAVIGATION_TITLE": "نظام التذاكر",
+  "NAVIGATION_TITLE": "نظام طلب الدعم",
   "problems": "المشكلات",
   "specialization_type": "نوع التخصص",
   "review_required": "مراجعة مطلوبة",
@@ -178,8 +178,29 @@
     "recycleBin": "سلة المحذوفات"
   },
   "sidebar": {
-    "welcome": "مرحبا،",
-    "logout": "تسجيل خروج"
+    "welcome": "مرحباً،",
+    "logout": "تسجيل خروج",
+    "menu": {
+      "dashboard": "لوحة التحكم",
+      "knowledgeBase": "استكشاف المعرفة",
+      "tickets": "طلبات الدعم",
+      "personnel": "قسم الموظفين",
+      "settings": "الإعدادات",
+      "groups": "المجموعات",
+      "users": "المستخدمون",
+      "admins": "المديرون",
+      "technicians": "الفنيون",
+      "requesters": "طالبو الدعم",
+      "systemInfo": "معلومات النظام",
+      "universities": "الجامعات",
+      "domains": "النطاقات",
+      "departments": "الأقسام",
+      "specializations": "التخصصات",
+      "problems": "المشكلات",
+      "trustedDevices": "الأجهزة الموثوقة",
+      "permissions": "الصلاحيات",
+      "auditLogs": "سجلات التدقيق"
+    }
   },
   "translation": {
     "id": "الرقم التعريفي",
@@ -323,7 +344,14 @@
     "status": "الحالة",
     "details": "التفاصيل",
     "view_user_title": "معلومات المستخدم",
-    "bulk_create": "إضافة مستخدمين جماعية"
+    "bulk_create": "إضافة مستخدمين جماعية",
+    "profile_edit_access": "صلاحية تعديل الملف الشخصي",
+    "enable_profile_edit": "تفعيل تعديل الملف الشخصي",
+    "disable_profile_edit": "إيقاف تعديل الملف الشخصي",
+    "enable_profile_edit_for_all": "تفعيل التعديل للجميع",
+    "disable_profile_edit_for_all": "إيقاف التعديل للجميع",
+    "profile_edit_access_updated": "تم تحديث صلاحية تعديل الملف الشخصي بنجاح",
+    "profile_edit_access_update_failed": "تعذر تحديث صلاحية تعديل الملف الشخصي"
   },
   "bulk": {
     "upload_sample": "رفع نموذج (إضافة جماعية)",
@@ -531,6 +559,10 @@
     "ticket_trends": "اتجاهات التذاكر",
     "no_reports": "لا توجد تقارير متاحة."
   },
+  "personnelDashboard": {
+    "activeAccounts": "الحسابات النشطة",
+    "editableAccounts": "الحسابات القابلة لتعديل الملف الشخصي"
+  },
   "period": {
     "daily": "يومياً",
     "monthly": "شهرياً",
@@ -668,7 +700,7 @@
     "unauthorized": "الوصول غير مصرح",
     "unauthorizedDescription": "ليس لديك صلاحية لوصول هذه الصفحة"
   },
-  "Tickets": "التذاكر",
+  "Tickets": "طلبات الدعم",
   "Settings": "الاعدادات",
   "Personnel": "قسم الموظفين",
   "profile": {
@@ -677,6 +709,14 @@
       "groups": "المجموعات",
       "specializations": "التخصصات",
       "settings": "الإعدادات"
+    },
+    "actions": {
+      "changeImage": "تغيير الصورة",
+      "editProfile": "تعديل الملف الشخصي",
+      "selectImage": "اختيار صورة",
+      "changeImageHint": "ارفع صورة ملف شخصي جديدة لحسابك.",
+      "imageUpdated": "تم تحديث صورة الملف الشخصي بنجاح",
+      "imageUpdateFailed": "تعذر تحديث صورة الملف الشخصي"
     },
     "groups": {
       "title": "مجموعات المستخدم",
@@ -699,6 +739,10 @@
       "system": "معلومات النظام",
       "searchPlaceholder": "ابحث داخل الإعدادات",
       "noSearchResults": "لا توجد نتائج مطابقة في هذا التبويب.",
+      "overview": {
+        "title": "نظرة عامة على الإعدادات",
+        "description": "افتح أي بطاقة لاستعراض الكيانات المرتبطة مع تصفية الأعمدة وتقسيم الصفحات."
+      },
       "password": "كلمة المرور",
       "devices": "الأجهزة الموثوقة",
       "extension": "إضافة المتصفح",
@@ -873,7 +917,7 @@
     "Delete": "حذف",
     "ipAddress": "العنوان الرقمي"
   },
-  "First_Time": "تنضم لنا للمرة الاولي ؟",
+  "First_Time": "هل تستخدم النظام للمرة الأولى؟",
   "First_time_Title": "تسجيل الدخول الاول",
   "yes": "نعم",
   "no": "لا",

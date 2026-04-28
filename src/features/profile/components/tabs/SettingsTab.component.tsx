@@ -3,11 +3,13 @@ import {
     LockOutlined,
     SafetyOutlined,
     AppstoreOutlined,
+    MessageOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import ResetPassword from "../ResetPassword.component";
 import TrustedDevices from "../TrustedDevices.component";
 import Extension from "../Extension.component";
+import QuickMessages from "../QuickMessages.component";
 import useTrustedDevices from "../../hooks/useTrustedDevices.hook";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -122,6 +124,15 @@ const SettingsTab = ({ forceDevices, onTourReady }: any) => {
                                 </span>
                             ),
                             children: <Extension searchTerm={searchTerm} />,
+                        },
+                        {
+                            key: "quick-messages",
+                            label: (
+                                <span>
+                                    <MessageOutlined /> {t("tickets.tools.quickMessages.title")}
+                                </span>
+                            ),
+                            children: <QuickMessages searchTerm={searchTerm} />,
                         },
                     ]}
                 />

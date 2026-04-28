@@ -41,15 +41,15 @@ function App() {
                         
                         < >
                             <GuardedRoute roles={["admin"]} allowNavigation={false}>
-                                <NavItem to="/dashboard">{t('DASHBOARD')}</NavItem>
+                                <NavItem to="/dashboard">{t("sidebar.menu.dashboard")}</NavItem>
                             </GuardedRoute>    
-                            <NavItem to="/knowledge-base">{t('Knowledge-Base')}</NavItem>
-                            {userRole && <NavItem to={`/${userRole}/tickets`}>{t('Tickets')}</NavItem>}
+                            <NavItem to="/knowledge-base">{t("sidebar.menu.knowledgeBase")}</NavItem>
+                            {userRole && <NavItem to={`/${userRole}/tickets`}>{t("sidebar.menu.tickets")}</NavItem>}
                             <GuardedRoute roles={["admin"]} allowNavigation={false}>
-                                <NavItem to="/identities/groups" activePrefixes={["/identities"]}>{t('Personnel')}</NavItem>
+                                <NavItem to="/identities" activePrefixes={["/identities"]}>{t("sidebar.menu.personnel")}</NavItem>
                             </GuardedRoute>    
                             <GuardedRoute roles={["admin"]} allowNavigation={false}>
-                                <NavItem to="/settings/system-info" activePrefixes={["/settings"]}>{t('Settings')}</NavItem>
+                                <NavItem to="/settings/system-info" activePrefixes={["/settings"]}>{t("sidebar.menu.settings")}</NavItem>
                             </GuardedRoute>    
                         </>
                     )}

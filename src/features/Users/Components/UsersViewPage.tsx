@@ -3,10 +3,12 @@ import { Card, Descriptions, Space, Typography, Spin, Button, Result, Tag, Avata
 import { ArrowLeftOutlined, MailOutlined, IdcardOutlined, PhoneOutlined, HomeOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useDeleteUser, useUserDetail, useUserPermissionsProfile } from '../Hooks/useUsers';
+import { useDeleteUser, useToggleUserProfileEditAccess, useUserDetail, useUserPermissionsProfile } from '../Hooks/useUsers';
 import type { Lookup } from '../Types/users';
 import AvatarDisplay from '../../../components/AvatarDisplay';
 import UserFormModal from './UsersFormModal';
+import { useSelector } from 'react-redux';
+import { getErrorMessage } from '../../../utils/error';
 
 const { Text, Title } = Typography;
 
@@ -86,6 +88,8 @@ const getInitials = (fullName: string) => {
 const UserViewPage: React.FC = () => {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
+    const auth = useSelector((state: any) => state.auth);
+    const currentUserRole = typeof auth.user?.role === "string" ? auth.user.role.toLowerCase() : "";
 
     const { role, id } = useParams<{ role: string; id: string }>();
     const userId = id;
@@ -95,6 +99,7 @@ const UserViewPage: React.FC = () => {
 
     const currentLanguage = i18n.language;
     const deleteMutation = useDeleteUser(role!);
+    const toggleProfileEditMutation = useToggleUserProfileEditAccess(role!, userId);
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
     const [confirmName, setConfirmName] = useState('');
     const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -151,6 +156,28 @@ const UserViewPage: React.FC = () => {
         refetch();
     };
 
+    const handleToggleProfileEdit = async () => {
+        if (!user) return;
+
+        try {
+            const response = await toggleProfileEditMutation.mutateAsync(
+                !user.allow_profile_edit,
+            );
+            message.success(
+                response?.data?.message ||
+                    t("user_list.profile_edit_access_updated"),
+            );
+            void refetch();
+        } catch (error: any) {
+            message.error(
+                getErrorMessage(
+                    error,
+                    t("user_list.profile_edit_access_update_failed"),
+                ),
+            );
+        }
+    };
+
     if (!role || !userId) {
         return <Result status="404" title="404" subTitle={t('translation.user_id_or_role_missing')} />;
     }
@@ -175,6 +202,7 @@ const UserViewPage: React.FC = () => {
     }
 
     const isStaff = role === 'admins' || role === 'technicians';
+    const canManageProfileEdit = currentUserRole === "admin" || currentUserRole === "superadmin";
 
     const allItems = [
         { key: 'full_name', label: t('user_list.full_name'), children: fullName, span: 2 },
@@ -202,6 +230,15 @@ const UserViewPage: React.FC = () => {
                 (user.permission_profile as any)?.name_ar ||
                 '-',
         },
+        {
+            key: 'allow_profile_edit',
+            label: t('user_list.profile_edit_access'),
+            children: (
+                <Tag color={user.allow_profile_edit ? 'green' : 'default'}>
+                    {user.allow_profile_edit ? t('yes') : t('no')}
+                </Tag>
+            ),
+        },
     ];
     const items = allItems.filter(item => item.condition === undefined || item.condition);
 
@@ -225,6 +262,24 @@ const UserViewPage: React.FC = () => {
                 }
                 extra={
                     <Space>
+                        {canManageProfileEdit && (
+                            <Tooltip
+                                title={user.allow_profile_edit
+                                    ? t('user_list.disable_profile_edit')
+                                    : t('user_list.enable_profile_edit')}
+                                placement="bottom"
+                            >
+                                <Button
+                                    type={user.allow_profile_edit ? 'default' : 'primary'}
+                                    onClick={handleToggleProfileEdit}
+                                    loading={toggleProfileEditMutation.isPending}
+                                >
+                                    {user.allow_profile_edit
+                                        ? t('user_list.disable_profile_edit')
+                                        : t('user_list.enable_profile_edit')}
+                                </Button>
+                            </Tooltip>
+                        )}
                         <Tooltip title={t('translation.edit')} placement="bottom">
                             <Button 
                                 icon={<EditOutlined />} 

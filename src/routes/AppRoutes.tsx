@@ -21,6 +21,7 @@ import KnowledgeGeneratorPage from "../features/knowledge-base/components/Knowle
 import KnowledgeGeneratorDetailPage from "../features/knowledge-base/components/KnowledgeGeneratorDetailPage.tsx";
 import ChatCenterPage from "../features/communications/components/ChatCenterPage.tsx";
 import SystemInfoTab from "../features/profile/components/SystemInfo.component.tsx";
+import PersonnelDashboard from "../features/Users/Components/PersonnelDashboard.tsx";
 
 
 import {
@@ -58,28 +59,33 @@ export const AppRoutes = () => {
 
     const IdentitiesMenuItems = [
         {
+            key: withBasePath("/identities"),
+            label: t("sidebar.menu.dashboard"),
+            icon: <ProjectOutlined />,
+        },
+        {
             key: withBasePath("/identities/groups"),
-            label: t('Groups'),
+            label: t("sidebar.menu.groups"),
             icon: <TeamOutlined />,
         },
         {
             key: withBasePath("/identities/users"),
-            label: t('Users'),
+            label: t("sidebar.menu.users"),
             icon: <UserOutlined />,
             children: [
                 {
                     key: withBasePath("/identities/users/admins"),
-                    label: t('Admins'),
+                    label: t("sidebar.menu.admins"),
                     icon: <SafetyOutlined />,
                 },
                 {
                     key: withBasePath("/identities/users/technicians"),
-                    label: t('Technicians'),
+                    label: t("sidebar.menu.technicians"),
                     icon: <ToolOutlined />,
                 },
                 {
                     key: withBasePath("/identities/users/requesters"),
-                    label: t('Requesters'),
+                    label: t("sidebar.menu.requesters"),
                     icon: <IdcardOutlined />,
                 },
             ],
@@ -87,16 +93,15 @@ export const AppRoutes = () => {
     ];
     const SettingsMenuItems = [
         // { key: "/settings/work-hours", label: t('Work Hours'), icon: <ClockCircleOutlined /> },
-        { key: withBasePath("/settings/system-info"), label: t("profile.settings.system"), icon: <ProjectOutlined /> },
-        { key: withBasePath("/settings/universities"), label: t('Universities'), icon: <BankOutlined /> },
-        { key: withBasePath("/settings/domains"), label: t('Domains'), icon: <ProjectOutlined /> },
-        { key: withBasePath("/settings/departments"), label: t('Departments'), icon: <ApartmentOutlined /> },
-        { key: withBasePath("/settings/specializations"), label: t('Specializations'), icon: <ExperimentOutlined /> },
-        { key: withBasePath("/settings/problems"), label: t('problems'), icon: <IssuesCloseOutlined /> },
-
-        { key: withBasePath("/settings/trusted-devices"), label: t("trusted_devices.Trusted Devices"), icon: <SafetyOutlined /> },
-        { key: withBasePath("/settings/permissions"), label: t('Permissions'), icon: <CheckOutlined /> },
-        { key: withBasePath("/settings/logs"), label: t('audit.title'), icon: <ClockCircleOutlined /> },
+        { key: withBasePath("/settings/system-info"), label: t("sidebar.menu.systemInfo"), icon: <ProjectOutlined /> },
+        { key: withBasePath("/settings/universities"), label: t("sidebar.menu.universities"), icon: <BankOutlined /> },
+        { key: withBasePath("/settings/domains"), label: t("sidebar.menu.domains"), icon: <ProjectOutlined /> },
+        { key: withBasePath("/settings/departments"), label: t("sidebar.menu.departments"), icon: <ApartmentOutlined /> },
+        { key: withBasePath("/settings/specializations"), label: t("sidebar.menu.specializations"), icon: <ExperimentOutlined /> },
+        { key: withBasePath("/settings/problems"), label: t("sidebar.menu.problems"), icon: <IssuesCloseOutlined /> },
+        { key: withBasePath("/settings/trusted-devices"), label: t("sidebar.menu.trustedDevices"), icon: <SafetyOutlined /> },
+        { key: withBasePath("/settings/permissions"), label: t("sidebar.menu.permissions"), icon: <CheckOutlined /> },
+        { key: withBasePath("/settings/logs"), label: t("sidebar.menu.auditLogs"), icon: <ClockCircleOutlined /> },
     ];
     return (
         <Routes>
@@ -127,7 +132,7 @@ export const AppRoutes = () => {
             }>
                 <Route index  element={
                      <GuardedRoute roles={["superadmin", "admin"]}>
-                       <GroupsList />
+                       <PersonnelDashboard />
                      </GuardedRoute>
                 } />
                 

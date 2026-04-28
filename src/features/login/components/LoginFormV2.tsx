@@ -165,7 +165,7 @@ const LoginFormV2 = () => {
                         message={error}
                         type="error"
                         showIcon
-                        style={{ marginBottom: 16 }}
+                        style={{ marginBottom: 16, wordBreak: "break-word" }}
                     />
                 )}
 
@@ -248,7 +248,7 @@ const LoginFormV2 = () => {
                                 }}
                                     strong
                                 >
-                                    {t("First_Time")}   
+                                    {t("First_Time")}
                                 </Text>
                             </NavLink>
                         </div>

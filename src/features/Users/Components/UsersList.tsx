@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Space, Pagination, Typography, Tag, Popover } from "antd";
+import { Button, Space, Pagination, Typography, Tag, Popover, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import type { ColumnsType } from "antd/es/table";
@@ -7,12 +7,13 @@ import Highlighter from 'react-highlight-words';
 import { useNavigate } from "react-router-dom";
 
 import type { UserListItem, Lookup } from "../Types/users";
-import { useDeleteUser, useUsers, useUniversities, useAllDomains, useAllDepartments } from "../Hooks/useUsers";
+import { useDeleteUser, useUsers, useUniversities, useAllDomains, useAllDepartments, useToggleRoleProfileEditAccess } from "../Hooks/useUsers";
 import AvatarDisplay from "../../../components/AvatarDisplay";
 import AppTable from "../../../components/AppTable";
 import UserFormModal from "./UsersFormModal";
 import BulkCreateModal from "./BulkCreateModal";
 import { getServerTextFilterProps, getServerSelectFilterProps } from "../../../components/table/serverFilters";
+import { getErrorMessage } from "../../../utils/error";
 
 export const UserList: React.FC<{ role: string }> = ({ role }) => {
     const { t, i18n } = useTranslation();
@@ -52,6 +53,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
 
     const { data, isLoading } = useUsers(role, pagination.page, pagination.pageSize, apiSearchQuery);
     const deleteMutation = useDeleteUser(role);
+    const toggleRoleProfileEditMutation = useToggleRoleProfileEditAccess(role);
 
     const resetToFirstPage = () => setPagination(prev => ({ ...prev, page: 1 }));
 
@@ -90,6 +92,23 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
     };
 
     const handleCloseModal = () => { setIsModalVisible(false); setEditingUser(undefined); };
+
+    const handleToggleAllProfileEdit = async (allowProfileEdit: boolean) => {
+        try {
+            const response = await toggleRoleProfileEditMutation.mutateAsync(allowProfileEdit);
+            message.success(
+                response?.data?.message ||
+                    t("user_list.profile_edit_access_updated"),
+            );
+        } catch (error: any) {
+            message.error(
+                getErrorMessage(
+                    error,
+                    t("user_list.profile_edit_access_update_failed"),
+                ),
+            );
+        }
+    };
 
     const renderExpandList = (item: string[], titleKey: string) => {
         if (!item || item.length === 0) {
@@ -375,6 +394,18 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                     showSizeChanger
                 />
                 <Space >
+                    <Button
+                        onClick={() => void handleToggleAllProfileEdit(true)}
+                        loading={toggleRoleProfileEditMutation.isPending}
+                    >
+                        {t("user_list.enable_profile_edit_for_all")}
+                    </Button>
+                    <Button
+                        onClick={() => void handleToggleAllProfileEdit(false)}
+                        loading={toggleRoleProfileEditMutation.isPending}
+                    >
+                        {t("user_list.disable_profile_edit_for_all")}
+                    </Button>
                     {role === "requesters" && (
                         <Button
                             icon={<PlusOutlined />}

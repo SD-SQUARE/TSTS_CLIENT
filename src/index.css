@@ -47,6 +47,7 @@ body{
   overflow: hidden;
   width: 100%;
   max-width: 950px;
+  min-height: 560px;
   margin: 0 auto;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   transform: scale(1);
@@ -68,7 +69,8 @@ body{
   background-color: #cad8ec;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
+  min-width: 0;
   padding: 3rem 2rem;
 }
 
@@ -356,7 +358,7 @@ body{
 @media (max-width: 768px) {
   .hero-visual-col { display: none !important; }
 
-  .login-card { flex-direction: column; max-width: 400px; }
+  .login-card { flex-direction: column; max-width: 400px; min-height: auto; }
   .login-left { display: none; }
   .login-right { flex: 1; padding: 2rem 1.5rem; }
 

@@ -15,6 +15,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useSystemInfo } from "../hooks/useSystemInfo.hook";
 import LocalizedDateText from "../../../components/LocalizedDateText";
+import SettingsOverviewDashboard from "./SettingsOverviewDashboard.component";
 
 const formatBytes = (bytes: number) => {
     if (!bytes) return "0 B";
@@ -207,6 +208,8 @@ const SystemInfoTab = ({ searchTerm = "" }: { searchTerm?: string }) => {
 
     return (
         <Space direction="vertical" size={20} style={{ width: "100%" }}>
+            <SettingsOverviewDashboard />
+
             <Card
                 style={{
                     borderRadius: 18,

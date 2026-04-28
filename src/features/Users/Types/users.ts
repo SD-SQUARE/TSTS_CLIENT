@@ -23,11 +23,12 @@ export interface ProfileLookup extends Lookup {
     }
     
     
-    export interface UserListItem {
+export interface UserListItem {
         id: string;
         image: string; 
         email?: string;
         user_type: string;
+        allow_profile_edit?: boolean;
         first_name_en: string;
         first_name_ar: string;
         mid_name_en: string;
@@ -73,6 +74,7 @@ export interface ProfileLookup extends Lookup {
         password?: string;
         status: "Active" | "InActive";
         user_type?: string;
+        allow_profile_edit?: boolean;
     }
     
     

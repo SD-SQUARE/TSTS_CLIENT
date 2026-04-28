@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useCallback, useEffect, useMemo, useRef } from "react";
-import { Modal, Steps, Button,  message, Spin, Flex } from "antd";
+import { Modal, Steps, Button,  message, Spin, Flex, Alert } from "antd";
 import { useTranslation } from "react-i18next";
 import { ExclamationCircleFilled } from '@ant-design/icons';
 
@@ -12,6 +12,7 @@ import StepAccess from "./UsersFormSteps/StepAccess";
 import type { UserFormData, UserListItem, UserPayload } from "../Types/users";
 import { useAddOrEditUser, useUserDetail } from "../Hooks/useUsers";
 import type { UserFormStepHandle } from "./UsersFormSteps/types";
+import { getApiFieldErrors, getErrorMessage } from "../../../utils/error";
 
 
 
@@ -51,6 +52,7 @@ const UserFormModal: React.FC<{
     const { t } = useTranslation();
     const [current, setCurrent] = useState(0);
     const [formData, setFormData] = useState<UserFormData>(initialFormData);
+    const [submitErrors, setSubmitErrors] = useState<string[]>([]);
     const currentStepRef = useRef<UserFormStepHandle | null>(null);
     // const [stepSubmitTrigger, setStepSubmitTrigger] = useState<(() => void) | null>(null);
 
@@ -65,6 +67,7 @@ const UserFormModal: React.FC<{
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setCurrent(0);
             setFormData(initialFormData);
+            setSubmitErrors([]);
             return;
         }
         if (userData) {
@@ -100,6 +103,7 @@ const UserFormModal: React.FC<{
         } else {
             setFormData(initialFormData);
             setCurrent(0);
+            setSubmitErrors([]);
         }
     }, [userData, isVisible, fetchedUserDetail]);
 
@@ -108,6 +112,7 @@ const UserFormModal: React.FC<{
     const resetModalState = () => {
         setCurrent(0);
         setFormData(initialFormData);
+        setSubmitErrors([]);
         // setStepSubmitTrigger(null);
         onClose();
     };
@@ -256,13 +261,21 @@ const UserFormModal: React.FC<{
             });
 
             try {
-                console.log(formPayload);
+                setSubmitErrors([]);
                 await addOrEditMutation.mutateAsync(formPayload);
                 message.success(t(userData ? "user_list.edit_success" : "user_list.add_success"));
                 resetModalState();
             } catch (error: any) {
-                console.error("Submission Error:", error);
-                message.error(t("user_list.submit_error"));
+                const backendFieldErrors = getApiFieldErrors(error)
+                    .map((item: { message?: string }) => item?.message)
+                    .filter((item: string | undefined): item is string => Boolean(item?.trim()));
+                const fallbackMessage = getErrorMessage(error, t("user_list.submit_error"));
+                const combinedErrors = Array.from(
+                    new Set([fallbackMessage, ...backendFieldErrors].filter(Boolean)),
+                );
+
+                setSubmitErrors(combinedErrors);
+                message.error(combinedErrors[0] || t("user_list.submit_error"));
             }
         },
 
@@ -301,6 +314,23 @@ const UserFormModal: React.FC<{
             <Spin spinning={isModalLoading}>
                 <Steps current={current} style={{ marginBottom: 24 }} items={stepItems} onChange={handleStepChange} />
 
+                {!!submitErrors.length && (
+                    <Alert
+                        type="error"
+                        showIcon
+                        style={{ marginBottom: 16 }}
+                        message={submitErrors[0]}
+                        description={
+                            submitErrors.length > 1 ? (
+                                <ul style={{ margin: 0, paddingInlineStart: 20 }}>
+                                    {submitErrors.slice(1).map((item) => (
+                                        <li key={item}>{item}</li>
+                                    ))}
+                                </ul>
+                            ) : null
+                        }
+                    />
+                )}
 
                 <div className="steps-content">
                     <CurrentStepComponent

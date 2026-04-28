@@ -74,7 +74,28 @@
   },
   "sidebar": {
     "welcome": "Welcome,",
-    "logout": "Logout"
+    "logout": "Logout",
+    "menu": {
+      "dashboard": "Dashboard",
+      "knowledgeBase": "Explore Knowledge",
+      "tickets": "Tickets",
+      "personnel": "Personnel",
+      "settings": "Settings",
+      "groups": "Groups",
+      "users": "Users",
+      "admins": "Admins",
+      "technicians": "Technicians",
+      "requesters": "Requesters",
+      "systemInfo": "System Info",
+      "universities": "Universities",
+      "domains": "Domains",
+      "departments": "Departments",
+      "specializations": "Specializations",
+      "problems": "Problems",
+      "trustedDevices": "Trusted Devices",
+      "permissions": "Permissions",
+      "auditLogs": "Audit Logs"
+    }
   },
   "translation": {
     "id": "ID",
@@ -225,7 +246,14 @@
     "status": "Status",
     "details": "Details",
     "view_user_title": "User Details",
-    "bulk_create": "Bulk Create Users"
+    "bulk_create": "Bulk Create Users",
+    "profile_edit_access": "Profile Edit Access",
+    "enable_profile_edit": "Enable Profile Edit",
+    "disable_profile_edit": "Disable Profile Edit",
+    "enable_profile_edit_for_all": "Enable Edit For All",
+    "disable_profile_edit_for_all": "Disable Edit For All",
+    "profile_edit_access_updated": "Profile edit access updated successfully",
+    "profile_edit_access_update_failed": "Failed to update profile edit access"
   },
   "bulk": {
     "upload_sample": "Upload Sample (Bulk)",
@@ -433,6 +461,10 @@
     "ticket_trends": "Ticket Trends",
     "no_reports": "No reports available."
   },
+  "personnelDashboard": {
+    "activeAccounts": "Active Accounts",
+    "editableAccounts": "Profile Editable"
+  },
   "period": {
     "daily": "Daily",
     "monthly": "Monthly",
@@ -590,6 +622,14 @@
       "specializations": "Specializations",
       "settings": "Settings"
     },
+    "actions": {
+      "changeImage": "Change Image",
+      "editProfile": "Edit Profile",
+      "selectImage": "Select Image",
+      "changeImageHint": "Upload a new profile image for your account.",
+      "imageUpdated": "Profile image updated successfully",
+      "imageUpdateFailed": "Failed to update profile image"
+    },
 
     "groups": {
       "title": "User Groups",
@@ -617,6 +657,10 @@
       "system": "System Info",
       "searchPlaceholder": "Search settings",
       "noSearchResults": "No matching results in this tab.",
+      "overview": {
+        "title": "Settings Overview",
+        "description": "Open any card to browse the related system entities with table filters and pagination."
+      },
 
       "reset": {
         "title": "Reset Password",
@@ -894,7 +938,7 @@
     "Type": "Type",
     "ipAddress": "IP Address"
   },
-  "First_Time": "Joining us for the first time ?",
+  "First_Time": "Joining us for the first time?",
   "First_time_Title": "First Time Login",
   "yes": "Yes",
   "no": "No",

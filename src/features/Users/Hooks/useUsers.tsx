@@ -73,8 +73,59 @@ export const useAddOrEditUser = (role: string, userId?: string) => {
             userId
                 ? api.put(`v1/users/${role}/${userId}`, data, { headers: { "Content-Type": "multipart/form-data" } })
                 : api.post(`v1/users/${role}`, data, { headers: { "Content-Type": "multipart/form-data" } }),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users", role] })
-        ,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["users", role] });
+            await queryClient.invalidateQueries({ queryKey: ["userDetail", role, userId] });
+            await queryClient.invalidateQueries({ queryKey: ["user-profile"] });
+            await queryClient.invalidateQueries({ queryKey: ["user-specializations"] });
+        },
+    });
+};
+
+export const useUpdateProfileImage = (userId?: string) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (data: FormData) =>
+            api.patch(`v1/users/profile/${userId}/image`, data, {
+                headers: { "Content-Type": "multipart/form-data" },
+            }),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["user-profile"] });
+            await queryClient.invalidateQueries({ queryKey: ["userDetail"] });
+            await queryClient.invalidateQueries({ queryKey: ["users"] });
+        },
+    });
+};
+
+export const useToggleUserProfileEditAccess = (role: string, userId?: string) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (allowProfileEdit: boolean) =>
+            api.patch(`v1/users/profile-edit-access/${userId}`, {
+                allow_profile_edit: allowProfileEdit,
+            }),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["users", role] });
+            await queryClient.invalidateQueries({ queryKey: ["userDetail", role, userId] });
+            await queryClient.invalidateQueries({ queryKey: ["user-profile"] });
+        },
+    });
+};
+
+export const useToggleRoleProfileEditAccess = (role: string) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (allowProfileEdit: boolean) =>
+            api.patch(`v1/users/profile-edit-access/role/${role}`, {
+                allow_profile_edit: allowProfileEdit,
+            }),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["users", role] });
+            await queryClient.invalidateQueries({ queryKey: ["user-profile"] });
+        },
     });
 };
 
