@@ -7,6 +7,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useLogin } from "../hooks/useLogin";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
+import { getErrorMessage } from "../../../utils/error";
 const { Title } = Typography;
 
 const LoginForm = () => {
@@ -59,7 +60,7 @@ const LoginForm = () => {
       try {
           await login(values);
     } catch (err: any) {
-      setError(err.response?.data?.message || t("Login_Failed"));
+      setError(getErrorMessage(err, t("Login_Failed")));
     } finally {
       setIsLoading(false);
     }
@@ -112,7 +113,7 @@ const LoginForm = () => {
             { type: "email", message: t("Invalid_email_address_format") },
           ]}
         >
-          <Input placeholder="example@mail.com" className="login-input" />
+          <Input placeholder="example@mail.com" className="login-input" dir="ltr" />
         </Form.Item>
 
         <Form.Item
@@ -129,7 +130,7 @@ const LoginForm = () => {
             { pattern: /[^A-Za-z0-9]/, message: t("Must_contain_a_special_character") },
           ]}
         >
-          <Input.Password placeholder="********" className="login-input" />
+          <Input.Password placeholder="********" className="login-input" dir="ltr" />
         </Form.Item>
 
 

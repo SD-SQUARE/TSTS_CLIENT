@@ -55,8 +55,9 @@ export const useTicketColumns = ({
     setPagination,
     handleView,
 }: UseTicketColumnsOptions) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const isRequester = role === 'requester';
+    const isArabic = i18n.language.startsWith('ar');
 
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState<SearchableDataIndex | ''>('');
@@ -118,6 +119,20 @@ export const useTicketColumns = ({
         ) : (
             text
         );
+
+    const getLocalizedLookupLabel = (item?: any) => {
+        const nestedName = typeof item?.name === 'object'
+            ? (isArabic ? item.name?.ar : item.name?.en)
+            : undefined;
+
+        return (
+            (isArabic
+                ? item?.name_ar || item?.name_en || nestedName
+                : item?.name_en || item?.name_ar || nestedName) ||
+            (typeof item?.name === 'string' ? item.name : '') ||
+            ''
+        );
+    };
 
     const getColumnSearchProps = (dataIndex: SearchableDataIndex, titleKey: string): TableColumnType<Ticket> => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
@@ -332,6 +347,7 @@ export const useTicketColumns = ({
                 { label: t('status.in_progress'), value: 'in_progress' },
                 { label: t('status.pending'), value: 'pending' },
                 { label: t('status.out_of_service'), value: 'out_of_service' },
+                { label: t('status.resolved'), value: 'resolved' },
                 { label: t('status.closed'), value: 'closed' },
             ]),
         },
@@ -371,7 +387,7 @@ export const useTicketColumns = ({
             width: 100,
             ellipsis: true,
             render: (specialization: Specialization | null) => {
-                const text = specialization?.name ?? t('tickets.noSpecialization');
+                const text = getLocalizedLookupLabel(specialization) || t('tickets.noSpecialization');
                 return (
                     <Popover title={t('tickets.specialization')} content={<div style={{ maxWidth: 300 }}>{text}</div>} trigger="hover" placement="topLeft">
                         <div style={{ width: '100%' }}>
@@ -383,7 +399,10 @@ export const useTicketColumns = ({
             ...getColumnSelectProps(
                 'specialization',
                 'tickets.specialization',
-                (Array.isArray(specs) ? specs : []).map((s: any) => ({ label: s.name, value: s.id })),
+                (Array.isArray(specs) ? specs : []).map((s: any) => ({
+                    label: s.displayName || getLocalizedLookupLabel(s),
+                    value: s.id,
+                })),
             ),
         },
         {
@@ -393,7 +412,7 @@ export const useTicketColumns = ({
             width: 180,
             ellipsis: true,
             render: (problem: Problem | null) => {
-                const text = problem?.name ?? t('tickets.noType');
+                const text = getLocalizedLookupLabel(problem) || t('tickets.noType');
                 return (
                     <Popover title={t('tickets.problemType')} content={<div style={{ maxWidth: 300 }}>{text}</div>} trigger="hover" placement="topLeft">
                         <div style={{ width: '100%' }}>
@@ -435,7 +454,7 @@ export const useTicketColumns = ({
                     width: 180,
                     ellipsis: true,
                     render: (_: string, record: Ticket) => {
-                        const text = record.requester?.university?.name || t('common.empty');
+                        const text = getLocalizedLookupLabel(record.requester?.university) || t('common.empty');
                         return (
                             <Popover title={t('user_list.university')} content={<div style={{ maxWidth: 300 }}>{text}</div>} trigger="hover" placement="topLeft">
                                 <div style={{ width: '100%' }}>
@@ -453,7 +472,7 @@ export const useTicketColumns = ({
                     width: 180,
                     ellipsis: true,
                     render: (_: string, record: Ticket) => {
-                        const text = record.requester?.domain?.name || t('common.empty');
+                        const text = getLocalizedLookupLabel(record.requester?.domain) || t('common.empty');
                         return (
                             <Popover title={t('user_list.domain')} content={<div style={{ maxWidth: 300 }}>{text}</div>} trigger="hover" placement="topLeft">
                                 <div style={{ width: '100%' }}>
@@ -471,7 +490,10 @@ export const useTicketColumns = ({
                     width: 220,
                     ellipsis: true,
                     render: (_: unknown, record: Ticket) => {
-                        const text = record.requester?.departments?.map((department) => department.name).join(', ') || t('common.empty');
+                        const text = record.requester?.departments
+                            ?.map((department) => getLocalizedLookupLabel(department))
+                            .filter(Boolean)
+                            .join(', ') || t('common.empty');
                         return (
                             <Popover title={t('user_list.department')} content={<div style={{ maxWidth: 300 }}>{text}</div>} trigger="hover" placement="topLeft">
                                 <div style={{ width: '100%' }}>

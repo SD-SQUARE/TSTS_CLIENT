@@ -20,8 +20,8 @@ import { useMemo, useState } from "react";
 import AddTrustedDeviceDrawer from "./AddTrustedDeviceDrawer.component";
 import { useSelector } from "react-redux";
 import useTrustedDevices from "../hooks/useTrustedDevices.hook";
-import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
+import LocalizedDateText from "../../../components/LocalizedDateText";
 
 const { Text, Title } = Typography;
 
@@ -39,7 +39,7 @@ const deviceLabel = (type: string) => {
 
 const TrustedDevices = ({ searchTerm = "" }: { searchTerm?: string }) => {
     
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const auth = useSelector((state: any) => state.auth);
     const userId = auth.user?.id;
 
@@ -150,7 +150,9 @@ const TrustedDevices = ({ searchTerm = "" }: { searchTerm?: string }) => {
                                 <Text type="secondary" style={{ marginTop: 8 }}>
                                     {t("profile.trustedDevices.device.activatedSince") }
                                 </Text>
-                                <Text>{dayjs(device.activatedSince).format("DD/MM/YYYY, hh:mm a")}</Text>
+                                <Text>
+                                    <LocalizedDateText value={device.activatedSince} language={i18n.language} />
+                                </Text>
                             </Space>
 
                             <div style={{ flex: 1 }} />

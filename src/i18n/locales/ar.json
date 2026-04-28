@@ -164,7 +164,7 @@
     "search_placeholder": "بحث...",
     "delete_confirm_title": "هل أنت متأكد من رغبتك في الحذف؟",
     "delete_confirm_content": "هذا الإجراء لا يمكن التراجع عنه.",
-    "delete_verify_error": "يجب كتابة كلمة \"delete\" بشكل صحيح للمتابعة.",
+    "delete_verify_error": "يجب كتابة كلمة \"{{keyword}}\" بشكل صحيح للمتابعة.",
     "create_success": "تم إنشاء {{title}} بنجاح",
     "update_success": "تم تحديث {{title}} بنجاح",
     "delete_success": "تم حذف {{title}} بنجاح",
@@ -880,8 +880,8 @@
   "deleteModal": {
     "title": "التحقق الأمني",
     "confirmText": "لتأكيد الحذف، يرجى كتابة",
-    "keyword": "delete",
-    "placeholder": "اكتب \"delete\"",
+    "keyword": "حذف",
+    "placeholder": "اكتب \"{{keyword}}\"",
     "ok": "حذف",
     "cancel": "إلغاء"
   }

@@ -6,7 +6,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Form, Input, Select, Button, Upload, Tag, Dropdown, Space, Typography, message, Flex, Card, Steps, Badge, TreeSelect } from 'antd';
+import { Form, Input, Select, Button, Upload, Tag, Dropdown, Typography, message, Flex, Card, Steps, Badge, TreeSelect } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import RequiredTag from '../../../components/RequiredTag';
@@ -15,6 +15,7 @@ import { fetchAdmins, fetchGroups, fetchGroupUsers, useTicketDetails, useTicketM
 import { queryClient } from '../../../app/queryClient';
 import ReactQuill from 'react-quill-new';
 import i18next from 'i18next';
+import { getErrorMessage } from '../../../utils/error';
 
 
 const TicketForm: React.FC = () => {
@@ -81,7 +82,7 @@ const TicketForm: React.FC = () => {
         loadInitialGroups();
     }, [t]);
 
-    const onLoadData = ({ id, pId, title }: any) => {
+    const onLoadData = ({ id, pId }: any) => {
         // eslint-disable-next-line no-async-promise-executor
         return new Promise<void>(async (resolve) => {
             if (treeData.some(node => node.pId === id)) {
@@ -387,8 +388,8 @@ const TicketForm: React.FC = () => {
             }
             message.success(t('success.saved'));
             navigate(`/${role}/tickets`);
-        } catch (err) {
-            message.error(t('errors.submitFailed'));
+        } catch (err: any) {
+            message.error(getErrorMessage(err, t('errors.submitFailed')));
         }
     };
 
@@ -401,57 +402,6 @@ const TicketForm: React.FC = () => {
         }
         return null;
     }, [selectedProblemId, groupedData]);
-
-    const handleCustomReset = () => {
-        const currentTitle = form.getFieldValue('title');
-        const currentDescription = form.getFieldValue('description');
-
-        form.resetFields();
-
-        const restoredValues: any = {};
-
-        if (currentTitle) restoredValues.title = currentTitle;
-        if (currentDescription) restoredValues.description = currentDescription;
-
-        if (Object.keys(restoredValues).length > 0) {
-            form.setFieldsValue(restoredValues);
-        }
-
-        if (isEdit && ticketData?.attachments?.length) {
-            setFileList(
-                ticketData.attachments.map((file: any) => ({
-                    uid: file.id,
-                    name: file.fileName || file.name || 'Attachment',
-                    status: 'done',
-                    url: file.url,
-                }))
-            );
-        } else {
-            setFileList([]);
-        }
-    };
-    // const handleCustomReset = () => {
-    //     const currentTitle = form.getFieldValue('title');
-    //     const currentDescription = form.getFieldValue('description');
-
-    //     form.resetFields();
-
-    //     form.setFieldsValue({
-    //         title: currentTitle,
-    //         description: currentDescription,
-    //     });
-
-    //     if (isEdit && ticketData?.attachments) {
-    //         setFileList(ticketData.attachments.map((file: any) => ({
-    //             uid: file.id,
-    //             name: file.fileName || file.name || 'Attachment',
-    //             status: 'done',
-    //             url: file.url,
-    //         })));
-    //     } else {
-    //         setFileList([]);
-    //     }
-    // };
 
     const modules = {
         toolbar: [

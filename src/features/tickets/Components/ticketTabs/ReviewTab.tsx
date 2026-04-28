@@ -2,10 +2,10 @@
 import React from 'react';
 import { Avatar, Rate, Typography, Empty, Flex, Card, Divider, Spin, Space } from 'antd';
 import { CalendarOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import i18next from 'i18next';
 import DOMPurify from "dompurify";
+import LocalizedDateText from '../../../../components/LocalizedDateText';
 
 interface Props {
     reviews: any[];
@@ -64,9 +64,9 @@ const TicketReviewsTab: React.FC<Props> = ({ reviews, isLoading }) => {
                                 <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
                                     <Space size={6} style={{ color: 'rgba(0, 0, 0, 0.45)', fontSize: '12px' }}>
                                         <CalendarOutlined />
-                                        <span dir='ltr'>{dayjs(item.createdAt).format('DD-MM-YYYY')}</span>
+                                        <LocalizedDateText value={item.createdAt} language={i18next.language} mode="date" />
                                         <ClockCircleOutlined />
-                                        <span dir='ltr'>{dayjs(item.createdAt).format('h:mm A')}</span>
+                                        <LocalizedDateText value={item.createdAt} language={i18next.language} mode="time" />
                                     </Space>
                                 </Typography.Text>
                             </Flex>

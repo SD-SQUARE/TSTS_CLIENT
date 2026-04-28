@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Layout, Menu, Drawer} from 'antd';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Body from './layouts/Body';
 
 const { Sider, Content } = Layout;
 
 const MainLayout = ({ menuItems }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -36,7 +38,7 @@ const MainLayout = ({ menuItems }) => {
 
                 {/* Mobile Drawer */}
                 <Drawer
-                    title="Menu"
+                    title={t("NAVIGATION_TITLE")}
                     placement="left"
                     onClose={() => setMobileMenuOpen(false)}
                     open={mobileMenuOpen}

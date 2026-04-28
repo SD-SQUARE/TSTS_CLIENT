@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import api from '../../../api/http';
 import RequiredTag from '../../../components/RequiredTag';
+import { getErrorMessage } from '../../../utils/error';
 
 
 const { Paragraph } = Typography;
@@ -46,14 +47,14 @@ const StepOtp: React.FC<StepOtpProps> = ({ setStep, email, setOtp, setToken, uid
             return response.data; 
         },
         onSuccess: (data) => {
-            message.success( t('forgotPassword.otpVerified') || data.message);
+            message.success(data?.message || t('forgotPassword.otpVerified'));
             console.log(data)
             setOtp(data.otp);
             setToken(data.reset_token);
             setTimeout(() => setStep(2), 600);
         },
         onError: (error: any) => {
-            message.error(t('forgotPassword.otpInvalid') || error.response?.data?.message);
+            message.error(getErrorMessage(error, t('forgotPassword.otpInvalid')));
         },
     });
 
@@ -70,12 +71,12 @@ const StepOtp: React.FC<StepOtpProps> = ({ setStep, email, setOtp, setToken, uid
             return response.data;
         },
         onSuccess: (data) => {
-            message.success(t('forgotPassword.otpResend') || data?.message);
+            message.success(data?.message || t('forgotPassword.otpResend'));
             setUid(data.oid);
             setCountdown(30);
         },
         onError: (error: any) => {
-            message.error(t('forgotPassword.otpResendError') || error.response?.data?.message);
+            message.error(getErrorMessage(error, t('forgotPassword.otpResendError')));
         },
     });
 

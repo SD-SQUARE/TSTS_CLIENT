@@ -4,11 +4,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../../api/http';
 import { message } from 'antd';
 import { t } from 'i18next';
+import i18n from '../../../i18n';
 
 
   export const useTicketProblems = () => {
     return useQuery({
-        queryKey: ['ticketGroupedProblems'],
+        queryKey: ['ticketGroupedProblems', i18n.language],
         queryFn: async () => {
             const { data } = await api.get('/v1/lockups/ticket/problems/');
             return data;
@@ -18,20 +19,20 @@ import { t } from 'i18next';
   
   export const useSpecializations = () =>
     useQuery({
-      queryKey: ['specializations'], queryFn: () =>
+      queryKey: ['specializations', i18n.language], queryFn: () =>
         api.get('v1/lockups/specializations/').then(res => res.data.specializations)
     });
 
 export const useTechnicians = () =>
   useQuery({
-    queryKey: ['technicians'], queryFn: () =>
+    queryKey: ['technicians', i18n.language], queryFn: () =>
           api.get('v1/lockups/technicians/').then(res => res.data.users)
   });
 
 
 export const useAdmins = () =>
   useQuery({
-    queryKey: ['admins'], queryFn: () =>
+    queryKey: ['admins', i18n.language], queryFn: () =>
       api.get('v1/lockups/admins').then(res => res.data.users)
   });
 

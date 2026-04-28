@@ -33,6 +33,7 @@ import {
   useUploadTicketFinalReportMedia,
 } from '../../Hooks/useTicketFinalReport';
 import type { FinalReportAttachment } from '../../Types/finalReport';
+import { getErrorMessage } from '../../../../utils/error';
 
 const isImageFile = (mime?: string | null) => Boolean(mime?.startsWith('image/'));
 const isVideoFile = (mime?: string | null) => Boolean(mime?.startsWith('video/'));
@@ -174,7 +175,7 @@ const TicketFinalReportTab: React.FC = () => {
       });
       message.success(t('tickets.finalReport.messages.saved'));
     } catch (error: any) {
-      message.error(error?.response?.data?.message || t('errors.submitFailed'));
+      message.error(getErrorMessage(error, t('errors.submitFailed')));
     }
   };
 
@@ -186,7 +187,7 @@ const TicketFinalReportTab: React.FC = () => {
       await uploadMutation.mutateAsync(formData);
       message.success(t('tickets.finalReport.messages.uploaded'));
     } catch (error: any) {
-      message.error(error?.response?.data?.message || t('errors.uploadFailed'));
+      message.error(getErrorMessage(error, t('errors.uploadFailed')));
     }
   };
 
@@ -200,6 +201,20 @@ const TicketFinalReportTab: React.FC = () => {
 
   return (
     <Flex vertical gap={16} style={{ padding: 8 }}>
+      <style>{`
+        .final-report-editor .ql-editor {
+          min-height: 220px;
+          unicode-bidi: plaintext;
+        }
+        .final-report-editor--ltr .ql-editor {
+          direction: ltr;
+          text-align: left;
+        }
+        .final-report-editor--rtl .ql-editor {
+          direction: rtl;
+          text-align: right;
+        }
+      `}</style>
       <Card style={{ borderRadius: 18 }}>
         <Flex justify="space-between" align="center" wrap="wrap" gap={12}>
           <div>
@@ -249,17 +264,19 @@ const TicketFinalReportTab: React.FC = () => {
               onChange={(event) => setTitleEn(event.target.value)}
               placeholder={t('tickets.finalReport.fields.titleEn')}
               dir="ltr"
+              style={{ textAlign: 'left' }}
             />
             <div>
               <Typography.Text type="secondary">
                 {t('tickets.finalReport.fields.contentEn')}
               </Typography.Text>
               <ReactQuill
+                className="final-report-editor final-report-editor--ltr"
                 theme="snow"
                 modules={editorModules}
                 value={contentEn}
                 onChange={setContentEn}
-                style={{ marginTop: 8, direction: 'ltr' }}
+                style={{ marginTop: 8 }}
               />
             </div>
           </Space>
@@ -271,19 +288,20 @@ const TicketFinalReportTab: React.FC = () => {
               value={titleAr}
               onChange={(event) => setTitleAr(event.target.value)}
               placeholder={t('tickets.finalReport.fields.titleAr')}
-              dir="rtl"
-              style={{ textAlign: 'right' }}
+              dir="auto"
+              style={{ textAlign: 'start' }}
             />
             <div>
               <Typography.Text type="secondary">
                 {t('tickets.finalReport.fields.contentAr')}
               </Typography.Text>
               <ReactQuill
+                className="final-report-editor final-report-editor--rtl"
                 theme="snow"
                 modules={editorModules}
                 value={contentAr}
                 onChange={setContentAr}
-                style={{ marginTop: 8, direction: 'rtl' }}
+                style={{ marginTop: 8 }}
               />
             </div>
           </Space>

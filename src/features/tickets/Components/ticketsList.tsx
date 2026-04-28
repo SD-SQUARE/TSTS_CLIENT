@@ -32,6 +32,7 @@ import ResizableTitle from './ticketListComponents/ResizableHeader';
 const TicketList: React.FC = () => {
     const { t, i18n } = useTranslation();
     const currentLanguage = i18n.language;
+    const isArabic = currentLanguage.startsWith('ar');
     const navigate = useNavigate();
     const { role } = useParams();
 
@@ -63,15 +64,33 @@ const TicketList: React.FC = () => {
 
     const antdLocale = currentLanguage === 'ar' ? arEG : enUS;
 
-    const localizedUserLabel = (item: any) =>
-        currentLanguage === 'ar'
-            ? item?.name_ar || item?.name_en || item?.name || item?.email || ''
-            : item?.name_en || item?.name_ar || item?.name || item?.email || '';
+    const localizedUserLabel = (item: any) => {
+        const nestedName = typeof item?.name === 'object'
+            ? (isArabic ? item.name?.ar : item.name?.en)
+            : undefined;
 
-    const localizedLookupLabel = (item: any) =>
-        currentLanguage === 'ar'
-            ? item?.name_ar || item?.name_en || item?.name || ''
-            : item?.name_en || item?.name_ar || item?.name || '';
+        return (
+            (isArabic
+                ? item?.name_ar || item?.name_en || nestedName
+                : item?.name_en || item?.name_ar || nestedName) ||
+            (typeof item?.name === 'string' ? item.name : item?.email) ||
+            ''
+        );
+    };
+
+    const localizedLookupLabel = (item: any) => {
+        const nestedName = typeof item?.name === 'object'
+            ? (isArabic ? item.name?.ar : item.name?.en)
+            : undefined;
+
+        return (
+            (isArabic
+                ? item?.name_ar || item?.name_en || nestedName
+                : item?.name_en || item?.name_ar || nestedName) ||
+            (typeof item?.name === 'string' ? item.name : '') ||
+            ''
+        );
+    };
 
     // ─── Row highlighting ────────────────────────────────────────────────────
     const {
@@ -85,19 +104,19 @@ const TicketList: React.FC = () => {
         () =>
             hierarchicalProblems?.specializations?.map((spec: any) => ({
                 title: (
-                    <Tooltip title={spec.name} mouseEnterDelay={0.1} placement="top">
+                    <Tooltip title={localizedLookupLabel(spec)} mouseEnterDelay={0.1} placement="top">
                         <span
-                            title={spec.name}
+                            title={localizedLookupLabel(spec)}
                             style={{
                                 display: 'block', width: '100%',
                                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                             }}
                         >
-                            {spec.name}
+                            {localizedLookupLabel(spec)}
                         </span>
                     </Tooltip>
                 ),
-                label: spec.name,
+                label: localizedLookupLabel(spec),
                 value: `spec-${spec.id}`,
                 key: spec.id,
                 selectable: false,
@@ -105,19 +124,19 @@ const TicketList: React.FC = () => {
                     spec.problems?.length > 0
                         ? spec.problems.map((prob: any) => ({
                               title: (
-                                  <Tooltip title={prob.name} mouseEnterDelay={0.1} placement="top">
+                                  <Tooltip title={localizedLookupLabel(prob)} mouseEnterDelay={0.1} placement="top">
                                       <span
-                                          title={prob.name}
+                                          title={localizedLookupLabel(prob)}
                                           style={{
                                               display: 'block', width: '100%',
                                               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                                           }}
                                       >
-                                          {prob.name}
+                                          {localizedLookupLabel(prob)}
                                       </span>
                                   </Tooltip>
                               ),
-                              label: prob.name,
+                              label: localizedLookupLabel(prob),
                               value: prob.id,
                               key: prob.id,
                               isLeaf: true,

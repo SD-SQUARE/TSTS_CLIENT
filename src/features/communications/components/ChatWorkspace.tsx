@@ -34,7 +34,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useQueryClient } from '@tanstack/react-query';
-import dayjs from 'dayjs';
 import {
   communicationKeys,
   useChatInbox,
@@ -53,6 +52,8 @@ import type {
   GroupLookupItem,
   UserLookupItem,
 } from '../types';
+import LocalizedDateText from '../../../components/LocalizedDateText';
+import { stripHtml } from '../../../utils/html';
 
 type SelectedConversation = {
   type: ConversationType;
@@ -187,7 +188,7 @@ const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ mode = 'page' }) => {
         return true;
       }
 
-      return [item.name, item.name_en, item.name_ar, item.lastMessage]
+      return [item.name, item.name_en, item.name_ar, stripHtml(item.lastMessage)]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(normalizedSearch));
     });
@@ -421,7 +422,7 @@ const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ mode = 'page' }) => {
                           {item.unreadCount > 0
                             ? ''
                             : item.lastMessageAt
-                              ? dayjs(item.lastMessageAt).format('hh:mm A')
+                              ? <LocalizedDateText value={item.lastMessageAt} language={i18n.language} mode="time" />
                               : ''}
                         </Typography.Text>
                       </Badge>
@@ -433,7 +434,7 @@ const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ mode = 'page' }) => {
                         color: item.unreadCount > 0 ? '#475569' : '#94a3b8',
                       }}
                     >
-                      {item.lastMessage || t('messagesCenter.noMessages')}
+                      {stripHtml(item.lastMessage) || t('messagesCenter.noMessages')}
                     </Typography.Paragraph>
                   </Flex>
                 </Flex>
@@ -601,7 +602,7 @@ const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ mode = 'page' }) => {
 
                   <Flex justify="flex-end" style={{ marginTop: 12 }}>
                     <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                      {dayjs(messageItem.createdAt).format('hh:mm A')}
+                      <LocalizedDateText value={messageItem.createdAt} language={i18n.language} mode="time" />
                     </Typography.Text>
                   </Flex>
                 </div>

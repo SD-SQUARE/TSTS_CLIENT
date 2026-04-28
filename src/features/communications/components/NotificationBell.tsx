@@ -14,7 +14,6 @@ import { BellOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import dayjs from 'dayjs';
 import {
   useMarkAllNotificationsAsRead,
   useMarkNotificationAsRead,
@@ -23,6 +22,8 @@ import {
 } from '../hooks/useCommunicationApi';
 import type { NotificationItem } from '../types';
 import { CHAT_DRAWER_OPEN_EVENT } from '../events';
+import LocalizedDateText from '../../../components/LocalizedDateText';
+import { stripHtml } from '../../../utils/html';
 
 type NotificationFilter = 'all' | 'unread';
 
@@ -189,13 +190,16 @@ const NotificationBell: React.FC = () => {
 
                     {item.notification.content && (
                       <Typography.Text type="secondary">
-                        {item.notification.content}
+                        {stripHtml(item.notification.content)}
                       </Typography.Text>
                     )}
 
                     <Flex justify="space-between" align="center" gap={12}>
                       <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                        {dayjs(item.notification.createdAt).format('YYYY-MM-DD hh:mm A')}
+                        <LocalizedDateText
+                          value={item.notification.createdAt}
+                          language={i18n.language}
+                        />
                       </Typography.Text>
                       <Typography.Text type="secondary" style={{ fontSize: 12 }}>
                         {t(`notifications.types.${item.notification.type}`)}

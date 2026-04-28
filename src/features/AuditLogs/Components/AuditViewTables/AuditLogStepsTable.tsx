@@ -3,8 +3,9 @@ import React from 'react';
 import { Card, Flex, Popover, Table, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { CalendarOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
 import EllipsisComponent from '../../../../components/EllipsisComponent';
+import i18next from 'i18next';
+import LocalizedDateText from '../../../../components/LocalizedDateText';
 
 interface AuditLogStepsTableProps {
     steps: any[];
@@ -38,14 +39,14 @@ const AuditLogStepsTable: React.FC<AuditLogStepsTableProps> = ({ steps }) => {
                 <Flex align="center" gap="middle"> 
                     <Flex align="center" gap="small">
                         <Typography.Text type="secondary">
-                            {dayjs(time).format('hh:mm A')}
+                            <LocalizedDateText value={time} language={i18next.language} mode="time" />
                         </Typography.Text>
                         <ClockCircleOutlined style={{ color: '#bfbfbf', fontSize: '12px' }} />
                     </Flex>
         
                     <Flex align="center" gap="small">
                         <Typography.Text type="secondary">
-                            {dayjs(time).format('DD-MM-YYYY')}
+                            <LocalizedDateText value={time} language={i18next.language} mode="date" />
                         </Typography.Text>
                         <CalendarOutlined style={{ color: '#bfbfbf', fontSize: '12px' }} />
                     </Flex>

@@ -29,7 +29,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ReactQuill from 'react-quill-new';
 import DOMPurify from 'dompurify';
-import dayjs from 'dayjs';
 import 'react-quill-new/dist/quill.snow.css';
 import {
   useGenerateKnowledgeDraft,
@@ -41,6 +40,8 @@ import {
 import type { FinalReportKnowledgeDraft } from '../../tickets/Types/finalReport';
 import KnowledgeAttachmentGallery from './KnowledgeAttachmentGallery';
 import { useUsersLookup } from '../../communications/hooks/useCommunicationApi';
+import LocalizedDateText from '../../../components/LocalizedDateText';
+import { getErrorMessage } from '../../../utils/error';
 
 const { RangePicker } = DatePicker;
 
@@ -137,8 +138,7 @@ const KnowledgeGeneratorDetailPage: React.FC = () => {
     title: draft.title_en || draft.title_ar || report?.title_en || report?.title_ar || '-',
     description:
       draft.description_en || draft.description_ar || report?.ticketTitle || '-',
-    specialization:
-      draft.specialization_en || draft.specialization_ar || t('knowledge.fields.category_en'),
+    specialization: draft.specialization_en || t('knowledge.fields.category_en'),
     content: draft.content_en || report?.content_en || '',
   };
 
@@ -146,8 +146,7 @@ const KnowledgeGeneratorDetailPage: React.FC = () => {
     title: draft.title_ar || draft.title_en || report?.title_ar || report?.title_en || '-',
     description:
       draft.description_ar || draft.description_en || report?.ticketTitle || '-',
-    specialization:
-      draft.specialization_ar || draft.specialization_en || t('knowledge.fields.category_ar'),
+    specialization: draft.specialization_ar || t('knowledge.fields.category_ar'),
     content: draft.content_ar || report?.content_ar || '',
   };
 
@@ -164,7 +163,7 @@ const KnowledgeGeneratorDetailPage: React.FC = () => {
       message.success(t('tickets.finalReport.messages.saved'));
     } catch (error: any) {
       if (!error?.errorFields) {
-        message.error(error?.response?.data?.message || t('errors.submitFailed'));
+        message.error(getErrorMessage(error, t('errors.submitFailed')));
       }
     }
   };
@@ -175,7 +174,7 @@ const KnowledgeGeneratorDetailPage: React.FC = () => {
       form.setFieldsValue(response.knowledgeDraft);
       message.success(t('knowledge.generator.messages.generated'));
     } catch (error: any) {
-      message.error(error?.response?.data?.message || t('errors.submitFailed'));
+      message.error(getErrorMessage(error, t('errors.submitFailed')));
     }
   };
 
@@ -186,7 +185,7 @@ const KnowledgeGeneratorDetailPage: React.FC = () => {
       message.success(t('knowledge.generator.messages.published'));
       navigate(`/knowledge-base?article=${response.knowledgeItemId}`);
     } catch (error: any) {
-      message.error(error?.response?.data?.message || t('errors.submitFailed'));
+      message.error(getErrorMessage(error, t('errors.submitFailed')));
     }
   };
 
@@ -218,10 +217,10 @@ const KnowledgeGeneratorDetailPage: React.FC = () => {
               <Tag>{report.author?.name || '-'}</Tag>
             </Space>
 
-            <Typography.Title level={3} style={{ margin: 0, color: '#fff' }}>
+            <Typography.Title level={3} style={{ margin: 0, color: '#fff', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
               {localizedTitle || t('knowledge.generator.detailTitle')}
             </Typography.Title>
-            <Typography.Text style={{ color: 'rgba(255,255,255,0.82)' }}>
+            <Typography.Text style={{ color: 'rgba(255,255,255,0.82)', overflowWrap: 'anywhere' }}>
               {report.ticketTitle || t('knowledge.generator.previewHint')}
             </Typography.Text>
           </div>
@@ -386,9 +385,9 @@ const KnowledgeGeneratorDetailPage: React.FC = () => {
                           title: t('audit.createdAt'),
                           key: 'createdAt',
                           render: (_, record) =>
-                            record.createdAt
-                              ? dayjs(record.createdAt).format('YYYY-MM-DD hh:mm A')
-                              : '-',
+                            record.createdAt ? (
+                              <LocalizedDateText value={record.createdAt} language={i18n.language} />
+                            ) : '-',
                         },
                       ]}
                     />
@@ -422,7 +421,9 @@ const KnowledgeGeneratorDetailPage: React.FC = () => {
 
                 <Space wrap size={[8, 8]}>
                   <Tag color="blue">{report.author?.name || '-'}</Tag>
-                  <Tag>{report.updatedAt ? dayjs(report.updatedAt).format('YYYY-MM-DD hh:mm A') : '-'}</Tag>
+                  <Tag>
+                    <LocalizedDateText value={report.updatedAt} language={i18n.language} />
+                  </Tag>
                   {report.attachments.length > 0 && <Tag>{`${report.attachments.length} ${t('tickets.finalReport.attachments')}`}</Tag>}
                 </Space>
               </Flex>
@@ -442,15 +443,16 @@ const KnowledgeGeneratorDetailPage: React.FC = () => {
                     <Typography.Text type="secondary">
                       {t('knowledge.languages.english')}
                     </Typography.Text>
-                    <Typography.Title level={3} style={{ marginTop: 8, marginBottom: 8 }}>
+                    <Typography.Title level={3} style={{ marginTop: 8, marginBottom: 8, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                       {englishPreview.title}
                     </Typography.Title>
-                    <Typography.Paragraph type="secondary">
+                    <Typography.Paragraph type="secondary" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                       {englishPreview.description}
                     </Typography.Paragraph>
                   </div>
 
                   <div
+                    style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}
                     dangerouslySetInnerHTML={{
                       __html: DOMPurify.sanitize(englishPreview.content || ''),
                     }}
@@ -465,16 +467,16 @@ const KnowledgeGeneratorDetailPage: React.FC = () => {
                     <Typography.Text type="secondary">
                       {t('knowledge.languages.arabic')}
                     </Typography.Text>
-                    <Typography.Title level={3} style={{ marginTop: 8, marginBottom: 8 }}>
+                    <Typography.Title level={3} style={{ marginTop: 8, marginBottom: 8, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                       {arabicPreview.title}
                     </Typography.Title>
-                    <Typography.Paragraph type="secondary">
+                    <Typography.Paragraph type="secondary" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                       {arabicPreview.description}
                     </Typography.Paragraph>
                   </div>
 
                   <div
-                    style={{ textAlign: 'right' }}
+                    style={{ textAlign: 'right', overflowWrap: 'anywhere', wordBreak: 'break-word' }}
                     dangerouslySetInnerHTML={{
                       __html: DOMPurify.sanitize(arabicPreview.content || ''),
                     }}

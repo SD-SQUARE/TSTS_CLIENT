@@ -10,6 +10,28 @@ export type FieldMapper<T> = {
 export function mapRecordToFormValues<T>(record: T, mappers: FieldMapper<T>): Record<string, any> {
     const mapped: Record<string, any> = { ...record };
 
+    const localizedFields = [
+        { key: "name", en: "name_en", ar: "name_ar" },
+        { key: "description", en: "description_en", ar: "description_ar" },
+        { key: "title", en: "title_en", ar: "title_ar" },
+        { key: "content", en: "content_en", ar: "content_ar" },
+    ];
+
+    localizedFields.forEach(({ key, en, ar }) => {
+        const source = mapped[key];
+        if (!source || typeof source !== "object" || Array.isArray(source)) {
+            return;
+        }
+
+        if (mapped[en] === undefined) {
+            mapped[en] = source.en ?? "";
+        }
+
+        if (mapped[ar] === undefined) {
+            mapped[ar] = source.ar ?? "";
+        }
+    });
+
     for (const [field, mapperFn] of Object.entries(mappers)) {
         mapped[field] = mapperFn(record);
     }

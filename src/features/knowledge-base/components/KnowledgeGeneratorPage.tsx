@@ -21,9 +21,9 @@ import {
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import dayjs from 'dayjs';
 import { useKnowledgeGeneratorReports } from '../../tickets/Hooks/useTicketFinalReport';
 import { useUsersLookup } from '../../communications/hooks/useCommunicationApi';
+import LocalizedDateText from '../../../components/LocalizedDateText';
 
 const { RangePicker } = DatePicker;
 
@@ -250,10 +250,18 @@ const KnowledgeGeneratorPage: React.FC = () => {
             {
               title: t('knowledge.generator.columns.title'),
               key: 'title',
-              render: (_, record) =>
-                (i18n.language === 'ar'
-                  ? record.title_ar || record.title_en
-                  : record.title_en || record.title_ar) || '-',
+              render: (_, record) => {
+                const title =
+                  (i18n.language === 'ar'
+                    ? record.title_ar || record.title_en
+                    : record.title_en || record.title_ar) || '-';
+
+                return (
+                  <Typography.Text ellipsis={{ tooltip: title }} style={{ maxWidth: 320 }}>
+                    {title}
+                  </Typography.Text>
+                );
+              },
             },
             {
               title: t('knowledge.generator.columns.author'),
@@ -277,7 +285,9 @@ const KnowledgeGeneratorPage: React.FC = () => {
               key: 'updatedAt',
               width: 180,
               render: (_, record) =>
-                record.updatedAt ? dayjs(record.updatedAt).format('YYYY-MM-DD hh:mm A') : '-',
+                record.updatedAt ? (
+                  <LocalizedDateText value={record.updatedAt} language={i18n.language} />
+                ) : '-',
             },
             {
               title: t('translation.view'),

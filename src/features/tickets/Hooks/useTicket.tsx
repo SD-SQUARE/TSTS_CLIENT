@@ -3,9 +3,22 @@ import type { Ticket, TicketsResponse } from '../Types/tickets';
 import api from '../../../api/http';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import i18n from '../../../i18n';
 
 export type TicketSearchValue = string | string[];
 export type TicketSearchQuery = Record<string, TicketSearchValue>;
+
+const extractLookupArray = (payload: any, key: string) => {
+    if (Array.isArray(payload)) {
+        return payload;
+    }
+
+    if (Array.isArray(payload?.[key])) {
+        return payload[key];
+    }
+
+    return [];
+};
 
 const fetchTickets = async (page: number, pageSize: number, searchQuery: TicketSearchQuery): Promise<{ data: Ticket[], total: number }> => {
 
@@ -158,10 +171,10 @@ export interface TicketFilterLookupItem {
 
 export const useRequestersLookup = (enabled = true) =>
     useQuery({
-        queryKey: ['lookup', 'requesters'],
+        queryKey: ['lookup', 'requesters', i18n.language],
         queryFn: async () => {
             const { data } = await api.get('/v1/lockups/requesters');
-            return (data.users || []).map((user: any) => ({
+            return extractLookupArray(data, 'users').map((user: any) => ({
                 id: user.id,
                 name: user.name_en || user.name_ar || user.email || '',
                 name_en: user.name_en,
@@ -175,30 +188,30 @@ export const useRequestersLookup = (enabled = true) =>
 
 export const useTicketUniversitiesLookup = () =>
     useQuery({
-        queryKey: ['lookup', 'ticket-universities'],
+        queryKey: ['lookup', 'ticket-universities', i18n.language],
         queryFn: async () => {
             const { data } = await api.get('/v1/lockups/universities');
-            return data.universities || [];
+            return extractLookupArray(data, 'universities');
         },
         staleTime: 5 * 60 * 1000,
     });
 
 export const useTicketDomainsLookup = () =>
     useQuery({
-        queryKey: ['lookup', 'ticket-domains'],
+        queryKey: ['lookup', 'ticket-domains', i18n.language],
         queryFn: async () => {
             const { data } = await api.get('/v1/lockups/domains');
-            return data.domains || [];
+            return extractLookupArray(data, 'domains');
         },
         staleTime: 5 * 60 * 1000,
     });
 
 export const useTicketDepartmentsLookup = () =>
     useQuery({
-        queryKey: ['lookup', 'ticket-departments'],
+        queryKey: ['lookup', 'ticket-departments', i18n.language],
         queryFn: async () => {
             const { data } = await api.get('/v1/lockups/departments');
-            return data.departments || [];
+            return extractLookupArray(data, 'departments');
         },
         staleTime: 5 * 60 * 1000,
     });

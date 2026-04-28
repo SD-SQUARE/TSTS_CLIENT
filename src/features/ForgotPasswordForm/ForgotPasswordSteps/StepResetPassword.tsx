@@ -7,6 +7,7 @@ import api from '../../../api/http';
 import RequiredTag from '../../../components/RequiredTag';
 import { useNavigate } from 'react-router-dom';
 import { APP_BASE_PATH } from '../../../app/config';
+import { getErrorMessage } from '../../../utils/error';
 
 
 interface StepResetPasswordProps {
@@ -32,12 +33,12 @@ const StepResetPassword: React.FC<StepResetPasswordProps> = ({ setStep, email, t
             return response.data;
         },
         onSuccess: (data) => {
-            message.success( t('forgotPassword.resetSuccess') || data.message);
+            message.success(data?.message || t('forgotPassword.resetSuccess'));
             navigate(`${APP_BASE_PATH}/auth/login`)
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
-            message.error( t('forgotPassword.resetFailed') || error.response?.data?.message);
+            message.error(getErrorMessage(error, t('forgotPassword.resetFailed')));
         },
     });
 
@@ -83,7 +84,7 @@ const StepResetPassword: React.FC<StepResetPasswordProps> = ({ setStep, email, t
                     },
                 ]}
             >
-                <Input.Password prefix={<LockOutlined />} />
+                <Input.Password prefix={<LockOutlined />} dir="ltr" />
             </Form.Item>
 
 
@@ -102,7 +103,7 @@ const StepResetPassword: React.FC<StepResetPasswordProps> = ({ setStep, email, t
                     }),
                 ]}
             >
-                <Input.Password prefix={<LockOutlined />} />
+                <Input.Password prefix={<LockOutlined />} dir="ltr" />
             </Form.Item>
 
             <Space direction="vertical" style={{ width: '100%' }}>

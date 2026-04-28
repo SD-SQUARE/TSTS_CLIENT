@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import api from '../../../api/http';
 import RequiredTag from '../../../components/RequiredTag';
+import { getErrorMessage } from '../../../utils/error';
 
 
 interface StepEmailProps {
@@ -24,13 +25,13 @@ const StepEmail: React.FC<StepEmailProps> = ({ setStep, setEmail, setUid }) => {
             return response.data; 
         },
         onSuccess: (data) => {
-            message.success( t('forgotPassword.otpSent') || data.message);
+            message.success(data?.message || t('forgotPassword.otpSent'));
             setUid(data.oid); 
             setStep(1);
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
-            message.error( t('forgotPassword.sendOtpError') || error.response?.data?.message);
+            message.error(getErrorMessage(error, t('forgotPassword.sendOtpError')));
         },
     });
 
@@ -51,7 +52,7 @@ const StepEmail: React.FC<StepEmailProps> = ({ setStep, setEmail, setUid }) => {
                     { type: 'email', message: t('forgotPassword.invalidEmailError') },
                 ]}
             >
-                <Input prefix={<MailOutlined />} placeholder="example@email.com" />
+                <Input prefix={<MailOutlined />} placeholder="example@email.com" dir="ltr" />
             </Form.Item>
 
             <Button type="primary" onClick={handleSendOtp} loading={sendOtpMutation.isPending} block>

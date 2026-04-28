@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Form, Input, Button, Typography, Alert, Image, Space, Avatar } from "antd";
+import { Form, Input, Button, Typography, Alert, Space, Avatar } from "antd";
 import { loginSchema } from "../schema/LoginSchema";
 import loginImage from "../../../assets/HU-bg-clear.png";
 import { APP_BASE_PATH } from "../../../app/config";
@@ -14,6 +14,7 @@ import { getJWTPayload } from "../../../utils/jwt_payload.utils";
 import { useLoginV2 } from "../hooks/useLoginV2";
 import { useTrustedDeviceAuth } from "../hooks/useTrustedDeviceAuth";
 import { useCookies } from 'react-cookie';
+import { getErrorMessage } from "../../../utils/error";
 const { Title,Text } = Typography;
 
 const LoginFormV2 = () => {
@@ -110,7 +111,7 @@ const LoginFormV2 = () => {
             }
 
         } catch (err: any) {
-            setError(err.response?.data?.message || t("Login_Failed"));
+            setError(getErrorMessage(err, t("Login_Failed")));
         } finally {
             setIsLoading(false);
         }
@@ -191,6 +192,7 @@ const LoginFormV2 = () => {
                             <Input
                                 placeholder="example@mail.com"
                                 className="login-input"
+                                dir="ltr"
                             />
                         </Form.Item>
 
@@ -212,6 +214,7 @@ const LoginFormV2 = () => {
                             <Input.Password
                                 placeholder="********"
                                 className="login-input"
+                                dir="ltr"
                             />
                         </Form.Item>
 

@@ -13,8 +13,8 @@ import {
     Typography,
 } from "antd";
 import { useTranslation } from "react-i18next";
-import dayjs from "dayjs";
 import { useSystemInfo } from "../hooks/useSystemInfo.hook";
+import LocalizedDateText from "../../../components/LocalizedDateText";
 
 const formatBytes = (bytes: number) => {
     if (!bytes) return "0 B";
@@ -36,7 +36,7 @@ const formatDuration = (seconds: number) => {
 };
 
 const SystemInfoTab = ({ searchTerm = "" }: { searchTerm?: string }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { data, isLoading } = useSystemInfo();
 
     const normalizedSearch = searchTerm.trim().toLowerCase();
@@ -223,7 +223,11 @@ const SystemInfoTab = ({ searchTerm = "" }: { searchTerm?: string }) => {
                     </Typography.Text>
                     <Tag color="blue-inverse" style={{ width: "fit-content", marginTop: 8 }}>
                         {t("profile.settings.systemInfo.lastUpdated")}{" "}
-                        {dayjs(data.generatedAt).format("YYYY-MM-DD hh:mm:ss A")}
+                        <LocalizedDateText
+                            value={data.generatedAt}
+                            language={i18n.language}
+                            options={{ year: "numeric", month: "2-digit", day: "2-digit", hour: "numeric", minute: "2-digit", second: "2-digit", hour12: true }}
+                        />
                     </Tag>
                 </Space>
             </Card>

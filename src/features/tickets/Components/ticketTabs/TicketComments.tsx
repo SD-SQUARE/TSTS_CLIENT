@@ -37,7 +37,6 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
-import dayjs from 'dayjs';
 import {
   useCreateQuickMessageMutation,
   useGetChatMessagesQuery,
@@ -55,6 +54,8 @@ import { knowledgeBaseApi } from '../../../knowledge-base/services/knowledgeBase
 import type { KnowledgeBaseItem } from '../../../knowledge-base/types/knowledge-types';
 import { APP_BASE_PATH } from '../../../../app/config';
 import type { QuickMessage } from '../../store/services/chatApi';
+import LocalizedDateText from '../../../../components/LocalizedDateText';
+import { getErrorMessage } from '../../../../utils/error';
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -374,6 +375,7 @@ const TicketComments: React.FC<{ assigneeName?: string; requesterId?: string }> 
       refetch();
     } catch (error) {
       console.error(error);
+      appMessage.error(getErrorMessage(error, t('errors.submitFailed')));
       setOptimisticMessages((prev) => prev.filter((item) => item.id !== tempId));
     }
   };
@@ -399,7 +401,7 @@ const TicketComments: React.FC<{ assigneeName?: string; requesterId?: string }> 
       }
     } catch (error) {
       console.error(error);
-      appMessage.error(t('errors.uploadFailed'));
+      appMessage.error(getErrorMessage(error, t('errors.uploadFailed')));
     }
   };
 
@@ -430,7 +432,7 @@ const TicketComments: React.FC<{ assigneeName?: string; requesterId?: string }> 
       setQuickMessageModalOpen(false);
     } catch (error) {
       console.error(error);
-      appMessage.error(t('errors.submitFailed'));
+      appMessage.error(getErrorMessage(error, t('errors.submitFailed')));
     }
   };
 
@@ -898,13 +900,11 @@ const TicketComments: React.FC<{ assigneeName?: string; requesterId?: string }> 
                             )}
                           </Flex>
 
-                          <Flex align="center" gap="small">
-                            <span dir="ltr">
+                            <Flex align="center" gap="small">
                               <Typography.Text type="secondary" style={{ fontSize: '11px', whiteSpace: 'nowrap' }}>
                                 <ClockCircleOutlined style={{ marginRight: 4 }} />
-                                {dayjs(item.createdAt).format('MMM DD, YYYY - h:mm A')}
+                                <LocalizedDateText value={item.createdAt} language={i18next.language} />
                               </Typography.Text>
-                            </span>
                             <div style={{ marginLeft: '8px', color: '#bfbfbf', fontSize: '12px' }}>
                               <span className="ant-collapse-arrow">
                                 <svg viewBox="64 64 896 896" focusable="false" width="1em" height="1em" fill="currentColor" style={{ transform: 'rotate(90deg)' }}>

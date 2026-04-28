@@ -2,11 +2,11 @@
 import React from 'react';
 import { Avatar, Flex, Select, Space, Tag, Typography } from 'antd';
 import { CalendarOutlined, ClockCircleOutlined, SearchOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../../../../i18n';
 import AppTable from '../../../../../components/AppTable';
 import { useActionsLookup, useTicketActivityUsersLookup } from '../../../Hooks/useTicket';
+import LocalizedDateText from '../../../../../components/LocalizedDateText';
 
 interface Props {
     ticketId?: string;
@@ -246,14 +246,14 @@ const TicketHistoryTable: React.FC<Props> = ({ ticketId, activities, getIcon, ge
             key: 'createdAt',
             width: 160,
             render: (date: string) => (
-                <Flex vertical gap={4} dir="ltr" style={{ alignItems: 'flex-start' }}> 
+                <Flex vertical gap={4} style={{ alignItems: 'flex-start' }}> 
                     <Space size={6} style={{ color: 'rgba(0, 0, 0, 0.45)', fontSize: '12px' }}>
                         <ClockCircleOutlined />
-                        <span dir='ltr'>{dayjs(date).format('h:mm A')}</span>
+                        <LocalizedDateText value={date} language={i18n.language} mode="time" />
                     </Space>
                     <Space size={6} style={{ color: 'rgba(0, 0, 0, 0.45)', fontSize: '12px' }}>
                         <CalendarOutlined />
-                        <span dir='ltr'>{dayjs(date).format('DD-MM-YYYY')}</span>
+                        <LocalizedDateText value={date} language={i18n.language} mode="date" />
                     </Space>
                 </Flex>
             ),

@@ -2,8 +2,8 @@ import React from 'react';
 import { Card, Descriptions, Flex, Tag, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { CalendarOutlined, ClockCircleOutlined, RightOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
 import i18next from 'i18next';
+import LocalizedDateText from '../../../../components/LocalizedDateText';
 
 interface AuditLogDetailsProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -62,15 +62,18 @@ const getMetadataChangeValues = (meta: any) => {
 const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({ data }) => {
     const { t } = useTranslation();
     const { oldValue, newValue } = getMetadataChangeValues(data?.metadata);
+    const actorName = [
+        data?.actor?.full_name?.first?.[i18next.language] ?? data?.actor?.full_name?.first?.en ?? data?.actor?.full_name?.first,
+        data?.actor?.full_name?.mid?.[i18next.language] ?? data?.actor?.full_name?.mid?.en ?? data?.actor?.full_name?.mid,
+        data?.actor?.full_name?.last?.[i18next.language] ?? data?.actor?.full_name?.last?.en ?? data?.actor?.full_name?.last,
+    ]
+        .filter(Boolean)
+        .join(" ");
 
     return (
         <Card title={t('audit.details')}>
             <Descriptions bordered column={2}>
-                <Descriptions.Item label={t('audit.username')}>{
-                    data?.actor?.full_name.first[i18next.language] + " " +
-                    data?.actor?.full_name.mid[i18next.language] + " " +
-                    data?.actor?.full_name.last[i18next.language]
-                }</Descriptions.Item>
+                <Descriptions.Item label={t('audit.username')}>{actorName || '-'}</Descriptions.Item>
                 <Descriptions.Item label={t('audit.ip')}>{data?.actor?.ipAddress}</Descriptions.Item>
                 <Descriptions.Item label={t('audit.role')}>
                     <Tag color="blue">{data?.actor?.type}</Tag>
@@ -84,12 +87,12 @@ const AuditLogDetails: React.FC<AuditLogDetailsProps> = ({ data }) => {
                 <Descriptions.Item label={t('audit.createdAt')}>
                     <Flex align="center" gap="small">
                         <Typography.Text type="secondary">
-                            {dayjs(data?.createdAt).format('hh:mm A')}
+                            <LocalizedDateText value={data?.createdAt} language={i18next.language} mode="time" />
                         </Typography.Text>
                         <ClockCircleOutlined style={{ color: '#bfbfbf', fontSize: '12px' }} />
 
                         <Typography.Text type="secondary">
-                            {dayjs(data?.createdAt).format('DD-MM-YYYY')}
+                            <LocalizedDateText value={data?.createdAt} language={i18next.language} mode="date" />
                         </Typography.Text>
                         <CalendarOutlined style={{ color: '#bfbfbf', fontSize: '12px' }} />
                     </Flex>

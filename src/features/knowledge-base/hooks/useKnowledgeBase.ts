@@ -10,6 +10,7 @@ import type {
   KnowledgeBaseItem,
   UpdateKnowledgeBaseDto,
 } from '../types/knowledge-types';
+import { getErrorMessage } from '../../../utils/error';
 
 const mapItemToFormValues = (item: KnowledgeBaseItem): KnowledgeBaseFormValues => ({
   title_en: item.title_en ?? item.title ?? '',
@@ -155,7 +156,7 @@ export const useKnowledgeBase = () => {
       closeModal();
     } catch (error) {
       console.error(error);
-      message.error(t('errors.submitFailed'));
+      message.error(getErrorMessage(error, t('errors.submitFailed')));
     }
   };
 

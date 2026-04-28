@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import EllipsisComponent from '../../../components/EllipsisComponent';
 import AppTable from '../../../components/AppTable';
 import type { ColumnsType } from 'antd/es/table';
+import LocalizedDateText from '../../../components/LocalizedDateText';
 import {
     getServerSelectFilterProps,
     getServerTextFilterProps,
@@ -157,14 +158,14 @@ const AuditLogList: React.FC = () => {
                     <Flex align="center" gap="small" style={{ whiteSpace: 'nowrap' }}>
                         <ClockCircleOutlined style={{ color: '#bfbfbf', fontSize: '12px' }} />
                         <Typography.Text type="secondary">
-                            {dayjs(date).format('hh:mm A')}
+                            <LocalizedDateText value={date} language={i18n.language} mode="time" />
                         </Typography.Text>
                     </Flex>
 
                     <Flex align="center" gap="small" style={{ whiteSpace: 'nowrap' }}>
                         <CalendarOutlined style={{ color: '#bfbfbf', fontSize: '12px' }} />
                         <Typography.Text type="secondary">
-                            {dayjs(date).format('DD-MM-YYYY')}
+                            <LocalizedDateText value={date} language={i18n.language} mode="date" />
                         </Typography.Text>
                     </Flex>
                 </Flex>

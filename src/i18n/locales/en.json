@@ -59,7 +59,7 @@
     "search_placeholder": "Search...",
     "delete_confirm_title": "Are you sure you want to delete this?",
     "delete_confirm_content": "This action cannot be undone.",
-    "delete_verify_error": "You must type \"delete\" exactly to proceed.",
+    "delete_verify_error": "You must type \"{{keyword}}\" exactly to proceed.",
     "create_success": "{{title}} created successfully",
     "update_success": "{{title}} updated successfully",
     "delete_success": "{{title}} deleted successfully",
@@ -902,7 +902,7 @@
     "title": "Security Check",
     "confirmText": "To confirm deletion, please type",
     "keyword": "delete",
-    "placeholder": "Type \"delete\"",
+    "placeholder": "Type \"{{keyword}}\"",
     "ok": "Delete",
     "cancel": "Cancel"
   }

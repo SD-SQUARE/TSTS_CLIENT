@@ -1,9 +1,9 @@
 // LanguageSwitcher
-import { Avatar, Dropdown, Space } from "antd";
+import { Avatar, Button, Space } from "antd";
 import i18n from "../../../../i18n";
-import { useState } from "react";
-import egFlag from '../../../../assets/lang/eg-flag.svg';
-import ukFlag from '../../../../assets/lang/uk-flag.svg';
+import { useMemo, useState } from "react";
+import egFlag from "../../../../assets/lang/eg-flag.svg";
+import ukFlag from "../../../../assets/lang/uk-flag.svg";
 import { useQueryClient } from "@tanstack/react-query";
 
 const languages = {
@@ -11,46 +11,36 @@ const languages = {
     ar: { label: "العربية", flag: egFlag },
 };
 
-// single language dropdown item
-const items = Object.entries(languages).map(([key, val]) => ({
-    key,
-    label: (
-        <Space>
-            <Avatar shape="square"  size={"small"} src={val.flag} />
-            {val.label}
-        </Space>
-    ),
-}));
-
 const LanguageSwitcher = () => {
-
-    const [lang, setLang] = useState(i18n.language);
+    const [lang, setLang] = useState((i18n.language || "en").split("-")[0]);
     const queryClient = useQueryClient();
-    const onChange = (key) => {
-        i18n.changeLanguage(key);
-        setLang(key)
 
-        queryClient.invalidateQueries(); 
+    const currentLang = useMemo(() => (lang || "en").split("-")[0], [lang]);
+    const currentLangData = languages[currentLang] || languages.en;
+
+    const onChange = () => {
+        const nextLang = currentLang === "ar" ? "en" : "ar";
+        i18n.changeLanguage(nextLang);
+        setLang(nextLang);
+        queryClient.invalidateQueries();
     };
 
-
     return (
-        <Dropdown
-            menu={{
-                items,
-                onClick: ({ key }) => onChange(key),
+        <Button
+            type="text"
+            onClick={onChange}
+            style={{
+                height: "auto",
+                color: "white",
+                paddingInline: 10,
+                borderRadius: 999,
             }}
-            placement="bottom"
-            arrow
         >
-            <Space style={{ cursor: "pointer", userSelect: "none" }}>
-                {(() => {
-                    const currentLang = (lang || 'en').split('-')[0];
-                    const langData = languages[currentLang] || languages['en'];
-                    return <Avatar shape="square" src={langData.flag} />;
-                })()}
+            <Space style={{ userSelect: "none" }}>
+                <Avatar shape="square" size="small" src={currentLangData.flag} />
+                {/* <span>{currentLangData.label}</span> */}
             </Space>
-        </Dropdown>
+        </Button>
     );
 };
 

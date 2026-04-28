@@ -1,7 +1,8 @@
 import React from 'react';
 import { Timeline, Card, Typography, FloatButton, Flex, Space } from 'antd';
 import { ZoomInOutlined, ZoomOutOutlined, ReloadOutlined, CalendarOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
+import i18n from '../../../../../i18n';
+import LocalizedDateText from '../../../../../components/LocalizedDateText';
 
 interface Props {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,12 +32,12 @@ const TicketHistoryTimeline: React.FC<Props> = ({ activities, zoom, handlers, ge
                                     {item.title}
                                 </Typography.Text>
                                 <Typography.Paragraph type="secondary" style={{ fontSize: `${12 * zoom}px`, marginBottom: 8 * zoom }}>
-                                    <Flex vertical gap={4} dir="ltr" style={{ alignItems: 'flex-start' }}>
+                                    <Flex vertical gap={4} style={{ alignItems: 'flex-start' }}>
                                         <Space size={6} style={{ color: 'rgba(0, 0, 0, 0.45)', fontSize: '12px' }}>
                                             <CalendarOutlined />
-                                            <span dir='ltr'>{dayjs(item.date).format('DD-MM-YYYY')}</span>
+                                            <LocalizedDateText value={item.date} language={i18n.language} mode="date" />
                                             <ClockCircleOutlined />
-                                            <span dir='ltr'>{dayjs(item.date).format('h:mm A')}</span>
+                                            <LocalizedDateText value={item.date} language={i18n.language} mode="time" />
                                         </Space>
                                     </Flex>
                                 </Typography.Paragraph>

@@ -23,6 +23,7 @@ import type { ColumnsType } from "antd/es/table";
 import AppTable from "./AppTable";
 import { mapRecordToFormValues, type FieldMapper } from "../utils/mapper";
 import { useTranslation } from "react-i18next";
+import { getApiFieldErrors, getErrorMessage } from "../utils/error";
 
 const { Text } = Typography;
 
@@ -107,12 +108,14 @@ export const GenericCrudPage = <T extends { id: string | number }>({
   }, [freshItem]);
 
   const handleApiErrors = (error: any) => {
-    if (error.response?.data?.errors) {
-      error.response.data.errors.forEach((err: any) => {
+    const fieldErrors = getApiFieldErrors(error);
+
+    if (fieldErrors.length > 0) {
+      fieldErrors.forEach((err: any) => {
         form.setFields([{ name: err.key, errors: [err.message] }]);
       });
     } else {
-      message.error(error.message || t("SERVER_ERROR"));
+      message.error(getErrorMessage(error, t("SERVER_ERROR")));
     }
   };
 
@@ -142,7 +145,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
         message.success(t("crud.delete_success", { title }));
         setViewingItem(null);
       },
-      onError: () => message.error(t("crud.delete_failed")),
+      onError: (error: any) => message.error(getErrorMessage(error, t("crud.delete_failed"))),
     });
   };
 
@@ -152,8 +155,10 @@ export const GenericCrudPage = <T extends { id: string | number }>({
   };
 
   const verifyDeleteInput = () => {
-    if (deleteInput !== "delete") {
-      message.error(t("crud.delete_verify_error"));
+    const expectedKeyword = String(t("deleteModal.keyword")).trim().toLowerCase();
+
+    if (deleteInput.trim().toLowerCase() !== expectedKeyword) {
+      message.error(t("crud.delete_verify_error", { keyword: t("deleteModal.keyword") }));
       return;
     }
 
@@ -338,7 +343,7 @@ export const GenericCrudPage = <T extends { id: string | number }>({
 
             <Input
               style={{ marginTop: 15 }}
-              placeholder={t("deleteModal.placeholder")}
+              placeholder={t("deleteModal.placeholder", { keyword: t("deleteModal.keyword") })}
               value={deleteInput}
               onChange={(e) => setDeleteInput(e.target.value)}
               onPressEnter={verifyDeleteInput}

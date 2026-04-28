@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { communicationKeys } from '../hooks/useCommunicationApi';
 import { CHAT_DRAWER_OPEN_EVENT } from '../events';
 import notificationAudioSrc from '../../../assets/audio/notification.wav';
+import { stripHtml } from '../../../utils/html';
 
 const RealtimeBridge: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -50,7 +51,7 @@ const RealtimeBridge: React.FC = () => {
 
         notification.info({
           message: incoming.notification.title,
-          description: incoming.notification.content || t('notifications.newItem'),
+          description: stripHtml(incoming.notification.content) || t('notifications.newItem'),
           placement: i18n.language === 'ar' ? 'topLeft' : 'topRight',
           onClick: () => {
             if (incoming.notification.type === 'message' && role !== 'requester') {
