@@ -2,6 +2,18 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../../../api/http";
 import type { Lookup, PermissionLookup, ProfileLookup, UserListItem } from "../Types/users";
 
+const extractLookupArray = (payload: any, key: string): Lookup[] => {
+    if (Array.isArray(payload)) {
+        return payload as Lookup[];
+    }
+
+    if (Array.isArray(payload?.[key])) {
+        return payload[key] as Lookup[];
+    }
+
+    return [];
+};
+
 
 export const useUsers = (
     role: string, 
@@ -68,20 +80,22 @@ export const useAddOrEditUser = (role: string, userId?: string) => {
 
 export const useUniversities = () =>
     useQuery({
-        queryKey: ["universities"],
-        queryFn: async () =>
-            (await api.get("v1/lockups/universities/")).data.universities as Lookup[],
+        queryKey: ["lookups", "universities"],
+        queryFn: async () => {
+            const data = (await api.get("v1/lockups/universities/")).data;
+            return extractLookupArray(data, "universities");
+        },
         staleTime: Infinity,
     });
 
 export const useDomains = (universityId?: string) =>
     useQuery({
-        queryKey: ["domains", universityId],
+        queryKey: ["lookups", "domains", universityId],
         queryFn: async () => {
             if (!universityId) return [];
             const url = `v1/lockups/universities/${universityId}/domains`;
             const res = await api.get(url);
-            return res.data.domains as Lookup[];
+            return extractLookupArray(res.data, "domains");
         },
         enabled: !!universityId,
         staleTime: Infinity,
@@ -89,23 +103,23 @@ export const useDomains = (universityId?: string) =>
 
 export const useAllDomains = () =>
     useQuery({
-        queryKey: ["domains", "all"],
+        queryKey: ["lookups", "domains", "all"],
         queryFn: async () => {
             const url = `v1/lockups/domains`;
             const res = await api.get(url);
-            return res.data.domains as Lookup[];
+            return extractLookupArray(res.data, "domains");
         },
         staleTime: Infinity,
     });
 
 export const useDepartments = (domainId?: string) =>
     useQuery({
-        queryKey: ["departments", domainId],
+        queryKey: ["lookups", "departments", domainId],
         queryFn: async () => {
             if (!domainId) return [];
             const url = `v1/lockups/domains/${domainId}/departments`;
             const res = await api.get(url);
-            return res.data.departments as Lookup[];
+            return extractLookupArray(res.data, "departments");
         },
         enabled: !!domainId,
         staleTime: Infinity,
@@ -113,18 +127,18 @@ export const useDepartments = (domainId?: string) =>
 
 export const useAllDepartments = () =>
     useQuery({
-        queryKey: ["departments", "all"],
+        queryKey: ["lookups", "departments", "all"],
         queryFn: async () => {
             const url = `v1/lockups/departments`;
             const res = await api.get(url);
-            return res.data.departments as Lookup[];
+            return extractLookupArray(res.data, "departments");
         },
         staleTime: Infinity,
     });
 
 export const usePermissionProfiles = () =>
     useQuery({
-        queryKey: ["permissionProfiles"],
+        queryKey: ["lookups", "permissionProfiles"],
         queryFn: async () => (await api.get("v1/permissions/profile")).data.profiles as ProfileLookup[],
         staleTime: Infinity,
     });
@@ -149,7 +163,10 @@ export const useUserPermissionsProfile = (id?: string) =>
 
 export const useSpecializations = () =>
     useQuery({
-        queryKey: ["specializations"],
-        queryFn: async () => (await api.get("v1/lockups/specializations/")).data.specializations as Lookup[],
+        queryKey: ["lookups", "specializations"],
+        queryFn: async () => {
+            const data = (await api.get("v1/lockups/specializations/")).data;
+            return extractLookupArray(data, "specializations");
+        },
         staleTime: Infinity,
     });

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Form, Input, Select, Tooltip } from "antd";
+import type { ColumnsType } from "antd/es/table";
 import { GenericCrudPage } from "../../../components/GenericCrudPage";
 import { useGenericCrud } from "../../../api/common/hooks/common-hooks";
 import type { Domain, CreateDomainDto, UpdateDomainDto } from "../types/types";
@@ -63,8 +64,24 @@ const DomainsPage: React.FC = () => {
       deleteFn:  (id) => universityApi.delete(id),
     });
 
+  const getLocalizedLookupName = (item?: {
+    name_en?: string;
+    name_ar?: string;
+    name?: { en?: string; ar?: string } | string;
+  }) => {
+    const localizedName = i18n.language === "ar"
+      ? item?.name_ar ?? (typeof item?.name === "object" ? item.name?.ar : undefined)
+      : item?.name_en ?? (typeof item?.name === "object" ? item.name?.en : undefined);
+
+    if (localizedName) {
+      return localizedName;
+    }
+
+    return typeof item?.name === "string" ? item.name : "-";
+  };
+
   const uniOptions = universities?.map((u) => ({
-    label: i18n.language === "ar" ? u.name_ar : u.name_en,
+    label: getLocalizedLookupName(u),
     value: u.id,
   })) ?? [];
 
@@ -160,10 +177,7 @@ const DomainsPage: React.FC = () => {
             title: t("university"),
             key: "university",
             render: (_: any, record: any) => {
-                const uni = record.university?.name;
-                if (!uni) return "-";
-
-                return i18n.language === "ar" ? uni.ar : uni.en;
+                return getLocalizedLookupName(record.university);
             },
             ...getServerSelectFilterProps({
               filterKey: "university",

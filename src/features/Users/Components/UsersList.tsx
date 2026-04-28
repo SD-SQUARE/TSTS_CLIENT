@@ -26,9 +26,29 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
     const { data: domains } = useAllDomains();
     const { data: departments } = useAllDepartments();
 
-    const uniOptions = universities?.map((u: Lookup) => ({ label: (currentLanguage === 'ar' ? u.name_ar : u.name_en) || u.name, value: u.id })) || [];
-    const domainOptions = domains?.map((d: Lookup) => ({ label: (currentLanguage === 'ar' ? d.name_ar : d.name_en) || d.name, value: d.id })) || [];
-    const deptOptions = departments?.map((d: Lookup) => ({ label: (currentLanguage === 'ar' ? d.name_ar : d.name_en) || d.name, value: d.id })) || [];
+    const getLookupLabel = (item?: Lookup | { name?: any; name_en?: string; name_ar?: string }) => {
+        if (!item) {
+            return "-";
+        }
+
+        const localizedName = currentLanguage === 'ar'
+            ? item.name_ar ?? (typeof item.name === "object" ? item.name?.ar : undefined)
+            : item.name_en ?? (typeof item.name === "object" ? item.name?.en : undefined);
+
+        if (localizedName) {
+            return localizedName;
+        }
+
+        return typeof item.name === "string" ? item.name : "-";
+    };
+
+    const safeUniversities = Array.isArray(universities) ? universities : [];
+    const safeDomains = Array.isArray(domains) ? domains : [];
+    const safeDepartments = Array.isArray(departments) ? departments : [];
+
+    const uniOptions = safeUniversities.map((u: Lookup) => ({ label: getLookupLabel(u), value: u.id }));
+    const domainOptions = safeDomains.map((d: Lookup) => ({ label: getLookupLabel(d), value: d.id }));
+    const deptOptions = safeDepartments.map((d: Lookup) => ({ label: getLookupLabel(d), value: d.id }));
 
     const { data, isLoading } = useUsers(role, pagination.page, pagination.pageSize, apiSearchQuery);
     const deleteMutation = useDeleteUser(role);
@@ -259,7 +279,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
         {
             title: t("user_list.university"),
             key: "university",
-            render: (_: any, user: UserListItem) => user.university?.name ?? "-",
+            render: (_: any, user: UserListItem) => getLookupLabel(user.university),
             ...getServerSelectFilterProps<UserListItem, any>({
                 filterKey: "universities",
                 filters: apiSearchQuery,
@@ -272,7 +292,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
         {
             title: t("user_list.domain"),
             key: "domain",
-            render: (_: any, user: UserListItem) => user.domain?.name ?? "-",
+            render: (_: any, user: UserListItem) => getLookupLabel(user.domain),
             ...getServerSelectFilterProps<UserListItem, any>({
                 filterKey: "domains",
                 filters: apiSearchQuery,
@@ -295,7 +315,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
 
                 const departmentNames = departments
                     .filter(Boolean)
-                    .map((department) => department[nameKey] || department.name);
+                    .map((department) => department[nameKey] || getLookupLabel(department));
 
                 return renderExpandList(departmentNames, "user_list.department");
             },

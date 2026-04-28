@@ -172,6 +172,7 @@ const SpecializationsPage: React.FC = () => {
       <Form.Item 
       name="review_required" 
       label={t("review_required")} 
+      initialValue={false}
       valuePropName="checked" 
     >
       <Switch 

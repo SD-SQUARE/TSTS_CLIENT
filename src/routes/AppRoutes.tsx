@@ -15,7 +15,6 @@ import UniversitiesPage from "../features/universities/components/Universities";
 import DomainsPage from "../features/domains/components/Domains";
 import DepartmentsPage from "../features/departments/components/Departments";
 import SpecializationsPage from "../features/specializations/components/Specializations";
-import WorkHoursPage from "../features/work-hours/components/WorkHours";
 import PermissionsPage from "../features/permissions/components/Permissions";
 import KnowledgeBasePage from "../features/knowledge-base/components/KnowledgeBasePage.tsx";
 import KnowledgeGeneratorPage from "../features/knowledge-base/components/KnowledgeGeneratorPage.tsx";
@@ -52,32 +51,34 @@ import AuditLogView from "../features/AuditLogs/Components/AuditLogView.tsx";
 import DashboardPage from "../features/Reports/Components/DashboardPage.tsx";
 import ReportViewPage from "../features/Reports/Components/ReportPage.tsx";
 
+const withBasePath = (path: string) => `${APP_BASE_PATH}${path}`;
+
 export const AppRoutes = () => {
     const { t } = useTranslation();
 
     const IdentitiesMenuItems = [
         {
-            key: "/identities/groups",
+            key: withBasePath("/identities/groups"),
             label: t('Groups'),
             icon: <TeamOutlined />,
         },
         {
-            key: "/identities/users",
+            key: withBasePath("/identities/users"),
             label: t('Users'),
             icon: <UserOutlined />,
             children: [
                 {
-                    key: "/identities/users/admins",
+                    key: withBasePath("/identities/users/admins"),
                     label: t('Admins'),
                     icon: <SafetyOutlined />,
                 },
                 {
-                    key: "/identities/users/technicians",
+                    key: withBasePath("/identities/users/technicians"),
                     label: t('Technicians'),
                     icon: <ToolOutlined />,
                 },
                 {
-                    key: "/identities/users/requesters",
+                    key: withBasePath("/identities/users/requesters"),
                     label: t('Requesters'),
                     icon: <IdcardOutlined />,
                 },
@@ -86,16 +87,16 @@ export const AppRoutes = () => {
     ];
     const SettingsMenuItems = [
         // { key: "/settings/work-hours", label: t('Work Hours'), icon: <ClockCircleOutlined /> },
-        { key: "/settings/system-info", label: t("profile.settings.system"), icon: <ProjectOutlined /> },
-        { key: "/settings/universities", label: t('Universities'), icon: <BankOutlined /> },
-        { key: "/settings/domains", label: t('Domains'), icon: <ProjectOutlined /> },
-        { key: "/settings/departments", label: t('Departments'), icon: <ApartmentOutlined /> },
-        { key: "/settings/specializations", label: t('Specializations'), icon: <ExperimentOutlined /> },
-        { key: "/settings/problems", label: t('problems'), icon: <IssuesCloseOutlined /> },
+        { key: withBasePath("/settings/system-info"), label: t("profile.settings.system"), icon: <ProjectOutlined /> },
+        { key: withBasePath("/settings/universities"), label: t('Universities'), icon: <BankOutlined /> },
+        { key: withBasePath("/settings/domains"), label: t('Domains'), icon: <ProjectOutlined /> },
+        { key: withBasePath("/settings/departments"), label: t('Departments'), icon: <ApartmentOutlined /> },
+        { key: withBasePath("/settings/specializations"), label: t('Specializations'), icon: <ExperimentOutlined /> },
+        { key: withBasePath("/settings/problems"), label: t('problems'), icon: <IssuesCloseOutlined /> },
 
-        { key: "/settings/trusted-devices", label: t("trusted_devices.Trusted Devices"), icon: <SafetyOutlined /> },
-        { key: "/settings/permissions", label: t('Permissions'), icon: <CheckOutlined /> },
-        { key: "/settings/logs", label: t('Audit Logs'), icon: <ClockCircleOutlined /> },
+        { key: withBasePath("/settings/trusted-devices"), label: t("trusted_devices.Trusted Devices"), icon: <SafetyOutlined /> },
+        { key: withBasePath("/settings/permissions"), label: t('Permissions'), icon: <CheckOutlined /> },
+        { key: withBasePath("/settings/logs"), label: t('audit.title'), icon: <ClockCircleOutlined /> },
     ];
     return (
         <Routes>

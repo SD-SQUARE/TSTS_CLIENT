@@ -1,7 +1,6 @@
 // NavItem 
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { APP_BASE_PATH } from "../../../../app/config";
-import Text from "antd/es/typography/Text"
 import styles from "./navbar_item.module.css";
 /**
  * A reusable React component for creating a navigation item.
@@ -13,11 +12,31 @@ import styles from "./navbar_item.module.css";
  * @example
  * <NavItem to="/about">About</NavItem>
  */
-const NavItem = ({ children, to = "/" }) => {
+const normalizePath = (path: string) => {
+    if (!path) {
+        return APP_BASE_PATH || "/";
+    }
+
+    if (APP_BASE_PATH && path.startsWith(APP_BASE_PATH)) {
+        return path;
+    }
+
+    return `${APP_BASE_PATH}${path}`;
+};
+
+const NavItem = ({ children, to = "/", activePrefixes = [] as string[] }) => {
+    const location = useLocation();
+    const resolvedTo = normalizePath(to);
+    const resolvedPrefixes = activePrefixes.map(normalizePath);
+
+    const isPrefixActive = resolvedPrefixes.some((prefix) => (
+        location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)
+    ));
+
     return <NavLink
-        to={`${APP_BASE_PATH}${to}`}
+        to={resolvedTo}
         className={({ isActive }) =>
-            `${styles.navItem} ${isActive ? styles.activeNavItem : ""}`
+            `${styles.navItem} ${isActive || isPrefixActive ? styles.activeNavItem : ""}`
         }>
         {children}
     </NavLink>

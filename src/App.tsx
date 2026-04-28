@@ -4,7 +4,6 @@ import NavBar from "./components/layouts/Nav/NavBar"
 import NavItem from "./components/layouts/Nav/components/NavItem"
 import { BrowserRouter } from "react-router-dom"
 import { AppRoutes } from "./routes/AppRoutes"
-import { APP_BASE_PATH } from "./app/config"
 import { useTranslation } from "react-i18next"
 import GuardedRoute from "./routes/GuardedRoute"
 import { useEffect } from "react"
@@ -42,15 +41,15 @@ function App() {
                         
                         < >
                             <GuardedRoute roles={["admin"]} allowNavigation={false}>
-                                <NavItem to={`${APP_BASE_PATH}/dashboard`}>{t('DASHBOARD')}</NavItem>
+                                <NavItem to="/dashboard">{t('DASHBOARD')}</NavItem>
                             </GuardedRoute>    
-                            <NavItem to={`${APP_BASE_PATH}/knowledge-base`}>{t('Knowledge-Base')}</NavItem>
+                            <NavItem to="/knowledge-base">{t('Knowledge-Base')}</NavItem>
                             {userRole && <NavItem to={`/${userRole}/tickets`}>{t('Tickets')}</NavItem>}
                             <GuardedRoute roles={["admin"]} allowNavigation={false}>
-                                <NavItem to={`/identities/groups`}>{t('Personnel')}</NavItem>
+                                <NavItem to="/identities/groups" activePrefixes={["/identities"]}>{t('Personnel')}</NavItem>
                             </GuardedRoute>    
                             <GuardedRoute roles={["admin"]} allowNavigation={false}>
-                                <NavItem to={`/settings/system-info`}>{t('Settings')}</NavItem>
+                                <NavItem to="/settings/system-info" activePrefixes={["/settings"]}>{t('Settings')}</NavItem>
                             </GuardedRoute>    
                         </>
                     )}

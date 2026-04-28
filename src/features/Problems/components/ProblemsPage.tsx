@@ -35,6 +35,22 @@ const ProblemsPage: React.FC = () => {
 
   const specializationsArray = (specResponse as any)?.specializations ?? [];
 
+  const getLocalizedLookupName = (item?: {
+    name_en?: string;
+    name_ar?: string;
+    name?: { en?: string; ar?: string } | string;
+  }) => {
+    const localizedName = i18n.language === "ar"
+      ? item?.name_ar ?? (typeof item?.name === "object" ? item.name?.ar : undefined)
+      : item?.name_en ?? (typeof item?.name === "object" ? item.name?.en : undefined);
+
+    if (localizedName) {
+      return localizedName;
+    }
+
+    return typeof item?.name === "string" ? item.name : "-";
+  };
+
   const {
     data,
     total,
@@ -123,14 +139,14 @@ const ProblemsPage: React.FC = () => {
       title: t("specialization_type"),
       dataIndex: "specialization",
       key: "specialization",
-      render: (spec: any) => (i18n.language === 'ar' ? spec?.name_ar : spec?.name_en) || "-",
+      render: (spec: any) => getLocalizedLookupName(spec),
       ...getServerSelectFilterProps({
         filterKey: "specialization",
         filters,
         setFilters,
         placeholder: t("filter_by_spec"),
         options: specializationsArray.map((spec: any) => ({
-          label: i18n.language === 'ar' ? spec.name_ar : spec.name_en,
+          label: getLocalizedLookupName(spec),
           value: spec.id,
         })),
         onChange: resetToFirstPage,
@@ -206,7 +222,7 @@ const ProblemsPage: React.FC = () => {
         >
           {Array.isArray(specializationsArray) && specializationsArray.map((spec) => (
             <Select.Option key={spec.id} value={spec.id}>
-              {i18n.language === 'ar' ? spec.name_ar : spec.name_en}
+              {getLocalizedLookupName(spec)}
             </Select.Option>
           ))}
         </Select>
@@ -215,6 +231,7 @@ const ProblemsPage: React.FC = () => {
       <Form.Item 
         name="review_required" 
         label={t("review_required")} 
+        initialValue={false}
         valuePropName="checked" 
       >
         <Switch 

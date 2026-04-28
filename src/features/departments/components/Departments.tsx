@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Form, Input, Select, Tooltip } from "antd";
+import type { ColumnsType } from "antd/es/table";
 import { GenericCrudPage } from "../../../components/GenericCrudPage";
 import { useGenericCrud } from "../../../api/common/hooks/common-hooks";
 import type { Department, CreateDepartmentDto, UpdateDepartmentDto } from "../types/types";
@@ -70,13 +71,29 @@ const {
       deleteFn:  (id) => universityApi.delete(id),
     });
 
+    const getLocalizedLookupName = (item?: {
+      name_en?: string;
+      name_ar?: string;
+      name?: { en?: string; ar?: string } | string;
+    }) => {
+      const localizedName = i18n.language === "ar"
+        ? item?.name_ar ?? (typeof item?.name === "object" ? item.name?.ar : undefined)
+        : item?.name_en ?? (typeof item?.name === "object" ? item.name?.en : undefined);
+
+      if (localizedName) {
+        return localizedName;
+      }
+
+      return typeof item?.name === "string" ? item.name : "-";
+    };
+
     const uniOptions = universities?.map((u) => ({
-      label: i18n.language === "ar" ? u.name_ar : u.name_en,
+      label: getLocalizedLookupName(u),
       value: u.id,
     })) ?? [];
 
     const domainOptions = domains?.map((u) => ({
-        label: i18n.language === "ar" ? u.name_ar : u.name_en,
+        label: getLocalizedLookupName(u),
         value: u.id,
     })) ?? [];
 
@@ -171,10 +188,7 @@ const {
             title: t("university"),
             key: "university",
             render: (_: any, record: any) => {
-                const university = record.domain?.university?.name;
-                if (!university) return "-";
-
-                return i18n.language === "ar" ? university.ar : university.en;
+                return getLocalizedLookupName(record.domain?.university);
             },
             ...getServerSelectFilterProps({
               filterKey: "university",
@@ -190,10 +204,7 @@ const {
             title: t("domain"),
             key: "domain",
             render: (_: any, record: any) => {
-                const domain = record.domain?.name;
-                if (!domain) return "-";
-
-                return i18n.language === "ar" ? domain.ar : domain.en;
+                return getLocalizedLookupName(record.domain);
             },
             ...getServerSelectFilterProps({
               filterKey: "domain",
