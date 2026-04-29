@@ -5,10 +5,13 @@ import AssigneeInlineEditor from "./AssigneeInlineEditor";
 import EllipsisComponent from "../../../../components/EllipsisComponent";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
 
 const AssigneeColumnCell: React.FC<{ record: any, assignees: any[] }> = ({ record, assignees }) => {
     const { t } = useTranslation();
     const [isVisible, setIsVisible] = React.useState(false);
+    const currentUserRole = useSelector((state: any) => state.auth.user?.role?.toLowerCase?.() || '');
+    const canInlineEdit = ['admin', 'technician', 'superadmin'].includes(currentUserRole);
     
     const assigneeNames = assignees
         ?.map((a) => a.name || `${a.first_name} ${a.last_name}`.trim())
@@ -37,26 +40,28 @@ const AssigneeColumnCell: React.FC<{ record: any, assignees: any[] }> = ({ recor
                 </div>
             </Popover>
 
-            <Popover
-                content={
-                    <AssigneeInlineEditor 
-                        record={record} 
-                        onSuccess={() => setIsVisible(false)} 
+            {canInlineEdit && (
+                <Popover
+                    content={
+                        <AssigneeInlineEditor 
+                            record={record} 
+                            onSuccess={() => setIsVisible(false)} 
+                        />
+                    }
+                    trigger="click"
+                    open={isVisible}
+                    onOpenChange={setIsVisible}
+                    placement="bottomRight"
+                    destroyTooltipOnHide
+                >
+                    <Button 
+                        type="text" 
+                        size="small" 
+                        icon={<EditOutlined style={{ fontSize: '12px', color: '#1677ff' }} />} 
+                        onClick={(e) => e.stopPropagation()}
                     />
-                }
-                trigger="click"
-                open={isVisible}
-                onOpenChange={setIsVisible}
-                placement="bottomRight"
-                destroyTooltipOnHide
-            >
-                <Button 
-                    type="text" 
-                    size="small" 
-                    icon={<EditOutlined style={{ fontSize: '12px', color: '#1677ff' }} />} 
-                    onClick={(e) => e.stopPropagation()}
-                />
-            </Popover>
+                </Popover>
+            )}
         </Flex>
     );
 };

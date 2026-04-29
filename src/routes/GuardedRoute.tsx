@@ -1,4 +1,4 @@
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation, useParams } from "react-router-dom";
 import { APP_BASE_PATH } from "../app/config";
 import { useSelector } from "react-redux";
 import { notification, Spin } from "antd";
@@ -10,6 +10,7 @@ interface GuardedRouteProps {
     roles?: string[];
     permissions?: string[];
     allowNavigation?: boolean;
+    matchRoleParam?: boolean;
     children: React.ReactNode;
 }
 
@@ -17,12 +18,14 @@ export default function GuardedRoute({
     roles = [],
     permissions = [],
     allowNavigation = true,
+    matchRoleParam = false,
     children,
 }: GuardedRouteProps) {
     const { t } = useTranslation();
     const notificationDirection = i18next.language === "ar" ? "topLeft" : "topRight";
     const { user, initialized } = useSelector((state: any) => state.auth);
     const location = useLocation();
+    const params = useParams();
 
     if (location.pathname === `${APP_BASE_PATH}/auth/login` || location.pathname === `${APP_BASE_PATH}/not-allowed`)
         return children;
@@ -34,6 +37,7 @@ export default function GuardedRoute({
     // console.log(user);
     // console.log(roles);
     const role = user?.role?.toLowerCase();
+    const routeRole = typeof params.role === "string" ? params.role.toLowerCase() : undefined;
     const userPermissions = user?.permissions || [];
 
     const isRoleAllowed = () => roles.includes("*") || roles.includes(role) ;
@@ -94,6 +98,31 @@ export default function GuardedRoute({
     }
     else if (!allowNavigation && (!isRoleAllowed() || !isPermissionsAllowed())) {
         return null;
+    }
+
+    if (matchRoleParam && role && routeRole && role !== routeRole) {
+        notification.error({
+            title: t("auth.unauthorized"),
+            description: t("auth.roleRouteMismatchDescription", {
+                defaultValue: "You cannot access another role's tickets.",
+            }),
+            placement: notificationDirection,
+            showProgress: true,
+            pauseOnHover: true,
+            icon: <BrokenSecurityShieldIcon />,
+            styles: {
+                title: {
+                    direction: i18next.language === "ar" ? "rtl" : "ltr",
+                },
+                description: {
+                    direction: i18next.language === "ar" ? "rtl" : "ltr",
+                },
+
+            }
+        });
+
+        const correctedPath = `${location.pathname.replace(`/${routeRole}/`, `/${role}/`)}${location.search}${location.hash}`;
+        return <Navigate to={correctedPath} replace />;
     }
 
     

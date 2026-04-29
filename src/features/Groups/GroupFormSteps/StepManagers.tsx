@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
 import type { GroupFormData, NamedObject } from '../Types/groups';
 import RequiredTag from '../../../components/RequiredTag';
-import { formatFullName, useAdmins, useTechnicians, type User } from '../Hooks/useGroupForm';
+import { formatFullName, useAdmins, type User } from '../Hooks/useGroupForm';
 
 
 interface StepProps {
@@ -16,9 +16,7 @@ interface StepProps {
 const StepManagers: React.FC<StepProps> = ({ initialData, onNext }) => {
     const { t } = useTranslation();
 
-
-    const { data: admins, isLoading: isLoadingAdmins } = useAdmins();   
-    const { data: technicians, isLoading: isLoadingTechnicians } = useTechnicians();
+    const { data: admins, isLoading: isLoadingAdmins } = useAdmins();
 
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,9 +43,6 @@ const StepManagers: React.FC<StepProps> = ({ initialData, onNext }) => {
 
 
     const adminOptions = useMemo(() => mapUsersToAntdOptions(admins), [admins]);
-    const technicianOptions = useMemo(() => mapUsersToAntdOptions(technicians), [technicians]);
-
-
 const { handleSubmit, control, formState: { errors }, reset } = useForm<GroupFormData>({
     defaultValues: initialData,
     mode: 'onChange',
@@ -70,7 +65,6 @@ const filterOption = (input: string, option: { value: string; label: string } | 
 
         onNext({
             heads: data.heads,
-            team_leader: data.team_leader,
         });
     };
 
@@ -119,37 +113,6 @@ const filterOption = (input: string, option: { value: string; label: string } | 
                     />
                 </Form.Item>
 
-                { }
-                <Form.Item
-                    label={<Flex align="start" gap="small">
-                        <span>{t('translation.team_leader')}</span>
-                        <RequiredTag />
-                    </Flex>}
-                    validateStatus={errors.team_leader ? 'error' : ''}
-                    help={errors.team_leader?.message}
-                    required
-                >
-                    <Controller
-                        name="team_leader"
-                        control={control}
-                        rules={{ required: t('required') }}
-                        render={({ field }) => (
-                            <Select
-                                placeholder={t('group_form.team_leader_placeholder')}
-                                loading={isLoadingTechnicians}
-                                options={technicianOptions}
-                                showSearch
-                                filterOption={filterOption}
-                                value={field.value?.id || undefined}
-                                onChange={(selectedId: string) => {
-
-                                    const selectedLeader = transformSelectedIdsToNamedObjects([selectedId], technicians)[0] || null;
-                                    field.onChange(selectedLeader);
-                                }}
-                            />
-                        )}
-                    />
-                </Form.Item>
             </Form>
         </Card>
     );

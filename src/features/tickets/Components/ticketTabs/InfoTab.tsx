@@ -12,6 +12,7 @@ import DOMPurify from "dompurify";
 import { useTicketMutations, useTicketProblems } from '../../Hooks/useTicketForm';
 import { useState } from 'react';
 import RequesterDetails from '../RequesterDetails';
+import { useSelector } from 'react-redux';
 
 interface TicketInfoTabProps {
     ticket: any;
@@ -21,7 +22,9 @@ interface TicketInfoTabProps {
 const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
     const { t } = useTranslation();
     const { role } = useParams();
-    const isRequester = role === 'requester';
+    const currentUserRole = useSelector((state: any) => state.auth.user?.role?.toLowerCase?.() || role || '');
+    const isRequester = currentUserRole === 'requester';
+    const canInlineEdit = ['admin', 'technician', 'superadmin'].includes(currentUserRole);
 
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -310,7 +313,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                                             {ticket?.status}
                                         </Tag>
 
-                                        {!isRequester && (
+                                        {canInlineEdit && (
                                             <Dropdown menu={statusMenu} trigger={['click']} disabled={updateMutation.isPending}>
                                                 <Button
                                                     type="text"
@@ -332,7 +335,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                                             {ticket?.priority}
                                         </Tag>
 
-                                        {!isRequester && (
+                                        {canInlineEdit && (
                                             <Dropdown menu={priorityMenu} trigger={['click']} disabled={updateMutation.isPending}>
                                                 <Button
                                                     type="text"
@@ -351,7 +354,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                                     <Space size={4}>
                                         <span>{ticket?.problem?.name}</span>
 
-                                        {!isRequester && (
+                                        {canInlineEdit && (
                                             <Dropdown menu={{ items: problemMenuItems }} trigger={['click']}>
                                                 <Button type="text" size="small" shape="circle" icon={<EditOutlined style={{ fontSize: '12px' }} />} />
                                             </Dropdown>
@@ -361,7 +364,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
 
 
                                 <Flex gap="small" wrap="wrap" style={{ marginTop: 8 }}>
-                                    {!isRequester && (
+                                    {canInlineEdit && (
                                         <Button style={btnStyle} styles={{
                                             root: {
                                                 borderColor: 'var(--color-secondary)',

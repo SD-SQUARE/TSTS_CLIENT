@@ -271,12 +271,17 @@ const GroupsList: React.FC = () => {
             ),
         },
         {
-            title: t('translation.team_leader'),
-            dataIndex: 'team_leader',
-            key: 'teamLeaders',
-            render: (leader: NamedObject) => (
-
-                leader ? <AvatarDisplay member={leader} /> : null
+            title: t('translation.team_leads', t('translation.team_leader')),
+            dataIndex: 'team_leads',
+            key: 'teamLeads',
+            render: (leaders: NamedObject[]) => (
+                <Space size="small">
+                    {(leaders || [])
+                        .filter(Boolean)
+                        .map((leader) => (
+                            <AvatarDisplay key={leader.id} member={leader} />
+                        ))}
+                </Space>
             ),
         },
         {

@@ -53,7 +53,7 @@ const initialFormData: GroupFormData = {
     description_en: '',
     color: '#60203d',
     heads: [],
-    team_leader: null,
+    team_leads: [],
     specializations: [],
 };
 
@@ -65,12 +65,6 @@ const cleanPayload = (data: GroupFormData) => {
         description_en: data.description_en,
         color: data.color
     };
-
-    if (data.team_leader && data.team_leader.id) {
-        payload.team_leader_id = data.team_leader.id;
-    } else {
-        payload.team_leader_id = null;
-    }
 
     payload.heads = data.heads.map(item => item.id) || [];
     payload.specializations = data.specializations.map(item => item.id) || [];
@@ -165,9 +159,10 @@ const GroupFormModal: React.FC<GroupFormModalProps> = ({ isVisible, onClose, gro
                     color: fetchedGroupDetail.color,
                     heads: fetchedGroupDetail.heads?.map(h => ({ id: h.id, name: h.name })) || [],
                     specializations: fetchedGroupDetail.specializations?.map(s => ({ id: s.id, name: s.name })) || [],
-                    team_leader: fetchedGroupDetail.team_leader
-                        ? { id: fetchedGroupDetail.team_leader.id, name: fetchedGroupDetail.team_leader.name }
-                        : null,
+                    team_leads: fetchedGroupDetail.team_leads?.map((lead) => ({ id: lead.id, name: lead.name })) || [],
+                    teams: fetchedGroupDetail.teams || [],
+                    members: fetchedGroupDetail.members || [],
+                    unassigned_members: fetchedGroupDetail.unassigned_members || [],
                 });
                 setCurrent(0);
             }

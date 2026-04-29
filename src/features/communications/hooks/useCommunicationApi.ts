@@ -6,6 +6,7 @@ import type {
   GroupLookupItem,
   NotificationItem,
   NotificationUnreadCount,
+  TeamLookupItem,
   UserLookupItem,
 } from '../types';
 
@@ -15,8 +16,10 @@ export const communicationKeys = {
   chatInbox: ['chat', 'inbox'] as const,
   personalMessages: (userId?: string) => ['chat', 'personal', userId] as const,
   groupMessages: (groupId?: string) => ['chat', 'group', groupId] as const,
+  teamMessages: (teamId?: string) => ['chat', 'team', teamId] as const,
   usersLookup: (search: string) => ['chat', 'lookup', 'users', search] as const,
   groupsLookup: (search: string, mine = false) => ['chat', 'lookup', 'groups', search, mine] as const,
+  teamsLookup: (search: string, mine = false) => ['chat', 'lookup', 'teams', search, mine] as const,
 };
 
 export const useNotifications = () =>
@@ -97,6 +100,16 @@ export const useGroupMessages = (groupId?: string) =>
     enabled: !!groupId,
   });
 
+export const useTeamMessages = (teamId?: string) =>
+  useQuery<ChatMessage[]>({
+    queryKey: communicationKeys.teamMessages(teamId),
+    queryFn: async () => {
+      const { data } = await api.get(`/v1/chat/team/${teamId}/messages`);
+      return data;
+    },
+    enabled: !!teamId,
+  });
+
 export const useSendPersonalMessage = () => {
   const queryClient = useQueryClient();
 
@@ -169,6 +182,42 @@ export const useSendGroupMessage = () => {
   });
 };
 
+export const useSendTeamMessage = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: {
+      teamId: string;
+      content: string;
+      files?: File[];
+    }) => {
+      const formData = new FormData();
+      formData.append('content', payload.content);
+      payload.files?.forEach((file) => formData.append('attachments', file));
+
+      const { data } = await api.post(
+        `/v1/chat/team/${payload.teamId}/messages`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
+
+      return data as ChatMessage;
+    },
+    onSuccess: async (_data, variables) => {
+      await queryClient.invalidateQueries({ queryKey: communicationKeys.chatInbox });
+      await queryClient.invalidateQueries({
+        queryKey: communicationKeys.teamMessages(variables.teamId),
+      });
+      await queryClient.invalidateQueries({ queryKey: communicationKeys.notifications });
+      await queryClient.invalidateQueries({ queryKey: communicationKeys.unreadNotifications });
+    },
+  });
+};
+
 export const useUsersLookup = (search: string, enabled = true) =>
   useQuery<UserLookupItem[]>({
     queryKey: communicationKeys.usersLookup(search),
@@ -194,6 +243,21 @@ export const useGroupsLookup = (search: string, enabled = true, mine = false, al
         },
       });
       return data.groups || [];
+    },
+    enabled: enabled && (allowEmpty || search.trim().length > 0),
+  });
+
+export const useTeamsLookup = (search: string, enabled = true, mine = false, allowEmpty = false) =>
+  useQuery<TeamLookupItem[]>({
+    queryKey: communicationKeys.teamsLookup(search, mine),
+    queryFn: async () => {
+      const { data } = await api.get('/v1/lockups/teams', {
+        params: {
+          name: search || undefined,
+          mine,
+        },
+      });
+      return data.teams || [];
     },
     enabled: enabled && (allowEmpty || search.trim().length > 0),
   });

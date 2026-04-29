@@ -10,6 +10,7 @@ import { useSensor, useSensors, PointerSensor } from '@dnd-kit/core';
 import { ConfigProvider } from 'antd';
 import enUS from 'antd/lib/locale/en_US';
 import arEG from 'antd/lib/locale/ar_EG';
+import { useSelector } from 'react-redux';
 
 import AppTable from '../../../components/AppTable';
 import {
@@ -35,6 +36,9 @@ const TicketList: React.FC = () => {
     const isArabic = currentLanguage.startsWith('ar');
     const navigate = useNavigate();
     const { role } = useParams();
+    const authRole = useSelector((state: any) => state.auth.user?.role?.toLowerCase?.() || '');
+    const effectiveRole = authRole || role || '';
+    const isRequester = effectiveRole === 'requester';
 
     const [pagination, setPagination] = useState({ page: 1, pageSize: 50 });
     const [apiSearchQuery, setApiSearchQuery] = useState<TicketSearchQuery>({});
@@ -48,7 +52,7 @@ const TicketList: React.FC = () => {
     const { data: hierarchicalProblems } = useTicketProblems();
     const { data: technicians } = useTechnicians();
     const { data: admins } = useAdmins();
-    const { data: requesters } = useRequestersLookup(role !== 'requester');
+    const { data: requesters } = useRequestersLookup(!isRequester);
     const { data: universities } = useTicketUniversitiesLookup();
     const { data: domains } = useTicketDomainsLookup();
     const { data: departments } = useTicketDepartmentsLookup();
@@ -162,7 +166,7 @@ const TicketList: React.FC = () => {
 
     // ─── Column definitions ──────────────────────────────────────────────────
     const { columns } = useTicketColumns({
-        role,
+        role: effectiveRole,
         specs: Array.isArray(specs) ? specs : [],
         problemTreeData,
         requesters: (requesters || []).map((item) => ({
@@ -204,7 +208,7 @@ const TicketList: React.FC = () => {
         apiSearchQuery,
         setApiSearchQuery,
         setPagination,
-        handleView: (id: string) => navigate(`/${role}/tickets/${id}`),
+        handleView: (id: string) => navigate(`/${effectiveRole}/tickets/${id}`),
     });
 
     const defaultColumnKeys = columns.map((col) => col.key as string);
@@ -294,11 +298,11 @@ const TicketList: React.FC = () => {
                         <Popover content={controlPanel} trigger="click">
                             <Button icon={<SettingOutlined />}>{t('common.columns')}</Button>
                         </Popover>
-                        {role === 'requester' && (
+                        {isRequester && (
                             <Button
                                 type="primary"
                                 icon={<PlusOutlined />}
-                                onClick={() => navigate('/requester/tickets/new-ticket')}
+                                onClick={() => navigate(`/${effectiveRole}/tickets/new-ticket`)}
                             >
                                 {t('tickets.new_ticket')}
                             </Button>

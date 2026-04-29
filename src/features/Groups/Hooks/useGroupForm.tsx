@@ -1,12 +1,12 @@
-
-
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
-import type { GroupFormData } from '../Types/groups';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../../../api/http';
 import i18next from 'i18next';
-
-
-
+import type {
+  GroupAssignmentsPayload,
+  GroupFormData,
+  GroupUser,
+  NamedObject,
+} from '../Types/groups';
 
 export interface User {
   id: string;
@@ -19,154 +19,141 @@ export interface User {
   status: string;
 }
 
-export interface Assignees {
-  id: string;
-  image: string;
-  email: string;
-  first_name_en: string;
-  first_name_ar: string;
-  mid_name_en: string;
-  mid_name_ar: string;
-  last_name_en: string;
-  last_name_ar: string;
-  user_type: string;
-  status: string;
-  job_en: string;
-  job_ar: string;
+export interface Assignees extends GroupUser {}
+
+interface GroupUsersResponse {
+  team_leads: GroupUser[];
+  heads: GroupUser[];
+  technicians: GroupUser[];
+  teams: GroupFormData['teams'];
+  unassigned_members: GroupUser[];
 }
 
-
-interface AssigneesApiResponse {
-  groups: Assignees[];
-}
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface UserApiResponse {
-  users: User[];
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const formatFullName = (user: any) => {
-  const name = `${user.first_name} ${user.mid_name || ''} ${user.last_name}`.trim();
-  // console.log(name);
-  return name;
+  const firstName = user?.first_name || user?.first_name_en || user?.first_name?.en || '';
+  const midName = user?.mid_name || user?.mid_name_en || user?.mid_name?.en || '';
+  const lastName = user?.last_name || user?.last_name_en || user?.last_name?.en || '';
+  return `${firstName} ${midName || ''} ${lastName}`.trim();
 };
 
-export const formatFullNameAssignee = (user: any) => {
-    if (!user || !user.first_name || !user.last_name || !user.mid_name) return '';
-    
-    const lang = i18next.language;
-    return `${user.first_name[lang]} ${user.mid_name?.[lang] || ''} ${user.last_name?.[lang] || ''}`.trim();
+export const formatLocalizedUserName = (user: Partial<GroupUser>) => {
+  const lang = i18next.language.startsWith('ar') ? 'ar' : 'en';
+  const objectName = `${user.first_name?.[lang] || ''} ${user.mid_name?.[lang] || ''} ${user.last_name?.[lang] || ''}`.trim();
+  const flatName = lang === 'ar'
+    ? `${user.first_name_ar || ''} ${user.mid_name_ar || ''} ${user.last_name_ar || ''}`.trim()
+    : `${user.first_name_en || ''} ${user.mid_name_en || ''} ${user.last_name_en || ''}`.trim();
+
+  return (
+    user.display_name ||
+    (lang === 'ar' ? user.name_ar : user.name_en) ||
+    objectName ||
+    flatName ||
+    user.name ||
+    user.email ||
+    ''
+  );
 };
 
+export const toNamedObject = (user: Partial<GroupUser>): NamedObject => ({
+  id: user.id || '',
+  name: formatLocalizedUserName(user),
+  name_en: user.name_en,
+  name_ar: user.name_ar,
+});
 
-export const useAdmins = () => {
-  return useQuery({
-    queryKey: ['admins'],
+export const useAdmins = () =>
+  useQuery({
+    queryKey: ['admins', i18next.language],
     queryFn: async () => {
       const response = await api.get('v1/lockups/admins');
-      console.log(response.data);
       return response.data.users;
     },
-    //staleTime: Infinity,
   });
-};
 
-export const useGroupDetail = (id?: string) => {
-  return useQuery({
+export const useGroupDetail = (id?: string) =>
+  useQuery({
     queryKey: ['groupDetail', id],
     queryFn: async () => {
       if (!id) return null;
 
-      // Fetch both endpoints in parallel
       const [groupRes, usersRes] = await Promise.all([
         api.get<GroupFormData>(`v1/groups/${id}`),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        api.get<{ team_leader: any; heads: any[]; technicians: any[] }>(`v1/groups/${id}/users`),
+        api.get<GroupUsersResponse>(`v1/groups/${id}/users`),
       ]);
 
       const groupData = groupRes.data;
       const usersData = usersRes.data;
 
-        console.log('groupData:', groupData);
-        console.log('usersData:', usersData);
-      // Merge them as needed
       return {
-        team_leader: usersData.team_leader,
-        heads: usersData.heads,
         ...groupData,
-        members: usersData.technicians,
+        heads:
+          usersData.heads?.map((head) => toNamedObject(head)) ||
+          groupData.heads ||
+          [],
+        team_leads:
+          usersData.team_leads?.map((lead) => toNamedObject(lead)) ||
+          groupData.team_leads ||
+          [],
+        members: usersData.technicians || [],
+        teams: usersData.teams || groupData.teams || [],
+        unassigned_members: usersData.unassigned_members || [],
       };
     },
     enabled: !!id,
-    //staleTime: Infinity,
   });
-};
 
-
-
-export const useTechnicians = () => {
-  return useQuery({
-    queryKey: ['technicians'],
+export const useTechnicians = () =>
+  useQuery({
+    queryKey: ['technicians', i18next.language],
     queryFn: async () => {
       const response = await api.get('v1/lockups/technicians/');
-
       return response.data.users;
     },
-    //staleTime: Infinity,
   });
-};
 
-export const useAssignees = (groupId: string | undefined) => {
-    return useQuery({
-        queryKey: ['nonMembers', groupId],
-        queryFn: async () => {
-            if (!groupId) return [];
-            const response = await api.get(`v1/lockups/groups/${groupId}/non-members-technicians`);
-            console.log('useAssignees:', response.data.technicians);
-            return response.data.technicians; // <-- return the array
-        },
-        enabled: !!groupId,
-    });
-};
+export const useAssignees = (groupId: string | undefined) =>
+  useQuery({
+    queryKey: ['nonMembers', groupId],
+    queryFn: async () => {
+      if (!groupId) return [];
+      const response = await api.get(`v1/lockups/groups/${groupId}/non-members-technicians`);
+      return response.data.technicians;
+    },
+    enabled: !!groupId,
+  });
 
-export const useGroupTechnicians = (groupId: string | undefined) => {
-    return useQuery({
-        queryKey: ['groupTechnicians', groupId],
-        queryFn: async () => {
-            if (!groupId) return [];
-            const response = await api.get(`v1/lockups/groups/${groupId}/technicians`);
-            console.log('useGroupTechnicians:', response.data.technicians);
-            return response.data.technicians; // <-- return the array
-        },
-        enabled: !!groupId,
-    });
-};
+export const useGroupTechnicians = (groupId: string | undefined) =>
+  useQuery({
+    queryKey: ['groupTechnicians', groupId],
+    queryFn: async () => {
+      if (!groupId) return [];
+      const response = await api.get(`v1/lockups/groups/${groupId}/technicians`);
+      return response.data.technicians;
+    },
+    enabled: !!groupId,
+  });
 
-
-export const useSpecializations = () => {
-  return useQuery({
+export const useSpecializations = () =>
+  useQuery({
     queryKey: ['specializations'],
     queryFn: async () => {
-
       const response = await api.get<GroupFormData>('v1/lockups/specializations/');
       return response.data.specializations;
     },
-
-    //staleTime: Infinity,
   });
-};
 
 export const useAssignUsers = (groupId: string | undefined) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (userIds: string[]) => {
-      if (!groupId) throw new Error("Group ID is missing for assignment.");
-      console.log(userIds);
-      return api.post(`v1/groups/${groupId}/assign`, { users: userIds });
+    mutationFn: (payload: GroupAssignmentsPayload) => {
+      if (!groupId) throw new Error('Group ID is missing for assignment.');
+      return api.post(`v1/groups/${groupId}/assign`, payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groupDetail', groupId] });
       queryClient.invalidateQueries({ queryKey: ['groups'] });
+      queryClient.invalidateQueries({ queryKey: ['groupTechnicians', groupId] });
+      queryClient.invalidateQueries({ queryKey: ['nonMembers', groupId] });
     },
   });
 };
@@ -181,18 +168,18 @@ export const useAddGroup = () => {
   });
 };
 
-
 export const useEditGroup = (groupId: string) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: any) => {
-
       if (groupId === 'dummy-id-for-add-mode') {
-        throw new Error("Attempted to edit a group without a valid ID.");
+        throw new Error('Attempted to edit a group without a valid ID.');
       }
       return api.put(`v1/groups/${groupId}`, data);
-    }, onSuccess: () => {
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
+      queryClient.invalidateQueries({ queryKey: ['groupDetail', groupId] });
     },
   });
 };

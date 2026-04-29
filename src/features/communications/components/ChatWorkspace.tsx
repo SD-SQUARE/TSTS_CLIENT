@@ -42,6 +42,9 @@ import {
   usePersonalMessages,
   useSendGroupMessage,
   useSendPersonalMessage,
+  useSendTeamMessage,
+  useTeamMessages,
+  useTeamsLookup,
   useUsersLookup,
 } from '../hooks/useCommunicationApi';
 import type {
@@ -50,6 +53,7 @@ import type {
   ChatMessage,
   ConversationType,
   GroupLookupItem,
+  TeamLookupItem,
   UserLookupItem,
 } from '../types';
 import LocalizedDateText from '../../../components/LocalizedDateText';
@@ -101,7 +105,8 @@ const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ mode = 'page' }) => {
   const [newChatOpen, setNewChatOpen] = useState(false);
   const [userSearch, setUserSearch] = useState('');
   const [groupSearch, setGroupSearch] = useState('');
-  const [newChatTab, setNewChatTab] = useState<'personal' | 'group'>('personal');
+  const [teamSearch, setTeamSearch] = useState('');
+  const [newChatTab, setNewChatTab] = useState<'personal' | 'group' | 'team'>('personal');
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const inboxQuery = useChatInbox();
@@ -111,12 +116,22 @@ const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ mode = 'page' }) => {
   const groupMessagesQuery = useGroupMessages(
     selectedConversation?.type === 'group' ? selectedConversation.id : undefined,
   );
+  const teamMessagesQuery = useTeamMessages(
+    selectedConversation?.type === 'team' ? selectedConversation.id : undefined,
+  );
   const sendPersonalMutation = useSendPersonalMessage();
   const sendGroupMutation = useSendGroupMessage();
+  const sendTeamMutation = useSendTeamMessage();
   const usersLookupQuery = useUsersLookup(userSearch, newChatOpen && newChatTab === 'personal');
   const groupsLookupQuery = useGroupsLookup(
     groupSearch,
     newChatOpen && newChatTab === 'group',
+    true,
+    true,
+  );
+  const teamsLookupQuery = useTeamsLookup(
+    teamSearch,
+    newChatOpen && newChatTab === 'team',
     true,
     true,
   );
@@ -127,11 +142,18 @@ const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ mode = 'page' }) => {
   );
   const activeMessages = selectedConversation?.type === 'group'
     ? groupMessagesQuery.data || []
+    : selectedConversation?.type === 'team'
+      ? teamMessagesQuery.data || []
     : personalMessagesQuery.data || [];
   const isConversationLoading = selectedConversation?.type === 'group'
     ? groupMessagesQuery.isLoading
+    : selectedConversation?.type === 'team'
+      ? teamMessagesQuery.isLoading
     : personalMessagesQuery.isLoading;
-  const isSending = sendPersonalMutation.isPending || sendGroupMutation.isPending;
+  const isSending =
+    sendPersonalMutation.isPending ||
+    sendGroupMutation.isPending ||
+    sendTeamMutation.isPending;
 
   useEffect(() => {
     if (!selectedConversation && inboxItems.length > 0) {
@@ -173,6 +195,18 @@ const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ mode = 'page' }) => {
     queryClient,
     selectedConversation?.id,
     selectedConversation?.type,
+  ]);
+
+  useEffect(() => {
+    if (selectedConversation?.type === 'team' && teamMessagesQuery.isSuccess) {
+      void queryClient.invalidateQueries({ queryKey: communicationKeys.chatInbox });
+    }
+  }, [
+    queryClient,
+    selectedConversation?.id,
+    selectedConversation?.type,
+    teamMessagesQuery.dataUpdatedAt,
+    teamMessagesQuery.isSuccess,
   ]);
 
   const filteredInbox = useMemo(() => {
@@ -307,6 +341,18 @@ const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ mode = 'page' }) => {
     setNewChatOpen(false);
   };
 
+  const handleNewTeamConversation = (item: TeamLookupItem) => {
+    setSelectedConversation({
+      type: 'team',
+      id: item.id,
+      name: item.name_en || item.name_ar || item.name,
+      name_en: item.name_en || item.name,
+      name_ar: item.name_ar || item.name_en || item.name,
+      image: null,
+    });
+    setNewChatOpen(false);
+  };
+
   const handleSend = async () => {
     if (!selectedConversation) {
       message.warning(t('messagesCenter.errors.selectConversation'));
@@ -325,9 +371,15 @@ const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ mode = 'page' }) => {
           content: composerValue.trim(),
           files: pendingFiles,
         });
-      } else {
+      } else if (selectedConversation.type === 'group') {
         await sendGroupMutation.mutateAsync({
           groupId: selectedConversation.id,
+          content: composerValue.trim(),
+          files: pendingFiles,
+        });
+      } else {
+        await sendTeamMutation.mutateAsync({
+          teamId: selectedConversation.id,
           content: composerValue.trim(),
           files: pendingFiles,
         });
@@ -643,6 +695,15 @@ const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ mode = 'page' }) => {
       ),
       value: 'group' as ConversationFilter,
     },
+    {
+      label: (
+        <Space size={6}>
+          <TeamOutlined />
+          <span>{t('messagesCenter.types.team', 'Team')}</span>
+        </Space>
+      ),
+      value: 'team' as ConversationFilter,
+    },
   ];
 
   return (
@@ -855,7 +916,7 @@ const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ mode = 'page' }) => {
       >
         <Tabs
           activeKey={newChatTab}
-          onChange={(key) => setNewChatTab(key as 'personal' | 'group')}
+          onChange={(key) => setNewChatTab(key as 'personal' | 'group' | 'team')}
           items={[
             {
               key: 'personal',
@@ -951,6 +1012,51 @@ const ChatWorkspace: React.FC<ChatWorkspaceProps> = ({ mode = 'page' }) => {
                                 <Typography.Text type="secondary" style={{ display: 'block' }}>
                                   {item.description || '-'}
                                 </Typography.Text>
+                              </div>
+                            </Flex>
+                          </Flex>
+                        </List.Item>
+                      )}
+                    />
+                  )}
+                </Flex>
+              ),
+            },
+            {
+              key: 'team',
+              label: t('messagesCenter.types.team', 'Team'),
+              children: (
+                <Flex vertical gap={12}>
+                  <Input
+                    allowClear
+                    value={teamSearch}
+                    onChange={(event) => setTeamSearch(event.target.value)}
+                    placeholder={t('messagesCenter.searchTeams', 'Search teams')}
+                    prefix={<SearchOutlined />}
+                  />
+
+                  {teamsLookupQuery.isLoading ? (
+                    <Flex justify="center" style={{ paddingBlock: 40 }}>
+                      <Spin />
+                    </Flex>
+                  ) : (
+                    <List
+                      dataSource={teamsLookupQuery.data || []}
+                      locale={{ emptyText: t('messagesCenter.noResults') }}
+                      renderItem={(item) => (
+                        <List.Item
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => handleNewTeamConversation(item)}
+                        >
+                          <Flex justify="space-between" align="center" style={{ width: '100%' }}>
+                            <Flex align="center" gap={10}>
+                              <Avatar
+                                src={undefined}
+                                style={{ background: '#44607f' }}
+                                icon={<TeamOutlined />}
+                              />
+                              <div>
+                                <Typography.Text strong>{getLocalizedName(item)}</Typography.Text>
                               </div>
                             </Flex>
                           </Flex>

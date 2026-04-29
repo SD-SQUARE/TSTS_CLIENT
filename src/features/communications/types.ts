@@ -1,4 +1,4 @@
-export type ConversationType = 'personal' | 'group';
+export type ConversationType = 'personal' | 'group' | 'team';
 
 export interface NotificationItem {
   id: string;
@@ -53,6 +53,7 @@ export interface ChatMessage {
   senderId: string | null;
   recipientId: string | null;
   groupId: string | null;
+  teamId?: string | null;
   content: string;
   sender: ChatParticipant;
   attachments: ChatAttachment[];
@@ -94,4 +95,12 @@ export interface GroupLookupItem {
   name_ar?: string;
   color?: string;
   description?: string;
+}
+
+export interface TeamLookupItem {
+  id: string;
+  name: string;
+  name_en?: string;
+  name_ar?: string;
+  group_id?: string | null;
 }

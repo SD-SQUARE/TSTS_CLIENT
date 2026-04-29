@@ -225,10 +225,10 @@ export const AppRoutes = () => {
             </Route>
 
             <Route path={`${APP_BASE_PATH}/:role/tickets`}>
-                <Route index element={<GuardedRoute roles={["*"]}><PageLayout ><TicketList /></PageLayout></GuardedRoute>} />
-                <Route path="new-ticket" element={<GuardedRoute roles={["*"]}><PageLayout><TicketForm /></PageLayout></GuardedRoute>} />
-                <Route path=":id/*" element={<GuardedRoute roles={["*"]}><PageLayout><TicketView /></PageLayout></GuardedRoute>} />
-                <Route path=":id/edit" element={<GuardedRoute roles={["*"]}><PageLayout><TicketForm /></PageLayout></GuardedRoute>} />
+                <Route index element={<GuardedRoute roles={["*"]} matchRoleParam><PageLayout ><TicketList /></PageLayout></GuardedRoute>} />
+                <Route path="new-ticket" element={<GuardedRoute roles={["*"]} matchRoleParam><PageLayout><TicketForm /></PageLayout></GuardedRoute>} />
+                <Route path=":id/*" element={<GuardedRoute roles={["*"]} matchRoleParam><PageLayout><TicketView /></PageLayout></GuardedRoute>} />
+                <Route path=":id/edit" element={<GuardedRoute roles={["*"]} matchRoleParam><PageLayout><TicketForm /></PageLayout></GuardedRoute>} />
             </Route>
 
             <Route path="/dashboard" element={

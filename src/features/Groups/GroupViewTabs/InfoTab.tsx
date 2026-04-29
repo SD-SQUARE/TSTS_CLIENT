@@ -1,7 +1,7 @@
 
 
 import React from 'react';
-import { Descriptions, Space, Typography, Tag, Tooltip, Button } from 'antd';
+import { Descriptions, Space, Typography, Tag, Tooltip, Button, Divider } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
 
 import { useGroupDetail } from '../Hooks/useGroupForm';
@@ -22,9 +22,7 @@ const renderMembers = (members: any ,t = undefined) => {
             {members.map(member => (
 
                 <Tag key={member.id} color="blue" style={{ marginInlineEnd: '4px' }}>
-                    {t == undefined ?
-                        member.first_name + ' ' + member.last_name
-                        : t(member.first_name + ' ' + member.last_name)}
+                    {member.name || `${member.first_name || ''} ${member.last_name || ''}`.trim()}
                 </Tag>
             ))}
         </Space>
@@ -52,14 +50,20 @@ const renderSpecMembers = (members: any, t = undefined) => {
 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const renderTeamLeader = (leader: any) => {
-    if (!leader) {
+const renderTeamLeads = (leaders: any[]) => {
+    if (!leaders || leaders.length === 0) {
         return <Text disabled>-</Text>;
     }
 
-    return <Tag color="green">{
-        leader.first_name + ' ' + leader.last_name
-    }</Tag>;
+    return (
+        <Space size={[0, 8]} wrap>
+            {leaders.map((leader) => (
+                <Tag key={leader.id} color="green" style={{ marginInlineEnd: '4px' }}>
+                    {leader.name}
+                </Tag>
+            ))}
+        </Space>
+    );
 };
 
 interface InfoTabProps { group: NonNullable<ReturnType<typeof useGroupDetail>['data']>; currentLanguage: string; t: (key: string) => string; onEdit: () => void }
@@ -91,10 +95,29 @@ const InfoTab: React.FC<InfoTabProps> = ({ group, t, onEdit }) => {
         { key: 'heads', label: t('translation.heads'), children: renderMembers(group.heads,t) },
 
 
-        { key: 'team_leader', label: t('translation.team_leader'), children: renderTeamLeader(group.team_leader) },
+        { key: 'team_leads', label: t('translation.team_leads', t('translation.team_leader')), children: renderTeamLeads(group.team_leads) },
 
 
         { key: 'specializations', label: t('translation.specializations'), children: renderSpecMembers(group.specializations) },
+        {
+            key: 'teams',
+            label: t('translation.teams', 'Teams'),
+            children: group.teams?.length ? (
+                <Space direction="vertical" style={{ width: '100%' }}>
+                    {group.teams.map((team) => (
+                        <div key={team.id}>
+                            <Text strong>{i18next.language.startsWith('ar') ? team.name_ar : team.name_en}</Text>
+                            <Text type="secondary" style={{ marginInlineStart: 8 }}>
+                                {t('translation.team_members_count', { count: team.members_count || team.technicians?.length || 0 })}
+                            </Text>
+                            <Divider style={{ margin: '8px 0' }} />
+                        </div>
+                    ))}
+                </Space>
+            ) : (
+                <Text disabled>-</Text>
+            ),
+        },
     ];
 
     return (
