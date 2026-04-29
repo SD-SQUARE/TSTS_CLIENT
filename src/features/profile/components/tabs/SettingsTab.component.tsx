@@ -4,12 +4,14 @@ import {
     SafetyOutlined,
     AppstoreOutlined,
     MessageOutlined,
+    FormOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import ResetPassword from "../ResetPassword.component";
 import TrustedDevices from "../TrustedDevices.component";
 import Extension from "../Extension.component";
 import QuickMessages from "../QuickMessages.component";
+import CustomFormManager from "../../../CustomForms/components/CustomFormManager";
 import useTrustedDevices from "../../hooks/useTrustedDevices.hook";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -133,6 +135,15 @@ const SettingsTab = ({ forceDevices, onTourReady }: any) => {
                                 </span>
                             ),
                             children: <QuickMessages searchTerm={searchTerm} />,
+                        },
+                        {
+                            key: "custom-forms",
+                            label: (
+                                <span>
+                                    <FormOutlined /> {t("Custom Forms")}
+                                </span>
+                            ),
+                            children: <CustomFormManager  />,
                         },
                     ]}
                 />

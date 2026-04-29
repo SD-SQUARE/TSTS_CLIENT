@@ -87,6 +87,7 @@ const ProfileHeader = ({
                     >
                         {t("profile.actions.changeImage")}
                     </Button>
+                    { canEditProfile && (
                     <Button
                         icon={<EditOutlined />}
                         onClick={onEditProfile}
@@ -98,6 +99,8 @@ const ProfileHeader = ({
                     >
                         {t("profile.actions.editProfile")}
                     </Button>
+                    )
+                    }
                 </Space>
             </div>
         </div>

@@ -1,6 +1,7 @@
 {
   "LOGO": "Helwan University",
   "LOGO_ALTER": "Helwan University",
+  "Custom Forms": "Custom Forms",
   "HOME": "Home",
   "DASHBOARD": "Dashboard",
   "CONTACT_US": "Contact Us",
@@ -270,10 +271,7 @@
   "name_ar": "Name (Arabic)",
   "description_en": "Description (English)",
   "description_ar": "Description (Arabic)",
-  "required": "This field is required",
-  "review_required": "Review Required",
-  "required": "Required",
-  "not_required": "Not Required",
+  "field_required": "This field is required",
   "universities": "Universities",
   "home": {
     "hero_title": "Resolve Tickets.",
@@ -649,6 +647,13 @@
         "description": "Description"
       }
     },
+    "personal":{
+      "title":"Personal Information",
+      "email":"Email",
+      "arabicName":"Arabic Name",
+      "englishName":"English Name",
+      "ssn":"SSN"
+    },
 
     "settings": {
       "password": "Password",
@@ -762,12 +767,7 @@
       }
     },
 
-    "personal": {
-      "title": "Personal Information",
-      "arabicName": "Arabic Name",
-      "email": "Email",
-      "ssn": "SSN"
-    },
+    
 
     "contacts": {
       "title": "Contacts",

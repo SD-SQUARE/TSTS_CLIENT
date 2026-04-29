@@ -1,6 +1,7 @@
 {
   "LOGO": "جامعة حلوان",
   "LOGO_ALTER": "جامعة حلوان",
+  "Custom Forms": "النماذج المخصصة",
   "HOME": "الصفحة الرئيسية",
   "DASHBOARD": "لوحة التحكم",
   "CONTACT_US": "اتصل بنا",
@@ -710,7 +711,25 @@
       "specializations": "التخصصات",
       "settings": "الإعدادات"
     },
-    "actions": {
+    "personal":{
+      "title": "معلومات شخصية",
+      "email":"البريد الالكتروني",
+      "arabicName":"الاسم بالعربية",
+      "englishName":"الاسم بالانجليزية",
+      "ssn":"الرقم القومي"
+    },
+    "organization": {
+      "title": "معلومات المنظمة",
+      "university": "الجامعة",
+      "domain": "النطاق"
+    },
+    "contacts": {
+      "title": "معلومات الاتصال",
+      "phones": "ارقام الهواتف",
+      "mobiles": "ارقام الموبايل",
+      "copy": "اضغط للنسخ"
+    },
+      "actions": {
       "changeImage": "تغيير الصورة",
       "editProfile": "تعديل الملف الشخصي",
       "selectImage": "اختيار صورة",

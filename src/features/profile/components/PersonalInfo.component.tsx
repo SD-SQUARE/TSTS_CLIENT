@@ -23,6 +23,15 @@ const PersonalInfo = ({ user }: { user: User }) => {
                     />
                 </Col>
 
+                {/* English Name */}
+                <Col xs={24}>
+                    <InfoItem
+                        icon={<IdcardOutlined />}
+                        label={t("profile.personal.englishName")}
+                        value={`${user?.first_name_en} ${user?.mid_name_en} ${user?.last_name_en}`}
+                    />
+                </Col>
+
                 {/* Email */}
                 <Col xs={24} sm={12}>
                     <InfoItem

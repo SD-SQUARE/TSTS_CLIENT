@@ -12,6 +12,7 @@ import TicketHistoryTab from './ticketTabs/HistoryTab';
 import { useGetChatMessagesQuery } from '../store/services/chatApi';
 import TicketReviewsTab from './ticketTabs/ReviewTab';
 import TicketFinalReportTab from './ticketTabs/FinalReportTab';
+import CustomFormManager from '../../CustomForms/components/CustomFormManager';
 
 const TicketView: React.FC = () => {
     const { t } = useTranslation();
@@ -27,7 +28,7 @@ const TicketView: React.FC = () => {
 
     const pathParts = location.pathname.split('/');
     const lastPart = pathParts[pathParts.length - 1];
-    const activeKey = ['media', 'chat', 'history', 'reviews', 'final-report'].includes(lastPart)
+    const activeKey = ['media', 'chat', 'history', 'reviews', 'final-report', 'custom-forms'].includes(lastPart)
         ? lastPart
         : 'info';
     const canManageFinalReport = ['admin', 'technician', 'superadmin'].includes(role || '');
@@ -98,6 +99,11 @@ const TicketView: React.FC = () => {
             label: t('tickets.tabFinalReport'),
             children: <TicketFinalReportTab />,
         }] : []),
+        {
+            key: 'custom-forms',
+            label: t('Custom Forms'),
+            children: <CustomFormManager isGlobal={false} ticketId={id} />,
+        },
         ...(role === 'admin' ? [{
             key: 'history',
             label: t('tickets.tabHistory'),

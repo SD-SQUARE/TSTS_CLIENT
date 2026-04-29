@@ -37,6 +37,7 @@ const Logo = ({ onClick }) => {
                 userSelect: "none",
                 transition: "all 0.3s ease", // smooth resizing
             }}
+
         />
     );
 };

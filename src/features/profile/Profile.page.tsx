@@ -8,10 +8,12 @@ import i18next from "i18next";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useCookies } from 'react-cookie';
+import { useLocation } from "react-router-dom";
 
 const Profile = () => {
     const { t } = useTranslation();
     const auth = useSelector((state: any) => state.auth);
+    const location = useLocation();
 
     const [activeMainTab, setActiveMainTab] = useState("profile");
     const [forceSettingsDevices, setForceSettingsDevices] = useState(false);
@@ -24,6 +26,15 @@ const Profile = () => {
             setForceSettingsDevices(true);
         }
     }, []);
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const requestedTab = params.get("tab");
+
+        if (requestedTab === "settings" || requestedTab === "profile" || requestedTab === "groups" || requestedTab === "specializations") {
+            setActiveMainTab(requestedTab);
+        }
+    }, [location.search]);
 
     if (!auth.user) return <Spin fullscreen size="large" />;
 

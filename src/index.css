@@ -27,6 +27,14 @@ body{
   --color-red: #cf1b2b;
 }
 
+
+
+
+
+.ant-avatar > img{
+    object-fit: initial !important;
+}
+
 .primary-color { color: var(--color-primary) !important; }
 .primary-bg { background-color: var(--color-primary) !important; }
 .secondary-color { color: var(--color-secondary) !important; }

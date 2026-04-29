@@ -22,7 +22,11 @@ import KnowledgeGeneratorDetailPage from "../features/knowledge-base/components/
 import ChatCenterPage from "../features/communications/components/ChatCenterPage.tsx";
 import SystemInfoTab from "../features/profile/components/SystemInfo.component.tsx";
 import PersonnelDashboard from "../features/Users/Components/PersonnelDashboard.tsx";
-
+import PublicFormPage from "../features/CustomForms/pages/PublicFormPage.tsx";
+import CustomFormManager from "../features/CustomForms/components/CustomFormManager";
+import FormEditPage from "../features/CustomForms/components/FormEditPage";
+import FormPreviewPage from "../features/CustomForms/components/FormPreviewPage";
+import ResponsesPage from "../features/CustomForms/components/ResponsesPage";
 
 import {
     CheckOutlined,
@@ -92,7 +96,6 @@ export const AppRoutes = () => {
         },
     ];
     const SettingsMenuItems = [
-        // { key: "/settings/work-hours", label: t('Work Hours'), icon: <ClockCircleOutlined /> },
         { key: withBasePath("/settings/system-info"), label: t("sidebar.menu.systemInfo"), icon: <ProjectOutlined /> },
         { key: withBasePath("/settings/universities"), label: t("sidebar.menu.universities"), icon: <BankOutlined /> },
         { key: withBasePath("/settings/domains"), label: t("sidebar.menu.domains"), icon: <ProjectOutlined /> },
@@ -105,18 +108,15 @@ export const AppRoutes = () => {
     ];
     return (
         <Routes>
-
             <Route index path={`${APP_BASE_PATH}/`} element={<Home />} />
-            {/* TODO: Add protection  */}
+            <Route path={`${APP_BASE_PATH}/f/:token`} element={<PublicFormPage />} />
 
             <Route index path={`${APP_BASE_PATH}/profile`} element={
-
                 <GuardedRoute roles={["*"]}>
                     <PageLayout> <Profile /></PageLayout>
                  </GuardedRoute> 
-                } />
+            } />
             
-
             <Route path={`${APP_BASE_PATH}/auth`}>
                 <Route index element={<LoginPage />} />
                 <Route path="login" element={<LoginPage />} />
@@ -124,7 +124,6 @@ export const AppRoutes = () => {
                 <Route path="first-time/login" element={<ForgotPasswordForm />} />
             </Route>
 
-                {/* Super/admin routes */}
             <Route path={`${APP_BASE_PATH}/identities`} element={
                 <GuardedRoute roles={["superadmin", "admin"]}>
                     <MainLayout menuItems={IdentitiesMenuItems} />
@@ -167,9 +166,8 @@ export const AppRoutes = () => {
                         <UserViewPage />
                      </GuardedRoute>
                 } />
+            </Route>
 
-                </Route>
-            {/* Routes that use MainLayout */}
             <Route path={`${APP_BASE_PATH}/settings`} element={
                  <GuardedRoute roles={["superadmin", "admin"]}>
                     <MainLayout menuItems={SettingsMenuItems} />
@@ -213,9 +211,7 @@ export const AppRoutes = () => {
                         <SystemInfoTab />
                      </GuardedRoute>
                 } />
-                {/* TODO:connect pages later */}
                 <Route path="permissions" element={<PermissionsPage />} />
-                {/* <Route path="work-hours" element={<WorkHoursPage />} /> */}
                 <Route path="logs" element={
                     <GuardedRoute roles={["superadmin", "admin"]}>
                         <AuditLogList />
@@ -226,9 +222,8 @@ export const AppRoutes = () => {
                         <AuditLogView />
                     </GuardedRoute>
                 } />
-
             </Route>
-            {/* Tickets routes */}
+
             <Route path={`${APP_BASE_PATH}/:role/tickets`}>
                 <Route index element={<GuardedRoute roles={["*"]}><PageLayout ><TicketList /></PageLayout></GuardedRoute>} />
                 <Route path="new-ticket" element={<GuardedRoute roles={["*"]}><PageLayout><TicketForm /></PageLayout></GuardedRoute>} />
@@ -237,7 +232,6 @@ export const AppRoutes = () => {
             </Route>
 
             <Route path="/dashboard" element={
-
                 <GuardedRoute roles={["superadmin", "admin"]}>
                 <PageLayout>
                     <DashboardPage />
@@ -278,8 +272,66 @@ export const AppRoutes = () => {
                     </GuardedRoute>
                 }
             />
+            {/* LIST */}
+            <Route
+                path={`${APP_BASE_PATH}/forms`}
+                element={
+                    <GuardedRoute roles={["admin", "superadmin", "technician"]}>
+                        <PageLayout>
+                            <CustomFormManager embedded={false} />
+                        </PageLayout>
+                    </GuardedRoute>
+                }
+            />
 
-            {/* Complmentary Paths */}
+            {/* CREATE (isolated page) */}
+            <Route
+                path={`${APP_BASE_PATH}/forms/new`}
+                element={
+                    <GuardedRoute roles={["admin", "superadmin", "technician"]}>
+                        <PageLayout>
+                            <FormEditPage />
+                        </PageLayout>
+                    </GuardedRoute>
+                }
+            />
+
+            {/* EDIT (isolated page) */}
+            <Route
+                path={`${APP_BASE_PATH}/forms/:id/edit`}
+                element={
+                    <GuardedRoute roles={["admin", "superadmin"]}>
+                        <PageLayout>
+                            <FormEditPage />
+                        </PageLayout>
+                    </GuardedRoute>
+                }
+            />
+
+            {/* PREVIEW */}
+            <Route
+                path={`${APP_BASE_PATH}/forms/:id/preview`}
+                element={
+                    <GuardedRoute roles={["admin", "superadmin", "technician"]}>
+                        <PageLayout>
+                            <FormPreviewPage />
+                        </PageLayout>
+                    </GuardedRoute>
+                }
+            />
+
+            {/* RESPONSES */}
+            <Route
+                path={`${APP_BASE_PATH}/forms/:id/responses`}
+                element={
+                    <GuardedRoute roles={["admin", "superadmin", "technician"]}>
+                        <PageLayout>
+                            <ResponsesPage />
+                        </PageLayout>
+                    </GuardedRoute>
+                }
+            />
+
             <Route path={`${APP_BASE_PATH}/server-error`} element={<PageLayout><ServerError /> </PageLayout>} />
             <Route path={`${APP_BASE_PATH}/not-allowed`} element={<PageLayout><NotAllowed /> </PageLayout>} />
             <Route path={`${APP_BASE_PATH}/*`} element={<PageLayout><NotFound /> </PageLayout>} />
