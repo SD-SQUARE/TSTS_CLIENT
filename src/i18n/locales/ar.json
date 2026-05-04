@@ -2,7 +2,8 @@
     "translation": {
         "add_team": "إضافة فريق",
         "teams": "الفرق",
-        "remove_team": "إزالة الفريق"
+        "remove_team": "إزالة الفريق",
+        "group_members": "أعضاء المجموعة"
     },
   "LOGO": "جامعة حلوان",
   "LOGO_ALTER": "جامعة حلوان",
