@@ -1,4 +1,9 @@
 {
+    "translations": {
+        "add_team": "إضافة فريق",
+        "teams": "الفرق",
+        "remove_team": "إزالة الفريق"
+    },
   "LOGO": "جامعة حلوان",
   "LOGO_ALTER": "جامعة حلوان",
   "Custom Forms": "النماذج المخصصة",

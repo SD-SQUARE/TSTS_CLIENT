@@ -1,4 +1,9 @@
 {
+    "translations": {
+        "add_team": "Add Team",
+        "teams": "Teams",
+        "remove_team": "Remove Team"
+    },
   "LOGO": "Helwan University",
   "LOGO_ALTER": "Helwan University",
   "Custom Forms": "Custom Forms",
