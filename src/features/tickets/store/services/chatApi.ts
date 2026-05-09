@@ -135,6 +135,37 @@ export const chatApi = createApi({
             }),
             invalidatesTags: ['QuickMessages'],
         }),
+
+        updateQuickMessage: builder.mutation<
+            QuickMessage,
+            {
+                id: string;
+                title_en?: string;
+                title_ar?: string;
+                content_en: string;
+                content_ar: string;
+            }
+        >({
+            query: ({ id, title_en, title_ar, content_en, content_ar }) => ({
+                url: `/v1/tickets/quick-messages/${id}`,
+                method: 'PUT',
+                data: {
+                    title_en,
+                    title_ar,
+                    content_en,
+                    content_ar,
+                },
+            }),
+            invalidatesTags: ['QuickMessages'],
+        }),
+
+        deleteQuickMessage: builder.mutation<void, string>({
+            query: (id) => ({
+                url: `/v1/tickets/quick-messages/${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['QuickMessages'],
+        }),
     }),
 });
 
@@ -144,4 +175,6 @@ export const {
     useSendMessageMutation,
     useGetQuickMessagesQuery,
     useCreateQuickMessageMutation,
+    useUpdateQuickMessageMutation,
+    useDeleteQuickMessageMutation,
 } = chatApi;

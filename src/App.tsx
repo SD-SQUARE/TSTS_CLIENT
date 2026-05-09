@@ -2,7 +2,6 @@
 import { Layout } from "antd"
 import NavBar from "./components/layouts/Nav/NavBar"
 import NavItem from "./components/layouts/Nav/components/NavItem"
-import { BrowserRouter } from "react-router-dom"
 import { AppRoutes } from "./routes/AppRoutes"
 import { useTranslation } from "react-i18next"
 import GuardedRoute from "./routes/GuardedRoute"
@@ -12,8 +11,12 @@ import { authInitialized, loginSuccess } from "./features/login/store/authSlice"
 import { useDispatch, useSelector } from "react-redux"
 import { loadCsrfToken } from "./api/http"
 import RealtimeBridge from "./features/communications/components/RealtimeBridge"
+import { initializeMsal, msalInstance } from "./features/login/components/LoginFormV2"
+import { loginMicrosoftApi } from "./api/auth/login/login.v2.api"
+import { getJWTPayload } from "./utils/jwt_payload.utils"
 
 function App() {
+    
     const { t } = useTranslation();
     const dispatch = useDispatch();
     const { user } = useSelector((state: any) => state.auth);
@@ -29,8 +32,29 @@ function App() {
         }
     }, []);
 
+    useEffect(() => {
+        const run = async () => {
+            await initializeMsal();
+
+            const response = await msalInstance?.handleRedirectPromise();
+
+            if (response?.idToken) {
+                const res = await loginMicrosoftApi(response.idToken);
+
+                dispatch(loginSuccess({
+                    user: getJWTPayload(res.access_token),
+                    token: res.access_token,
+                }));
+
+                window.location.replace("/");
+            }
+        };
+
+        run();
+    }, []);
+
     return (
-        <BrowserRouter>
+        <>
             <Layout style={{ width: '100%', minHeight: '100vh' }}  >  
                 <RealtimeBridge />
                 {/* Navigation bar */}
@@ -59,7 +83,7 @@ function App() {
                 <AppRoutes />
 
             </Layout>
-        </BrowserRouter>
+        </>
     )
 }
 

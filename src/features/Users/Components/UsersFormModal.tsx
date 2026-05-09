@@ -48,7 +48,8 @@ const UserFormModal: React.FC<{
     onClose: () => void;
     userData?: UserListItem;
     role: string;
-}> = ({ isVisible, onClose, userData, role }) => {
+    profileEditMode?: boolean;
+}> = ({ isVisible, onClose, userData, role, profileEditMode = false }) => {
     const { t } = useTranslation();
     const [current, setCurrent] = useState(0);
     const [formData, setFormData] = useState<UserFormData>(initialFormData);
@@ -210,16 +211,15 @@ const UserFormModal: React.FC<{
 
             university: data.university?.id || null,
             domain: data.domain?.id || null,
-            permission_profile: data.permission_profile?.id || null,
+            ...(!profileEditMode ? { permission_profile: data.permission_profile?.id || null } : {}),
 
             departments: data.departments?.map(item => item.id),
-            specializations: data.specializations.map(item => item.id),
         };
 
-        if (data.email && data.email.trim() !== "") {
+        if (!profileEditMode && data.email && data.email.trim() !== "") {
             payload.email = data.email;
         }
-        if (data.password && data.password.trim() !== "") {
+        if (!profileEditMode && data.password && data.password.trim() !== "") {
             payload.password = data.password ;
         } else if (isEdit) {
             delete payload.password;
@@ -248,9 +248,6 @@ const UserFormModal: React.FC<{
                 }
                 else if (key === "contacts") {
                     formPayload.append("contacts", JSON.stringify(val));
-                }
-                else if (key === "specializations") {
-                    formPayload.append("allowed_specializations", JSON.stringify(val));
                 }
                 else if (Array.isArray(val)) {
                     formPayload.append(key, JSON.stringify(val));
@@ -286,8 +283,12 @@ const UserFormModal: React.FC<{
         { title: t("user_list.info_title"), component: StepInfo },
         { title: t("user_list.contacts_title"), component: StepContacts },
         { title: t("user_list.jobLocation_title"), component: StepJobLocation },
-        { title: t("user_list.perm_title"), component: StepPermissions },
-        { title: t("user_list.access_title"), component: StepAccess },
+        ...(!profileEditMode
+            ? [
+                { title: t("user_list.perm_title"), component: StepPermissions },
+                { title: t("user_list.access_title"), component: StepAccess },
+            ]
+            : []),
     ];
 
     const CurrentStepComponent = steps[current].component as any;
@@ -336,7 +337,7 @@ const UserFormModal: React.FC<{
                     <CurrentStepComponent
                         ref={currentStepRef}
                         initialData={formData}
-                        onNext={next}
+                        onNext={isLastStep ? handleSubmit : next}
                         onSubmit={handleSubmit}
                         isSubmitting={addOrEditMutation.isPending}
                     // onTriggerSubmit={handleTriggerSubmit}

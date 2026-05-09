@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Form, message, Modal } from 'antd';
 import mammoth from 'mammoth';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import { useGenericCrud } from '../../../api/common/hooks/common-hooks';
 import { knowledgeBaseApi } from '../services/knowledgeBaseApi';
 import type {
@@ -49,6 +50,7 @@ export const useKnowledgeBase = () => {
   const { t } = useTranslation();
   const [form] = Form.useForm<KnowledgeBaseFormValues>();
   const [searchText, setSearchText] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
   const [debouncedSearch, setDebouncedSearch] = useState(searchText);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(9);
@@ -65,6 +67,13 @@ export const useKnowledgeBase = () => {
   });
 
   const {
+    data: categories = [],
+  } = useQuery({
+    queryKey: ['knowledgeBaseCategories'],
+    queryFn: () => knowledgeBaseApi.getCategories(),
+  });
+
+  const {
     data,
     total,
     isLoading,
@@ -72,10 +81,11 @@ export const useKnowledgeBase = () => {
     updateMutation,
     deleteMutation,
   } = useGenericCrud<KnowledgeBaseItem, CreateKnowledgeBaseDto, UpdateKnowledgeBaseDto>({
-    queryKey: ['knowledgeBase', debouncedSearch, currentPage, pageSize],
+    queryKey: ['knowledgeBase', debouncedSearch, selectedCategory, currentPage, pageSize],
     fetchFn: () =>
       knowledgeBaseApi.getAll({
         search: debouncedSearch,
+        category: selectedCategory,
         page: currentPage,
         page_size: pageSize,
       }),
@@ -226,7 +236,7 @@ export const useKnowledgeBase = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, selectedCategory]);
 
   useEffect(() => {
     if (!requestedArticleId || !data?.length) {
@@ -254,10 +264,13 @@ export const useKnowledgeBase = () => {
     editingId,
     isSubmitting: createMutation.isPending || updateMutation.isPending,
     viewingItem,
+    categories,
+    selectedCategory,
     openViewModal,
     closeViewModal,
     handleShareArticle,
     setSearchText,
+    setSelectedCategory,
     setCurrentPage,
     setPageSize,
     openModal,

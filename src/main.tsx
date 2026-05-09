@@ -9,13 +9,16 @@ import "./i18n"
 
 import { CookiesProvider } from "react-cookie";
 import I18nProvider from "./i18n/I18nProvider";
+import { BrowserRouter } from "react-router-dom";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
     <CookiesProvider>
         <Provider store={store}>
             <QueryClientProvider client={queryClient}>
                 <I18nProvider>
-                    <App />
+                    <BrowserRouter>
+                        <App />
+                    </BrowserRouter>
                 </I18nProvider>
             </QueryClientProvider>
         </Provider>

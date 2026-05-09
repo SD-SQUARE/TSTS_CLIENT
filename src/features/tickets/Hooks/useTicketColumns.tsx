@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useRef, useState } from 'react';
-import { Button, Flex, Input, Popover, Select, Space, TreeSelect } from 'antd';
+import { Badge, Button, Flex, Input, Popover, Select, Space, TreeSelect } from 'antd';
 import { FilterOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import Highlighter from 'react-highlight-words';
@@ -133,6 +133,15 @@ export const useTicketColumns = ({
             ''
         );
     };
+
+    const withSlaRibbon = (record: Ticket, content: React.ReactNode) =>
+        record.sla?.violated ? (
+            <Badge.Ribbon text={t('sla.violated')} color="red">
+                <div style={{ paddingTop: 18 }}>{content}</div>
+            </Badge.Ribbon>
+        ) : (
+            content
+        );
 
     const getColumnSearchProps = (dataIndex: SearchableDataIndex, titleKey: string): TableColumnType<Ticket> => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
@@ -308,26 +317,28 @@ export const useTicketColumns = ({
             key: 'title',
             width: 450,
             ellipsis: true,
-            render: (text: string, record: Ticket) => (
-                <Popover
-                    title={t('tickets.title')}
-                    content={<div style={{ maxWidth: 400 }}>{text}</div>}
-                    trigger="hover"
-                    placement="topLeft"
-                >
-                    <div
-                        onClick={() => handleView(record.id)}
-                        style={{
-                            cursor: 'pointer',
-                            color: 'var(--color-primary, #1677ff)',
-                            display: 'block',
-                            width: '100%',
-                        }}
+            render: (text: string, record: Ticket) =>
+                withSlaRibbon(
+                    record,
+                    <Popover
+                        title={t('tickets.title')}
+                        content={<div style={{ maxWidth: 400 }}>{text}</div>}
+                        trigger="hover"
+                        placement="topLeft"
                     >
-                        <EllipsisComponent content={renderHighlightedText(text, 'title')} />
-                    </div>
-                </Popover>
-            ),
+                        <div
+                            onClick={() => handleView(record.id)}
+                            style={{
+                                cursor: 'pointer',
+                                color: 'var(--color-primary, #1677ff)',
+                                display: 'block',
+                                width: '100%',
+                            }}
+                        >
+                            <EllipsisComponent content={renderHighlightedText(text, 'title')} />
+                        </div>
+                    </Popover>,
+                ),
             ...getColumnSearchProps('title', 'tickets.title'),
         },
         {

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Form, Input, Button, Typography, Alert, Space, Avatar } from "antd";
+import { PublicClientApplication } from "@azure/msal-browser";
+import { WindowsOutlined } from "@ant-design/icons";
 import { loginSchema } from "../schema/LoginSchema";
 import loginImage from "../../../assets/HU-bg-clear.png";
 import { APP_BASE_PATH } from "../../../app/config";
@@ -15,7 +17,31 @@ import { useLoginV2 } from "../hooks/useLoginV2";
 import { useTrustedDeviceAuth } from "../hooks/useTrustedDeviceAuth";
 import { useCookies } from 'react-cookie';
 import { getErrorMessage } from "../../../utils/error";
+import { loginMicrosoftApi } from "../../../api/auth/login/login.v2.api";
 const { Title,Text } = Typography;
+
+const azureClientId = import.meta.env.VITE_AZURE_CLIENT_ID as string | undefined;
+const azureTenantId = import.meta.env.VITE_AZURE_TENANT_ID as string | undefined;
+const microsoftAuthEnabled = Boolean(azureClientId && azureTenantId);
+export const msalInstance = microsoftAuthEnabled
+    ? new PublicClientApplication({
+        auth: {
+            clientId: azureClientId!,
+            authority: `https://login.microsoftonline.com/${azureTenantId}`,
+            redirectUri: window.location.origin
+        },
+        cache: {
+            cacheLocation: "sessionStorage",
+        },
+    })
+    : null;
+let msalInitPromise: Promise<void> | null = null;
+
+export const initializeMsal = async () => {
+    if (!msalInstance) return;
+    msalInitPromise ??= msalInstance.initialize();
+    await msalInitPromise;
+};
 
 const LoginFormV2 = () => {
     const { t } = useTranslation();
@@ -26,6 +52,7 @@ const LoginFormV2 = () => {
 
     const [isHovered, setIsHovered] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isMicrosoftLoading, setIsMicrosoftLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [ _, setCookie ] = useCookies(['showTrustedDeviceTour']);
 
@@ -139,6 +166,35 @@ const LoginFormV2 = () => {
         }
     };
 
+    const handleMicrosoftLogin = async () => {
+        if (!msalInstance) return;
+
+        setIsMicrosoftLoading(true);
+        setError(null);
+
+        try {
+            await initializeMsal();
+            const microsoftResponse = await msalInstance.loginPopup({
+                scopes: ["openid", "profile", "email"],
+                prompt: "select_account",
+            });
+
+            const res = await loginMicrosoftApi(microsoftResponse.idToken);
+            dispatch(
+                loginSuccess({
+                    user: getJWTPayload(res.access_token),
+                    token: res.access_token,
+                })
+            );
+            setCookie("showTrustedDeviceTour", "1");
+            gotoMainPage();
+        } catch (err: any) {
+            setError(getErrorMessage(err, t("sso.loginFailed")));
+        } finally {
+            setIsMicrosoftLoading(false);
+        }
+    };
+
     const onValuesChange = (_: any, allValues: any) => {
         if (step === "CREDENTIALS") validateForm(allValues);
     };
@@ -235,6 +291,19 @@ const LoginFormV2 = () => {
                                 {t("Login")}
                             </Button>
                         </Form.Item>
+
+                        {microsoftAuthEnabled && (
+                            <Form.Item>
+                                <Button
+                                    icon={<WindowsOutlined />}
+                                    loading={isMicrosoftLoading}
+                                    block
+                                    onClick={() => void handleMicrosoftLogin()}
+                                >
+                                    {t("sso.microsoftLogin")}
+                                </Button>
+                            </Form.Item>
+                        )}
 
                         <div style={{
                             display: "flex",

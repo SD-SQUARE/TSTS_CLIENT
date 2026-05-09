@@ -5,6 +5,11 @@ export const loginV2Api = async (data: { email: string; password: string }) => {
     return res.data; // { step, userId }
 };
 
+export const loginMicrosoftApi = async (idToken: string) => {
+    const res = await api.post("v2/auth/microsoft", { idToken });
+    return res.data;
+};
+
 export const getAuthOptionsApi = async (userId: string) => {
     const res = await api.post("v2/auth/trusted-device/options", { userId });
     return res.data;

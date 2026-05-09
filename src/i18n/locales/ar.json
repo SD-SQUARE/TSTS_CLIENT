@@ -66,6 +66,7 @@
     "create_btn": "إنشاء مقال",
     "view_title": "معاينة المقال",
     "search_placeholder": "البحث في قاعدة المعرفة...",
+    "filter_category": "تصفية حسب الفئة",
     "no_articles": "لم يتم العثور على مقالات.",
     "no_content": "لا يوجد محتوى متاح.",
     "card_label": "مقال معرفي",
@@ -200,6 +201,9 @@
       "problems": "المشكلات",
       "trustedDevices": "الأجهزة الموثوقة",
       "permissions": "الصلاحيات",
+      "siteSettings": "إعدادات الموقع",
+      "slaManagement": "إدارة SLA",
+      "recycleBin": "سلة المحذوفات",
       "auditLogs": "سجلات التدقيق"
     }
   },
@@ -361,7 +365,8 @@
     "enable_profile_edit_for_all": "تفعيل التعديل للجميع",
     "disable_profile_edit_for_all": "إيقاف التعديل للجميع",
     "profile_edit_access_updated": "تم تحديث صلاحية تعديل الملف الشخصي بنجاح",
-    "profile_edit_access_update_failed": "تعذر تحديث صلاحية تعديل الملف الشخصي"
+    "profile_edit_access_update_failed": "تعذر تحديث صلاحية تعديل الملف الشخصي",
+    "ssn_14_digits": "يجب أن يتكون الرقم القومي من 14 رقمًا"
   },
   "bulk": {
     "upload_sample": "رفع نموذج (إضافة جماعية)",
@@ -467,8 +472,17 @@
     "contact_info": "معلومات الاتصال",
     "organization_details": "معلومات الجهة",
     "searchAction": "بحث عن عملية",
-    "searchUser": "بحث عن مستخدم"
-    ,
+    "searchUser": "بحث عن مستخدم",
+    "analytics": {
+      "total": "إجمالي الطلبات",
+      "myTickets": "طلباتي",
+      "assigned": "الطلبات المسندة",
+      "open": "مفتوحة",
+      "inProgress": "قيد التنفيذ",
+      "resolved": "تم الحل",
+      "unassigned": "غير مسندة",
+      "slaViolated": "مخالفة SLA"
+    },
     "tools": {
       "button": "الأدوات",
       "title": "أدوات التعليق",
@@ -491,6 +505,9 @@
         "contentPlaceholderAr": "اكتب محتوى الرسالة السريعة بالعربية...",
         "save": "حفظ الرسالة السريعة",
         "saved": "تم حفظ الرسالة السريعة",
+        "updated": "تم تحديث الرسالة السريعة",
+        "editTitle": "تعديل الرسالة السريعة",
+        "deleteConfirm": "حذف هذه الرسالة السريعة؟",
         "inserted": "تمت إضافة الرسالة السريعة إلى التعليق",
         "empty": "لا توجد رسائل سريعة بعد.",
         "validation": "يرجى كتابة الرسالة السريعة باللغتين العربية والإنجليزية.",
@@ -522,6 +539,44 @@
         "uploaded": "تم رفع المرفقات بنجاح"
       }
     }
+  },
+  "siteSettings": {
+    "title": "إعدادات الموقع",
+    "logo": "الشعار",
+    "uploadLogo": "رفع الشعار",
+    "logoUpdated": "تم تحديث الشعار",
+    "alerting": "التنبيهات",
+    "unassignedAlertMinutes": "التنبيه عند بقاء الطلب غير مسند لمدة بالدقائق",
+    "saved": "تم حفظ الإعدادات",
+    "allowedDomains": "نطاقات البريد الإلكتروني المسموحة",
+    "domain": "النطاق",
+    "domainPlaceholder": "example.edu",
+    "addDomain": "إضافة نطاق",
+    "editDomain": "تعديل النطاق",
+    "domainSaved": "تم حفظ نطاق البريد الإلكتروني",
+    "deleteDomainConfirm": "حذف نطاق البريد الإلكتروني المسموح؟",
+    "invalidDomain": "أدخل نطاق بريد إلكتروني صالح",
+    "emailDomainNotAllowed": "نطاق البريد الإلكتروني غير مسموح. النطاقات المسموحة: {{domains}}"
+  },
+  "sla": {
+    "title": "SLA",
+    "addRule": "إضافة قاعدة SLA",
+    "editRule": "تعديل قاعدة SLA",
+    "ruleName": "اسم القاعدة",
+    "scope": "النطاق",
+    "wildcard": "أي قيمة",
+    "maxHours": "أقصى عدد ساعات",
+    "active": "نشطة",
+    "inactive": "غير نشطة",
+    "saved": "تم حفظ قاعدة SLA",
+    "deleteConfirm": "حذف قاعدة SLA؟",
+    "violated": "مخالفة SLA"
+  },
+  "recycleBin": {
+    "title": "سلة المحذوفات",
+    "selectEntity": "اختر كيانًا",
+    "restoreConfirm": "استعادة هذا السجل المحذوف؟",
+    "editDeletedRecord": "تعديل السجل المحذوف"
   },
   "audit": {
     "title": "سجلات التدقيق",
@@ -694,6 +749,7 @@
   },
   "Email_Is_Required": "البريد الإلكتروني مطلوب",
   "Invalid_email_address_format": "صيغ البريد الإلكتروني غير صالح",
+  "invalid_ssn": "الرقم القومي غير صالح",
   "Password_is_required": "كلمة المرور مطلوبة",
   "Must_be_at_least_8_characters": "كلمة المرور يجب أن تحتوي على الأقل 8 حروف على الأقل",
   "Must_contain_an_uppercase_letter": "كلمة المرور يجب أن تحتوي على حرف كبير",
@@ -709,6 +765,10 @@
     "loginDescription": "الرجاء تسجيل الدخول للوصول لهذه الصفحة",
     "unauthorized": "الوصول غير مصرح",
     "unauthorizedDescription": "ليس لديك صلاحية لوصول هذه الصفحة"
+  },
+  "sso": {
+    "microsoftLogin": "المتابعة عبر Microsoft",
+    "loginFailed": "فشل تسجيل الدخول عبر Microsoft"
   },
   "Tickets": "طلبات الدعم",
   "Settings": "الاعدادات",

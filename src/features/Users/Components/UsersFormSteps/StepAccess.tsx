@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
 import { Form, Card, Flex, Input } from "antd";
 import { Controller, useForm } from "react-hook-form";
 
@@ -7,6 +7,7 @@ import { t } from "i18next";
 import type { UserFormData } from "../../Types/users";
 import RequiredTag from "../../../../components/RequiredTag";
 import type { UserFormStepHandle } from "./types";
+import { useAllowedEmailDomains } from "../../../site-settings/hooks/useSiteSettings";
 
 
 interface Props {
@@ -26,6 +27,11 @@ const StepAccess = forwardRef<UserFormStepHandle, Props>(({
         useForm<UserFormData>({ defaultValues: initialData, mode: "onChange" });
 
         const isEdit = !!initialData?.email;
+    const { data: allowedDomains = [] } = useAllowedEmailDomains();
+    const allowedDomainNames = useMemo(
+        () => allowedDomains.map((item) => item.domain.toLowerCase()),
+        [allowedDomains],
+    );
 
     useEffect(() => { reset(initialData); }, [initialData, reset]);
 
@@ -62,7 +68,17 @@ const StepAccess = forwardRef<UserFormStepHandle, Props>(({
                     <Controller name="email" control={control}
                         rules={{
                             required: isEdit ? false : t("required"),
-                            pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Invalid email" },
+                            pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: t("Invalid_email_address_format") },
+                            validate: (value) => {
+                                if (!value || allowedDomainNames.length === 0) return true;
+                                const domain = value.split("@").pop()?.toLowerCase();
+                                return (
+                                    (domain && allowedDomainNames.includes(domain)) ||
+                                    t("siteSettings.emailDomainNotAllowed", {
+                                        domains: allowedDomainNames.join(", "),
+                                    })
+                                );
+                            },
                         }}
                         render={({ field }) => <Input {...field} />} />
                 </Form.Item>

@@ -1,6 +1,7 @@
 import { Avatar, Grid } from "antd";
 import logo from "../../../../assets/HU-bg-clear.png";
 import { useNavigate } from "react-router-dom";
+import { useSiteSettings } from "../../../../features/site-settings/hooks/useSiteSettings";
 
 const { useBreakpoint } = Grid;
 
@@ -9,6 +10,7 @@ const { useBreakpoint } = Grid;
 const Logo = ({ onClick }) => {
     const screens = useBreakpoint();
     const navigate = useNavigate();
+    const { data: settings } = useSiteSettings();
 
     const getLogoSize = (screens) => {
         if (screens.xl) return 48;
@@ -28,7 +30,7 @@ const Logo = ({ onClick }) => {
     return (
         <Avatar
             shape="square"
-            src={logo}
+            src={settings?.logoUrl || logo}
             size={getLogoSize(screens)}
             onClick={handleClick}
             style={{

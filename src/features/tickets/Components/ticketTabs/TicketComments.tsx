@@ -12,6 +12,7 @@ import {
   Input,
   List,
   Modal,
+  Popconfirm,
   Space,
   Spin,
   Tag,
@@ -24,6 +25,7 @@ import {
   BulbOutlined,
   ClockCircleOutlined,
   DeleteOutlined,
+  EditOutlined,
   FileImageOutlined,
   FileOutlined,
   FilePdfOutlined,
@@ -39,9 +41,11 @@ import {
 import { useParams } from 'react-router-dom';
 import {
   useCreateQuickMessageMutation,
+  useDeleteQuickMessageMutation,
   useGetChatMessagesQuery,
   useGetQuickMessagesQuery,
   useSendMessageMutation,
+  useUpdateQuickMessageMutation,
   useUploadChatMediaMutation,
 } from '../../store/services/chatApi';
 import { useTranslation } from 'react-i18next';
@@ -98,6 +102,10 @@ const TicketComments: React.FC<{ assigneeName?: string; requesterId?: string }> 
   const [sendMessage, { isLoading: isSending }] = useSendMessageMutation();
   const [createQuickMessage, { isLoading: isCreatingQuickMessage }] =
     useCreateQuickMessageMutation();
+  const [updateQuickMessage, { isLoading: isUpdatingQuickMessage }] =
+    useUpdateQuickMessageMutation();
+  const [deleteQuickMessage, { isLoading: isDeletingQuickMessage }] =
+    useDeleteQuickMessageMutation();
 
   const [text, setText] = useState('');
   const [pendingMediaIds, setPendingMediaIds] = useState<string[]>([]);
@@ -109,6 +117,7 @@ const TicketComments: React.FC<{ assigneeName?: string; requesterId?: string }> 
   const [quickMessageTitleAr, setQuickMessageTitleAr] = useState('');
   const [quickMessageContentEn, setQuickMessageContentEn] = useState('');
   const [quickMessageContentAr, setQuickMessageContentAr] = useState('');
+  const [editingQuickMessage, setEditingQuickMessage] = useState<QuickMessage | null>(null);
   const [solutionsSearch, setSolutionsSearch] = useState('');
   const [solutions, setSolutions] = useState<KnowledgeBaseItem[]>([]);
   const [solutionsLoading, setSolutionsLoading] = useState(false);
@@ -410,26 +419,55 @@ const TicketComments: React.FC<{ assigneeName?: string; requesterId?: string }> 
     setTempFiles((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleCreateQuickMessage = async () => {
+  const resetQuickMessageModal = () => {
+    setQuickMessageModalOpen(false);
+    setEditingQuickMessage(null);
+    setQuickMessageTitleEn('');
+    setQuickMessageTitleAr('');
+    setQuickMessageContentEn('');
+    setQuickMessageContentAr('');
+  };
+
+  const openQuickMessageModal = (item?: QuickMessage) => {
+    if (item) {
+      setEditingQuickMessage(item);
+      setQuickMessageTitleEn(item.title_en || '');
+      setQuickMessageTitleAr(item.title_ar || '');
+      setQuickMessageContentEn(item.content_en || '');
+      setQuickMessageContentAr(item.content_ar || '');
+    } else {
+      setEditingQuickMessage(null);
+      setQuickMessageTitleEn('');
+      setQuickMessageTitleAr('');
+      setQuickMessageContentEn('');
+      setQuickMessageContentAr('');
+    }
+    setQuickMessageModalOpen(true);
+  };
+
+  const handleSaveQuickMessage = async () => {
     if (!stripHtml(quickMessageContentEn) || !stripHtml(quickMessageContentAr)) {
       appMessage.warning(t('tickets.tools.quickMessages.validation'));
       return;
     }
 
     try {
-      await createQuickMessage({
+      const payload = {
         title_en: quickMessageTitleEn.trim() || undefined,
         title_ar: quickMessageTitleAr.trim() || undefined,
         content_en: quickMessageContentEn.trim(),
         content_ar: quickMessageContentAr.trim(),
-      }).unwrap();
+      };
 
-      appMessage.success(t('tickets.tools.quickMessages.saved'));
-      setQuickMessageTitleEn('');
-      setQuickMessageTitleAr('');
-      setQuickMessageContentEn('');
-      setQuickMessageContentAr('');
-      setQuickMessageModalOpen(false);
+      if (editingQuickMessage) {
+        await updateQuickMessage({ id: editingQuickMessage.id, ...payload }).unwrap();
+        appMessage.success(t('tickets.tools.quickMessages.updated'));
+      } else {
+        await createQuickMessage(payload).unwrap();
+        appMessage.success(t('tickets.tools.quickMessages.saved'));
+      }
+
+      resetQuickMessageModal();
     } catch (error) {
       console.error(error);
       appMessage.error(getErrorMessage(error, t('errors.submitFailed')));
@@ -685,7 +723,7 @@ const TicketComments: React.FC<{ assigneeName?: string; requesterId?: string }> 
                     <Button
                       type="primary"
                       icon={<PlusOutlined />}
-                      onClick={() => setQuickMessageModalOpen(true)}
+                      onClick={() => openQuickMessageModal()}
                     >
                       {t('tickets.tools.quickMessages.new')}
                     </Button>
@@ -707,10 +745,39 @@ const TicketComments: React.FC<{ assigneeName?: string; requesterId?: string }> 
                             style={{ width: '100%', borderRadius: 14 }}
                           >
                             <Flex vertical gap={8}>
-                              <Text strong>
-                                {getQuickMessageTitle(item) ||
-                                  t('tickets.tools.quickMessages.defaultTitle')}
-                              </Text>
+                              <Flex justify="space-between" gap={8} align="center">
+                                <Text strong>
+                                  {getQuickMessageTitle(item) ||
+                                    t('tickets.tools.quickMessages.defaultTitle')}
+                                </Text>
+                                <Space>
+                                  <Button
+                                    size="small"
+                                    icon={<EditOutlined />}
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      openQuickMessageModal(item);
+                                    }}
+                                  />
+                                  <Popconfirm
+                                    title={t('tickets.tools.quickMessages.deleteConfirm')}
+                                    okText={t('translation.yes')}
+                                    cancelText={t('translation.no')}
+                                    onConfirm={(event) => {
+                                      event?.stopPropagation();
+                                      deleteQuickMessage(item.id);
+                                    }}
+                                  >
+                                    <Button
+                                      danger
+                                      size="small"
+                                      icon={<DeleteOutlined />}
+                                      loading={isDeletingQuickMessage}
+                                      onClick={(event) => event.stopPropagation()}
+                                    />
+                                  </Popconfirm>
+                                </Space>
+                              </Flex>
                               <Text
                                 type="secondary"
                                 ellipsis={{ tooltip: getQuickMessageContent(item) }}
@@ -788,17 +855,11 @@ const TicketComments: React.FC<{ assigneeName?: string; requesterId?: string }> 
       </Drawer>
 
       <Modal
-        title={t('tickets.tools.quickMessages.modalTitle')}
+        title={editingQuickMessage ? t('tickets.tools.quickMessages.editTitle') : t('tickets.tools.quickMessages.modalTitle')}
         open={quickMessageModalOpen}
-        onCancel={() => {
-          setQuickMessageModalOpen(false);
-          setQuickMessageTitleEn('');
-          setQuickMessageTitleAr('');
-          setQuickMessageContentEn('');
-          setQuickMessageContentAr('');
-        }}
-        onOk={() => void handleCreateQuickMessage()}
-        confirmLoading={isCreatingQuickMessage}
+        onCancel={resetQuickMessageModal}
+        onOk={() => void handleSaveQuickMessage()}
+        confirmLoading={isCreatingQuickMessage || isUpdatingQuickMessage}
         okText={t('tickets.tools.quickMessages.save')}
       >
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>

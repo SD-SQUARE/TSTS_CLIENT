@@ -95,6 +95,9 @@
       "problems": "Problems",
       "trustedDevices": "Trusted Devices",
       "permissions": "Permissions",
+      "siteSettings": "Site Settings",
+      "slaManagement": "SLA Management",
+      "recycleBin": "Recycle Bin",
       "auditLogs": "Audit Logs"
     }
   },
@@ -263,7 +266,8 @@
     "enable_profile_edit_for_all": "Enable Edit For All",
     "disable_profile_edit_for_all": "Disable Edit For All",
     "profile_edit_access_updated": "Profile edit access updated successfully",
-    "profile_edit_access_update_failed": "Failed to update profile edit access"
+    "profile_edit_access_update_failed": "Failed to update profile edit access",
+    "ssn_14_digits": "SSN must be exactly 14 digits"
   },
   "bulk": {
     "upload_sample": "Upload Sample (Bulk)",
@@ -368,6 +372,16 @@
     "organization_details": "Organization Details",
     "searchAction": "Search Actions",
     "searchUser": "Search Users",
+    "analytics": {
+      "total": "Total tickets",
+      "myTickets": "My tickets",
+      "assigned": "Assigned tickets",
+      "open": "Open",
+      "inProgress": "In progress",
+      "resolved": "Resolved",
+      "unassigned": "Unassigned",
+      "slaViolated": "SLA violated"
+    },
     "tools": {
       "button": "Tools",
       "title": "Comment Tools",
@@ -390,6 +404,9 @@
         "contentPlaceholderAr": "Write the Arabic quick message...",
         "save": "Save Quick Message",
         "saved": "Quick message saved",
+        "updated": "Quick message updated",
+        "editTitle": "Edit Quick Message",
+        "deleteConfirm": "Delete this quick message?",
         "inserted": "Quick message added to the comment",
         "empty": "No quick messages yet.",
         "validation": "Please write the quick message in both English and Arabic.",
@@ -421,6 +438,44 @@
         "uploaded": "Attachments uploaded successfully"
       }
     }
+  },
+  "siteSettings": {
+    "title": "Site Settings",
+    "logo": "Logo",
+    "uploadLogo": "Upload Logo",
+    "logoUpdated": "Logo updated",
+    "alerting": "Alerting",
+    "unassignedAlertMinutes": "Alert when a ticket stays unassigned for minutes",
+    "saved": "Settings saved",
+    "allowedDomains": "Allowed Email Domains",
+    "domain": "Domain",
+    "domainPlaceholder": "example.edu",
+    "addDomain": "Add Domain",
+    "editDomain": "Edit Domain",
+    "domainSaved": "Email domain saved",
+    "deleteDomainConfirm": "Delete this allowed email domain?",
+    "invalidDomain": "Enter a valid email domain",
+    "emailDomainNotAllowed": "Email domain is not allowed. Allowed domains: {{domains}}"
+  },
+  "sla": {
+    "title": "SLA",
+    "addRule": "Add SLA Rule",
+    "editRule": "Edit SLA Rule",
+    "ruleName": "Rule Name",
+    "scope": "Scope",
+    "wildcard": "Any",
+    "maxHours": "Max hours",
+    "active": "Active",
+    "inactive": "Inactive",
+    "saved": "SLA rule saved",
+    "deleteConfirm": "Delete this SLA rule?",
+    "violated": "SLA violated"
+  },
+  "recycleBin": {
+    "title": "Recycle Bin",
+    "selectEntity": "Select an entity",
+    "restoreConfirm": "Restore this deleted record?",
+    "editDeletedRecord": "Edit Deleted Record"
   },
   "audit": {
     "title": "Audit Logs",
@@ -593,6 +648,7 @@
   },
   "Email_Is_Required": "Email is required",
   "Invalid_email_address_format": "Invalid email address format",
+  "invalid_ssn": "Invalid SSN",
   "Password_is_required": "Password is required",
   "Must_be_at_least_8_characters": "Password must be at least 8 characters",
   "Must_contain_an_uppercase_letter": "Password must contain an uppercase letter",
@@ -608,6 +664,10 @@
     "loginDescription": "Please login to access this page",
     "unauthorized": "Unauthorized access",
     "unauthorizedDescription": "You are not authorized to access this page"
+  },
+  "sso": {
+    "microsoftLogin": "Continue with Microsoft",
+    "loginFailed": "Microsoft sign-in failed"
   },
 
   "problems": "Problems",
@@ -823,6 +883,7 @@
     "create_btn": "Create Article",
     "view_title": "Article Preview",
     "search_placeholder": "Search knowledge base...",
+    "filter_category": "Filter by category",
     "no_articles": "No articles found.",
     "no_content": "No content available.",
     "card_label": "Knowledge article",

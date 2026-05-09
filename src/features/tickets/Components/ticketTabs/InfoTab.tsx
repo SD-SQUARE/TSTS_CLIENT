@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Typography, Card, Button, Flex, message, Splitter, Dropdown, Space, Popconfirm, Spin, Tag } from 'antd';
+import { Typography, Card, Button, Flex, message, Splitter, Dropdown, Space, Popconfirm, Spin, Tag, Badge } from 'antd';
 import { CheckCircleOutlined, EditOutlined, ToolOutlined, ReloadOutlined, CloseCircleOutlined, MessageOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -166,6 +166,100 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
     };
 
     const btnStyle: React.CSSProperties = { flex: '1 1 140px', height: '40px' };
+    const renderDetailsCard = () => (
+                        <Card size="small" title={t('tickets.details')}>
+                            <Flex vertical gap="middle">
+                                <Flex justify="space-between" align="center">
+                                    <Typography.Text type="secondary">{t('tickets.ticket_number')}</Typography.Text>
+                                    <Typography.Text copyable>{ticket?.ticket_number || '-'}</Typography.Text>
+                                </Flex>
+
+                                {ticket?.sla?.violated && (
+                                    <Flex justify="space-between" align="center">
+                                        <Typography.Text type="secondary">{t('sla.title')}</Typography.Text>
+                                        <Tag color="red">
+                                            {ticket?.sla?.ruleName || t('sla.violated')}
+                                            {ticket?.sla?.maxHours ? ` (${ticket.sla.maxHours}h)` : ''}
+                                        </Tag>
+                                    </Flex>
+                                )}
+
+                                <Flex justify="space-between" align="center">
+                                    <Typography.Text type="secondary">{t('tickets.status')}</Typography.Text>
+                                    <Space size={4}>
+                                        <Tag color={getStatusColor(ticket?.status)}>
+                                            {ticket?.status}
+                                        </Tag>
+
+                                        {canInlineEdit && (
+                                            <Dropdown menu={statusMenu} trigger={['click']} disabled={updateMutation.isPending}>
+                                                <Button
+                                                    type="text"
+                                                    size="small"
+                                                    shape="circle"
+                                                    icon={updateMutation.isPending ? <Spin size="small" /> : <EditOutlined style={{ fontSize: '12px' }} />}
+                                                />
+                                            </Dropdown>
+                                        )}
+                                    </Space>
+                                </Flex>
+
+                                <Flex justify="space-between" align="center">
+                                    <Typography.Text type="secondary">{t('tickets.priority')}</Typography.Text>
+
+                                    <Space size={4}>
+
+                                        <Tag color={getPriorityColor(ticket?.priority)}>
+                                            {ticket?.priority}
+                                        </Tag>
+
+                                        {canInlineEdit && (
+                                            <Dropdown menu={priorityMenu} trigger={['click']} disabled={updateMutation.isPending}>
+                                                <Button
+                                                    type="text"
+                                                    size="small"
+                                                    shape="circle"
+                                                    icon={updateMutation.isPending ? <Spin size="small" /> : <EditOutlined style={{ fontSize: '12px' }} />}
+                                                />
+                                            </Dropdown>
+                                        )}
+
+                                    </Space>
+                                </Flex>
+
+                                <Flex justify="space-between" align="center">
+                                    <Typography.Text type="secondary">{t('tickets.specialization')}</Typography.Text>
+                                    <span>{ticket?.specialization?.name || t('tickets.noSpecialization')}</span>
+                                </Flex>
+
+                                <Flex justify="space-between" align="center">
+                                    <Typography.Text type="secondary">{t('tickets.problemType')}</Typography.Text>
+                                    <Space size={4}>
+                                        <span>{ticket?.problem?.name}</span>
+
+                                        {canInlineEdit && (
+                                            <Dropdown menu={{ items: problemMenuItems }} trigger={['click']}>
+                                                <Button type="text" size="small" shape="circle" icon={<EditOutlined style={{ fontSize: '12px' }} />} />
+                                            </Dropdown>
+                                        )}
+                                    </Space>
+                                </Flex>
+
+
+                                <Flex gap="small" wrap="wrap" style={{ marginTop: 8 }}>
+                                    {canInlineEdit && (
+                                        <Button style={btnStyle} styles={{
+                                            root: {
+                                                borderColor: 'var(--color-secondary)',
+                                                color: 'var(--color-secondary)',
+                                            }
+                                        }} icon={<EditOutlined />} onClick={onEdit} disabled={ticket?.status === resolved_status}>{t('common.edit')}</Button>
+                                    )}
+                                    {actionButton}
+                                </Flex>
+                            </Flex>
+                        </Card>
+    );
 
     if (ticket?.status !== resolved_status) {
         if (isRequester) {
@@ -299,83 +393,13 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
 
                 <Splitter.Panel defaultSize="30%" min="25%" style={{ overflowY: 'auto', padding: '16px', backgroundColor: '#fafafa', height: '100%' }}>
                     <Flex vertical gap="large">
-                        <Card size="small" title={t('tickets.details')}>
-                            <Flex vertical gap="middle">
-                                <Flex justify="space-between" align="center">
-                                    <Typography.Text type="secondary">{t('tickets.ticket_number')}</Typography.Text>
-                                    <Typography.Text copyable>{ticket?.ticket_number || '-'}</Typography.Text>
-                                </Flex>
-
-                                <Flex justify="space-between" align="center">
-                                    <Typography.Text type="secondary">{t('tickets.status')}</Typography.Text>
-                                    <Space size={4}>
-                                        <Tag color={getStatusColor(ticket?.status)}>
-                                            {ticket?.status}
-                                        </Tag>
-
-                                        {canInlineEdit && (
-                                            <Dropdown menu={statusMenu} trigger={['click']} disabled={updateMutation.isPending}>
-                                                <Button
-                                                    type="text"
-                                                    size="small"
-                                                    shape="circle"
-                                                    icon={updateMutation.isPending ? <Spin size="small" /> : <EditOutlined style={{ fontSize: '12px' }} />}
-                                                />
-                                            </Dropdown>
-                                        )}
-                                    </Space>
-                                </Flex>
-
-                                <Flex justify="space-between" align="center">
-                                    <Typography.Text type="secondary">{t('tickets.priority')}</Typography.Text>
-
-                                    <Space size={4}>
-
-                                        <Tag color={getPriorityColor(ticket?.priority)}>
-                                            {ticket?.priority}
-                                        </Tag>
-
-                                        {canInlineEdit && (
-                                            <Dropdown menu={priorityMenu} trigger={['click']} disabled={updateMutation.isPending}>
-                                                <Button
-                                                    type="text"
-                                                    size="small"
-                                                    shape="circle"
-                                                    icon={updateMutation.isPending ? <Spin size="small" /> : <EditOutlined style={{ fontSize: '12px' }} />}
-                                                />
-                                            </Dropdown>
-                                        )}
-
-                                    </Space>
-                                </Flex>
-
-                                <Flex justify="space-between" align="center">
-                                    <Typography.Text type="secondary">{t('tickets.problemType')}</Typography.Text>
-                                    <Space size={4}>
-                                        <span>{ticket?.problem?.name}</span>
-
-                                        {canInlineEdit && (
-                                            <Dropdown menu={{ items: problemMenuItems }} trigger={['click']}>
-                                                <Button type="text" size="small" shape="circle" icon={<EditOutlined style={{ fontSize: '12px' }} />} />
-                                            </Dropdown>
-                                        )}
-                                    </Space>
-                                </Flex>
-
-
-                                <Flex gap="small" wrap="wrap" style={{ marginTop: 8 }}>
-                                    {canInlineEdit && (
-                                        <Button style={btnStyle} styles={{
-                                            root: {
-                                                borderColor: 'var(--color-secondary)',
-                                                color: 'var(--color-secondary)',
-                                            }
-                                        }} icon={<EditOutlined />} onClick={onEdit} disabled={ticket?.status === resolved_status}>{t('common.edit')}</Button>
-                                    )}
-                                    {actionButton}
-                                </Flex>
-                            </Flex>
-                        </Card>
+                        {ticket?.sla?.violated ? (
+                            <Badge.Ribbon text={t('sla.violated')} color="red">
+                                {renderDetailsCard()}
+                            </Badge.Ribbon>
+                        ) : (
+                            renderDetailsCard()
+                        )}
 
                         {!isRequester && ( 
                             <RequesterDetails requesterId={ticket?.requester.id} />

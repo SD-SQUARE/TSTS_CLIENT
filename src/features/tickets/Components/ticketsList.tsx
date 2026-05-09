@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useMemo, useState } from 'react';
 import {
-    Typography, Alert, Pagination, Space, Button, Flex, Popover, Tooltip, Tag,
+    Typography, Alert, Pagination, Space, Button, Flex, Popover, Tooltip, Tag, Row, Col, Card, Statistic,
 } from 'antd';
 import { PlusOutlined, SettingOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -48,6 +48,7 @@ const TicketList: React.FC = () => {
         pagination.pageSize,
         apiSearchQuery,
     );
+    const ticketRows = data?.data || [];
     const { data: specs } = useSpecializations();
     const { data: hierarchicalProblems } = useTicketProblems();
     const { data: technicians } = useTechnicians();
@@ -276,6 +277,40 @@ const TicketList: React.FC = () => {
     );
 
     const tableWidth = finalColumns.reduce((sum, col) => sum + (col.width as number || 100), 0);
+    const analytics = useMemo(() => {
+        const normalizedStatus = (value?: string) => (value || '').toLowerCase().replace(/\s+/g, '_');
+        const total = data?.total || ticketRows.length;
+        const open = ticketRows.filter((ticket) => ['open', 're_open'].includes(normalizedStatus(ticket.status))).length;
+        const inProgress = ticketRows.filter((ticket) => normalizedStatus(ticket.status) === 'in_progress').length;
+        const resolved = ticketRows.filter((ticket) => ['resolved', 'closed'].includes(normalizedStatus(ticket.status))).length;
+        const unassigned = ticketRows.filter((ticket) => !ticket.assignee || ticket.assignee.length === 0).length;
+        const violated = ticketRows.filter((ticket) => ticket.sla?.violated).length;
+
+        if (isRequester) {
+            return [
+                { label: t('tickets.analytics.myTickets'), value: total },
+                { label: t('tickets.analytics.open'), value: open },
+                { label: t('tickets.analytics.resolved'), value: resolved },
+                { label: t('tickets.analytics.slaViolated'), value: violated },
+            ];
+        }
+
+        if (effectiveRole === 'technician') {
+            return [
+                { label: t('tickets.analytics.assigned'), value: total },
+                { label: t('tickets.analytics.inProgress'), value: inProgress },
+                { label: t('tickets.analytics.open'), value: open },
+                { label: t('tickets.analytics.slaViolated'), value: violated },
+            ];
+        }
+
+        return [
+            { label: t('tickets.analytics.total'), value: total },
+            { label: t('tickets.analytics.unassigned'), value: unassigned },
+            { label: t('tickets.analytics.inProgress'), value: inProgress },
+            { label: t('tickets.analytics.slaViolated'), value: violated },
+        ];
+    }, [data?.total, effectiveRole, isRequester, t, ticketRows]);
 
     return (
         <div style={{ padding: '24px' }}>
@@ -310,10 +345,20 @@ const TicketList: React.FC = () => {
                     </Space>
                 </Flex>
 
+                <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+                    {analytics.map((item) => (
+                        <Col xs={12} md={6} key={item.label}>
+                            <Card size="small">
+                                <Statistic title={item.label} value={item.value} />
+                            </Card>
+                        </Col>
+                    ))}
+                </Row>
+
                 <AppTable
                     components={{ header: { cell: ResizableTitle } }}
                     columns={finalColumns}
-                    dataSource={data?.data || []}
+                    dataSource={ticketRows}
                     rowKey="id"
                     skeletonLoading={isLoading}
                     tableLayout="fixed"

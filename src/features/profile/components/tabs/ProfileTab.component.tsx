@@ -87,6 +87,7 @@ const ProfileTab = () => {
                     }}
                     userData={editingUser}
                     role={editableRole}
+                    profileEditMode
                 />
             )}
 

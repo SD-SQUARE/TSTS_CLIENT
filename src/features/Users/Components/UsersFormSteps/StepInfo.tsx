@@ -222,7 +222,12 @@ const StepInfo = forwardRef<UserFormStepHandle, Props>(({ initialData, onNext },
                 <Form.Item label={<Flex gap="small"><span>{t("user_list.ssn")}</span><RequiredTag /></Flex>}
                     validateStatus={errors.ssn ? "error" : ""} help={errors.ssn?.message} required>
                     <Controller name="ssn" control={control}
-                        rules={{ required: "Required", pattern: { value: /^[0-9]{10,20}$/, message: "Invalid SSN" } }}
+                        rules={{
+                            required: t("required"),
+                            minLength: { value: 14, message: t("user_list.ssn_14_digits") },
+                            maxLength: { value: 14, message: t("user_list.ssn_14_digits") },
+                            pattern: { value: /^[0-9]+$/, message: t("invalid_ssn") },
+                        }}
                         render={({ field }) => <Input {...field} />} />
                 </Form.Item>
             </Form>

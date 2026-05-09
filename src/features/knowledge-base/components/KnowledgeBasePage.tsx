@@ -12,6 +12,7 @@ import {
   Empty,
   Divider,
   Pagination,
+  Select,
 } from 'antd';
 import {
   SearchOutlined,
@@ -65,10 +66,13 @@ const KnowledgeBasePage: React.FC = () => {
     editingId,
     isSubmitting,
     viewingItem,
+    categories,
+    selectedCategory,
     openViewModal,
     closeViewModal,
     handleShareArticle,
     setSearchText,
+    setSelectedCategory,
     setCurrentPage,
     setPageSize,
     openModal,
@@ -246,7 +250,7 @@ const KnowledgeBasePage: React.FC = () => {
         </div>
       </div>
 
-      <div style={{ maxWidth: 800, margin: '-30px auto 40px', padding: '0 24px' }}>
+      <div style={{ maxWidth: 900, margin: '-30px auto 40px', padding: '0 24px', display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         <Input
           size="large"
           placeholder={t('knowledge.search_placeholder')}
@@ -254,7 +258,21 @@ const KnowledgeBasePage: React.FC = () => {
           allowClear
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          style={{ borderRadius: 8, boxShadow: '0 10px 25px rgba(0,0,0,0.1)', height: 60, border: 'none' }}
+          style={{ borderRadius: 8, boxShadow: '0 10px 25px rgba(0,0,0,0.1)', height: 60, border: 'none', flex: '2 1 360px' }}
+        />
+        <Select
+          allowClear
+          size="large"
+          value={selectedCategory}
+          onChange={setSelectedCategory}
+          placeholder={t('knowledge.filter_category')}
+          options={categories.map((item) => ({
+            value: item.value,
+            label: activeLanguage === 'ar'
+              ? item.specialization_ar || item.specialization_en
+              : item.specialization_en || item.specialization_ar,
+          }))}
+          style={{ height: 60, flex: '1 1 240px' }}
         />
       </div>
 

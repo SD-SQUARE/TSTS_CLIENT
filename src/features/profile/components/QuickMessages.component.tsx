@@ -11,12 +11,15 @@ import {
     Spin,
     Typography,
     message as appMessage,
+    Popconfirm,
 } from "antd";
-import { MessageOutlined, PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, MessageOutlined, PlusOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import {
     useCreateQuickMessageMutation,
+    useDeleteQuickMessageMutation,
     useGetQuickMessagesQuery,
+    useUpdateQuickMessageMutation,
     type QuickMessage,
 } from "../../tickets/store/services/chatApi";
 import i18next from "i18next";
@@ -35,7 +38,10 @@ const QuickMessages = ({ searchTerm = "" }: { searchTerm?: string }) => {
     const { t } = useTranslation();
     const { data: quickMessages = [], isLoading } = useGetQuickMessagesQuery();
     const [createQuickMessage, { isLoading: isCreating }] = useCreateQuickMessageMutation();
+    const [updateQuickMessage, { isLoading: isUpdating }] = useUpdateQuickMessageMutation();
+    const [deleteQuickMessage, { isLoading: isDeleting }] = useDeleteQuickMessageMutation();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingMessage, setEditingMessage] = useState<QuickMessage | null>(null);
     const [titleEn, setTitleEn] = useState("");
     const [titleAr, setTitleAr] = useState("");
     const [contentEn, setContentEn] = useState("");
@@ -57,10 +63,25 @@ const QuickMessages = ({ searchTerm = "" }: { searchTerm?: string }) => {
 
     const resetModal = () => {
         setIsModalOpen(false);
+        setEditingMessage(null);
         setTitleEn("");
         setTitleAr("");
         setContentEn("");
         setContentAr("");
+    };
+
+    const openCreateModal = () => {
+        resetModal();
+        setIsModalOpen(true);
+    };
+
+    const openEditModal = (item: QuickMessage) => {
+        setEditingMessage(item);
+        setTitleEn(item.title_en || "");
+        setTitleAr(item.title_ar || "");
+        setContentEn(item.content_en || "");
+        setContentAr(item.content_ar || "");
+        setIsModalOpen(true);
     };
 
     const getLocalizedTitle = (item: QuickMessage) => {
@@ -79,21 +100,28 @@ const QuickMessages = ({ searchTerm = "" }: { searchTerm?: string }) => {
         return item.content_en || item.content_ar || "";
     };
 
-    const handleCreate = async () => {
+    const handleSave = async () => {
         if (!stripHtml(contentEn) || !stripHtml(contentAr)) {
             appMessage.warning(t("tickets.tools.quickMessages.validation"));
             return;
         }
 
         try {
-            await createQuickMessage({
+            const payload = {
                 title_en: titleEn.trim() || undefined,
                 title_ar: titleAr.trim() || undefined,
                 content_en: contentEn.trim(),
                 content_ar: contentAr.trim(),
-            }).unwrap();
+            };
 
-            appMessage.success(t("tickets.tools.quickMessages.saved"));
+            if (editingMessage) {
+                await updateQuickMessage({ id: editingMessage.id, ...payload }).unwrap();
+                appMessage.success(t("tickets.tools.quickMessages.updated"));
+            } else {
+                await createQuickMessage(payload).unwrap();
+                appMessage.success(t("tickets.tools.quickMessages.saved"));
+            }
+
             resetModal();
         } catch (error) {
             appMessage.error(getErrorMessage(error, t("errors.submitFailed")));
@@ -119,7 +147,7 @@ const QuickMessages = ({ searchTerm = "" }: { searchTerm?: string }) => {
                             </Text>
                         </Space>
 
-                        <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalOpen(true)}>
+                        <Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>
                             {t("tickets.tools.quickMessages.new")}
                         </Button>
                     </Flex>
@@ -149,9 +177,22 @@ const QuickMessages = ({ searchTerm = "" }: { searchTerm?: string }) => {
                                         }}
                                     >
                                         <Space direction="vertical" size={8} style={{ width: "100%" }}>
-                                            <Flex align="center" gap={8}>
-                                                <MessageOutlined style={{ color: "var(--color-primary)" }} />
-                                                <Text strong>{getLocalizedTitle(item)}</Text>
+                                            <Flex align="center" justify="space-between" gap={8}>
+                                                <Space>
+                                                    <MessageOutlined style={{ color: "var(--color-primary)" }} />
+                                                    <Text strong>{getLocalizedTitle(item)}</Text>
+                                                </Space>
+                                                <Space>
+                                                    <Button size="small" icon={<EditOutlined />} onClick={() => openEditModal(item)} />
+                                                    <Popconfirm
+                                                        title={t("tickets.tools.quickMessages.deleteConfirm")}
+                                                        okText={t("translation.yes")}
+                                                        cancelText={t("translation.no")}
+                                                        onConfirm={() => deleteQuickMessage(item.id)}
+                                                    >
+                                                        <Button danger size="small" icon={<DeleteOutlined />} loading={isDeleting} />
+                                                    </Popconfirm>
+                                                </Space>
                                             </Flex>
                                             <Text type="secondary">
                                                 {getLocalizedContent(item)}
@@ -171,11 +212,11 @@ const QuickMessages = ({ searchTerm = "" }: { searchTerm?: string }) => {
             </Space>
 
             <Modal
-                title={t("tickets.tools.quickMessages.modalTitle")}
+                title={editingMessage ? t("tickets.tools.quickMessages.editTitle") : t("tickets.tools.quickMessages.modalTitle")}
                 open={isModalOpen}
                 onCancel={resetModal}
-                onOk={() => void handleCreate()}
-                confirmLoading={isCreating}
+                onOk={() => void handleSave()}
+                confirmLoading={isCreating || isUpdating}
                 okText={t("tickets.tools.quickMessages.save")}
             >
                 <Space direction="vertical" size="middle" style={{ width: "100%" }}>

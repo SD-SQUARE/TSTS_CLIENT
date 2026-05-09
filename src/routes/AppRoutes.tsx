@@ -27,6 +27,9 @@ import CustomFormManager from "../features/CustomForms/components/CustomFormMana
 import FormEditPage from "../features/CustomForms/components/FormEditPage";
 import FormPreviewPage from "../features/CustomForms/components/FormPreviewPage";
 import ResponsesPage from "../features/CustomForms/components/ResponsesPage";
+import SiteSettingsPage from "../features/site-settings/components/SiteSettingsPage";
+import SlaManagementPage from "../features/sla/components/SlaManagementPage";
+import RecycleBinPage from "../features/recycle-bin/components/RecycleBinPage";
 
 import {
     CheckOutlined,
@@ -40,7 +43,10 @@ import {
     UserOutlined,
     ToolOutlined,
     IdcardOutlined,
-    IssuesCloseOutlined
+    IssuesCloseOutlined,
+    PictureOutlined,
+    AlertOutlined,
+    RestOutlined
 } from '@ant-design/icons';
 import TicketList from "../features/tickets/Components/ticketsList.tsx";
 import TicketForm from "../features/tickets/Components/ticketForm.tsx";
@@ -104,6 +110,9 @@ export const AppRoutes = () => {
         { key: withBasePath("/settings/problems"), label: t("sidebar.menu.problems"), icon: <IssuesCloseOutlined /> },
         { key: withBasePath("/settings/trusted-devices"), label: t("sidebar.menu.trustedDevices"), icon: <SafetyOutlined /> },
         { key: withBasePath("/settings/permissions"), label: t("sidebar.menu.permissions"), icon: <CheckOutlined /> },
+        { key: withBasePath("/settings/site-settings"), label: t("sidebar.menu.siteSettings"), icon: <PictureOutlined /> },
+        { key: withBasePath("/settings/sla"), label: t("sidebar.menu.slaManagement"), icon: <AlertOutlined /> },
+        { key: withBasePath("/settings/recycle-bin"), label: t("sidebar.menu.recycleBin"), icon: <RestOutlined /> },
         { key: withBasePath("/settings/logs"), label: t("sidebar.menu.auditLogs"), icon: <ClockCircleOutlined /> },
     ];
     return (
@@ -212,6 +221,21 @@ export const AppRoutes = () => {
                      </GuardedRoute>
                 } />
                 <Route path="permissions" element={<PermissionsPage />} />
+                <Route path="site-settings" element={
+                    <GuardedRoute roles={["superadmin", "admin"]}>
+                        <SiteSettingsPage />
+                    </GuardedRoute>
+                } />
+                <Route path="sla" element={
+                    <GuardedRoute roles={["superadmin", "admin"]}>
+                        <SlaManagementPage />
+                    </GuardedRoute>
+                } />
+                <Route path="recycle-bin" element={
+                    <GuardedRoute roles={["superadmin", "admin"]}>
+                        <RecycleBinPage />
+                    </GuardedRoute>
+                } />
                 <Route path="logs" element={
                     <GuardedRoute roles={["superadmin", "admin"]}>
                         <AuditLogList />

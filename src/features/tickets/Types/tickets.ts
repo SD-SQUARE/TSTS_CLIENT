@@ -27,6 +27,8 @@ export interface Requester {
   export interface Ticket {
     id: string;
     ticket_number: string;
+    createdAt?: string;
+    modifiedAt?: string;
     title: string;
     description: string;
     requester: Requester;
@@ -36,6 +38,13 @@ export interface Requester {
     priority: string;
     isOutOfService: boolean;
     assignee: Requester[];
+    sla?: {
+      violated: boolean;
+      ageHours?: number;
+      maxHours?: number;
+      ruleId?: string;
+      ruleName?: string;
+    };
   }
   
   export interface TicketsResponse {

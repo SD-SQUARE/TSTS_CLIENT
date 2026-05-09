@@ -4,8 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 
 import { t } from "i18next";
 import type { UserFormData } from "../../Types/users";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { usePermissionProfiles, useSpecializations } from "../../Hooks/useUsers";
+import { usePermissionProfiles } from "../../Hooks/useUsers";
 import RequiredTag from "../../../../components/RequiredTag";
 import type { UserFormStepHandle } from "./types";
 
@@ -18,12 +17,10 @@ const StepPermissions = forwardRef<UserFormStepHandle, Props>(({ initialData, on
     useEffect(() => { reset(initialData); }, [initialData, reset]);
 
     const { data: profiles, isLoading: profilesLoading } = usePermissionProfiles();
-    const { data: specializations, isLoading: specsLoading } = useSpecializations();
 
     const onSubmit = (data: UserFormData) => {
         onNext({
             permission_profile: data.permission_profile,
-            specializations: data.specializations,
         });
     };
 
@@ -32,7 +29,6 @@ const StepPermissions = forwardRef<UserFormStepHandle, Props>(({ initialData, on
             const data = getValues();
             return {
                 permission_profile: data.permission_profile,
-                specializations: data.specializations,
             };
         },
     }), [getValues]);
@@ -69,27 +65,7 @@ const StepPermissions = forwardRef<UserFormStepHandle, Props>(({ initialData, on
                         )}
                     />
                 </Form.Item>
-                <Form.Item label={<Flex gap="small"><span>{t("user_list.specializations")}</span><RequiredTag /></Flex>}
-                    validateStatus={errors.specializations ? "error" : ""} help={errors.specializations?.message} required>
-                    <Controller name="specializations" control={control}
-                        rules={{ required: "Required", validate: val => Array.isArray(val) && val.length > 0 || "Required" }}
-                        render={({ field }) => (
-                            <Select
-                                {...field}
-                                mode="multiple"
-                                loading={specsLoading}
-                                showSearch
-                                filterOption={filterOption}
-                                options={specializations?.map(s => ({ value: s.id, label: s.name }))}
-                                value={field.value?.map(s => s.id)}
-                                onChange={(ids: string[]) => {
-                                    const selected = specializations?.filter(s => ids.includes(s.id)) || [];
-                                    field.onChange(selected);
-                                }}
-                            />
-                        )}
-                    />
-                </Form.Item>
+                {/* Specialization assignment is intentionally managed outside the user create/edit modal. */}
             </Form>
         </Card>
     );
