@@ -185,7 +185,7 @@ const SpecializationsPage: React.FC = () => {
 
   return (
     <GenericCrudPage<Specialization>
-      title={t("specializations")}
+          title={t("translation.specializations")}
       columns={columns}
       formItems={formItems}
       data={data}

@@ -204,6 +204,10 @@
     }
   },
   "translation": {
+    "universities": "الجامعات",
+    "departments": "الأقسام",
+    "Domains": "النطاقات",
+    "domains": "النطاقات",
     "team": "فريق",
     "add_team": "إضافة فريق",
     "teams": "الفرق",

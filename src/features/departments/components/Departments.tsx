@@ -185,7 +185,7 @@ const {
             }),
         },
         {
-            title: t("university"),
+            title: t("translation.universities"),
             key: "university",
             render: (_: any, record: any) => {
                 return getLocalizedLookupName(record.domain?.university);
@@ -201,7 +201,7 @@ const {
         },
 
         {
-            title: t("domain"),
+            title: t("translation.domains"),
             key: "domain",
             render: (_: any, record: any) => {
                 return getLocalizedLookupName(record.domain);
@@ -263,7 +263,7 @@ const {
 
       <Form.Item
         name="domain"
-        label={t("domain")}
+              label={t("translation.domains")}
         rules={[{ required: true, message: t("required") }]}
       >
         <Select
@@ -280,7 +280,7 @@ const nestedFieldMappers = {
 };
   return (
     <GenericCrudPage<Department>
-      title={t("departments")}
+      title={t("translation.departments")} 
       columns={columns}
       formItems={formItems}
       data={data}

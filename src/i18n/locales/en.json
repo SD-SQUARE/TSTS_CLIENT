@@ -99,6 +99,10 @@
     }
   },
   "translation": {
+    "universities": "Universities",
+    "departments": "Departments",
+    "Domains": "Domains",
+    "domains": "Domains",
     "team": "Team",
     "add_team": "Add Team",
     "teams": "Teams",

@@ -174,7 +174,7 @@ const DomainsPage: React.FC = () => {
         },
 
         {
-            title: t("university"),
+            title: t("translation.universities"), 
             key: "university",
             render: (_: any, record: any) => {
                 return getLocalizedLookupName(record.university);
@@ -236,7 +236,7 @@ const DomainsPage: React.FC = () => {
 
       <Form.Item
         name="university"
-        label={t("university")}
+        label={t("translation.universities")}
         rules={[{ required: true, message: t("required") }]}
       >
         <Select
@@ -255,7 +255,7 @@ const DomainsPage: React.FC = () => {
     };
   return (
     <GenericCrudPage<Domain>
-      title={t("Domains")}
+      title={t("translation.Domains")}
       columns={columns}
       formItems={formItems}
       data={data}total={total}
