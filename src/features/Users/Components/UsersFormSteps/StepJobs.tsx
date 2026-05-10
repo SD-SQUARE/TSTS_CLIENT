@@ -16,9 +16,13 @@ const ENGLISH_REGEX = /^[A-Za-z\s.,!?'"()@&$-]+$/;
 const ARABIC_REGEX = /^[\u0600-\u06FF\s\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF.,!?'"()@&$-]+$/u;
 
 
-interface Props { initialData: UserFormData; onNext: (data: Partial<UserFormData>) => void; }
+interface Props {
+    initialData: UserFormData;
+    onNext: (data: Partial<UserFormData>) => void;
+    role?: string; // Add role prop to determine user type
+}
 
-const StepJobLocation = forwardRef<UserFormStepHandle, Props>(({ initialData, onNext }, ref) => {
+const StepJobLocation = forwardRef<UserFormStepHandle, Props>(({ initialData, onNext, role }, ref) => {
     const { handleSubmit, control, formState: { errors }, reset, watch, setValue, getValues } =
         useForm<UserFormData>({ defaultValues: initialData, mode: "onChange" });
     useEffect(() => { reset(initialData); }, [initialData, reset]);
@@ -37,7 +41,11 @@ const StepJobLocation = forwardRef<UserFormStepHandle, Props>(({ initialData, on
 
     const { pathname } = useLocation();
 
-    const isStaff = pathname.includes('admins') || pathname.includes('technicians');
+    // Check if user is staff based on role prop or URL path
+    const isStaff = role ? ( role === 'superadmin' || role === 'admins' || role === 'technicians') : (pathname.includes('admins') || pathname.includes('technicians'));
+
+    // Department should be visible only for requesters
+    const showDepartments = !isStaff;
 
     useEffect(() => {
         if (initialData.university?.id !== universityId) {
@@ -150,30 +158,30 @@ const StepJobLocation = forwardRef<UserFormStepHandle, Props>(({ initialData, on
                         )}
                     />
                 </Form.Item>
-                { !isStaff &&
-                <Form.Item label={<Flex gap="small"><span>{t("user_list.department")}</span></Flex>}
-                    validateStatus={errors.departments ? "error" : ""} help={errors.departments?.message} required>
-                    <Controller name="departments" control={control}
-                        // rules={{  validate: val => Array.isArray(val) && val.length > 0  }}
-                        render={({ field }) => (
-                            <Select
-                                {...field}
-                                disabled={!domainId}
-                                mode="multiple"
-                                loading={depLoading}
-                                showSearch
-                                filterOption={filterOption}
-                                options={mapLookupToOptions(departments)}
-                                value={field.value?.map(d => d.id)}
-                                onChange={(ids: string[]) => {
-                                    const selected = departments?.filter(dep => ids.includes(dep.id)) || [];
-                                    field.onChange(selected);
-                                }}
-                            />
-                        )}
-                    />
-                </Form.Item>
-}
+                {showDepartments &&
+                    <Form.Item label={<Flex gap="small"><span>{t("user_list.department")}</span></Flex>}
+                        validateStatus={errors.departments ? "error" : ""} help={errors.departments?.message} required>
+                        <Controller name="departments" control={control}
+                            // rules={{  validate: val => Array.isArray(val) && val.length > 0  }}
+                            render={({ field }) => (
+                                <Select
+                                    {...field}
+                                    disabled={!domainId}
+                                    mode="multiple"
+                                    loading={depLoading}
+                                    showSearch
+                                    filterOption={filterOption}
+                                    options={mapLookupToOptions(departments)}
+                                    value={field.value?.map(d => d.id)}
+                                    onChange={(ids: string[]) => {
+                                        const selected = departments?.filter(dep => ids.includes(dep.id)) || [];
+                                        field.onChange(selected);
+                                    }}
+                                />
+                            )}
+                        />
+                    </Form.Item>
+                }
             </Form>
         </Card>
     );

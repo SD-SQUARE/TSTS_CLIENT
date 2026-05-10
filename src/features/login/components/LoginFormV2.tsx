@@ -18,28 +18,33 @@ import { useTrustedDeviceAuth } from "../hooks/useTrustedDeviceAuth";
 import { useCookies } from 'react-cookie';
 import { getErrorMessage } from "../../../utils/error";
 import { loginMicrosoftApi } from "../../../api/auth/login/login.v2.api";
-const { Title,Text } = Typography;
+const { Title, Text } = Typography;
 
 const azureClientId = import.meta.env.VITE_AZURE_CLIENT_ID as string | undefined;
 const azureTenantId = import.meta.env.VITE_AZURE_TENANT_ID as string | undefined;
 const microsoftAuthEnabled = Boolean(azureClientId && azureTenantId);
+
+// MSAL Configuration - matches working SSO demo
 export const msalInstance = microsoftAuthEnabled
     ? new PublicClientApplication({
         auth: {
             clientId: azureClientId!,
             authority: `https://login.microsoftonline.com/${azureTenantId}`,
-            redirectUri: window.location.origin
+            redirectUri: window.location.origin,
         },
         cache: {
             cacheLocation: "sessionStorage",
         },
     })
     : null;
+
 let msalInitPromise: Promise<void> | null = null;
 
 export const initializeMsal = async () => {
     if (!msalInstance) return;
-    msalInitPromise ??= msalInstance.initialize();
+    if (!msalInitPromise) {
+        msalInitPromise = msalInstance.initialize();
+    }
     await msalInitPromise;
 };
 
@@ -54,7 +59,7 @@ const LoginFormV2 = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isMicrosoftLoading, setIsMicrosoftLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [ _, setCookie ] = useCookies(['showTrustedDeviceTour']);
+    const [_, setCookie] = useCookies(['showTrustedDeviceTour']);
 
     // 🔐 step control
     const [step, setStep] = useState<"CREDENTIALS" | "DEVICE">("CREDENTIALS");
@@ -174,21 +179,36 @@ const LoginFormV2 = () => {
 
         try {
             await initializeMsal();
+
+            console.log("[SSO] Starting Microsoft login popup...");
             const microsoftResponse = await msalInstance.loginPopup({
                 scopes: ["openid", "profile", "email"],
                 prompt: "select_account",
             });
 
+            console.log("[SSO] Microsoft login successful, ID token received");
+            console.log("[SSO] Sending ID token to backend...");
+
             const res = await loginMicrosoftApi(microsoftResponse.idToken);
+
+            console.log("[SSO] Backend response:", res);
+
+            if (!res.access_token) {
+                throw new Error("No access token received from backend");
+            }
+
             dispatch(
                 loginSuccess({
                     user: getJWTPayload(res.access_token),
                     token: res.access_token,
                 })
             );
+
+            console.log("[SSO] Login successful, redirecting...");
             setCookie("showTrustedDeviceTour", "1");
             gotoMainPage();
         } catch (err: any) {
+            console.error("[SSO] Microsoft login error:", err);
             setError(getErrorMessage(err, t("sso.loginFailed")));
         } finally {
             setIsMicrosoftLoading(false);
@@ -206,7 +226,7 @@ const LoginFormV2 = () => {
             onMouseLeave={() => setIsHovered(false)}
         >
             <div className="login-left">
-                <Avatar src={loginImage} shape="square" size={250} style={{objectFit: "contain"}} />
+                <Avatar src={loginImage} shape="square" size={250} style={{ objectFit: "contain" }} />
             </div>
 
             <div className="login-right">

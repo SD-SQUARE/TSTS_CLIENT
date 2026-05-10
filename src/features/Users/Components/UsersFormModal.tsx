@@ -340,6 +340,7 @@ const UserFormModal: React.FC<{
                         onNext={isLastStep ? handleSubmit : next}
                         onSubmit={handleSubmit}
                         isSubmitting={addOrEditMutation.isPending}
+                        role={role}
                     // onTriggerSubmit={handleTriggerSubmit}
                     />
                 </div>
