@@ -13,6 +13,8 @@ import { useTicketMutations, useTicketProblems } from '../../Hooks/useTicketForm
 import { useState } from 'react';
 import RequesterDetails from '../RequesterDetails';
 import { useSelector } from 'react-redux';
+import LocalizedDateText from '../../../../components/LocalizedDateText';
+import { formatTicketClosedDuration } from '../../utils/ticketTime';
 
 interface TicketInfoTabProps {
     ticket: any;
@@ -20,7 +22,7 @@ interface TicketInfoTabProps {
 }
 
 const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { role } = useParams();
     const currentUserRole = useSelector((state: any) => state.auth.user?.role?.toLowerCase?.() || role || '');
     const isRequester = currentUserRole === 'requester';
@@ -174,7 +176,19 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                                     <Typography.Text copyable>{ticket?.ticket_number || '-'}</Typography.Text>
                                 </Flex>
 
-                                {ticket?.sla?.violated && (
+                                <Flex justify="space-between" align="center">
+                                    <Typography.Text type="secondary">{t('tickets.createdAt')}</Typography.Text>
+                                    <LocalizedDateText value={ticket?.createdAt} language={i18n.language} />
+                                </Flex>
+
+                                <Flex justify="space-between" align="center">
+                                    <Typography.Text type="secondary">{t('tickets.totalTimeUntilClosed')}</Typography.Text>
+                                    <Typography.Text>
+                                        {formatTicketClosedDuration(ticket || {}, t)}
+                                    </Typography.Text>
+                                </Flex>
+
+                                {!isRequester && ticket?.sla?.violated && (
                                     <Flex justify="space-between" align="center">
                                         <Typography.Text type="secondary">{t('sla.title')}</Typography.Text>
                                         <Tag color="red">
@@ -393,7 +407,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
 
                 <Splitter.Panel defaultSize="30%" min="25%" style={{ overflowY: 'auto', padding: '16px', backgroundColor: '#fafafa', height: '100%' }}>
                     <Flex vertical gap="large">
-                        {ticket?.sla?.violated ? (
+                        {!isRequester && ticket?.sla?.violated ? (
                             <Badge.Ribbon text={t('sla.violated')} color="red">
                                 {renderDetailsCard()}
                             </Badge.Ribbon>

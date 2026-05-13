@@ -11,6 +11,7 @@ interface GuardedRouteProps {
     permissions?: string[];
     allowNavigation?: boolean;
     matchRoleParam?: boolean;
+    strict?: boolean;
     children: React.ReactNode;
 }
 
@@ -19,6 +20,7 @@ export default function GuardedRoute({
     permissions = [],
     allowNavigation = true,
     matchRoleParam = false,
+    strict = false,
     children,
 }: GuardedRouteProps) {
     const { t } = useTranslation();
@@ -39,12 +41,42 @@ export default function GuardedRoute({
     const role = user?.role?.toLowerCase();
     const routeRole = typeof params.role === "string" ? params.role.toLowerCase() : undefined;
     const userPermissions = user?.permissions || [];
+    const isSuperAdmin = role === "superadmin";
 
-    const isRoleAllowed = () => roles.includes("*") || roles.includes(role) ;
+    const hasAnyRoleRequirement = roles.length > 0;
+    const hasConcreteRoleRequirement = roles.some((requiredRole) => requiredRole !== "*");
+    const hasPermissionRequirement = permissions.length > 0;
+
+    const isRoleAllowed = () =>
+        !hasAnyRoleRequirement ||
+        roles.includes("*") ||
+        (!!role && roles.map((requiredRole) => requiredRole.toLowerCase()).includes(role));
 
     const isPermissionsAllowed = () =>
-        permissions.length === 0 ||
+        !hasPermissionRequirement ||
+        userPermissions.includes("*") ||
         permissions.every(p => userPermissions.includes(p));
+
+    const isAccessAllowed = () => {
+        if (isSuperAdmin) return true;
+        if (!hasAnyRoleRequirement && !hasPermissionRequirement) return true;
+
+        if (strict) {
+            const roleAllowed = hasConcreteRoleRequirement ? isRoleAllowed() : true;
+            const permissionAllowed = hasPermissionRequirement ? isPermissionsAllowed() : true;
+            return roleAllowed && permissionAllowed;
+        }
+
+        if (hasConcreteRoleRequirement && hasPermissionRequirement) {
+            return isRoleAllowed() || isPermissionsAllowed();
+        }
+
+        if (hasPermissionRequirement) {
+            return isPermissionsAllowed();
+        }
+
+        return isRoleAllowed();
+    };
 
     // console.log(isRoleAllowed());
     // console.log(isPermissionsAllowed());
@@ -76,7 +108,7 @@ export default function GuardedRoute({
         );
     }
     // 🚫 Logged in but unauthorized
-    else if ((!isRoleAllowed() || !isPermissionsAllowed()) && allowNavigation) {
+    else if (!isAccessAllowed() && allowNavigation) {
         notification.error({
             title: t("auth.unauthorized"),
             description: t("auth.unauthorizedDescription"),
@@ -96,11 +128,11 @@ export default function GuardedRoute({
         });
         return <Navigate to={`${APP_BASE_PATH}/not-allowed`} replace />;
     }
-    else if (!allowNavigation && (!isRoleAllowed() || !isPermissionsAllowed())) {
+    else if (!allowNavigation && !isAccessAllowed()) {
         return null;
     }
 
-    if (matchRoleParam && role && routeRole && role !== routeRole) {
+    if (matchRoleParam && !isSuperAdmin && role && routeRole && role !== routeRole) {
         notification.error({
             title: t("auth.unauthorized"),
             description: t("auth.roleRouteMismatchDescription", {

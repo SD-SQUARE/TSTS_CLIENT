@@ -18,6 +18,7 @@ import { useTrustedDeviceAuth } from "../hooks/useTrustedDeviceAuth";
 import { useCookies } from 'react-cookie';
 import { getErrorMessage } from "../../../utils/error";
 import { loginMicrosoftApi } from "../../../api/auth/login/login.v2.api";
+import { useSiteSettings } from "../../site-settings/hooks/useSiteSettings";
 const { Title, Text } = Typography;
 
 const azureClientId = import.meta.env.VITE_AZURE_CLIENT_ID as string | undefined;
@@ -67,6 +68,8 @@ const LoginFormV2 = () => {
 
     const loginV2 = useLoginV2();
     const trustedAuth = useTrustedDeviceAuth();
+    const { data: settings } = useSiteSettings();
+    const logoSrc = settings?.logoUrl || loginImage;
 
     const redirectPath =
         typeof location.state?.from === "string"
@@ -226,7 +229,7 @@ const LoginFormV2 = () => {
             onMouseLeave={() => setIsHovered(false)}
         >
             <div className="login-left">
-                <Avatar src={loginImage} shape="square" size={250} style={{ objectFit: "contain" }} />
+                <Avatar src={logoSrc} shape="square" size={250} style={{ objectFit: "contain" }} />
             </div>
 
             <div className="login-right">

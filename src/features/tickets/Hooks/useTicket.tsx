@@ -7,6 +7,7 @@ import i18n from '../../../i18n';
 
 export type TicketSearchValue = string | string[];
 export type TicketSearchQuery = Record<string, TicketSearchValue>;
+export type TicketAnalytics = Record<string, number | undefined>;
 
 const extractLookupArray = (payload: any, key: string) => {
     if (Array.isArray(payload)) {
@@ -55,6 +56,19 @@ export const useTickets = (page: number, pageSize: number, searchQuery: TicketSe
     return useQuery({
         queryKey: ['tickets', page, pageSize, searchQuery],
         queryFn: () => fetchTickets(page, pageSize, searchQuery),
+    });
+};
+
+const fetchTicketAnalytics = async (): Promise<TicketAnalytics> => {
+    const { data } = await api.get('/v1/tickets/analytics');
+    return data || {};
+};
+
+export const useTicketAnalytics = () => {
+    return useQuery({
+        queryKey: ['tickets', 'analytics', i18n.language],
+        queryFn: fetchTicketAnalytics,
+        staleTime: 30 * 1000,
     });
 };
 

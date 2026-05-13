@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import {
   getServerTextFilterProps,
 } from '../../../components/table/serverFilters';
+import { ARABIC_TEXT_PATTERN, ENGLISH_TEXT_PATTERN } from '../../../utils/validationPatterns';
 
 const normalizePermissionValue = (
   permission: Partial<PermissionProfilePermission> & {
@@ -348,7 +349,7 @@ const PermissionsPage: React.FC = () => {
         label={t('name_en')}
         rules={[
           { required: true, message: t('required') },
-          { pattern: /^[A-Za-z0-9\s.,-]*$/, message: t('english_only') },
+          { pattern: ENGLISH_TEXT_PATTERN, message: t('english_only') },
         ]}
       >
         <Input placeholder="e.g. HR Manager" />
@@ -359,7 +360,7 @@ const PermissionsPage: React.FC = () => {
         label={t('name_ar')}
         rules={[
           { required: true, message: t('required') },
-          { pattern: /^[\u0600-\u06FF\s0-9.,-]*$/, message: t('arabic_only') },
+          { pattern: ARABIC_TEXT_PATTERN, message: t('arabic_only') },
         ]}
       >
         <Input
@@ -371,7 +372,7 @@ const PermissionsPage: React.FC = () => {
       <Form.Item
         name="description_en"
         label={t('description_en')}
-        rules={[{ pattern: /^[A-Za-z0-9\s.,-]*$/, message: t('english_only') }]}
+        rules={[{ pattern: ENGLISH_TEXT_PATTERN, message: t('english_only') }]}
       >
         <Input.TextArea rows={3} />
       </Form.Item>
@@ -379,7 +380,7 @@ const PermissionsPage: React.FC = () => {
       <Form.Item
         name="description_ar"
         label={t('description_ar')}
-        rules={[{ pattern: /^[\u0600-\u06FF\s0-9.,-]*$/, message: t('arabic_only') }]}
+        rules={[{ pattern: ARABIC_TEXT_PATTERN, message: t('arabic_only') }]}
       >
         <Input.TextArea rows={3} style={{ direction: 'rtl', textAlign: 'right' }} />
       </Form.Item>

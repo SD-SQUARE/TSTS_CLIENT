@@ -308,7 +308,7 @@ const TicketComments: React.FC<{ assigneeName?: string; requesterId?: string }> 
         {previewBody}
         <Flex vertical gap={10} style={{ padding: 12 }}>
           <Flex justify="space-between" align="start" gap={8}>
-            <Text strong style={{ lineHeight: 1.4 }}>
+            <Text strong style={{ lineHeight: 1.4, minWidth: 0, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
               {file.name}
             </Text>
             {options?.onRemove && (
@@ -573,11 +573,17 @@ const TicketComments: React.FC<{ assigneeName?: string; requesterId?: string }> 
           flex: 1 !important;
         }
         .message-content {
-          word-break: normal;
-          overflow-wrap: break-word;
+          word-break: break-word;
+          overflow-wrap: anywhere;
           white-space: normal;
           display: block;
           max-width: 100%;
+          min-width: 0;
+        }
+        .message-content * {
+          max-width: 100%;
+          overflow-wrap: anywhere;
+          word-break: break-word;
         }
         .message-content img {
           max-width: 100%;

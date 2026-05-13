@@ -4,6 +4,7 @@ import { Alert, Card, Typography, message } from "antd";
 import { customFormApi } from "../services/customFormApi";
 import type { CustomFormPayload } from "../types";
 import FormBuilder from "./FormBuilder";
+import { getErrorMessage } from "../../../utils/error";
 import "./customForms.css";
 
 const { Paragraph, Title } = Typography;
@@ -46,6 +47,9 @@ const FormEditPage = () => {
       await queryClient.invalidateQueries({ queryKey: ["custom-forms"] });
       goBack();
     },
+    onError: (error) => {
+      message.error(getErrorMessage(error, "Form could not be created."));
+    },
   });
 
   const updateMutation = useMutation({
@@ -60,6 +64,9 @@ const FormEditPage = () => {
       await queryClient.invalidateQueries({ queryKey: ["custom-forms"] });
       await queryClient.invalidateQueries({ queryKey: ["custom-form", id] });
       goBack();
+    },
+    onError: (error) => {
+      message.error(getErrorMessage(error, "Form could not be updated."));
     },
   });
 

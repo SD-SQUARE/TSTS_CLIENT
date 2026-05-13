@@ -4,6 +4,7 @@ export interface RecycleEntity {
   key: string;
   tableName: string;
   label: string;
+  deletedCount?: number;
 }
 
 export interface DeletedRecordsResponse {
@@ -26,10 +27,5 @@ export const recycleBinApi = {
 
   async restore(entity: string, id: string) {
     await api.post(`v1/recycle-bin/${entity}/${id}/restore`);
-  },
-
-  async update(entity: string, id: string, data: Record<string, unknown>) {
-    const response = await api.put<DeletedRecordsResponse>(`v1/recycle-bin/${entity}/${id}`, data);
-    return response.data;
   },
 };

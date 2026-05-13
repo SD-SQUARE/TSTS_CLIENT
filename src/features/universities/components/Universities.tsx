@@ -6,6 +6,7 @@ import { universityApi } from '../services/universityApi';
 import type { University, CreateUniversityDto, UpdateUniversityDto } from '../types/types';
 import { useTranslation } from "react-i18next";
 import { getServerTextFilterProps } from "../../../components/table/serverFilters";
+import { ARABIC_TEXT_PATTERN, ENGLISH_TEXT_PATTERN } from "../../../utils/validationPatterns";
 
 const UniversitiesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -131,7 +132,7 @@ const UniversitiesPage: React.FC = () => {
   const formItems = (
     <>
       <Form.Item name="name_en" label={t("name_en")} rules={[{ required: true },
-          { pattern: /^[A-Za-z0-9\s.,-]*$/, message: t("english_only") }]}>
+          { pattern: ENGLISH_TEXT_PATTERN, message: t("english_only") }]}>
         <Input />
       </Form.Item>
       <Form.Item 
@@ -139,7 +140,7 @@ const UniversitiesPage: React.FC = () => {
         label={t("name_ar")} 
         rules={[
           { required: true, message: t("required") },
-          { pattern: /^[\u0600-\u06FF\s0-9.,-]*$/, message: t("arabic_only") },
+          { pattern: ARABIC_TEXT_PATTERN, message: t("arabic_only") },
         ]}
       >
         <Input style={{ direction: "rtl" }} />
@@ -148,7 +149,7 @@ const UniversitiesPage: React.FC = () => {
         name="description_en" 
         label={t("description_en")}
         rules={[
-          { pattern: /^[A-Za-z0-9\s.,-]*$/, message: t("english_only") },
+          { pattern: ENGLISH_TEXT_PATTERN, message: t("english_only") },
         ]}
       >
         <Input.TextArea rows={4} />
@@ -157,7 +158,7 @@ const UniversitiesPage: React.FC = () => {
         name="description_ar" 
         label={t("description_ar")}
         rules={[
-          { pattern: /^[\u0600-\u06FF\s0-9.,-]*$/, message: t("arabic_only") },
+          { pattern: ARABIC_TEXT_PATTERN, message: t("arabic_only") },
         ]}
       >
         <Input.TextArea rows={4} style={{ direction: "rtl" }} />

@@ -121,7 +121,7 @@ export const AppRoutes = () => {
             <Route path={`${APP_BASE_PATH}/f/:token`} element={<PublicFormPage />} />
 
             <Route index path={`${APP_BASE_PATH}/profile`} element={
-                <GuardedRoute roles={["*"]}>
+                <GuardedRoute roles={["*"]} permissions={["profile.view"]}>
                     <PageLayout> <Profile /></PageLayout>
                  </GuardedRoute> 
             } />
@@ -139,39 +139,39 @@ export const AppRoutes = () => {
                  </GuardedRoute>
             }>
                 <Route index  element={
-                     <GuardedRoute roles={["superadmin", "admin"]}>
+                     <GuardedRoute roles={["superadmin", "admin"]} permissions={["identities.dashboard.view"]}>
                        <PersonnelDashboard />
                      </GuardedRoute>
                 } />
                 
                 <Route path="groups" element={
-                     <GuardedRoute roles={["superadmin", "admin"]}>
+                     <GuardedRoute roles={["superadmin", "admin"]} permissions={["groups.view"]}>
                         <GroupsList />
                      </GuardedRoute>
                 } />
                 <Route path="groups/:id" element={
-                     <GuardedRoute roles={["superadmin", "admin"]}>
+                     <GuardedRoute roles={["superadmin", "admin"]} permissions={["groups.view"]}>
                         <GroupViewPage />
                      </GuardedRoute>
                 } />
 
                 <Route path="users/technicians" element={
-                     <GuardedRoute roles={["superadmin", "admin"]}>
+                     <GuardedRoute roles={["superadmin", "admin"]} permissions={["users.view"]}>
                         <UserList role={'technicians'} />
                      </GuardedRoute>
                 } />
                 <Route path="users/requesters" element={
-                     <GuardedRoute roles={["superadmin", "admin"]}>
+                     <GuardedRoute roles={["superadmin", "admin"]} permissions={["users.view"]}>
                         <UserList role={'requesters'} />
                      </GuardedRoute>
                 } />
                 <Route path="users/admins" element={
-                     <GuardedRoute roles={["superadmin", "admin"]}>
+                     <GuardedRoute roles={["superadmin", "admin"]} permissions={["users.view"]}>
                         <UserList role={'admins'} />
                      </GuardedRoute>
                 } />
                 <Route path="users/:role/:id" element={
-                     <GuardedRoute roles={["superadmin", "admin"]}>
+                     <GuardedRoute roles={["superadmin", "admin"]} permissions={["users.view"]}>
                         <UserViewPage />
                      </GuardedRoute>
                 } />
@@ -184,79 +184,83 @@ export const AppRoutes = () => {
                 }>
 
                 <Route path="universities" element={
-                     <GuardedRoute roles={["superadmin", "admin"]}>
+                     <GuardedRoute roles={["superadmin", "admin"]} permissions={["universities.view"]}>
                     <UniversitiesPage />
                      </GuardedRoute>
                 } />
                 
                 <Route path="domains" element={
-                     <GuardedRoute roles={["superadmin", "admin"]}>
+                     <GuardedRoute roles={["superadmin", "admin"]} permissions={["domains.view"]}>
                         <DomainsPage />
                      </GuardedRoute>
                 } />
                 <Route path="departments" element={
-                     <GuardedRoute roles={["superadmin", "admin"]}>
+                     <GuardedRoute roles={["superadmin", "admin"]} permissions={["departments.view"]}>
                         <DepartmentsPage />
                      </GuardedRoute>
                 } />
                 <Route path="specializations" element={
-                     <GuardedRoute roles={["superadmin", "admin"]}>
+                     <GuardedRoute roles={["superadmin", "admin"]} permissions={["specializations.view"]}>
                         <SpecializationsPage />
                      </GuardedRoute>
                 } />
                 <Route path="problems" element={
-                     <GuardedRoute roles={["superadmin", "admin"]}>
+                     <GuardedRoute roles={["superadmin", "admin"]} permissions={["problems.view"]}>
                         <ProblemsPage />
                      </GuardedRoute>
                 } />
                 
                 <Route path="trusted-devices" element={
-                     <GuardedRoute roles={["superadmin", "admin"]}>
+                     <GuardedRoute roles={["superadmin", "admin"]} permissions={["trusted_devices.view"]}>
                         <TrustedDevicesPage />
                      </GuardedRoute>
                 } />
                 <Route path="system-info" element={
-                     <GuardedRoute roles={["superadmin", "admin"]}>
+                     <GuardedRoute roles={["superadmin", "admin"]} permissions={["settings.system_info.view"]}>
                         <SystemInfoTab />
                      </GuardedRoute>
                 } />
-                <Route path="permissions" element={<PermissionsPage />} />
+                <Route path="permissions" element={
+                    <GuardedRoute roles={["superadmin", "admin"]} permissions={["permissions.view", "permission_profiles.view"]}>
+                        <PermissionsPage />
+                    </GuardedRoute>
+                } />
                 <Route path="site-settings" element={
-                    <GuardedRoute roles={["superadmin", "admin"]}>
+                    <GuardedRoute roles={["superadmin", "admin"]} permissions={["site_settings.view"]}>
                         <SiteSettingsPage />
                     </GuardedRoute>
                 } />
                 <Route path="sla" element={
-                    <GuardedRoute roles={["superadmin", "admin"]}>
+                    <GuardedRoute roles={["superadmin", "admin"]} permissions={["sla.view"]}>
                         <SlaManagementPage />
                     </GuardedRoute>
                 } />
                 <Route path="recycle-bin" element={
-                    <GuardedRoute roles={["superadmin", "admin"]}>
+                    <GuardedRoute roles={["superadmin", "admin"]} permissions={["recycle_bin.view"]}>
                         <RecycleBinPage />
                     </GuardedRoute>
                 } />
                 <Route path="logs" element={
-                    <GuardedRoute roles={["superadmin", "admin"]}>
+                    <GuardedRoute roles={["superadmin", "admin"]} permissions={["audit_logs.view"]}>
                         <AuditLogList />
                     </GuardedRoute>
                 } />
                 <Route path="logs/:id" element={
-                    <GuardedRoute roles={["superadmin", "admin"]}>
+                    <GuardedRoute roles={["superadmin", "admin"]} permissions={["audit_logs.view"]}>
                         <AuditLogView />
                     </GuardedRoute>
                 } />
             </Route>
 
             <Route path={`${APP_BASE_PATH}/:role/tickets`}>
-                <Route index element={<GuardedRoute roles={["*"]} matchRoleParam><PageLayout ><TicketList /></PageLayout></GuardedRoute>} />
-                <Route path="new-ticket" element={<GuardedRoute roles={["*"]} matchRoleParam><PageLayout><TicketForm /></PageLayout></GuardedRoute>} />
-                <Route path=":id/*" element={<GuardedRoute roles={["*"]} matchRoleParam><PageLayout><TicketView /></PageLayout></GuardedRoute>} />
-                <Route path=":id/edit" element={<GuardedRoute roles={["*"]} matchRoleParam><PageLayout><TicketForm /></PageLayout></GuardedRoute>} />
+                <Route index element={<GuardedRoute roles={["*"]} permissions={["tickets.view"]} matchRoleParam><PageLayout ><TicketList /></PageLayout></GuardedRoute>} />
+                <Route path="new-ticket" element={<GuardedRoute roles={["requester"]} permissions={["tickets.create"]} matchRoleParam><PageLayout><TicketForm /></PageLayout></GuardedRoute>} />
+                <Route path=":id/*" element={<GuardedRoute roles={["*"]} permissions={["tickets.view"]} matchRoleParam><PageLayout><TicketView /></PageLayout></GuardedRoute>} />
+                <Route path=":id/edit" element={<GuardedRoute roles={["*"]} permissions={["tickets.edit"]} matchRoleParam><PageLayout><TicketForm /></PageLayout></GuardedRoute>} />
             </Route>
 
             <Route path="/dashboard" element={
-                <GuardedRoute roles={["superadmin", "admin"]}>
+                <GuardedRoute roles={["superadmin", "admin"]} permissions={["dashboard.view"]}>
                 <PageLayout>
                     <DashboardPage />
                     </PageLayout>
@@ -264,18 +268,18 @@ export const AppRoutes = () => {
             } />
             
             <Route path="/reports/:id" element={
-                <GuardedRoute roles={["superadmin", "admin"]}>
+                <GuardedRoute roles={["superadmin", "admin"]} permissions={["reports.view"]}>
                 <PageLayout>
                     <ReportViewPage />
                     </PageLayout>
                 </GuardedRoute>
             } />
 
-            <Route path="knowledge-base" element={<GuardedRoute roles={["*"]}><PageLayout><KnowledgeBasePage /> </PageLayout></GuardedRoute>} />
+            <Route path="knowledge-base" element={<GuardedRoute roles={["*"]} permissions={["knowledge_base.view"]}><PageLayout><KnowledgeBasePage /> </PageLayout></GuardedRoute>} />
             <Route
                 path="chat"
                 element={
-                    <GuardedRoute roles={["admin", "superadmin", "technician"]}>
+                    <GuardedRoute roles={["admin", "superadmin", "technician"]} permissions={["chat.view"]}>
                         <PageLayout><ChatCenterPage /></PageLayout>
                     </GuardedRoute>
                 }
@@ -283,7 +287,7 @@ export const AppRoutes = () => {
             <Route
                 path="knowledge-base/generator"
                 element={
-                    <GuardedRoute roles={["admin", "superadmin", "technician"]}>
+                    <GuardedRoute roles={["admin", "superadmin", "technician"]} permissions={["knowledge_generator.view"]}>
                         <PageLayout><KnowledgeGeneratorPage /></PageLayout>
                     </GuardedRoute>
                 }
@@ -291,7 +295,7 @@ export const AppRoutes = () => {
             <Route
                 path="knowledge-base/generator/:reportId"
                 element={
-                    <GuardedRoute roles={["admin", "superadmin", "technician"]}>
+                    <GuardedRoute roles={["admin", "superadmin", "technician"]} permissions={["knowledge_generator.view"]}>
                         <PageLayout><KnowledgeGeneratorDetailPage /></PageLayout>
                     </GuardedRoute>
                 }
@@ -300,7 +304,7 @@ export const AppRoutes = () => {
             <Route
                 path={`${APP_BASE_PATH}/forms`}
                 element={
-                    <GuardedRoute roles={["admin", "superadmin", "technician"]}>
+                    <GuardedRoute roles={["admin", "superadmin", "technician"]} permissions={["custom_forms.view"]}>
                         <PageLayout>
                             <CustomFormManager embedded={false} />
                         </PageLayout>
@@ -312,7 +316,7 @@ export const AppRoutes = () => {
             <Route
                 path={`${APP_BASE_PATH}/forms/new`}
                 element={
-                    <GuardedRoute roles={["admin", "superadmin", "technician"]}>
+                    <GuardedRoute roles={["admin", "superadmin", "technician"]} permissions={["custom_forms.create"]}>
                         <PageLayout>
                             <FormEditPage />
                         </PageLayout>
@@ -324,7 +328,7 @@ export const AppRoutes = () => {
             <Route
                 path={`${APP_BASE_PATH}/forms/:id/edit`}
                 element={
-                    <GuardedRoute roles={["admin", "superadmin"]}>
+                    <GuardedRoute roles={["admin", "superadmin", "technician"]} permissions={["custom_forms.edit"]}>
                         <PageLayout>
                             <FormEditPage />
                         </PageLayout>
@@ -336,7 +340,7 @@ export const AppRoutes = () => {
             <Route
                 path={`${APP_BASE_PATH}/forms/:id/preview`}
                 element={
-                    <GuardedRoute roles={["admin", "superadmin", "technician"]}>
+                    <GuardedRoute roles={["admin", "superadmin", "technician"]} permissions={["custom_forms.view"]}>
                         <PageLayout>
                             <FormPreviewPage />
                         </PageLayout>
@@ -348,7 +352,7 @@ export const AppRoutes = () => {
             <Route
                 path={`${APP_BASE_PATH}/forms/:id/responses`}
                 element={
-                    <GuardedRoute roles={["admin", "superadmin", "technician"]}>
+                    <GuardedRoute roles={["admin", "superadmin", "technician"]} permissions={["custom_forms.export"]}>
                         <PageLayout>
                             <ResponsesPage />
                         </PageLayout>

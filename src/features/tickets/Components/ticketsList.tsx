@@ -3,7 +3,16 @@ import React, { useMemo, useState } from 'react';
 import {
     Typography, Alert, Pagination, Space, Button, Flex, Popover, Tooltip, Tag, Row, Col, Card, Statistic,
 } from 'antd';
-import { PlusOutlined, SettingOutlined } from '@ant-design/icons';
+import {
+    AlertOutlined,
+    CheckCircleOutlined,
+    ClockCircleOutlined,
+    InboxOutlined,
+    PlusOutlined,
+    SettingOutlined,
+    TeamOutlined,
+    UserOutlined,
+} from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSensor, useSensors, PointerSensor } from '@dnd-kit/core';
@@ -18,6 +27,7 @@ import {
     useTicketDepartmentsLookup,
     useTicketDomainsLookup,
     useTicketUniversitiesLookup,
+    useTicketAnalytics,
     useTickets,
     type TicketSearchQuery,
 } from '../Hooks/useTicket';
@@ -48,6 +58,7 @@ const TicketList: React.FC = () => {
         pagination.pageSize,
         apiSearchQuery,
     );
+    const { data: analyticsData, isLoading: analyticsLoading } = useTicketAnalytics();
     const ticketRows = data?.data || [];
     const { data: specs } = useSpecializations();
     const { data: hierarchicalProblems } = useTicketProblems();
@@ -278,39 +289,44 @@ const TicketList: React.FC = () => {
 
     const tableWidth = finalColumns.reduce((sum, col) => sum + (col.width as number || 100), 0);
     const analytics = useMemo(() => {
-        const normalizedStatus = (value?: string) => (value || '').toLowerCase().replace(/\s+/g, '_');
-        const total = data?.total || ticketRows.length;
-        const open = ticketRows.filter((ticket) => ['open', 're_open'].includes(normalizedStatus(ticket.status))).length;
-        const inProgress = ticketRows.filter((ticket) => normalizedStatus(ticket.status) === 'in_progress').length;
-        const resolved = ticketRows.filter((ticket) => ['resolved', 'closed'].includes(normalizedStatus(ticket.status))).length;
-        const unassigned = ticketRows.filter((ticket) => !ticket.assignee || ticket.assignee.length === 0).length;
-        const violated = ticketRows.filter((ticket) => ticket.sla?.violated).length;
+        const valueOf = (key: string) => analyticsData?.[key] ?? 0;
+        const metric = (
+            key: string,
+            label: string,
+            icon: React.ReactNode,
+            tone: { bg: string; border: string; color: string },
+        ) => ({
+            key,
+            label,
+            value: valueOf(key),
+            icon,
+            tone,
+        });
 
         if (isRequester) {
             return [
-                { label: t('tickets.analytics.myTickets'), value: total },
-                { label: t('tickets.analytics.open'), value: open },
-                { label: t('tickets.analytics.resolved'), value: resolved },
-                { label: t('tickets.analytics.slaViolated'), value: violated },
+                metric('total', t('tickets.analytics.myTickets'), <UserOutlined />, { bg: '#eef6ff', border: '#91caff', color: '#1677ff' }),
+                metric('open', t('tickets.analytics.open'), <InboxOutlined />, { bg: '#f6ffed', border: '#b7eb8f', color: '#389e0d' }),
+                metric('resolved', t('tickets.analytics.resolved'), <CheckCircleOutlined />, { bg: '#f6fffb', border: '#87e8de', color: '#08979c' }),
             ];
         }
 
         if (effectiveRole === 'technician') {
             return [
-                { label: t('tickets.analytics.assigned'), value: total },
-                { label: t('tickets.analytics.inProgress'), value: inProgress },
-                { label: t('tickets.analytics.open'), value: open },
-                { label: t('tickets.analytics.slaViolated'), value: violated },
+                metric('assigned', t('tickets.analytics.assigned'), <TeamOutlined />, { bg: '#eef6ff', border: '#91caff', color: '#1677ff' }),
+                metric('inProgress', t('tickets.analytics.inProgress'), <ClockCircleOutlined />, { bg: '#fffbe6', border: '#ffe58f', color: '#d48806' }),
+                metric('open', t('tickets.analytics.open'), <InboxOutlined />, { bg: '#f6ffed', border: '#b7eb8f', color: '#389e0d' }),
+                metric('slaViolated', t('tickets.analytics.slaViolated'), <AlertOutlined />, { bg: '#fff1f0', border: '#ffa39e', color: '#cf1322' }),
             ];
         }
 
         return [
-            { label: t('tickets.analytics.total'), value: total },
-            { label: t('tickets.analytics.unassigned'), value: unassigned },
-            { label: t('tickets.analytics.inProgress'), value: inProgress },
-            { label: t('tickets.analytics.slaViolated'), value: violated },
+            metric('total', t('tickets.analytics.total'), <TeamOutlined />, { bg: '#eef6ff', border: '#91caff', color: '#1677ff' }),
+            metric('unassigned', t('tickets.analytics.unassigned'), <InboxOutlined />, { bg: '#fff7e6', border: '#ffd591', color: '#d46b08' }),
+            metric('inProgress', t('tickets.analytics.inProgress'), <ClockCircleOutlined />, { bg: '#fffbe6', border: '#ffe58f', color: '#d48806' }),
+            metric('slaViolated', t('tickets.analytics.slaViolated'), <AlertOutlined />, { bg: '#fff1f0', border: '#ffa39e', color: '#cf1322' }),
         ];
-    }, [data?.total, effectiveRole, isRequester, t, ticketRows]);
+    }, [analyticsData, effectiveRole, isRequester, t]);
 
     return (
         <div style={{ padding: '24px' }}>
@@ -347,9 +363,39 @@ const TicketList: React.FC = () => {
 
                 <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
                     {analytics.map((item) => (
-                        <Col xs={12} md={6} key={item.label}>
-                            <Card size="small">
-                                <Statistic title={item.label} value={item.value} />
+                        <Col xs={24} sm={12} lg={6} key={item.key}>
+                            <Card
+                                size="small"
+                                loading={analyticsLoading}
+                                style={{
+                                    borderColor: item.tone.border,
+                                    background: `linear-gradient(180deg, #fff 0%, ${item.tone.bg} 100%)`,
+                                    borderRadius: 8,
+                                }}
+                            >
+                                <Flex align="center" gap={12}>
+                                    <div
+                                        style={{
+                                            width: 36,
+                                            height: 36,
+                                            display: 'grid',
+                                            placeItems: 'center',
+                                            borderRadius: 8,
+                                            color: item.tone.color,
+                                            background: '#fff',
+                                            border: `1px solid ${item.tone.border}`,
+                                            flex: '0 0 auto',
+                                        }}
+                                    >
+                                        {item.icon}
+                                    </div>
+                                    <div style={{ minWidth: 0 }}>
+                                        <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                                            {item.label}
+                                        </Typography.Text>
+                                        <Statistic value={item.value} valueStyle={{ fontSize: 22, color: item.tone.color, lineHeight: 1.15 }} />
+                                    </div>
+                                </Flex>
                             </Card>
                         </Col>
                     ))}

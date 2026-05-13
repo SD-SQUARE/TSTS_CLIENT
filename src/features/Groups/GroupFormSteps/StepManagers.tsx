@@ -1,11 +1,11 @@
 
 import React, { useEffect, useMemo } from 'react';
-import { Form, Card, Flex, Select } from 'antd';
+import { Form, Card, Flex, Select, Space, Tag } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
-import type { GroupFormData, NamedObject } from '../Types/groups';
+import type { GroupFormData, GroupUser, NamedObject } from '../Types/groups';
 import RequiredTag from '../../../components/RequiredTag';
-import { formatFullName, useAdmins, type User } from '../Hooks/useGroupForm';
+import { formatFullName, useGroupHeadCandidates } from '../Hooks/useGroupForm';
 
 
 interface StepProps {
@@ -16,19 +16,36 @@ interface StepProps {
 const StepManagers: React.FC<StepProps> = ({ initialData, onNext }) => {
     const { t } = useTranslation();
 
-    const { data: admins, isLoading: isLoadingAdmins } = useAdmins();
+    const { data: headCandidates, isLoading: isLoadingHeadCandidates } = useGroupHeadCandidates();
 
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mapUsersToAntdOptions = (users: any) => {
         if (!users) return [];
-        return users.map(user => ({
+        return users.map((user) => {
+            const userType = user.user_type || '';
+            const normalizedType = userType.toLowerCase();
+            const roleLabel = normalizedType.includes('technician')
+                ? t('translation.technician', { defaultValue: 'Technician' })
+                : t('translation.admin', { defaultValue: 'Admin' });
+            const name = formatFullName(user);
+
+            return {
             value: user.id,
-            label: formatFullName(user),
-        }));
+            label: (
+                <Space size={6}>
+                    <span>{name}</span>
+                    <Tag color={normalizedType.includes('technician') ? 'blue' : 'green'} style={{ marginInlineEnd: 0 }}>
+                        {roleLabel}
+                    </Tag>
+                </Space>
+            ),
+            textLabel: `${name} ${roleLabel}`,
+        };
+        });
     };
 
-    const transformSelectedIdsToNamedObjects = (selectedIds: string[], allUsers: User[] | undefined): NamedObject[] => {
+    const transformSelectedIdsToNamedObjects = (selectedIds: string[], allUsers: GroupUser[] | undefined): NamedObject[] => {
         if (!allUsers || selectedIds.length === 0) {
             return [];
         }
@@ -37,12 +54,13 @@ const StepManagers: React.FC<StepProps> = ({ initialData, onNext }) => {
             return {
                 id: id,
                 name: match ? formatFullName(match) : 'Unknown User',
+                user_type: match?.user_type,
             } as NamedObject;
         });
     };
 
 
-    const adminOptions = useMemo(() => mapUsersToAntdOptions(admins), [admins]);
+    const headOptions = useMemo(() => mapUsersToAntdOptions(headCandidates), [headCandidates, t]);
 const { handleSubmit, control, formState: { errors }, reset } = useForm<GroupFormData>({
     defaultValues: initialData,
     mode: 'onChange',
@@ -53,10 +71,10 @@ useEffect(() => {
 }, [initialData, reset]);
 
 
-const filterOption = (input: string, option: { value: string; label: string } | undefined) => {
-    if (!option || !option.label) return false;
+const filterOption = (input: string, option: any) => {
+    if (!option) return false;
     
-    return option.label.toLowerCase().includes(input.toLowerCase());
+    return (option.textLabel || '').toLowerCase().includes(input.toLowerCase());
 };
 
 
@@ -96,8 +114,8 @@ const filterOption = (input: string, option: { value: string; label: string } | 
                                 {...field}
                                 mode="multiple"
                                 placeholder={t('group_form.select_heads_placeholder')}
-                                loading={isLoadingAdmins}
-                                options={adminOptions}
+                                loading={isLoadingHeadCandidates}
+                                options={headOptions}
 
                                 showSearch
                                 filterOption={filterOption}
@@ -105,7 +123,7 @@ const filterOption = (input: string, option: { value: string; label: string } | 
                                 value={field.value ? field.value.map(h => h.id) : []}
 
                                 onChange={(selectedIds: string[]) => {
-                                    const selectedHeads = transformSelectedIdsToNamedObjects(selectedIds, admins);
+                                    const selectedHeads = transformSelectedIdsToNamedObjects(selectedIds, headCandidates);
                                     field.onChange(selectedHeads);
                                 }}
                             />

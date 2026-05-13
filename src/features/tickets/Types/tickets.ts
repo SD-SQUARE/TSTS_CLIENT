@@ -29,6 +29,8 @@ export interface Requester {
     ticket_number: string;
     createdAt?: string;
     modifiedAt?: string;
+    closedAt?: string | null;
+    totalTimeUntilClosedSeconds?: number | null;
     title: string;
     description: string;
     requester: Requester;

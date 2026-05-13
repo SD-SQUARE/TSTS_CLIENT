@@ -11,6 +11,8 @@ export type CustomFormFieldType =
 export interface CustomFormOption {
   id: string;
   label: string;
+  label_en?: string;
+  label_ar?: string;
 }
 
 export interface CustomFormFieldSettings {
@@ -24,8 +26,14 @@ export interface CustomFormField {
   id: string;
   type: CustomFormFieldType;
   label: string;
+  label_en?: string;
+  label_ar?: string;
   description?: string | null;
+  description_en?: string | null;
+  description_ar?: string | null;
   placeholder?: string | null;
+  placeholder_en?: string | null;
+  placeholder_ar?: string | null;
   required: boolean;
   options: CustomFormOption[];
   settings?: CustomFormFieldSettings;
@@ -33,8 +41,14 @@ export interface CustomFormField {
 
 export interface CustomFormSettings {
   submitLabel?: string;
+  submitLabel_en?: string;
+  submitLabel_ar?: string;
   successTitle?: string;
+  successTitle_en?: string;
+  successTitle_ar?: string;
   successDescription?: string;
+  successDescription_en?: string;
+  successDescription_ar?: string;
 }
 
 export interface CustomFormCreator {
@@ -46,7 +60,11 @@ export interface CustomFormCreator {
 export interface CustomForm {
   id: string;
   title: string;
+  title_en?: string;
+  title_ar?: string;
   description?: string;
+  description_en?: string;
+  description_ar?: string;
   fields: CustomFormField[];
   settings?: CustomFormSettings;
   isGlobal: boolean;
@@ -60,7 +78,11 @@ export interface CustomForm {
 
 export interface CustomFormPayload {
   title: string;
+  title_en?: string;
+  title_ar?: string;
   description?: string;
+  description_en?: string;
+  description_ar?: string;
   fields: CustomFormField[];
   settings?: CustomFormSettings;
   isGlobal?: boolean;

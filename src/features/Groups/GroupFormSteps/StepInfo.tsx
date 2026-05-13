@@ -6,10 +6,8 @@ import { useTranslation } from 'react-i18next';
 import { Controller, useForm } from 'react-hook-form';
 import type { GroupFormData } from '../Types/groups';
 import RequiredTag from '../../../components/RequiredTag';
+import { ARABIC_TEXT_PATTERN, ENGLISH_TEXT_PATTERN } from '../../../utils/validationPatterns';
 
-
-const ENGLISH_REGEX = /^[A-Za-z\s.,!?'"()@&$-]+$/;
-const ARABIC_REGEX = /^[\u0600-\u06FF\s\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF.,!?'"()@&$-]+$/u;
 
 interface ApiErrorField {
     field: string;
@@ -72,7 +70,7 @@ const StepInfo: React.FC<StepProps> = ({ initialData, onNext, apiErrors }) => {
                         control={control}
                         rules={{
                             required: t("required"), pattern: {
-                                value: ARABIC_REGEX,
+                                value: ARABIC_TEXT_PATTERN,
                                 message: t("arabic_only"),
                             }
                         }}
@@ -91,7 +89,7 @@ const StepInfo: React.FC<StepProps> = ({ initialData, onNext, apiErrors }) => {
                         control={control}
                         rules={{
                             required: t("required"), pattern: {
-                                value: ARABIC_REGEX,
+                                value: ARABIC_TEXT_PATTERN,
                                 message: t("arabic_only"),
                             }
                         }}
@@ -106,7 +104,7 @@ const StepInfo: React.FC<StepProps> = ({ initialData, onNext, apiErrors }) => {
                         control={control}
                         rules={{
                             required: t("required"), pattern: {
-                                value: ENGLISH_REGEX,
+                                value: ENGLISH_TEXT_PATTERN,
                                 message: t("english_only"),
                             }
                         }}
@@ -122,7 +120,7 @@ const StepInfo: React.FC<StepProps> = ({ initialData, onNext, apiErrors }) => {
                         control={control}
                         rules={{
                             required: t("required"), pattern: {
-                                value: ENGLISH_REGEX,
+                                value: ENGLISH_TEXT_PATTERN,
                                 message: t("english_only"),
                             }
                         }}

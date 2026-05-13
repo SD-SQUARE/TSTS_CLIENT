@@ -15,12 +15,21 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import { DownloadOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 import { customFormApi } from "../services/customFormApi";
 import "./customForms.css";
 
 const { Paragraph, Title } = Typography;
 
+const getLocalizedValue = (
+  language: string,
+  en?: string | null,
+  ar?: string | null,
+  fallback?: string | null,
+) => (language.startsWith("ar") ? ar || en || fallback || "" : en || ar || fallback || "");
+
 const ResponsesPage = () => {
+  const { i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
 
   const responsesQuery = useQuery({
@@ -32,11 +41,17 @@ const ResponsesPage = () => {
   const columns = useMemo(() => {
     const payload = responsesQuery.data;
     if (!payload) return [];
+    const fieldMap = new Map(payload.form.fields.map((field) => [field.id, field]));
 
     return payload.columns.map((column) => {
+      const field = fieldMap.get(column.key);
+      const title = field
+        ? getLocalizedValue(i18n.language, field.label_en, field.label_ar, field.label)
+        : column.title;
+
       if (column.key === "submittedAt") {
         return {
-          title: column.title,
+          title,
           dataIndex: "submittedAt",
           key: column.key,
           width: 220,
@@ -46,7 +61,7 @@ const ResponsesPage = () => {
 
       if (column.key === "responder" || column.key === "responderEmail") {
         return {
-          title: column.title,
+          title,
           dataIndex: column.key,
           key: column.key,
           ellipsis: true,
@@ -54,7 +69,7 @@ const ResponsesPage = () => {
       }
 
       return {
-        title: column.title,
+        title,
         key: column.key,
         ellipsis: true,
         render: (_: unknown, row: any) => {
@@ -65,7 +80,7 @@ const ResponsesPage = () => {
         },
       };
     });
-  }, [responsesQuery.data]);
+  }, [i18n.language, responsesQuery.data]);
 
   const handleExport = async () => {
     if (!id) return;
@@ -80,7 +95,12 @@ const ResponsesPage = () => {
       const link = document.createElement("a");
       link.href = url;
       link.download = `${
-        responsesQuery.data?.form.title?.replace(/\s+/g, "_").toLowerCase() ||
+        getLocalizedValue(
+          i18n.language,
+          responsesQuery.data?.form.title_en,
+          responsesQuery.data?.form.title_ar,
+          responsesQuery.data?.form.title,
+        )?.replace(/\s+/g, "_").toLowerCase() ||
         "form_responses"
       }_responses.xlsx`;
       link.click();
@@ -105,6 +125,12 @@ const ResponsesPage = () => {
   }
 
   const lastResponse = payload.responses[0]?.submittedAt;
+  const localizedTitle = getLocalizedValue(
+    i18n.language,
+    payload.form.title_en,
+    payload.form.title_ar,
+    payload.form.title,
+  );
 
   return (
     <div className="custom-form-responses-page">
@@ -115,7 +141,7 @@ const ResponsesPage = () => {
           style={{ width: "100%" }}
         >
           <Title level={2} style={{ marginBottom: 0 }}>
-            {payload.form.title}
+            {localizedTitle}
           </Title>
           <Paragraph type="secondary" style={{ marginBottom: 0 }}>
             Dynamic response table built from the saved form schema. Export the

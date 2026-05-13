@@ -18,6 +18,7 @@ import {
   message,
 } from "antd";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import {
   DeleteOutlined,
@@ -31,6 +32,7 @@ import {
 import { APP_BASE_PATH } from "../../../app/config";
 import { customFormApi } from "../services/customFormApi";
 import type { CustomForm } from "../types";
+import { getErrorMessage } from "../../../utils/error";
 import "./customForms.css";
 
 const { Paragraph, Text, Title } = Typography;
@@ -57,11 +59,19 @@ const buildPublicFormUrl = (token: string) => {
   return `${window.location.origin}${base}/f/${token}`;
 };
 
+const getLocalizedValue = (
+  language: string,
+  en?: string | null,
+  ar?: string | null,
+  fallback?: string | null,
+) => (language.startsWith("ar") ? ar || en || fallback || "" : en || ar || fallback || "");
+
 const CustomFormManager = ({
   ticketId,
   isGlobal = true,
   embedded = true,
 }: CustomFormManagerProps) => {
+  const { i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
@@ -104,6 +114,7 @@ const CustomFormManager = ({
       await queryClient.invalidateQueries({ queryKey: ["custom-forms"] });
       await queryClient.invalidateQueries({ queryKey: ["custom-form-templates"] });
     },
+    onError: (error) => message.error(getErrorMessage(error, "Form could not be deleted.")),
   });
 
   const attachTemplateMutation = useMutation({
@@ -115,6 +126,8 @@ const CustomFormManager = ({
       setSelectedTemplateId(undefined);
       await queryClient.invalidateQueries({ queryKey: ["custom-forms"] });
     },
+    onError: (error) =>
+      message.error(getErrorMessage(error, "Template could not be attached.")),
   });
 
   const shareMutation = useMutation({
@@ -135,6 +148,8 @@ const CustomFormManager = ({
       setShareModalOpen(false);
       setShareForm(null);
     },
+    onError: (error) =>
+      message.error(getErrorMessage(error, "Share link could not be created.")),
   });
 
   const forms = listQuery.data || [];
@@ -277,6 +292,21 @@ const CustomFormManager = ({
       ) : (
         <Row gutter={[16, 16]} className="custom-forms-grid">
           {forms.map((form) => (
+            (() => {
+              const localizedTitle = getLocalizedValue(
+                i18n.language,
+                form.title_en,
+                form.title_ar,
+                form.title,
+              );
+              const localizedDescription = getLocalizedValue(
+                i18n.language,
+                form.description_en,
+                form.description_ar,
+                form.description,
+              );
+
+              return (
             <Col xs={24} md={12} xl={8} key={form.id}>
               <Card className="custom-form-item-card">
                 <div className="custom-form-item-card__header">
@@ -290,11 +320,11 @@ const CustomFormManager = ({
                     </Space>
 
                     <Title level={4} style={{ marginTop: 14, marginBottom: 8 }}>
-                      {form.title}
+                      {localizedTitle}
                     </Title>
 
                     <Paragraph type="secondary" ellipsis={{ rows: 3 }}>
-                      {form.description || "No description provided."}
+                      {localizedDescription || "No description provided."}
                     </Paragraph>
                   </div>
                 </div>
@@ -355,6 +385,8 @@ const CustomFormManager = ({
                 </Flex>
               </Card>
             </Col>
+              );
+            })()
           ))}
         </Row>
       )}
@@ -385,14 +417,14 @@ const CustomFormManager = ({
           onChange={setSelectedTemplateId}
           options={(templateLibraryQuery.data || []).map((form) => ({
             value: form.id,
-            label: `${form.title} (${form.fields.length} questions)`,
+            label: `${getLocalizedValue(i18n.language, form.title_en, form.title_ar, form.title)} (${form.fields.length} questions)`,
           }))}
           loading={templateLibraryQuery.isLoading}
         />
       </Modal>
 
       <Modal
-        title={`Share "${shareForm?.title || "form"}"`}
+        title={`Share "${getLocalizedValue(i18n.language, shareForm?.title_en, shareForm?.title_ar, shareForm?.title) || "form"}"`}
         open={shareModalOpen}
         onCancel={() => {
           setShareModalOpen(false);

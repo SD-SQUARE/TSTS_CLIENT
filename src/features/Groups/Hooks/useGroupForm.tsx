@@ -59,6 +59,7 @@ export const toNamedObject = (user: Partial<GroupUser>): NamedObject => ({
   name: formatLocalizedUserName(user),
   name_en: user.name_en,
   name_ar: user.name_ar,
+  user_type: user.user_type,
 });
 
 export const useAdmins = () =>
@@ -67,6 +68,32 @@ export const useAdmins = () =>
     queryFn: async () => {
       const response = await api.get('v1/lockups/admins');
       return response.data.users;
+    },
+  });
+
+export const useGroupHeadCandidates = () =>
+  useQuery({
+    queryKey: ['groupHeadCandidates', i18next.language],
+    queryFn: async () => {
+      const [adminsResponse, techniciansResponse] = await Promise.all([
+        api.get('v1/lockups/admins'),
+        api.get('v1/lockups/technicians/'),
+      ]);
+
+      const candidates = [
+        ...(adminsResponse.data.users || []).map((user: GroupUser) => ({
+          ...user,
+          user_type: user.user_type || 'Admin',
+        })),
+        ...(techniciansResponse.data.users || []).map((user: GroupUser) => ({
+          ...user,
+          user_type: user.user_type || 'Technician',
+        })),
+      ];
+
+      return Array.from(
+        new Map(candidates.map((user: GroupUser) => [user.id, user])).values(),
+      );
     },
   });
 

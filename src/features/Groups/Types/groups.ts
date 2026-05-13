@@ -3,6 +3,7 @@ export interface NamedObject {
   name: string;
   name_en?: string;
   name_ar?: string;
+  user_type?: string;
 }
 
 export interface GroupUser extends NamedObject {

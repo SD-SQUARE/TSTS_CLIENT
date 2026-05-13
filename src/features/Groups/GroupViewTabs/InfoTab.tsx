@@ -11,19 +11,35 @@ import i18next from 'i18next';
 
 const { Text } = Typography;
 
+const getMemberRoleTag = (member: any, t: (key: string, options?: any) => string) => {
+    const normalizedType = `${member.user_type || ''}`.toLowerCase();
+    if (!normalizedType) return null;
+
+    const isTechnician = normalizedType.includes('technician');
+    return (
+        <Tag color={isTechnician ? 'blue' : 'green'} style={{ marginInlineStart: 4, marginInlineEnd: 0 }}>
+            {isTechnician
+                ? t('translation.technician', { defaultValue: 'Technician' })
+                : t('translation.admin', { defaultValue: 'Admin' })}
+        </Tag>
+    );
+};
+
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const renderMembers = (members: any ,t = undefined) => {
+const renderMembers = (members: any, t: (key: string, options?: any) => string) => {
     if (!members || members.length === 0) {
         return <Text disabled>-</Text>;
     }
     return (
         <Space size={[0, 8]} wrap>
             {members.map(member => (
-
-                <Tag key={member.id} color="blue" style={{ marginInlineEnd: '4px' }}>
-                    {member.name || `${member.first_name || ''} ${member.last_name || ''}`.trim()}
-                </Tag>
+                <Space key={member.id} size={4}>
+                    <Tag color="blue" style={{ marginInlineEnd: 0 }}>
+                        {member.name || `${member.first_name || ''} ${member.last_name || ''}`.trim()}
+                    </Tag>
+                    {getMemberRoleTag(member, t)}
+                </Space>
             ))}
         </Space>
     );
@@ -31,7 +47,7 @@ const renderMembers = (members: any ,t = undefined) => {
 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const renderSpecMembers = (members: any, t = undefined) => {
+const renderSpecMembers = (members: any) => {
     // console.log(members);
     if (!members || members.length === 0) {
         return <Text disabled>-</Text>;
@@ -66,7 +82,7 @@ const renderTeamLeads = (leaders: any[]) => {
     );
 };
 
-interface InfoTabProps { group: NonNullable<ReturnType<typeof useGroupDetail>['data']>; currentLanguage: string; t: (key: string) => string; onEdit: () => void }
+interface InfoTabProps { group: NonNullable<ReturnType<typeof useGroupDetail>['data']>; currentLanguage: string; t: (key: string, options?: any) => string; onEdit: () => void }
 
 
 const InfoTab: React.FC<InfoTabProps> = ({ group, t, onEdit }) => {

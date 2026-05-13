@@ -46,7 +46,11 @@ const FormPreviewPage = () => {
 
       <FormRenderer
         title={formQuery.data.title}
+        title_en={formQuery.data.title_en}
+        title_ar={formQuery.data.title_ar}
         description={formQuery.data.description}
+        description_en={formQuery.data.description_en}
+        description_ar={formQuery.data.description_ar}
         fields={formQuery.data.fields || []}
         settings={formQuery.data.settings}
         previewOnly

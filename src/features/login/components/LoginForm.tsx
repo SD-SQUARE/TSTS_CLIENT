@@ -8,6 +8,7 @@ import { useLogin } from "../hooks/useLogin";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { getErrorMessage } from "../../../utils/error";
+import { useSiteSettings } from "../../site-settings/hooks/useSiteSettings";
 const { Title } = Typography;
 
 const LoginForm = () => {
@@ -17,6 +18,8 @@ const LoginForm = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
+    const { data: settings } = useSiteSettings();
+    const logoSrc = settings?.logoUrl || loginImage;
     
     const gotoMainPage = () => {
         navigate(`${APP_BASE_PATH}/`);
@@ -78,7 +81,7 @@ const LoginForm = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="login-left">
-        <Image src={loginImage} preview={false}/>
+        <Image src={logoSrc} preview={false}/>
         </div>
 
       <div className="login-right">

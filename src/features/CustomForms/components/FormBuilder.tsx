@@ -113,13 +113,21 @@ const choiceFieldTypes = new Set<CustomFormFieldType>([
 
 const createDefaultSettings = (): CustomFormSettings => ({
   submitLabel: "Submit",
+  submitLabel_en: "Submit",
+  submitLabel_ar: "إرسال",
   successTitle: "Response received",
+  successTitle_en: "Response received",
+  successTitle_ar: "تم استلام الرد",
   successDescription: "Thanks for filling out this form.",
+  successDescription_en: "Thanks for filling out this form.",
+  successDescription_ar: "شكرا لتعبئة هذا النموذج.",
 });
 
 const createOption = (label: string) => ({
   id: uuid(),
   label,
+  label_en: label,
+  label_ar: "",
 });
 
 const createField = (type: CustomFormFieldType): CustomFormField => {
@@ -129,9 +137,16 @@ const createField = (type: CustomFormFieldType): CustomFormField => {
     id: uuid(),
     type,
     label: "",
+    label_en: "",
+    label_ar: "",
     description: "",
+    description_en: "",
+    description_ar: "",
     placeholder:
       type === "date" || choiceField ? "" : "Add a helpful placeholder",
+    placeholder_en:
+      type === "date" || choiceField ? "" : "Add a helpful placeholder",
+    placeholder_ar: "",
     required: false,
     options: choiceField ? [createOption("Option 1"), createOption("Option 2")] : [],
     settings: {},
@@ -146,13 +161,21 @@ const normalizeField = (field: Partial<CustomFormField>, index: number): CustomF
     id: field.id || uuid(),
     type: safeType,
     label: field.label || "",
+    label_en: field.label_en || field.label || "",
+    label_ar: field.label_ar || field.label || "",
     description: field.description || "",
+    description_en: field.description_en || field.description || "",
+    description_ar: field.description_ar || field.description || "",
     placeholder: field.placeholder || "",
+    placeholder_en: field.placeholder_en || field.placeholder || "",
+    placeholder_ar: field.placeholder_ar || field.placeholder || "",
     required: Boolean(field.required),
     options: supportsOptions
       ? (field.options || []).map((option, optionIndex) => ({
           id: option.id || `${field.id || `field-${index + 1}`}-option-${optionIndex + 1}`,
           label: option.label || "",
+          label_en: option.label_en || option.label || "",
+          label_ar: option.label_ar || option.label || "",
         }))
       : [],
     settings: {
@@ -183,6 +206,7 @@ const SortableFieldCard = ({
   } = useSortable({ id: field.id });
 
   const supportsOptions = choiceFieldTypes.has(field.type);
+  const displayLabel = field.label_en || field.label_ar || field.label;
   const cardStyle = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -206,7 +230,7 @@ const SortableFieldCard = ({
             icon={<DragOutlined />}
           />
           <div>
-            <Text strong>{field.label || "Untitled question"}</Text>
+            <Text strong>{displayLabel || "Untitled question"}</Text>
             <div>
               <Text type="secondary">
                 {FIELD_LIBRARY.find((item) => item.type === field.type)?.label}
@@ -226,12 +250,28 @@ const SortableFieldCard = ({
       </div>
 
       <Row gutter={[14, 14]}>
-        <Col xs={24} md={14}>
+        <Col xs={24} md={7}>
           <Input
-            placeholder="Question title"
-            value={field.label}
+            placeholder="Question title (English)"
+            value={field.label_en || ""}
             onChange={(event) =>
-              onUpdate(field.id, { label: event.target.value })
+              onUpdate(field.id, {
+                label_en: event.target.value,
+                label: event.target.value || field.label_ar || "",
+              })
+            }
+          />
+        </Col>
+        <Col xs={24} md={7}>
+          <Input
+            placeholder="Question title (Arabic)"
+            value={field.label_ar || ""}
+            dir="rtl"
+            onChange={(event) =>
+              onUpdate(field.id, {
+                label_ar: event.target.value,
+                label: field.label_en || event.target.value || "",
+              })
             }
           />
         </Col>
@@ -262,25 +302,66 @@ const SortableFieldCard = ({
         </Col>
 
         <Col span={24}>
-          <Input.TextArea
-            rows={2}
-            placeholder="Helper text or instructions (optional)"
-            value={field.description || ""}
-            onChange={(event) =>
-              onUpdate(field.id, { description: event.target.value })
-            }
-          />
+          <Row gutter={[14, 14]}>
+            <Col xs={24} md={12}>
+              <Input.TextArea
+                rows={2}
+                placeholder="Helper text or instructions (English)"
+                value={field.description_en || ""}
+                onChange={(event) =>
+                  onUpdate(field.id, {
+                    description_en: event.target.value,
+                    description: event.target.value || field.description_ar || "",
+                  })
+                }
+              />
+            </Col>
+            <Col xs={24} md={12}>
+              <Input.TextArea
+                rows={2}
+                placeholder="Helper text or instructions (Arabic)"
+                value={field.description_ar || ""}
+                dir="rtl"
+                onChange={(event) =>
+                  onUpdate(field.id, {
+                    description_ar: event.target.value,
+                    description: field.description_en || event.target.value || "",
+                  })
+                }
+              />
+            </Col>
+          </Row>
         </Col>
 
         {!supportsOptions && field.type !== "date" && (
           <Col span={24}>
-            <Input
-              placeholder="Placeholder (optional)"
-              value={field.placeholder || ""}
-              onChange={(event) =>
-                onUpdate(field.id, { placeholder: event.target.value })
-              }
-            />
+            <Row gutter={[14, 14]}>
+              <Col xs={24} md={12}>
+                <Input
+                  placeholder="Placeholder (English)"
+                  value={field.placeholder_en || ""}
+                  onChange={(event) =>
+                    onUpdate(field.id, {
+                      placeholder_en: event.target.value,
+                      placeholder: event.target.value || field.placeholder_ar || "",
+                    })
+                  }
+                />
+              </Col>
+              <Col xs={24} md={12}>
+                <Input
+                  placeholder="Placeholder (Arabic)"
+                  value={field.placeholder_ar || ""}
+                  dir="rtl"
+                  onChange={(event) =>
+                    onUpdate(field.id, {
+                      placeholder_ar: event.target.value,
+                      placeholder: field.placeholder_en || event.target.value || "",
+                    })
+                  }
+                />
+              </Col>
+            </Row>
           </Col>
         )}
 
@@ -328,13 +409,35 @@ const SortableFieldCard = ({
                   className="custom-form-builder__option-row"
                 >
                   <Input
-                    placeholder="Option label"
-                    value={option.label}
+                    placeholder="Option label (English)"
+                    value={option.label_en || ""}
                     onChange={(event) =>
                       onUpdate(field.id, {
                         options: field.options.map((item) =>
                           item.id === option.id
-                            ? { ...item, label: event.target.value }
+                            ? {
+                                ...item,
+                                label_en: event.target.value,
+                                label: event.target.value || item.label_ar || "",
+                              }
+                            : item,
+                        ),
+                      })
+                    }
+                  />
+                  <Input
+                    placeholder="Option label (Arabic)"
+                    value={option.label_ar || ""}
+                    dir="rtl"
+                    onChange={(event) =>
+                      onUpdate(field.id, {
+                        options: field.options.map((item) =>
+                          item.id === option.id
+                            ? {
+                                ...item,
+                                label_ar: event.target.value,
+                                label: item.label_en || event.target.value || "",
+                              }
                             : item,
                         ),
                       })
@@ -438,7 +541,11 @@ const FormBuilder = ({
   onCancel,
 }: FormBuilderProps) => {
   const [title, setTitle] = useState("");
+  const [titleEn, setTitleEn] = useState("");
+  const [titleAr, setTitleAr] = useState("");
   const [description, setDescription] = useState("");
+  const [descriptionEn, setDescriptionEn] = useState("");
+  const [descriptionAr, setDescriptionAr] = useState("");
   const [fields, setFields] = useState<CustomFormField[]>([]);
   const [settings, setSettings] = useState<CustomFormSettings>(
     createDefaultSettings(),
@@ -453,8 +560,19 @@ const FormBuilder = ({
   );
 
   useEffect(() => {
-    setTitle(initialValues?.title || "");
-    setDescription(initialValues?.description || "");
+    const nextTitleEn = initialValues?.title_en || initialValues?.title || "";
+    const nextTitleAr = initialValues?.title_ar || initialValues?.title || "";
+    const nextDescriptionEn =
+      initialValues?.description_en || initialValues?.description || "";
+    const nextDescriptionAr =
+      initialValues?.description_ar || initialValues?.description || "";
+
+    setTitle(nextTitleEn || nextTitleAr);
+    setTitleEn(nextTitleEn);
+    setTitleAr(nextTitleAr);
+    setDescription(nextDescriptionEn || nextDescriptionAr);
+    setDescriptionEn(nextDescriptionEn);
+    setDescriptionAr(nextDescriptionAr);
     setFields(
       (initialValues?.fields || []).map((field, index) =>
         normalizeField(field, index),
@@ -517,8 +635,13 @@ const FormBuilder = ({
   };
 
   const handleSave = () => {
-    if (!title.trim()) {
-      message.error("Please add a title for the form.");
+    const finalTitleEn = titleEn.trim();
+    const finalTitleAr = titleAr.trim();
+    const finalDescriptionEn = descriptionEn.trim();
+    const finalDescriptionAr = descriptionAr.trim();
+
+    if (!finalTitleEn && !finalTitleAr && !title.trim()) {
+      message.error("Please add an English or Arabic title for the form.");
       return;
     }
 
@@ -528,10 +651,12 @@ const FormBuilder = ({
     }
 
     const hasInvalidField = fields.some((field) => {
-      if (!field.label.trim()) return true;
+      if (!(field.label_en || field.label_ar || field.label).trim()) return true;
 
       if (choiceFieldTypes.has(field.type)) {
-        const filledOptions = field.options.filter((option) => option.label.trim());
+        const filledOptions = field.options.filter((option) =>
+          (option.label_en || option.label_ar || option.label).trim(),
+        );
         return filledOptions.length < 2;
       }
 
@@ -546,27 +671,62 @@ const FormBuilder = ({
     }
 
     const payload: CustomFormPayload = {
-      title: title.trim(),
-      description: description.trim(),
+      title: finalTitleEn || finalTitleAr || title.trim(),
+      title_en: finalTitleEn || finalTitleAr,
+      title_ar: finalTitleAr || finalTitleEn,
+      description: finalDescriptionEn || finalDescriptionAr || description.trim(),
+      description_en: finalDescriptionEn,
+      description_ar: finalDescriptionAr,
       fields: fields.map((field) => ({
         ...field,
-        label: field.label.trim(),
-        description: field.description?.trim() || "",
-        placeholder: field.placeholder?.trim() || "",
+        label: (field.label_en || field.label_ar || field.label).trim(),
+        label_en: (field.label_en || field.label_ar || field.label).trim(),
+        label_ar: (field.label_ar || field.label_en || field.label).trim(),
+        description: (field.description_en || field.description_ar || field.description || "").trim(),
+        description_en: field.description_en?.trim() || "",
+        description_ar: field.description_ar?.trim() || "",
+        placeholder: (field.placeholder_en || field.placeholder_ar || field.placeholder || "").trim(),
+        placeholder_en: field.placeholder_en?.trim() || "",
+        placeholder_ar: field.placeholder_ar?.trim() || "",
         options: choiceFieldTypes.has(field.type)
           ? field.options
-              .filter((option) => option.label.trim())
+              .filter((option) =>
+                (option.label_en || option.label_ar || option.label).trim(),
+              )
               .map((option) => ({
                 ...option,
-                label: option.label.trim(),
+                label: (option.label_en || option.label_ar || option.label).trim(),
+                label_en: (option.label_en || option.label_ar || option.label).trim(),
+                label_ar: (option.label_ar || option.label_en || option.label).trim(),
               }))
           : [],
       })),
       settings: {
-        submitLabel: settings.submitLabel?.trim() || "Submit",
-        successTitle: settings.successTitle?.trim() || "Response received",
+        submitLabel:
+          settings.submitLabel_en?.trim() ||
+          settings.submitLabel_ar?.trim() ||
+          settings.submitLabel?.trim() ||
+          "Submit",
+        submitLabel_en: settings.submitLabel_en?.trim() || "Submit",
+        submitLabel_ar: settings.submitLabel_ar?.trim() || "إرسال",
+        successTitle:
+          settings.successTitle_en?.trim() ||
+          settings.successTitle_ar?.trim() ||
+          settings.successTitle?.trim() ||
+          "Response received",
+        successTitle_en: settings.successTitle_en?.trim() || "Response received",
+        successTitle_ar: settings.successTitle_ar?.trim() || "تم استلام الرد",
         successDescription:
-          settings.successDescription?.trim() || "Thanks for filling out this form.",
+          settings.successDescription_en?.trim() ||
+          settings.successDescription_ar?.trim() ||
+          settings.successDescription?.trim() ||
+          "Thanks for filling out this form.",
+        successDescription_en:
+          settings.successDescription_en?.trim() ||
+          "Thanks for filling out this form.",
+        successDescription_ar:
+          settings.successDescription_ar?.trim() ||
+          "شكرا لتعبئة هذا النموذج.",
       },
     };
 
@@ -590,12 +750,27 @@ const FormBuilder = ({
         </Flex>
 
         <Row gutter={[14, 14]} style={{ marginTop: 18 }}>
-          <Col xs={24} md={14}>
+          <Col xs={24} md={7}>
             <Input
               size="large"
-              placeholder="Form title"
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
+              placeholder="Form title (English)"
+              value={titleEn}
+              onChange={(event) => {
+                setTitleEn(event.target.value);
+                setTitle(event.target.value || titleAr);
+              }}
+            />
+          </Col>
+          <Col xs={24} md={7}>
+            <Input
+              size="large"
+              placeholder="Form title (Arabic)"
+              value={titleAr}
+              dir="rtl"
+              onChange={(event) => {
+                setTitleAr(event.target.value);
+                setTitle(titleEn || event.target.value);
+              }}
             />
           </Col>
           <Col xs={24} md={10}>
@@ -604,12 +779,31 @@ const FormBuilder = ({
             </Card>
           </Col>
           <Col span={24}>
-            <Input.TextArea
-              rows={4}
-              placeholder="Describe what this form is for and how it should be used"
-              value={description}
-              onChange={(event) => setDescription(event.target.value)}
-            />
+            <Row gutter={[14, 14]}>
+              <Col xs={24} md={12}>
+                <Input.TextArea
+                  rows={4}
+                  placeholder="Describe the form in English"
+                  value={descriptionEn}
+                  onChange={(event) => {
+                    setDescriptionEn(event.target.value);
+                    setDescription(event.target.value || descriptionAr);
+                  }}
+                />
+              </Col>
+              <Col xs={24} md={12}>
+                <Input.TextArea
+                  rows={4}
+                  placeholder="Describe the form in Arabic"
+                  value={descriptionAr}
+                  dir="rtl"
+                  onChange={(event) => {
+                    setDescriptionAr(event.target.value);
+                    setDescription(descriptionEn || event.target.value);
+                  }}
+                />
+              </Col>
+            </Row>
           </Col>
         </Row>
       </Card>
@@ -657,38 +851,85 @@ const FormBuilder = ({
           </div>
 
           <Row gutter={[14, 14]}>
-            <Col xs={24} md={8}>
+            <Col xs={24} md={12}>
               <Input
-                placeholder="Submit button text"
-                value={settings.submitLabel}
+                placeholder="Submit button text (English)"
+                value={settings.submitLabel_en}
                 onChange={(event) =>
                   setSettings((current) => ({
                     ...current,
-                    submitLabel: event.target.value,
+                    submitLabel_en: event.target.value,
+                    submitLabel: event.target.value || current.submitLabel_ar || "",
                   }))
                 }
               />
             </Col>
-            <Col xs={24} md={8}>
+            <Col xs={24} md={12}>
               <Input
-                placeholder="Success title"
-                value={settings.successTitle}
+                placeholder="Submit button text (Arabic)"
+                value={settings.submitLabel_ar}
+                dir="rtl"
                 onChange={(event) =>
                   setSettings((current) => ({
                     ...current,
-                    successTitle: event.target.value,
+                    submitLabel_ar: event.target.value,
+                    submitLabel: current.submitLabel_en || event.target.value || "",
                   }))
                 }
               />
             </Col>
-            <Col xs={24} md={8}>
+            <Col xs={24} md={12}>
               <Input
-                placeholder="Success message"
-                value={settings.successDescription}
+                placeholder="Success title (English)"
+                value={settings.successTitle_en}
                 onChange={(event) =>
                   setSettings((current) => ({
                     ...current,
-                    successDescription: event.target.value,
+                    successTitle_en: event.target.value,
+                    successTitle: event.target.value || current.successTitle_ar || "",
+                  }))
+                }
+              />
+            </Col>
+            <Col xs={24} md={12}>
+              <Input
+                placeholder="Success title (Arabic)"
+                value={settings.successTitle_ar}
+                dir="rtl"
+                onChange={(event) =>
+                  setSettings((current) => ({
+                    ...current,
+                    successTitle_ar: event.target.value,
+                    successTitle: current.successTitle_en || event.target.value || "",
+                  }))
+                }
+              />
+            </Col>
+            <Col xs={24} md={12}>
+              <Input
+                placeholder="Success message (English)"
+                value={settings.successDescription_en}
+                onChange={(event) =>
+                  setSettings((current) => ({
+                    ...current,
+                    successDescription_en: event.target.value,
+                    successDescription:
+                      event.target.value || current.successDescription_ar || "",
+                  }))
+                }
+              />
+            </Col>
+            <Col xs={24} md={12}>
+              <Input
+                placeholder="Success message (Arabic)"
+                value={settings.successDescription_ar}
+                dir="rtl"
+                onChange={(event) =>
+                  setSettings((current) => ({
+                    ...current,
+                    successDescription_ar: event.target.value,
+                    successDescription:
+                      current.successDescription_en || event.target.value || "",
                   }))
                 }
               />

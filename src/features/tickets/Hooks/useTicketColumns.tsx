@@ -12,6 +12,8 @@ import { getTicketIdentifierSearchKey } from '../Components/ticketListComponents
 import type { Problem, Specialization, Ticket } from '../Types/tickets';
 import EllipsisComponent from '../../../components/EllipsisComponent';
 import AssigneeColumnCell from '../Components/ticketListComponents/AssigneeColumnCell';
+import LocalizedDateText from '../../../components/LocalizedDateText';
+import { formatTicketClosedDuration } from '../utils/ticketTime';
 
 type SearchableDataIndex =
     | 'id'
@@ -135,7 +137,7 @@ export const useTicketColumns = ({
     };
 
     const withSlaRibbon = (record: Ticket, content: React.ReactNode) =>
-        record.sla?.violated ? (
+        !isRequester && record.sla?.violated ? (
             <Badge.Ribbon text={t('sla.violated')} color="red">
                 <div style={{ paddingTop: 18 }}>{content}</div>
             </Badge.Ribbon>
@@ -338,8 +340,37 @@ export const useTicketColumns = ({
                             <EllipsisComponent content={renderHighlightedText(text, 'title')} />
                         </div>
                     </Popover>,
-                ),
+            ),
             ...getColumnSearchProps('title', 'tickets.title'),
+        },
+        {
+            title: t('tickets.createdAt'),
+            dataIndex: 'createdAt',
+            key: 'createdAt',
+            width: 180,
+            render: (createdAt: string) => (
+                <LocalizedDateText value={createdAt} language={i18n.language} />
+            ),
+        },
+        {
+            title: t('tickets.totalTimeUntilClosed'),
+            dataIndex: 'totalTimeUntilClosedSeconds',
+            key: 'totalTimeUntilClosedSeconds',
+            width: 180,
+            render: (_: number | null, record: Ticket) => (
+                <Popover
+                    title={t('tickets.closedAt')}
+                    content={
+                        record.closedAt
+                            ? <LocalizedDateText value={record.closedAt} language={i18n.language} />
+                            : t('tickets.notClosedYet')
+                    }
+                    trigger="hover"
+                    placement="topLeft"
+                >
+                    <span>{formatTicketClosedDuration(record, t)}</span>
+                </Popover>
+            ),
         },
         {
             title: t('tickets.status'),

@@ -11,6 +11,7 @@ import { departmentApi } from "../services/departmentApi";
 import type { CreateUniversityDto, University, UpdateUniversityDto } from "../../universities/types/types";
 import { universityApi } from "../../universities/services/universityApi";
 import { getServerTextFilterProps, getServerSelectFilterProps } from "../../../components/table/serverFilters";
+import { ARABIC_TEXT_PATTERN, ENGLISH_TEXT_PATTERN } from "../../../utils/validationPatterns";
 
 const DepartmentsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -224,7 +225,7 @@ const {
         label={t("name_en")} 
         rules={[
           { required: true, message: t("required") },
-          { pattern: /^[A-Za-z0-9\s.,-]*$/, message: t("english_only") },
+          { pattern: ENGLISH_TEXT_PATTERN, message: t("english_only") },
         ]}
       >
         <Input placeholder={t("name_en")} />
@@ -235,7 +236,7 @@ const {
         label={t("name_ar")} 
         rules={[
           { required: true, message: t("required") },
-          { pattern: /^[\u0600-\u06FF\s0-9.,-]*$/, message: t("arabic_only") },
+          { pattern: ARABIC_TEXT_PATTERN, message: t("arabic_only") },
         ]}
       >
         <Input placeholder={t("name_ar")} style={{ direction: "rtl", textAlign: "right" }} />
@@ -245,7 +246,7 @@ const {
         name="description_en" 
         label={t("description_en")}
         rules={[
-          { pattern: /^[A-Za-z0-9\s.,-]*$/, message: t("english_only") },
+          { pattern: ENGLISH_TEXT_PATTERN, message: t("english_only") },
         ]}
       >
         <Input.TextArea placeholder={t("description_en")} rows={4} />
@@ -255,7 +256,7 @@ const {
         name="description_ar" 
         label={t("description_ar")}
         rules={[
-          { pattern: /^[\u0600-\u06FF\s0-9.,-]*$/, message: t("arabic_only") },
+          { pattern: ARABIC_TEXT_PATTERN, message: t("arabic_only") },
         ]}
       >
         <Input.TextArea placeholder={t("description_ar")} rows={4} style={{ direction: "rtl", textAlign: "right" }} />

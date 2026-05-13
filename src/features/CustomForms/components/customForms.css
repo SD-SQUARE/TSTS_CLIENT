@@ -113,9 +113,15 @@
 
 .custom-form-builder__option-row {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
   gap: 10px;
   margin-bottom: 10px;
+}
+
+.custom-form-render-field,
+.custom-form-render-field * {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .custom-form-builder__footer {
