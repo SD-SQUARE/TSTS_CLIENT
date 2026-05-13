@@ -14,20 +14,22 @@ body{
 }
 /* SYSTEM COLORING SCHEMA */
 :root {
-  --color-primary: #021d40; /* Navy */
-  --color-secondary: #e0a10d; /* Gold */
-  --color-white: #f2f2f2;
-  --color-dark-white: #E5E4EE;
-  --color-black: #070e16;
-  --color-gray: #808080;
-  --color-red: #ff4d4f;
-  --bg-light: #f4f7f9;
-  --text-grey: #555;
-  --text-light: #dbe4ee;
-  --color-red: #cf1b2b;
+    --color-primary: #021d40; /* Navy */
+    --color-secondary: #e0a10d; /* Gold */
+    --color-white: #f2f2f2;
+    --color-dark-white: #E5E4EE;
+    --color-black: #070e16;
+    --color-gray: #808080;
+    --color-red: #ff4d4f;
+    --bg-light: #f4f7f9;
+    --text-grey: #555;
+    --text-light: #dbe4ee;
+    --color-red: #cf1b2b;
 }
 
-
+.css-var-_r_0_.ant-form-css-var{
+    --ant-form-item-margin-bottom: 16px !important;
+}
 
 
 

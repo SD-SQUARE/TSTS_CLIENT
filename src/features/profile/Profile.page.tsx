@@ -52,11 +52,11 @@ const Profile = () => {
             label: t("profile.tabs.groups"),
             children: <GroupsTab />,
         },
-        {
-            key: "specializations",
-            label: t("profile.tabs.specializations"),
-            children: <SpecializationsTab />,
-        },
+        // {
+        //     key: "specializations",
+        //     label: t("profile.tabs.specializations"),
+        //     children: <SpecializationsTab />,
+        // },
         {
             key: "settings",
             label: t("profile.tabs.settings"),

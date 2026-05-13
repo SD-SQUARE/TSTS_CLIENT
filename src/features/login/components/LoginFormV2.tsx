@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { Form, Input, Button, Typography, Alert, Space, Avatar } from "antd";
-import { PublicClientApplication } from "@azure/msal-browser";
-import { WindowsOutlined } from "@ant-design/icons";
+import { Form, Input, Button, Typography, Alert, Space, Avatar, Divider } from "antd";
+
 import { loginSchema } from "../schema/LoginSchema";
 import loginImage from "../../../assets/HU-bg-clear.png";
 import { APP_BASE_PATH } from "../../../app/config";
@@ -19,35 +18,9 @@ import { useCookies } from 'react-cookie';
 import { getErrorMessage } from "../../../utils/error";
 import { loginMicrosoftApi } from "../../../api/auth/login/login.v2.api";
 import { useSiteSettings } from "../../site-settings/hooks/useSiteSettings";
+import { msalInstance, loginRequest, microsoftAuthEnabled } from "../config/msalConfig";
+
 const { Title, Text } = Typography;
-
-const azureClientId = import.meta.env.VITE_AZURE_CLIENT_ID as string | undefined;
-const azureTenantId = import.meta.env.VITE_AZURE_TENANT_ID as string | undefined;
-const microsoftAuthEnabled = Boolean(azureClientId && azureTenantId);
-
-// MSAL Configuration - matches working SSO demo
-export const msalInstance = microsoftAuthEnabled
-    ? new PublicClientApplication({
-        auth: {
-            clientId: azureClientId!,
-            authority: `https://login.microsoftonline.com/${azureTenantId}`,
-            redirectUri: window.location.origin,
-        },
-        cache: {
-            cacheLocation: "sessionStorage",
-        },
-    })
-    : null;
-
-let msalInitPromise: Promise<void> | null = null;
-
-export const initializeMsal = async () => {
-    if (!msalInstance) return;
-    if (!msalInitPromise) {
-        msalInitPromise = msalInstance.initialize();
-    }
-    await msalInitPromise;
-};
 
 const LoginFormV2 = () => {
     const { t } = useTranslation();
@@ -175,26 +148,29 @@ const LoginFormV2 = () => {
     };
 
     const handleMicrosoftLogin = async () => {
-        if (!msalInstance) return;
+        if (!msalInstance) {
+            setError(t("sso.notConfigured", { defaultValue: "Microsoft SSO is not configured" }));
+            return;
+        }
 
         setIsMicrosoftLoading(true);
         setError(null);
 
         try {
-            await initializeMsal();
-
             console.log("[SSO] Starting Microsoft login popup...");
+            
             const microsoftResponse = await msalInstance.loginPopup({
-                scopes: ["openid", "profile", "email"],
+                ...loginRequest,
                 prompt: "select_account",
             });
 
             console.log("[SSO] Microsoft login successful, ID token received");
-            console.log("[SSO] Sending ID token to backend...");
+            console.log("[SSO] User email:", microsoftResponse.account?.username);
+            console.log("[SSO] Sending ID token to backend for verification...");
 
             const res = await loginMicrosoftApi(microsoftResponse.idToken);
 
-            console.log("[SSO] Backend response:", res);
+            console.log("[SSO] Backend authentication successful");
 
             if (!res.access_token) {
                 throw new Error("No access token received from backend");
@@ -212,7 +188,23 @@ const LoginFormV2 = () => {
             gotoMainPage();
         } catch (err: any) {
             console.error("[SSO] Microsoft login error:", err);
-            setError(getErrorMessage(err, t("sso.loginFailed")));
+            
+            // Provide user-friendly error messages
+            let errorMessage = t("sso.loginFailed", { defaultValue: "Microsoft login failed" });
+            
+            if (err.message?.includes("user_not_found") || err.response?.data?.message?.includes("not_found")) {
+                errorMessage = t("sso.userNotInDatabase", { 
+                    defaultValue: "Your email is not registered in our system. Please contact an administrator." 
+                });
+            } else if (err.message?.includes("domain_not_allowed") || err.response?.data?.message?.includes("domain")) {
+                errorMessage = t("sso.domainNotAllowed", { 
+                    defaultValue: "Your email domain is not allowed. Please use an authorized email address." 
+                });
+            } else if (err.errorCode === "user_cancelled") {
+                errorMessage = t("sso.cancelled", { defaultValue: "Login cancelled" });
+            }
+            
+            setError(errorMessage);
         } finally {
             setIsMicrosoftLoading(false);
         }
@@ -272,6 +264,11 @@ const LoginFormV2 = () => {
                                 placeholder="example@mail.com"
                                 className="login-input"
                                 dir="ltr"
+                                styles={{
+                                    input: {
+                                        direction: 'ltr'
+                                    }
+                                }}
                             />
                         </Form.Item>
 
@@ -294,6 +291,11 @@ const LoginFormV2 = () => {
                                 placeholder="********"
                                 className="login-input"
                                 dir="ltr"
+                                styles={{
+                                    input: {
+                                        direction: "ltr"
+                                    }
+                                }}
                             />
                         </Form.Item>
 
@@ -316,22 +318,59 @@ const LoginFormV2 = () => {
                         </Form.Item>
 
                         {microsoftAuthEnabled && (
-                            <Form.Item>
-                                <Button
-                                    icon={<WindowsOutlined />}
-                                    loading={isMicrosoftLoading}
-                                    block
-                                    onClick={() => void handleMicrosoftLogin()}
+                            <>
+                                <Divider plain
+                                    style={{ margin: "0 0 12px 0", color: "#999" }}
+                                    
                                 >
-                                    {t("sso.microsoftLogin")}
-                                </Button>
-                            </Form.Item>
+                                    {t("sso.or", { defaultValue: "OR" })}
+                                </Divider>
+                                
+                                <Form.Item style={{ marginBottom: 0 }}>
+                                    <Button
+                                        loading={isMicrosoftLoading}
+                                        block
+                                        onClick={() => void handleMicrosoftLogin()}
+                                        style={{
+                                            height: "44px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            gap: "12px",
+                                            background: "#fff",
+                                            border: "1px solid #d9d9d9",
+                                            borderRadius: "8px",
+                                            fontSize: "15px",
+                                            fontWeight: 500,
+                                            color: "#333",
+                                            transition: "all 0.2s",
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.borderColor = "#0078d4";
+                                            e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 120, 212, 0.15)";
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.borderColor = "#d9d9d9";
+                                            e.currentTarget.style.boxShadow = "none";
+                                        }}
+                                    >
+                                        <svg width="20" height="20" viewBox="0 0 21 21" fill="none">
+                                            <rect x="1" y="1" width="9" height="9" fill="#f25022" />
+                                            <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
+                                            <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
+                                            <rect x="11" y="11" width="9" height="9" fill="#ffb900" />
+                                        </svg>
+                                        <span>{t("sso.microsoftLogin", { defaultValue: "Sign in with Microsoft" })}</span>
+                                    </Button>
+                                </Form.Item>
+                            </>
                         )}
 
                         <div style={{
                             display: "flex",
                             justifyContent: "center",
                             alignItems: "center",
+                            marginTop: "1rem"
                         }} >
                             <NavLink to={`${APP_BASE_PATH}/auth/first-time/login`}>
                                 <Text style={{

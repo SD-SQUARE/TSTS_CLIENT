@@ -10,8 +10,10 @@ import "./i18n"
 import { CookiesProvider } from "react-cookie";
 import I18nProvider from "./i18n/I18nProvider";
 import { BrowserRouter } from "react-router-dom";
+import { MsalProvider } from "@azure/msal-react";
+import { msalInstance } from "./features/login/config/msalConfig";
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+const app = (
     <CookiesProvider>
         <Provider store={store}>
             <QueryClientProvider client={queryClient}>
@@ -23,5 +25,15 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             </QueryClientProvider>
         </Provider>
     </CookiesProvider>
+);
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+    msalInstance ? (
+        <MsalProvider instance={msalInstance}>
+            {app}
+        </MsalProvider>
+    ) : (
+        app
+    )
 );
 
