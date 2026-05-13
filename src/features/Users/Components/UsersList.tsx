@@ -72,7 +72,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
 
     useEffect(() => {
         handleResetAll();
-    },[role])
+    }, [role])
 
     const handleView = (id: string) => {
         navigate(`/identities/users/${role}/${id}`);
@@ -98,7 +98,7 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
             const response = await toggleRoleProfileEditMutation.mutateAsync(allowProfileEdit);
             message.success(
                 response?.data?.message ||
-                    t("user_list.profile_edit_access_updated"),
+                t("user_list.profile_edit_access_updated"),
             );
         } catch (error: any) {
             message.error(
@@ -168,18 +168,25 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
             key: "full_name",
             fixed: "left",
             width: 250,
+            ellipsis: false,
+            onCell: () => ({
+                style: {
+                    whiteSpace: 'normal',
+                    wordBreak: 'normal',
+                    lineHeight: '1.5',
+                }
+            }),
             render: (_: string, record: UserListItem) => {
                 let displayName = record[`full_name_${currentLanguage}`] || "";
 
-                if (displayName === "" || !displayName)
-                {
+                if (displayName === "" || !displayName) {
                     const firstName = record?.[`first_name_${currentLanguage}`] || '';
                     const midName = record?.[`mid_name_${currentLanguage}`] || '';
                     const lastName = record?.[`last_name_${currentLanguage}`] || '';
                     displayName = `${firstName} ${midName} ${lastName}`.trim();
                 }
                 return (
-                    <Typography.Text strong>
+                    <Typography.Text strong style={{ display: 'block' }}>
                         <Highlighter
                             highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
                             searchWords={[apiSearchQuery.first_name || '']}
@@ -254,9 +261,9 @@ export const UserList: React.FC<{ role: string }> = ({ role }) => {
                 onChange: resetToFirstPage,
             }),
         },
-        { 
-            title: t("user_list.job_title"), 
-            dataIndex: `job_${currentLanguage}`, 
+        {
+            title: t("user_list.job_title"),
+            dataIndex: `job_${currentLanguage}`,
             key: "job",
             width: 150,
             ...getServerTextFilterProps<UserListItem, any>({

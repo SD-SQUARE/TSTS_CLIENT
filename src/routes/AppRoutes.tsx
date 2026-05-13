@@ -121,9 +121,7 @@ export const AppRoutes = () => {
             <Route path={`${APP_BASE_PATH}/f/:token`} element={<PublicFormPage />} />
 
             <Route index path={`${APP_BASE_PATH}/profile`} element={
-                <GuardedRoute roles={["*"]} permissions={["profile.view"]}>
                     <PageLayout> <Profile /></PageLayout>
-                 </GuardedRoute> 
             } />
             
             <Route path={`${APP_BASE_PATH}/auth`}>
@@ -253,10 +251,10 @@ export const AppRoutes = () => {
             </Route>
 
             <Route path={`${APP_BASE_PATH}/:role/tickets`}>
-                <Route index element={<GuardedRoute roles={["*"]} permissions={["tickets.view"]} matchRoleParam><PageLayout ><TicketList /></PageLayout></GuardedRoute>} />
-                <Route path="new-ticket" element={<GuardedRoute roles={["requester"]} permissions={["tickets.create"]} matchRoleParam><PageLayout><TicketForm /></PageLayout></GuardedRoute>} />
-                <Route path=":id/*" element={<GuardedRoute roles={["*"]} permissions={["tickets.view"]} matchRoleParam><PageLayout><TicketView /></PageLayout></GuardedRoute>} />
-                <Route path=":id/edit" element={<GuardedRoute roles={["*"]} permissions={["tickets.edit"]} matchRoleParam><PageLayout><TicketForm /></PageLayout></GuardedRoute>} />
+                <Route index element={<PageLayout ><TicketList /></PageLayout>} />
+                <Route path="new-ticket" element={<PageLayout><TicketForm /></PageLayout>} />
+                <Route path=":id/*" element={<PageLayout><TicketView /></PageLayout>} />
+                <Route path=":id/edit" element={<PageLayout><TicketForm /></PageLayout>} />
             </Route>
 
             <Route path="/dashboard" element={
@@ -275,7 +273,7 @@ export const AppRoutes = () => {
                 </GuardedRoute>
             } />
 
-            <Route path="knowledge-base" element={<GuardedRoute roles={["*"]} permissions={["knowledge_base.view"]}><PageLayout><KnowledgeBasePage /> </PageLayout></GuardedRoute>} />
+            <Route path="knowledge-base" element={<PageLayout><KnowledgeBasePage /> </PageLayout>} />
             <Route
                 path="chat"
                 element={

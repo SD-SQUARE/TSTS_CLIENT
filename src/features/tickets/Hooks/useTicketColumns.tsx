@@ -138,8 +138,8 @@ export const useTicketColumns = ({
 
     const withSlaRibbon = (record: Ticket, content: React.ReactNode) =>
         !isRequester && record.sla?.violated ? (
-            <Badge.Ribbon text={t('sla.violated')} color="red">
-                <div style={{ paddingTop: 18 }}>{content}</div>
+            <Badge.Ribbon text={t('sla.violated')} color="red" style={{ position: 'absolute', top: -2, right: -8 }}>
+                <div style={{ paddingTop: 0 }}>{content}</div>
             </Badge.Ribbon>
         ) : (
             content
@@ -319,6 +319,11 @@ export const useTicketColumns = ({
             key: 'title',
             width: 450,
             ellipsis: true,
+            onCell: (record: Ticket) => ({
+                style: !isRequester && record.sla?.violated ? {
+                    position: 'relative' as const,
+                } : {}
+            }),
             render: (text: string, record: Ticket) =>
                 withSlaRibbon(
                     record,
@@ -471,8 +476,7 @@ export const useTicketColumns = ({
                     title: t('tickets.requester'),
                     dataIndex: ['requester', 'name'],
                     key: 'requesterName',
-                    width: 180,
-                    ellipsis: true,
+                    width: 220,
                     render: (requesterName: string) => (
                         <Popover
                             title={t('tickets.requester')}
@@ -484,7 +488,9 @@ export const useTicketColumns = ({
                             trigger="hover"
                             placement="topLeft"
                         >
-                            <EllipsisComponent content={requesterName || t('common.empty')} />
+                            <div style={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                                {requesterName || t('common.empty')}
+                            </div>
                         </Popover>
                     ),
                     ...getColumnSelectProps('requester', 'tickets.requester', requesters),

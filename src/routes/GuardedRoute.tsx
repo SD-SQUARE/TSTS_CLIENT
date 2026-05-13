@@ -36,12 +36,21 @@ export default function GuardedRoute({
         return <Spin fullscreen size="large" />;
     }
     
-    // console.log(user);
-    // console.log(roles);
     const role = user?.role?.toLowerCase();
     const routeRole = typeof params.role === "string" ? params.role.toLowerCase() : undefined;
     const userPermissions = user?.permissions || [];
     const isSuperAdmin = role === "superadmin";
+    
+    // Debug logging for permission issues
+    if (permissions.length > 0) {
+        console.log('[GuardedRoute] Permission Check:', {
+            path: location.pathname,
+            requiredPermissions: permissions,
+            userPermissions,
+            userRole: role,
+            hasPermissions: userPermissions.length > 0
+        });
+    }
 
     const hasAnyRoleRequirement = roles.length > 0;
     const hasConcreteRoleRequirement = roles.some((requiredRole) => requiredRole !== "*");

@@ -43,7 +43,16 @@ const SlaManagementPage = () => {
   const { data: specializations = [] } = useSpecializations();
   const { data: groupedProblems } = useTicketProblems();
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey });
+  const invalidate = () => {
+    // Invalidate SLA rules query
+    queryClient.invalidateQueries({ queryKey });
+    
+    // Invalidate all ticket queries since SLA affects ticket display
+    queryClient.invalidateQueries({ queryKey: ['tickets'] });
+    
+    // Show success message
+    message.success(t('sla.cache_invalidated', { defaultValue: 'SLA rules updated. Ticket list will refresh.' }));
+  };
 
   const createMutation = useMutation({
     mutationFn: slaApi.create,
