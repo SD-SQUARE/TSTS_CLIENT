@@ -67,7 +67,7 @@ const StepAccess = forwardRef<UserFormStepHandle, Props>(({
                     validateStatus={errors.email ? "error" : ""} help={errors.email?.message}>
                     <Controller name="email" control={control}
                         rules={{
-                            required: isEdit ? false : t("required"),
+                            // required: isEdit ? false : t("required"),
                             pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: t("Invalid_email_address_format") },
                             validate: (value) => {
                                 if (!value || allowedDomainNames.length === 0) return true;
@@ -86,7 +86,7 @@ const StepAccess = forwardRef<UserFormStepHandle, Props>(({
                     validateStatus={errors.password ? "error" : ""} help={errors.password?.message} >
                     <Controller name="password" control={control} disabled={isSubmitting}
                         rules={{
-                            required:isEdit ? false : t("required"),
+                            // required:isEdit ? false : t("required"),
                             minLength: isEdit ? {
                                 value: 8,
                                 message: t("password_8_chars"),

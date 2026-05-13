@@ -302,11 +302,9 @@ export const AppRoutes = () => {
             <Route
                 path={`${APP_BASE_PATH}/forms`}
                 element={
-                    <GuardedRoute roles={["admin", "superadmin", "technician"]} permissions={["custom_forms.view"]}>
                         <PageLayout>
                             <CustomFormManager embedded={false} />
                         </PageLayout>
-                    </GuardedRoute>
                 }
             />
 
@@ -314,11 +312,9 @@ export const AppRoutes = () => {
             <Route
                 path={`${APP_BASE_PATH}/forms/new`}
                 element={
-                    <GuardedRoute roles={["admin", "superadmin", "technician"]} permissions={["custom_forms.create"]}>
                         <PageLayout>
                             <FormEditPage />
                         </PageLayout>
-                    </GuardedRoute>
                 }
             />
 
@@ -326,11 +322,9 @@ export const AppRoutes = () => {
             <Route
                 path={`${APP_BASE_PATH}/forms/:id/edit`}
                 element={
-                    <GuardedRoute roles={["admin", "superadmin", "technician"]} permissions={["custom_forms.edit"]}>
-                        <PageLayout>
+                    <PageLayout>
                             <FormEditPage />
                         </PageLayout>
-                    </GuardedRoute>
                 }
             />
 
@@ -338,11 +332,9 @@ export const AppRoutes = () => {
             <Route
                 path={`${APP_BASE_PATH}/forms/:id/preview`}
                 element={
-                    <GuardedRoute roles={["admin", "superadmin", "technician"]} permissions={["custom_forms.view"]}>
-                        <PageLayout>
+                     <PageLayout>
                             <FormPreviewPage />
                         </PageLayout>
-                    </GuardedRoute>
                 }
             />
 
@@ -350,11 +342,9 @@ export const AppRoutes = () => {
             <Route
                 path={`${APP_BASE_PATH}/forms/:id/responses`}
                 element={
-                    <GuardedRoute roles={["admin", "superadmin", "technician"]} permissions={["custom_forms.export"]}>
-                        <PageLayout>
+                    <PageLayout>
                             <ResponsesPage />
                         </PageLayout>
-                    </GuardedRoute>
                 }
             />
 
