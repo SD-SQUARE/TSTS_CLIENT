@@ -33,6 +33,12 @@ export interface ReportDetail {
     columns: DynamicColumn[];
     records: Record<string, any>[];
     filters: string[];
+    meta?: {
+        page_size: number;
+        page_index: number;
+        total: number;
+        total_pages: number;
+    };
 }
 
 export interface ReportQueryParams {

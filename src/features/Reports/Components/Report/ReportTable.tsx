@@ -13,9 +13,26 @@ interface Props {
     filtersList: string[];
     activeFilters: { column: string; value: string }[];
     onFiltersChange: (filters: { column: string; value: string }[]) => void;
+    pagination?: {
+        current: number;
+        pageSize: number;
+        total: number;
+        showSizeChanger: boolean;
+        showTotal?: (total: number, range: [number, number]) => string;
+        onChange: (page: number, pageSize: number) => void;
+    };
 }
 
-const ReportTable: React.FC<Props> = ({ columns, records, loading, title, filtersList = [], activeFilters, onFiltersChange }) => {
+const ReportTable: React.FC<Props> = ({
+    columns,
+    records,
+    loading,
+    title,
+    filtersList = [],
+    activeFilters,
+    onFiltersChange,
+    pagination
+}) => {
 
     const handleFilterUpdate = useCallback((column: string, value: string | undefined) => {
         let newFilters = [...activeFilters];
@@ -54,7 +71,7 @@ const ReportTable: React.FC<Props> = ({ columns, records, loading, title, filter
                 columns={mappedColumns}
                 skeletonLoading={loading}
                 rowKey={(record, index) => record.id || index}
-                pagination={{ pageSize: 10, showSizeChanger: true }}
+                pagination={pagination || { pageSize: 10, showSizeChanger: true }}
             />
         </Card>
     );

@@ -2,7 +2,6 @@ import { Spin, Tabs } from "antd";
 import { useTranslation } from "react-i18next";
 import ProfileTab from "./components/tabs/ProfileTab.component";
 import GroupsTab from "./components/tabs/GroupsTab.component";
-import SpecializationsTab from "./components/tabs/SpecializationsTab.component";
 import SettingsTab from "./components/tabs/SettingsTab.component";
 import i18next from "i18next";
 import { useSelector } from "react-redux";
@@ -31,7 +30,7 @@ const Profile = () => {
         const params = new URLSearchParams(location.search);
         const requestedTab = params.get("tab");
 
-        if (requestedTab === "settings" || requestedTab === "profile" || requestedTab === "groups" || requestedTab === "specializations") {
+        if (requestedTab === "settings" || requestedTab === "profile" || requestedTab === "groups" || requestedTab === "specializations" || requestedTab === "ai-assistant") {
             setActiveMainTab(requestedTab);
         }
     }, [location.search]);
@@ -85,7 +84,6 @@ const Profile = () => {
                 <SettingsTab
                     forceDevices={forceSettingsDevices}
                     onTourReady={() =>
-                        // localStorage.removeItem("showTrustedDeviceTour")\
                         setCookie("showTrustedDeviceTour", "0")
                     }
                 />

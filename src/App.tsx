@@ -11,6 +11,7 @@ import { authInitialized, loginSuccess } from "./features/login/store/authSlice"
 import { useDispatch, useSelector } from "react-redux"
 import { loadCsrfToken } from "./api/http"
 import RealtimeBridge from "./features/communications/components/RealtimeBridge"
+import { RobotOutlined } from "@ant-design/icons"
 
 function App() {
 
@@ -47,6 +48,16 @@ function App() {
                                 <NavItem to="/knowledge-base">{t("sidebar.menu.knowledgeBase")}</NavItem>
                                 
                                 {userRole && <NavItem to={`/${userRole}/tickets`}>{t("sidebar.menu.tickets")}</NavItem>}
+
+                                {/* AI Assistant - only for requesters */}
+                                {userRole === "requester" && (
+                                    <NavItem to="/ai-assistant">
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                                            <RobotOutlined />
+                                            {t("ai_assistant.title", "AI Assistant")}
+                                        </span>
+                                    </NavItem>
+                                )}
                                 
                                 <GuardedRoute roles={["admin"]} allowNavigation={false}>
                                     <NavItem to="/identities" activePrefixes={["/identities"]}>{t("sidebar.menu.personnel")}</NavItem>

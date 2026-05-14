@@ -23,6 +23,8 @@ const ReportViewPage: React.FC = () => {
     const [isDownloading, setIsDownloading] = useState(false);
 
     const [activeFilters, setActiveFilters] = useState<{ column: string; value: string }[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
 
     const filtersQueryParam = useMemo(() => {
         return activeFilters.length > 0 ? JSON.stringify(activeFilters) : undefined;
@@ -33,7 +35,7 @@ const ReportViewPage: React.FC = () => {
         endDate: dates[1],
         periodType,
         filters: filtersQueryParam,
-    });
+    }, currentPage, pageSize);
     const handleDownload = async () => {
         setIsDownloading(true);
         try {
@@ -93,12 +95,14 @@ const ReportViewPage: React.FC = () => {
 
 
             <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                <ReportChart
-                    data={data?.statistics}
-                    loading={isLoading}
-                    title={t('dashboard.trends')}
-                />
-
+                {/* Only show chart if there is statistics data */}
+                {(isLoading || (data?.statistics && data.statistics.length > 0)) && (
+                    <ReportChart
+                        data={data?.statistics}
+                        loading={isLoading}
+                        title={t('dashboard.trends')}
+                    />
+                )}
                 <ReportFilterBar
                     periodType={periodType}
                     dates={dates}
@@ -114,6 +118,17 @@ const ReportViewPage: React.FC = () => {
                     filtersList={data?.filters || []}
                     activeFilters={activeFilters}
                     onFiltersChange={setActiveFilters}
+                    pagination={{
+                        current: currentPage,
+                        pageSize: pageSize,
+                        total: data?.meta?.total || 0,
+                        showSizeChanger: true,
+                        showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+                        onChange: (page, size) => {
+                            setCurrentPage(page);
+                            setPageSize(size);
+                        },
+                    }}
                 />
             </Space>
 

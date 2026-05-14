@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { Button, Card, DatePicker, Flex, Input, Select, Space, Typography } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useDashboardCharts, useReportsList } from '../Hooks/useReports';
+import { useDashboardCharts, useDashboardAnalytics, useReportsList } from '../Hooks/useReports';
 import DashboardLineChart from './Dashboard/DashboardLineChart';
+import AnalyticsCards from './Dashboard/AnalyticsCards';
 import ReportCardList from './Dashboard/ReportCardList';
 import dayjs from 'dayjs';
 
@@ -34,6 +35,15 @@ const DashboardPage: React.FC = () => {
             refetchOnWindowFocus: true,
         }
     );
+    const { data: analyticsData, isLoading: isAnalyticsLoading } = useDashboardAnalytics({
+        startDate: dates[0],
+        endDate: dates[1]
+    },
+        {
+            refetchInterval: REFRESH_INTERVAL,
+            refetchOnWindowFocus: true,
+        }
+    );
     const { data: reportsData, isLoading: isReportsLoading } = useReportsList(search);
 
     return (
@@ -41,6 +51,9 @@ const DashboardPage: React.FC = () => {
             <Title level={2}>{t('dashboard.welcome')}</Title>
 
             <Space direction="vertical" size="large" style={{ width: '100%' }}>
+
+                {/* Analytics Cards */}
+                <AnalyticsCards data={analyticsData} loading={isAnalyticsLoading} />
 
                 <Card
                     title={t('dashboard.trends')}

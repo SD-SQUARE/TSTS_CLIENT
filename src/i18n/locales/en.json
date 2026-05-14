@@ -695,7 +695,8 @@
       "profile": "Profile",
       "groups": "Groups",
       "specializations": "Specializations",
-      "settings": "Settings"
+      "settings": "Settings",
+      "ai_assistant": "AI Assistant"
     },
     "actions": {
       "changeImage": "Change Image",
@@ -1027,5 +1028,17 @@
     "placeholder": "Type \"{{keyword}}\"",
     "ok": "Delete",
     "cancel": "Cancel"
+  },
+  "ai_assistant": {
+    "title": "AI Assistant",
+    "checking": "Checking...",
+    "online": "Online",
+    "offline": "Offline - Limited mode",
+    "kb_only": "Knowledge Base Only",
+    "clear": "Clear chat",
+    "welcome_title": "How can I help you?",
+    "welcome_desc": "Ask me anything about technical support, or I can help you create a ticket.",
+    "placeholder": "Ask a question... (Enter to send, Shift+Enter for new line)",
+    "disclaimer": "AI responses may not always be accurate. For urgent issues, please create a support ticket."
   }
 }

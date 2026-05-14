@@ -13,46 +13,60 @@ interface Props {
 const DashboardLineChart: React.FC<Props> = ({ data, loading }) => {
     const { t } = useTranslation();
 
-    
     const flattenedData = useMemo(() => {
-        return data?.flatMap(ticket =>
-            ticket.statistics.map(stats => ({
+        if (!data || data.length === 0) return [];
+
+        // Collect all unique periods across all specializations and sort them
+        const allPeriods = Array.from(
+            new Set(data.flatMap(ticket => ticket.statistics.map(s => s.period)))
+        ).sort(); // lexicographic sort works for YYYY, YYYY-MM, YYYY-MM-DD formats
+
+        // For each specialization, fill in missing periods with 0
+        return data.flatMap(ticket => {
+            const periodMap = new Map(ticket.statistics.map(s => [s.period, s.value]));
+            return allPeriods.map(period => ({
                 category: ticket.ticketType,
-                period: stats.period,
-                value: stats.value
-            }))
-        ) || [];
+                period,
+                value: periodMap.get(period) ?? 0,
+            }));
+        });
     }, [data]);
 
     const config = {
         data: flattenedData,
         xField: 'period',
         yField: 'value',
-        
         sizeField: 3,
         colorField: 'category',
         smooth: true,
-        
         animation: {
             appear: { animation: 'path-in', duration: 1000 },
         },
-        color: ['#1677ff', '#52c41a', '#faad14', '#ff4d4f', '#722ed1'],
         point: { size: 4, shape: 'circle' },
-        // scale: {
-        //     color: {
-        //         domain: categoriesOrder,
-        //     },
-        // },
         label: {
-            content: (d: any) => `${d.category}: ${d.value}`,
+            content: (d: any) => d.value > 0 ? `${d.value}` : '',
             style: {
                 fill: '#595959',
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: 600,
-                textBaseline: 'bottom',
+                textBaseline: 'bottom' as const,
             },
             offset: 10,
             layout: [{ type: 'hide-overlap' }],
+        },
+        axis: {
+            x: {
+                label: {
+                    autoRotate: true,
+                    autoHide: false,
+                },
+            },
+        },
+        legend: {
+            position: 'top' as const,
+        },
+        tooltip: {
+            title: (d: any) => d.period,
         },
     };
 

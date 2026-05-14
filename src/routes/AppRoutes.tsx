@@ -61,6 +61,7 @@ import AuditLogList from "../features/AuditLogs/Components/AuditLogsList.tsx";
 import AuditLogView from "../features/AuditLogs/Components/AuditLogView.tsx";
 import DashboardPage from "../features/Reports/Components/DashboardPage.tsx";
 import ReportViewPage from "../features/Reports/Components/ReportPage.tsx";
+import AiAssistant from "../features/ai-assistant/AiAssistant.tsx";
 
 const withBasePath = (path: string) => `${APP_BASE_PATH}${path}`;
 
@@ -269,6 +270,14 @@ export const AppRoutes = () => {
                 <GuardedRoute roles={["superadmin", "admin"]} permissions={["reports.view"]}>
                 <PageLayout>
                     <ReportViewPage />
+                    </PageLayout>
+                </GuardedRoute>
+            } />
+
+            <Route path="/ai-assistant" element={
+                <GuardedRoute roles={["requester"]} allowNavigation={false}>
+                    <PageLayout>
+                        <AiAssistant />
                     </PageLayout>
                 </GuardedRoute>
             } />
