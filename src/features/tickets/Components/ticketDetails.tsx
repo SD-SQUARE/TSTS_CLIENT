@@ -13,6 +13,7 @@ import { useGetChatMessagesQuery } from '../store/services/chatApi';
 import TicketReviewsTab from './ticketTabs/ReviewTab';
 import TicketFinalReportTab from './ticketTabs/FinalReportTab';
 import CustomFormManager from '../../CustomForms/components/CustomFormManager';
+import RemoteControlTab from './ticketTabs/RemoteControlTab';
 
 const TicketView: React.FC = () => {
     const { t } = useTranslation();
@@ -28,10 +29,11 @@ const TicketView: React.FC = () => {
 
     const pathParts = location.pathname.split('/');
     const lastPart = pathParts[pathParts.length - 1];
-    const activeKey = ['media', 'chat', 'history', 'reviews', 'final-report', 'custom-forms'].includes(lastPart)
+    const activeKey = ['media', 'chat', 'history', 'reviews', 'final-report', 'custom-forms', 'remote-control'].includes(lastPart)
         ? lastPart
         : 'info';
     const canManageFinalReport = ['admin', 'technician', 'superadmin'].includes(role || '');
+    const canRemoteControl = ['admin', 'technician', 'superadmin'].includes(role || '');
 
     useEffect(() => {
         if (activeKey === 'info') {
@@ -108,6 +110,15 @@ const TicketView: React.FC = () => {
             key: 'history',
             label: t('tickets.tabHistory'),
             children: <TicketHistoryTab />,
+        }] : []),
+        ...(canRemoteControl ? [{
+            key: 'remote-control',
+            label: (
+                <span>
+                    🖥️ {t('tickets.tabRemoteControl', 'Remote Control')}
+                </span>
+            ),
+            children: <RemoteControlTab ticket={ticket} />,
         }] : []),
     ];
 

@@ -6,6 +6,7 @@ import type { CustomFormPayload } from "../types";
 import FormBuilder from "./FormBuilder";
 import { getErrorMessage } from "../../../utils/error";
 import "./customForms.css";
+import { useTranslation } from "react-i18next";
 
 const { Paragraph, Title } = Typography;
 
@@ -14,6 +15,7 @@ const FormEditPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
+  const { t } = useTranslation();
 
   const isEditMode = Boolean(id);
   const ticketId = searchParams.get("ticketId");
@@ -43,12 +45,12 @@ const FormEditPage = () => {
         isGlobal: !ticketId,
       }),
     onSuccess: async () => {
-      message.success("Form created.");
+      message.success(t('customForms.created', 'Form created.'));
       await queryClient.invalidateQueries({ queryKey: ["custom-forms"] });
       goBack();
     },
     onError: (error) => {
-      message.error(getErrorMessage(error, "Form could not be created."));
+      message.error(getErrorMessage(error, t('customForms.createError', 'Form could not be created.')));
     },
   });
 
@@ -60,13 +62,13 @@ const FormEditPage = () => {
         isGlobal: formQuery.data?.isGlobal ?? !ticketId,
       }),
     onSuccess: async () => {
-      message.success("Form updated.");
+      message.success(t('customForms.updated', 'Form updated.'));
       await queryClient.invalidateQueries({ queryKey: ["custom-forms"] });
       await queryClient.invalidateQueries({ queryKey: ["custom-form", id] });
       goBack();
     },
     onError: (error) => {
-      message.error(getErrorMessage(error, "Form could not be updated."));
+      message.error(getErrorMessage(error, t('customForms.updateError', 'Form could not be updated.')));
     },
   });
 
@@ -74,12 +76,12 @@ const FormEditPage = () => {
     <div className="custom-form-builder-page">
       <Card className="custom-form-builder__panel">
         <Title level={2} style={{ marginBottom: 8 }}>
-          {isEditMode ? "Edit form" : "Create form"}
+          {isEditMode ? t('customForms.editForm', 'Edit form') : t('customForms.createForm', 'Create form')}
         </Title>
         <Paragraph type="secondary" style={{ marginBottom: 0 }}>
           {isTicketMode
-            ? "This form will live inside the current ticket and can collect its own public responses."
-            : "This form becomes a reusable template in your profile settings and can be attached to tickets later."}
+            ? t('customForms.ticketModeDesc', 'This form will live inside the current ticket and can collect its own public responses.')
+            : t('customForms.templateModeDesc', 'This form becomes a reusable template in your profile settings and can be attached to tickets later.')}
         </Paragraph>
       </Card>
 
@@ -87,8 +89,8 @@ const FormEditPage = () => {
         <Alert
           type="info"
           showIcon
-          message="Return path saved"
-          description="When you save, you will be sent back to the page where you launched the builder."
+          message={t('customForms.returnPathSaved', 'Return path saved')}
+          description={t('customForms.returnPathDesc', 'When you save, you will be sent back to the page where you launched the builder.')}
         />
       ) : null}
 

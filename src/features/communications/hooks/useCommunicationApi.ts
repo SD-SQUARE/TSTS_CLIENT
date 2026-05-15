@@ -22,12 +22,12 @@ export const communicationKeys = {
   teamsLookup: (search: string, mine = false) => ['chat', 'lookup', 'teams', search, mine] as const,
 };
 
-export const useNotifications = () =>
-  useQuery<NotificationItem[]>({
-    queryKey: communicationKeys.notifications,
+export const useNotifications = (page = 1, pageSize = 10) =>
+  useQuery<{ data: NotificationItem[]; pagination: { page: number; pageSize: number; total: number } }>({
+    queryKey: [...communicationKeys.notifications, page, pageSize],
     queryFn: async () => {
-      const { data } = await api.get('/v1/notifications');
-      return data.data || [];
+      const { data } = await api.get('/v1/notifications', { params: { page, pageSize } });
+      return data;
     },
   });
 

@@ -47,10 +47,24 @@ const LoginFormV2 = () => {
     const redirectPath =
         typeof location.state?.from === "string"
             ? location.state.from
-            : `${APP_BASE_PATH}/`;
+            : null; // will be determined by role after login
 
-    const gotoMainPage = () => {
-        navigate(redirectPath, { replace: true });
+    const getRoleDefaultPath = (role: string) => {
+        const r = role.toLowerCase();
+        if (r === "requester") return "/ai-assistant";
+        if (r === "technician") return `/${r}/tickets`;
+        if (r === "admin" || r === "superadmin") return "/dashboard";
+        return `${APP_BASE_PATH}/`;
+    };
+
+    const gotoMainPage = (userRole?: string) => {
+        if (redirectPath) {
+            navigate(redirectPath, { replace: true });
+        } else if (userRole) {
+            navigate(getRoleDefaultPath(userRole), { replace: true });
+        } else {
+            navigate(`${APP_BASE_PATH}/`, { replace: true });
+        }
     };
 
     const goBackToCredentials = () => {
@@ -104,9 +118,10 @@ const LoginFormV2 = () => {
 
             // 🟢 Logged in without device
             if (res.step === "LOGGED_IN_NO_DEVICE") {
+                const payload = getJWTPayload(res.access_token);
                 dispatch(
                     loginSuccess({
-                        user: getJWTPayload(res.access_token),
+                        user: payload,
                         token: res.access_token,
                     })
                 );
@@ -115,7 +130,7 @@ const LoginFormV2 = () => {
                 // localStorage.setItem("showTrustedDeviceTour", "1");
                 setCookie("showTrustedDeviceTour", "1");
 
-                gotoMainPage();
+                gotoMainPage(payload?.role);
             }
 
         } catch (err: any) {
@@ -133,15 +148,15 @@ const LoginFormV2 = () => {
 
         try {
             const data = await trustedAuth.mutateAsync(userId);
-
+            const payload = getJWTPayload(data.access_token);
             dispatch(
                 loginSuccess({
-                    user: getJWTPayload(data.access_token),
+                    user: payload,
                     token: data.access_token,
                 })
             );
 
-            gotoMainPage();
+            gotoMainPage(payload?.role);
         } catch {
             setError(t("Trusted_Device_Verification_Failed"));
         }
@@ -176,16 +191,17 @@ const LoginFormV2 = () => {
                 throw new Error("No access token received from backend");
             }
 
+            const payload = getJWTPayload(res.access_token);
             dispatch(
                 loginSuccess({
-                    user: getJWTPayload(res.access_token),
+                    user: payload,
                     token: res.access_token,
                 })
             );
 
             console.log("[SSO] Login successful, redirecting...");
             setCookie("showTrustedDeviceTour", "1");
-            gotoMainPage();
+            gotoMainPage(payload?.role);
         } catch (err: any) {
             console.error("[SSO] Microsoft login error:", err);
             

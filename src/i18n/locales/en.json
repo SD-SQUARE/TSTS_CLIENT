@@ -302,6 +302,8 @@
     "reach_team": "Reach our technical support team directly."
   },
   "tickets": {
+    
+    "tabRemoteControl": "Remote Control",
     "participants": "Participants",
     "listTitle": "Tickets Overview",
     "id": "ID",
@@ -737,6 +739,7 @@
       "password": "Password",
       "devices": "Trusted Devices",
       "extension": "Browser Extension",
+      "desktopApp": "Desktop App",
       "system": "System Info",
       "searchPlaceholder": "Search settings",
       "noSearchResults": "No matching results in this tab.",
@@ -1040,5 +1043,18 @@
     "welcome_desc": "Ask me anything about technical support, or I can help you create a ticket.",
     "placeholder": "Ask a question... (Enter to send, Shift+Enter for new line)",
     "disclaimer": "AI responses may not always be accurate. For urgent issues, please create a support ticket."
+  },
+  "customForms": {
+    "editForm": "Edit form",
+    "createForm": "Create form",
+    "ticketModeDesc": "This form will live inside the current ticket and can collect its own public responses.",
+    "templateModeDesc": "This form becomes a reusable template in your profile settings and can be attached to tickets later.",
+    "returnPathSaved": "Return path saved",
+    "returnPathDesc": "When you save, you will be sent back to the page where you launched the builder.",
+    "created": "Form created.",
+    "createError": "Form could not be created.",
+    "updated": "Form updated.",
+    "updateError": "Form could not be updated."
   }
+ 
 }

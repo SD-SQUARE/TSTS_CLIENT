@@ -5,6 +5,7 @@ import {
     AppstoreOutlined,
     MessageOutlined,
     FormOutlined,
+    DesktopOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import ResetPassword from "../ResetPassword.component";
@@ -12,6 +13,7 @@ import TrustedDevices from "../TrustedDevices.component";
 import Extension from "../Extension.component";
 import QuickMessages from "../QuickMessages.component";
 import CustomFormManager from "../../../CustomForms/components/CustomFormManager";
+import DesktopApp from "../DesktopApp.component";
 import useTrustedDevices from "../../hooks/useTrustedDevices.hook";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -144,6 +146,15 @@ const SettingsTab = ({ forceDevices, onTourReady }: any) => {
                                 </span>
                             ),
                             children: <CustomFormManager  />,
+                        },
+                        {
+                            key: "desktop-app",
+                            label: (
+                                <span>
+                                    <DesktopOutlined /> {t("profile.settings.desktopApp", "Desktop App")}
+                                </span>
+                            ),
+                            children: <DesktopApp />,
                         },
                     ]}
                 />

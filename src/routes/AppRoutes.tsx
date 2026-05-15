@@ -258,6 +258,13 @@ export const AppRoutes = () => {
                 <Route path=":id/edit" element={<PageLayout><TicketForm /></PageLayout>} />
             </Route>
 
+            {/* Admin/SuperAdmin all-tickets shortcut */}
+            <Route path="/tickets" element={
+                <GuardedRoute roles={["admin", "superadmin"]}>
+                    <PageLayout><TicketList /></PageLayout>
+                </GuardedRoute>
+            } />
+
             <Route path="/dashboard" element={
                 <GuardedRoute roles={["superadmin", "admin"]} permissions={["dashboard.view"]}>
                 <PageLayout>
