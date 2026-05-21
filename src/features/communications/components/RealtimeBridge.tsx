@@ -11,6 +11,20 @@ import { CHAT_DRAWER_OPEN_EVENT } from '../events';
 import notificationAudioSrc from '../../../assets/audio/notification.wav';
 import { stripHtml } from '../../../utils/html';
 
+const resolveSocketUrl = () => {
+  const electronApiBase = window.electronAPI?.apiBaseUrl;
+  if (electronApiBase) {
+    return electronApiBase.replace(/\/api\/?$/, '');
+  }
+
+  const explicitApiBase = import.meta.env.VITE_API_BASE_URL as string | undefined;
+  if (explicitApiBase) {
+    return explicitApiBase.replace(/\/api\/?$/, '');
+  }
+
+  return undefined;
+};
+
 const RealtimeBridge: React.FC = () => {
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
@@ -34,11 +48,16 @@ const RealtimeBridge: React.FC = () => {
       return undefined;
     }
 
-    const socket = io({
+    const socketUrl = resolveSocketUrl();
+    const socket = io(socketUrl, {
       auth: {
         token,
       },
-      transports: ['polling', 'websocket'],
+      query: {
+        token,
+      },
+      transports: ['websocket', 'polling'],
+      withCredentials: true,
     });
 
     socket.on('notification:new', (payload) => {

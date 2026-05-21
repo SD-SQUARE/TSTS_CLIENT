@@ -1,0 +1,34 @@
+.ticket-form-page .anticon,
+.ticket-form-page .ant-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+.ticket-form-page .anticon svg {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  max-width: 1em;
+  max-height: 1em;
+  flex: 0 0 auto;
+}
+
+.ticket-form-quill {
+  margin-bottom: 1.5rem;
+}
+
+.ticket-form-quill .ql-toolbar {
+  border-radius: 6px 6px 0 0;
+}
+
+.ticket-form-quill .ql-container {
+  min-height: 16rem;
+  border-radius: 0 0 6px 6px;
+  background: #fff;
+}
+
+.ticket-form-quill .ql-editor {
+  min-height: 16rem;
+}

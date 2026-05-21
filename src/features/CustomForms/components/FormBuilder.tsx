@@ -44,6 +44,7 @@ import type {
   CustomFormPayload,
   CustomFormSettings,
 } from "../types";
+import { useTranslation } from "react-i18next";
 import "./customForms.css";
 
 const { Paragraph, Text, Title } = Typography;
@@ -110,6 +111,16 @@ const choiceFieldTypes = new Set<CustomFormFieldType>([
   "single_choice",
   "multiple_choice",
 ]);
+
+const getFieldTypeLabel = (type: CustomFormFieldType, t: (key: string, options?: any) => string) => {
+  const item = FIELD_LIBRARY.find((fieldType) => fieldType.type === type);
+  return t(`customForms.fieldTypes.${type}.label`, { defaultValue: item?.label || type });
+};
+
+const getFieldTypeDescription = (type: CustomFormFieldType, t: (key: string, options?: any) => string) => {
+  const item = FIELD_LIBRARY.find((fieldType) => fieldType.type === type);
+  return t(`customForms.fieldTypes.${type}.description`, { defaultValue: item?.description || "" });
+};
 
 const createDefaultSettings = (): CustomFormSettings => ({
   submitLabel: "Submit",
@@ -196,6 +207,7 @@ const SortableFieldCard = ({
   onUpdate: (fieldId: string, patch: Partial<CustomFormField>) => void;
   onDelete: (fieldId: string) => void;
 }) => {
+  const { t } = useTranslation();
   const {
     attributes,
     listeners,
@@ -230,10 +242,10 @@ const SortableFieldCard = ({
             icon={<DragOutlined />}
           />
           <div>
-            <Text strong>{displayLabel || "Untitled question"}</Text>
+            <Text strong>{displayLabel || t("customForms.untitledQuestion")}</Text>
             <div>
               <Text type="secondary">
-                {FIELD_LIBRARY.find((item) => item.type === field.type)?.label}
+                {getFieldTypeLabel(field.type, t)}
               </Text>
             </div>
           </div>
@@ -245,14 +257,14 @@ const SortableFieldCard = ({
           icon={<DeleteOutlined />}
           onClick={() => onDelete(field.id)}
         >
-          Remove
+          {t("common.remove", { defaultValue: "Remove" })}
         </Button>
       </div>
 
       <Row gutter={[14, 14]}>
         <Col xs={24} md={7}>
           <Input
-            placeholder="Question title (English)"
+            placeholder={t("customForms.questionTitleEn")}
             value={field.label_en || ""}
             onChange={(event) =>
               onUpdate(field.id, {
@@ -264,7 +276,7 @@ const SortableFieldCard = ({
         </Col>
         <Col xs={24} md={7}>
           <Input
-            placeholder="Question title (Arabic)"
+            placeholder={t("customForms.questionTitleAr")}
             value={field.label_ar || ""}
             dir="rtl"
             onChange={(event) =>
@@ -296,7 +308,7 @@ const SortableFieldCard = ({
             }}
             options={FIELD_LIBRARY.map((item) => ({
               value: item.type,
-              label: item.label,
+              label: getFieldTypeLabel(item.type, t),
             }))}
           />
         </Col>
@@ -306,7 +318,7 @@ const SortableFieldCard = ({
             <Col xs={24} md={12}>
               <Input.TextArea
                 rows={2}
-                placeholder="Helper text or instructions (English)"
+                placeholder={t("customForms.helperTextEn")}
                 value={field.description_en || ""}
                 onChange={(event) =>
                   onUpdate(field.id, {
@@ -319,7 +331,7 @@ const SortableFieldCard = ({
             <Col xs={24} md={12}>
               <Input.TextArea
                 rows={2}
-                placeholder="Helper text or instructions (Arabic)"
+                placeholder={t("customForms.helperTextAr")}
                 value={field.description_ar || ""}
                 dir="rtl"
                 onChange={(event) =>
@@ -338,7 +350,7 @@ const SortableFieldCard = ({
             <Row gutter={[14, 14]}>
               <Col xs={24} md={12}>
                 <Input
-                  placeholder="Placeholder (English)"
+                  placeholder={t("customForms.placeholderEn")}
                   value={field.placeholder_en || ""}
                   onChange={(event) =>
                     onUpdate(field.id, {
@@ -350,7 +362,7 @@ const SortableFieldCard = ({
               </Col>
               <Col xs={24} md={12}>
                 <Input
-                  placeholder="Placeholder (Arabic)"
+                  placeholder={t("customForms.placeholderAr")}
                   value={field.placeholder_ar || ""}
                   dir="rtl"
                   onChange={(event) =>
@@ -370,7 +382,7 @@ const SortableFieldCard = ({
             <Col xs={24} md={12}>
               <InputNumber
                 style={{ width: "100%" }}
-                placeholder="Minimum value"
+                placeholder={t("customForms.minValue")}
                 value={field.settings?.min}
                 onChange={(value) =>
                   onUpdate(field.id, {
@@ -385,7 +397,7 @@ const SortableFieldCard = ({
             <Col xs={24} md={12}>
               <InputNumber
                 style={{ width: "100%" }}
-                placeholder="Maximum value"
+                placeholder={t("customForms.maxValue")}
                 value={field.settings?.max}
                 onChange={(value) =>
                   onUpdate(field.id, {
@@ -409,7 +421,7 @@ const SortableFieldCard = ({
                   className="custom-form-builder__option-row"
                 >
                   <Input
-                    placeholder="Option label (English)"
+                    placeholder={t("customForms.optionLabelEn")}
                     value={option.label_en || ""}
                     onChange={(event) =>
                       onUpdate(field.id, {
@@ -426,7 +438,7 @@ const SortableFieldCard = ({
                     }
                   />
                   <Input
-                    placeholder="Option label (Arabic)"
+                    placeholder={t("customForms.optionLabelAr")}
                     value={option.label_ar || ""}
                     dir="rtl"
                     onChange={(event) =>
@@ -469,7 +481,7 @@ const SortableFieldCard = ({
                   })
                 }
               >
-                Add option
+                {t("customForms.addOption")}
               </Button>
             </Flex>
           </Col>
@@ -480,7 +492,7 @@ const SortableFieldCard = ({
             <Col xs={24} md={12}>
               <InputNumber
                 style={{ width: "100%" }}
-                placeholder="Min selections"
+                placeholder={t("customForms.minSelectionsPlaceholder")}
                 value={field.settings?.minSelections}
                 onChange={(value) =>
                   onUpdate(field.id, {
@@ -496,7 +508,7 @@ const SortableFieldCard = ({
             <Col xs={24} md={12}>
               <InputNumber
                 style={{ width: "100%" }}
-                placeholder="Max selections"
+                placeholder={t("customForms.maxSelectionsPlaceholder")}
                 value={field.settings?.maxSelections}
                 onChange={(value) =>
                   onUpdate(field.id, {
@@ -515,10 +527,10 @@ const SortableFieldCard = ({
         <Col span={24}>
           <Flex align="center" justify="space-between">
             <div>
-              <Text strong>Required question</Text>
+              <Text strong>{t("customForms.requiredQuestion")}</Text>
               <div>
                 <Text type="secondary">
-                  Prevent submission until this question is answered.
+                  {t("customForms.requiredQuestionDesc")}
                 </Text>
               </div>
             </div>
@@ -540,6 +552,7 @@ const FormBuilder = ({
   mode = "template",
   onCancel,
 }: FormBuilderProps) => {
+  const { t } = useTranslation();
   const [title, setTitle] = useState("");
   const [titleEn, setTitleEn] = useState("");
   const [titleAr, setTitleAr] = useState("");
@@ -585,9 +598,11 @@ const FormBuilder = ({
   }, [initialValues]);
 
   const summaryText = useMemo(() => {
-    const typeLabel = mode === "ticket" ? "ticket form" : "template";
-    return `${fields.length} questions in this ${typeLabel}`;
-  }, [fields.length, mode]);
+    return t("customForms.builderSummary", {
+      count: fields.length,
+      type: mode === "ticket" ? t("customForms.ticketForm") : t("customForms.template"),
+    });
+  }, [fields.length, mode, t]);
 
   const updateField = (fieldId: string, patch: Partial<CustomFormField>) => {
     setFields((currentFields) =>
@@ -641,12 +656,12 @@ const FormBuilder = ({
     const finalDescriptionAr = descriptionAr.trim();
 
     if (!finalTitleEn && !finalTitleAr && !title.trim()) {
-      message.error("Please add an English or Arabic title for the form.");
+      message.error(t("customForms.titleRequired"));
       return;
     }
 
     if (!fields.length) {
-      message.error("Add at least one question before saving.");
+      message.error(t("customForms.questionRequiredBeforeSave"));
       return;
     }
 
@@ -665,7 +680,7 @@ const FormBuilder = ({
 
     if (hasInvalidField) {
       message.error(
-        "Each question needs a title, and choice questions need at least two options.",
+        t("customForms.invalidQuestions"),
       );
       return;
     }
@@ -738,14 +753,13 @@ const FormBuilder = ({
       <Card className="custom-form-builder__panel">
         <Flex vertical gap={10}>
           <Tag color={mode === "ticket" ? "gold" : "blue"} bordered={false}>
-            {mode === "ticket" ? "Ticket form" : "Reusable template"}
+            {mode === "ticket" ? t("customForms.ticketForm") : t("customForms.reusableTemplate")}
           </Tag>
           <Title level={3} style={{ margin: 0 }}>
-            {mode === "ticket" ? "Design a ticket form" : "Build a reusable form"}
+            {mode === "ticket" ? t("customForms.designTicketForm") : t("customForms.buildReusableForm")}
           </Title>
           <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-            Create polished forms with drag-to-reorder questions, flexible field
-            types, and branded success messaging.
+            {t("customForms.builderIntro")}
           </Paragraph>
         </Flex>
 
@@ -753,7 +767,7 @@ const FormBuilder = ({
           <Col xs={24} md={7}>
             <Input
               size="large"
-              placeholder="Form title (English)"
+              placeholder={t("customForms.formTitleEn")}
               value={titleEn}
               onChange={(event) => {
                 setTitleEn(event.target.value);
@@ -764,7 +778,7 @@ const FormBuilder = ({
           <Col xs={24} md={7}>
             <Input
               size="large"
-              placeholder="Form title (Arabic)"
+              placeholder={t("customForms.formTitleAr")}
               value={titleAr}
               dir="rtl"
               onChange={(event) => {
@@ -783,7 +797,7 @@ const FormBuilder = ({
               <Col xs={24} md={12}>
                 <Input.TextArea
                   rows={4}
-                  placeholder="Describe the form in English"
+                  placeholder={t("customForms.formDescriptionEn")}
                   value={descriptionEn}
                   onChange={(event) => {
                     setDescriptionEn(event.target.value);
@@ -794,7 +808,7 @@ const FormBuilder = ({
               <Col xs={24} md={12}>
                 <Input.TextArea
                   rows={4}
-                  placeholder="Describe the form in Arabic"
+                  placeholder={t("customForms.formDescriptionAr")}
                   value={descriptionAr}
                   dir="rtl"
                   onChange={(event) => {
@@ -812,11 +826,10 @@ const FormBuilder = ({
         <Flex vertical gap={14}>
           <div>
             <Title level={4} style={{ marginBottom: 6 }}>
-              Question library
+              {t("customForms.questionLibrary")}
             </Title>
             <Text type="secondary">
-              Drop in advanced fields, then shape the experience with labels,
-              validation, and instructions.
+              {t("customForms.questionLibraryDesc")}
             </Text>
           </div>
 
@@ -829,8 +842,8 @@ const FormBuilder = ({
                 onClick={() => addField(item.type)}
               >
                 <Flex vertical align="flex-start" gap={2}>
-                  <Text strong>{item.label}</Text>
-                  <Text type="secondary">{item.description}</Text>
+                  <Text strong>{getFieldTypeLabel(item.type, t)}</Text>
+                  <Text type="secondary">{getFieldTypeDescription(item.type, t)}</Text>
                 </Flex>
               </Button>
             ))}
@@ -842,18 +855,17 @@ const FormBuilder = ({
         <Flex vertical gap={14}>
           <div>
             <Title level={4} style={{ marginBottom: 6 }}>
-              Submission experience
+              {t("customForms.submissionExperience")}
             </Title>
             <Text type="secondary">
-              Tune the CTA and the confirmation message users see after
-              submitting the form.
+              {t("customForms.submissionExperienceDesc")}
             </Text>
           </div>
 
           <Row gutter={[14, 14]}>
             <Col xs={24} md={12}>
               <Input
-                placeholder="Submit button text (English)"
+                placeholder={t("customForms.submitLabelEn")}
                 value={settings.submitLabel_en}
                 onChange={(event) =>
                   setSettings((current) => ({
@@ -866,7 +878,7 @@ const FormBuilder = ({
             </Col>
             <Col xs={24} md={12}>
               <Input
-                placeholder="Submit button text (Arabic)"
+                placeholder={t("customForms.submitLabelAr")}
                 value={settings.submitLabel_ar}
                 dir="rtl"
                 onChange={(event) =>
@@ -880,7 +892,7 @@ const FormBuilder = ({
             </Col>
             <Col xs={24} md={12}>
               <Input
-                placeholder="Success title (English)"
+                placeholder={t("customForms.successTitleEn")}
                 value={settings.successTitle_en}
                 onChange={(event) =>
                   setSettings((current) => ({
@@ -893,7 +905,7 @@ const FormBuilder = ({
             </Col>
             <Col xs={24} md={12}>
               <Input
-                placeholder="Success title (Arabic)"
+                placeholder={t("customForms.successTitleAr")}
                 value={settings.successTitle_ar}
                 dir="rtl"
                 onChange={(event) =>
@@ -907,7 +919,7 @@ const FormBuilder = ({
             </Col>
             <Col xs={24} md={12}>
               <Input
-                placeholder="Success message (English)"
+                placeholder={t("customForms.successMessageEn")}
                 value={settings.successDescription_en}
                 onChange={(event) =>
                   setSettings((current) => ({
@@ -921,7 +933,7 @@ const FormBuilder = ({
             </Col>
             <Col xs={24} md={12}>
               <Input
-                placeholder="Success message (Arabic)"
+                placeholder={t("customForms.successMessageAr")}
                 value={settings.successDescription_ar}
                 dir="rtl"
                 onChange={(event) =>
@@ -940,13 +952,13 @@ const FormBuilder = ({
 
       <div>
         <Title level={4} style={{ marginBottom: 12 }}>
-          Questions
+          {t("customForms.questions")}
         </Title>
 
         {!fields.length ? (
           <Card className="custom-form-builder__panel">
             <Empty
-              description="Start with a field from the library above, then drag questions into the order you want."
+              description={t("customForms.emptyBuilder")}
             />
           </Card>
         ) : (
@@ -978,19 +990,19 @@ const FormBuilder = ({
         <Flex justify="space-between" align="center" wrap="wrap" gap={12}>
           <Text type="secondary">
             {mode === "ticket"
-              ? "This form will be attached to the current ticket."
-              : "Templates can be reused later inside tickets."}
+              ? t("customForms.attachedToTicket")
+              : t("customForms.templatesReusable")}
           </Text>
 
           <Space wrap>
-            {onCancel && <Button onClick={onCancel}>Cancel</Button>}
+            {onCancel && <Button onClick={onCancel}>{t("common.cancel", { defaultValue: "Cancel" })}</Button>}
             <Button
               type="primary"
               icon={<SaveOutlined />}
               loading={loading}
               onClick={handleSave}
             >
-              Save form
+              {t("customForms.saveForm")}
             </Button>
           </Space>
         </Flex>

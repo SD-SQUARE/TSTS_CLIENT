@@ -1,159 +1,146 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect } from 'react';
-import { Alert, Button, Card, Flex, Input, Space, Spin, Steps, Tag, Typography } from 'antd';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Alert, Button, Card, Flex, Input, Space, Tag, Typography, message } from 'antd';
 import {
+    CheckCircleOutlined,
+    CopyOutlined,
     DesktopOutlined,
     LinkOutlined,
     LoadingOutlined,
-    CheckCircleOutlined,
-    DownloadOutlined,
-    InfoCircleOutlined,
+    SafetyCertificateOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useElectron, isElectron } from '../../../../hooks/useElectron';
+import { isElectron, useElectron } from '../../../../hooks/useElectron';
 
-const { Text, Title, Paragraph } = Typography;
+const { Paragraph, Text, Title } = Typography;
 
 interface Props {
     ticket?: any;
 }
 
-const RemoteControlTab: React.FC<Props> = ({ ticket }) => {
-    const { t, i18n } = useTranslation();
-    const isArabic = i18n.language.startsWith('ar');
-    const { connectToRemote, isRustDeskInstalled } = useElectron();
-    const inElectron = isElectron();
+const cleanRemoteId = (value: string) => value.trim().replace(/\s+/g, '');
 
-    const [remoteId, setRemoteId] = useState('');
+const RemoteControlTab: React.FC<Props> = ({ ticket }) => {
+    const { t } = useTranslation();
+    const {
+        connectToRemote,
+        connectViaProtocol,
+        isRustDeskInstalled,
+        openRustDesk,
+    } = useElectron();
+    const inElectron = isElectron();
+    const profileRemoteId = ticket?.requester?.rustdeskId || '';
+    const requesterName = ticket?.requester?.name || ticket?.requester?.full_name_en || ticket?.requester?.email || '';
+
+    const [remoteId, setRemoteId] = useState(profileRemoteId);
     const [isConnecting, setIsConnecting] = useState(false);
-    const [connectionStatus, setConnectionStatus] = useState<'idle' | 'connecting' | 'success' | 'error'>('idle');
+    const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [errorMsg, setErrorMsg] = useState('');
     const [rustDeskInstalled, setRustDeskInstalled] = useState<boolean | null>(null);
 
-    // Pre-fill from ticket requester's rustdesk ID if available
-    useEffect(() => {
-        if (ticket?.requester?.rustdeskId) {
-            setRemoteId(ticket.requester.rustdeskId);
-        }
-    }, [ticket]);
+    const cleanId = useMemo(() => cleanRemoteId(remoteId), [remoteId]);
+    const idFromProfile = Boolean(profileRemoteId);
 
     useEffect(() => {
-        if (inElectron) {
-            isRustDeskInstalled().then(r => setRustDeskInstalled(r.installed));
-        }
-    }, [inElectron]);
+        if (profileRemoteId) setRemoteId(profileRemoteId);
+    }, [profileRemoteId]);
+
+    useEffect(() => {
+        if (!inElectron) return;
+        void isRustDeskInstalled().then((result) => setRustDeskInstalled(result.installed));
+    }, [inElectron, isRustDeskInstalled]);
+
+    const handleCopyRemoteId = async () => {
+        if (!cleanId) return;
+        await navigator.clipboard.writeText(cleanId);
+        message.success(t('desktop.idCopied'));
+    };
 
     const handleConnect = async () => {
-        const cleanId = remoteId.trim().replace(/\s+/g, '');
         if (!cleanId) return;
 
         setIsConnecting(true);
-        setConnectionStatus('connecting');
+        setConnectionStatus('idle');
         setErrorMsg('');
 
         try {
-            const result = await connectToRemote(cleanId);
+            const result = inElectron
+                ? await connectToRemote(cleanId)
+                : await connectViaProtocol(cleanId);
+
             if (result.success) {
                 setConnectionStatus('success');
-                setTimeout(() => setConnectionStatus('idle'), 3000);
+                window.setTimeout(() => setConnectionStatus('idle'), 3500);
             } else {
                 setConnectionStatus('error');
-                setErrorMsg(result.error || 'Connection failed');
+                setErrorMsg(result.error || t('desktop.remoteOpenFailed', { defaultValue: 'Could not open RustDesk.' }));
             }
-        } catch (err: any) {
+        } catch (error: any) {
             setConnectionStatus('error');
-            setErrorMsg(err.message || 'Unknown error');
+            setErrorMsg(error.message || t('desktop.remoteOpenFailed', { defaultValue: 'Could not open RustDesk.' }));
         } finally {
             setIsConnecting(false);
         }
     };
 
-    // Not in Electron — show download prompt
-    if (!inElectron) {
-        return (
-            <div style={{ padding: 24, maxWidth: 600 }}>
-                <Alert
-                    type="info"
-                    showIcon
-                    icon={<DesktopOutlined />}
-                    message={isArabic ? 'ميزة التحكم عن بُعد' : 'Remote Control Feature'}
-                    description={
-                        <Space direction="vertical" size={12} style={{ width: '100%', marginTop: 8 }}>
-                            <Text>
-                                {isArabic
-                                    ? 'للاتصال بجهاز المستخدم عن بُعد، يجب تشغيل تطبيق TSTS Desktop.'
-                                    : 'To connect to the requester\'s machine remotely, you need to run the TSTS Desktop app.'}
-                            </Text>
-                            <Button
-                                type="primary"
-                                icon={<DownloadOutlined />}
-                                href="/api/v1/desktop/download"
-                                target="_blank"
-                            >
-                                {isArabic ? 'تحميل تطبيق TSTS Desktop' : 'Download TSTS Desktop'}
-                            </Button>
-                        </Space>
-                    }
-                />
-
-                <Card style={{ marginTop: 20 }} title={
-                    <Flex align="center" gap={8}>
-                        <InfoCircleOutlined style={{ color: '#1677ff' }} />
-                        {isArabic ? 'كيف يعمل التحكم عن بُعد؟' : 'How does remote control work?'}
-                    </Flex>
-                }>
-                    <Steps
-                        direction="vertical"
-                        size="small"
-                        items={[
-                            {
-                                title: isArabic ? 'تحميل التطبيق' : 'Download the app',
-                                description: isArabic
-                                    ? 'قم بتحميل وتثبيت تطبيق TSTS Desktop على جهازك'
-                                    : 'Download and install TSTS Desktop on your machine',
-                                status: 'process',
-                            },
-                            {
-                                title: isArabic ? 'المستخدم يسجل معرّفه' : 'Requester registers their ID',
-                                description: isArabic
-                                    ? 'يقوم المستخدم بتحميل التطبيق وتسجيل معرّف جهازه من الإعدادات'
-                                    : 'The requester downloads the app and registers their machine ID from Settings',
-                                status: 'wait',
-                            },
-                            {
-                                title: isArabic ? 'الاتصال بالجهاز' : 'Connect to the machine',
-                                description: isArabic
-                                    ? 'أدخل معرّف جهاز المستخدم وانقر اتصال'
-                                    : 'Enter the requester\'s machine ID and click Connect',
-                                status: 'wait',
-                            },
-                        ]}
-                    />
-                </Card>
-            </div>
-        );
-    }
-
     return (
-        <div style={{ padding: 24, maxWidth: 560 }}>
-            <Title level={4} style={{ marginBottom: 4 }}>
-                <DesktopOutlined style={{ marginInlineEnd: 8, color: '#1677ff' }} />
-                {isArabic ? 'التحكم عن بُعد' : 'Remote Control'}
-            </Title>
-            <Paragraph type="secondary" style={{ marginBottom: 20 }}>
-                {isArabic
-                    ? 'أدخل معرّف RustDesk الخاص بجهاز المستخدم للاتصال به عن بُعد.'
-                    : 'Enter the requester\'s RustDesk ID to connect to their machine remotely.'}
-            </Paragraph>
+        <div style={{ maxWidth: 780, padding: 24 }}>
+            <Card bordered={false} style={{ marginBottom: 16 }}>
+                <Flex justify="space-between" align="flex-start" gap={16} wrap="wrap">
+                    <div>
+                        <Tag color={inElectron ? 'blue' : 'purple'} bordered={false}>
+                            {inElectron
+                                ? t('desktop.nativeMode', { defaultValue: 'Desktop mode' })
+                                : t('desktop.browserMode', { defaultValue: 'Browser mode' })}
+                        </Tag>
+                        <Title level={3} style={{ marginTop: 10, marginBottom: 6 }}>
+                            {t('desktop.remoteControlTitle', { defaultValue: 'Remote control' })}
+                        </Title>
+                        <Paragraph type="secondary" style={{ marginBottom: 0, maxWidth: 560 }}>
+                            {inElectron
+                                ? t('desktop.remoteControlDesktopDesc', { defaultValue: 'Start a RustDesk support session using the desktop integration.' })
+                                : t('desktop.remoteControlBrowserDesc', { defaultValue: 'This opens RustDesk directly through its browser protocol if RustDesk is installed on this machine.' })}
+                        </Paragraph>
+                    </div>
+                    <Space wrap>
+                        {inElectron && (
+                            <Button icon={<DesktopOutlined />} onClick={() => void openRustDesk()}>
+                                {t('desktop.openRustDesk')}
+                            </Button>
+                        )}
+                        <Button
+                            type="primary"
+                            icon={isConnecting ? <LoadingOutlined /> : <DesktopOutlined />}
+                            onClick={handleConnect}
+                            loading={isConnecting}
+                            disabled={!cleanId || (inElectron && rustDeskInstalled === false)}
+                        >
+                            {t('desktop.connectWithRustDesk', { defaultValue: 'Connect with RustDesk' })}
+                        </Button>
+                    </Space>
+                </Flex>
+            </Card>
 
             {rustDeskInstalled === false && (
                 <Alert
                     type="warning"
                     showIcon
-                    message={isArabic ? 'RustDesk غير مثبت' : 'RustDesk not installed'}
-                    description={isArabic
-                        ? 'يرجى تثبيت RustDesk أولاً. سيتم تثبيته تلقائياً عند تثبيت تطبيق TSTS Desktop.'
-                        : 'Please install RustDesk first. It is automatically installed with TSTS Desktop.'}
+                    message={t('desktop.rustdeskMissing')}
+                    description={t('desktop.rustdeskMissingDesc')}
+                    style={{ marginBottom: 16 }}
+                />
+            )}
+
+            {connectionStatus === 'error' && (
+                <Alert type="error" showIcon message={errorMsg} style={{ marginBottom: 16 }} />
+            )}
+
+            {connectionStatus === 'success' && (
+                <Alert
+                    type="success"
+                    showIcon
+                    icon={<CheckCircleOutlined />}
+                    message={t('desktop.openingRustDesk', { defaultValue: 'Opening RustDesk...' })}
                     style={{ marginBottom: 16 }}
                 />
             )}
@@ -161,63 +148,51 @@ const RemoteControlTab: React.FC<Props> = ({ ticket }) => {
             <Card>
                 <Space direction="vertical" size={16} style={{ width: '100%' }}>
                     <div>
-                        <Text strong style={{ display: 'block', marginBottom: 6 }}>
-                            {isArabic ? 'معرّف جهاز المستخدم (RustDesk ID)' : 'Requester Machine ID (RustDesk ID)'}
-                        </Text>
-                        <Input
-                            size="large"
-                            placeholder={isArabic ? 'مثال: 123456789' : 'e.g. 123456789'}
-                            value={remoteId}
-                            onChange={e => setRemoteId(e.target.value)}
-                            onPressEnter={handleConnect}
-                            prefix={<LinkOutlined style={{ color: '#bbb' }} />}
-                            style={{ fontFamily: 'monospace', letterSpacing: 2 }}
-                            disabled={isConnecting}
-                        />
-                        <Text type="secondary" style={{ fontSize: 12, marginTop: 4, display: 'block' }}>
-                            {isArabic
-                                ? 'يمكن للمستخدم العثور على معرّفه في تطبيق TSTS Desktop → الإعدادات → تطبيق سطح المكتب'
-                                : 'The requester can find their ID in TSTS Desktop → Settings → Desktop App'}
-                        </Text>
+                        <Text strong>{t('desktop.requesterMachineId', { defaultValue: 'Requester machine ID' })}</Text>
+                        {requesterName && (
+                            <Text type="secondary" style={{ display: 'block', marginTop: 4 }}>
+                                {requesterName}
+                            </Text>
+                        )}
                     </div>
 
-                    {connectionStatus === 'error' && (
-                        <Alert type="error" showIcon message={errorMsg || (isArabic ? 'فشل الاتصال' : 'Connection failed')} />
-                    )}
-
-                    {connectionStatus === 'success' && (
-                        <Alert
-                            type="success"
-                            showIcon
-                            icon={<CheckCircleOutlined />}
-                            message={isArabic ? 'جارٍ فتح RustDesk...' : 'Opening RustDesk...'}
-                        />
-                    )}
-
-                    <Button
-                        type="primary"
+                    <Input
                         size="large"
-                        icon={isConnecting ? <LoadingOutlined /> : <DesktopOutlined />}
-                        onClick={handleConnect}
-                        disabled={!remoteId.trim() || isConnecting || rustDeskInstalled === false}
-                        block
-                    >
-                        {isConnecting
-                            ? (isArabic ? 'جارٍ الاتصال...' : 'Connecting...')
-                            : (isArabic ? 'اتصال بالجهاز' : 'Connect to Machine')}
-                    </Button>
+                        placeholder={t('desktop.remoteIdPlaceholder', { defaultValue: 'RustDesk ID' })}
+                        value={remoteId}
+                        onChange={(event) => setRemoteId(event.target.value)}
+                        onPressEnter={handleConnect}
+                        readOnly={idFromProfile}
+                        prefix={<LinkOutlined style={{ color: '#8c8c8c' }} />}
+                        suffix={
+                            cleanId ? (
+                                <Button
+                                    type="text"
+                                    icon={<CopyOutlined />}
+                                    onClick={handleCopyRemoteId}
+                                    aria-label={t('common.copy', { defaultValue: 'Copy' })}
+                                />
+                            ) : null
+                        }
+                        style={{ fontFamily: 'monospace', letterSpacing: 2 }}
+                    />
+
+                    <Flex gap={8} wrap="wrap">
+                        {idFromProfile ? (
+                            <Tag color="green" icon={<CheckCircleOutlined />}>
+                                {t('desktop.idRegisteredOnProfile', { defaultValue: 'Registered on requester profile' })}
+                            </Tag>
+                        ) : (
+                            <Tag color="gold">
+                                {t('desktop.manualRemoteId', { defaultValue: 'Manual ID entry' })}
+                            </Tag>
+                        )}
+                        <Tag icon={<SafetyCertificateOutlined />}>
+                            {t('desktop.permissionReminder', { defaultValue: 'Confirm requester permission before connecting' })}
+                        </Tag>
+                    </Flex>
                 </Space>
             </Card>
-
-            <Alert
-                type="info"
-                showIcon
-                style={{ marginTop: 16 }}
-                message={isArabic ? 'ملاحظة أمنية' : 'Security Note'}
-                description={isArabic
-                    ? 'يتم تسجيل جميع جلسات التحكم عن بُعد في سجل التذكرة. تأكد من حصولك على إذن المستخدم قبل الاتصال.'
-                    : 'All remote sessions are logged in the ticket history. Ensure you have the requester\'s permission before connecting.'}
-            />
         </div>
     );
 };

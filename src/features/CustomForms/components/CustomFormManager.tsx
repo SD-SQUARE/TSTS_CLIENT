@@ -71,7 +71,7 @@ const CustomFormManager = ({
   isGlobal = true,
   embedded = true,
 }: CustomFormManagerProps) => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
@@ -110,24 +110,24 @@ const CustomFormManager = ({
   const deleteMutation = useMutation({
     mutationFn: (id: string) => customFormApi.delete(id),
     onSuccess: async () => {
-      message.success("Form deleted.");
+      message.success(t("customForms.deleted"));
       await queryClient.invalidateQueries({ queryKey: ["custom-forms"] });
       await queryClient.invalidateQueries({ queryKey: ["custom-form-templates"] });
     },
-    onError: (error) => message.error(getErrorMessage(error, "Form could not be deleted.")),
+    onError: (error) => message.error(getErrorMessage(error, t("customForms.deleteError"))),
   });
 
   const attachTemplateMutation = useMutation({
     mutationFn: (templateId: string) =>
       customFormApi.duplicateToTicket(templateId, { ticketId: ticketId! }),
     onSuccess: async () => {
-      message.success("Template added to this ticket.");
+      message.success(t("customForms.templateAttached"));
       setTemplateModalOpen(false);
       setSelectedTemplateId(undefined);
       await queryClient.invalidateQueries({ queryKey: ["custom-forms"] });
     },
     onError: (error) =>
-      message.error(getErrorMessage(error, "Template could not be attached.")),
+      message.error(getErrorMessage(error, t("customForms.attachError"))),
   });
 
   const shareMutation = useMutation({
@@ -139,7 +139,7 @@ const CustomFormManager = ({
       try {
         await navigator.clipboard.writeText(buildPublicFormUrl(shareLink.token));
         message.success(
-          `Link copied. It expires ${dayjs(shareLink.expiresAt).format("MMM D, YYYY h:mm A")}.`,
+          t("customForms.linkCopied", { date: dayjs(shareLink.expiresAt).format("MMM D, YYYY h:mm A") }),
         );
       } catch {
         message.info(buildPublicFormUrl(shareLink.token));
@@ -149,7 +149,7 @@ const CustomFormManager = ({
       setShareForm(null);
     },
     onError: (error) =>
-      message.error(getErrorMessage(error, "Share link could not be created.")),
+      message.error(getErrorMessage(error, t("customForms.shareError"))),
   });
 
   const forms = listQuery.data || [];
@@ -166,10 +166,10 @@ const CustomFormManager = ({
     [forms],
   );
 
-  const heading = ticketId ? "Ticket forms" : "Form library";
+  const heading = ticketId ? t("customForms.ticketForms") : t("customForms.formLibrary");
   const subheading = ticketId
-    ? "Attach reusable templates, create ticket-specific forms, and manage public response links per ticket."
-    : "Create polished reusable forms from your profile settings, then deploy them inside tickets whenever you need them.";
+    ? t("customForms.ticketFormsDesc")
+    : t("customForms.formLibraryDesc");
 
   const openCreatePage = () => {
     const params = new URLSearchParams();
@@ -213,7 +213,7 @@ const CustomFormManager = ({
         <Flex justify="space-between" align="flex-start" wrap="wrap" gap={16}>
           <div style={{ maxWidth: 760 }}>
             <Tag color="gold" bordered={false}>
-              {ticketId ? "Ticket workflow" : "Profile settings"}
+              {ticketId ? t("customForms.ticketWorkflow") : t("customForms.profileSettings")}
             </Tag>
             <Title level={2} style={{ marginTop: 12, marginBottom: 8 }}>
               {heading}
@@ -232,7 +232,7 @@ const CustomFormManager = ({
                     }    
                 }              
               >
-                Use template
+                {t("customForms.useTemplate")}
               </Button>
             )}
             <Button
@@ -240,7 +240,7 @@ const CustomFormManager = ({
               icon={<PlusOutlined />}
               onClick={openCreatePage}
             >
-              {ticketId ? "Create ticket form" : "Create template"}
+              {ticketId ? t("customForms.createTicketForm") : t("customForms.createTemplate")}
             </Button>
           </Space>
         </Flex>
@@ -249,22 +249,22 @@ const CustomFormManager = ({
       <Row gutter={[16, 16]} className="custom-forms-grid">
         <Col xs={24} md={8}>
           <Card className="custom-form-summary-card">
-            <Statistic title="Forms" value={summary.totalForms} />
+            <Statistic title={t("customForms.forms")} value={summary.totalForms} />
           </Card>
         </Col>
         <Col xs={24} md={8}>
           <Card className="custom-form-summary-card">
-            <Statistic title="Responses" value={summary.totalResponses} />
+            <Statistic title={t("customForms.responses")} value={summary.totalResponses} />
           </Card>
         </Col>
         <Col xs={24} md={8}>
           <Card className="custom-form-summary-card">
             <Statistic
-              title="Latest created"
+              title={t("customForms.latestCreated")}
               value={
                 summary.newestForm
                   ? dayjs(summary.newestForm).format("MMM D, YYYY")
-                  : "No forms yet"
+                  : t("customForms.noFormsYet")
               }
             />
           </Card>
@@ -284,8 +284,8 @@ const CustomFormManager = ({
           <Empty
             description={
               ticketId
-                ? "No forms are attached to this ticket yet."
-                : "Your reusable form library is still empty."
+                ? t("customForms.emptyTicketForms")
+                : t("customForms.emptyLibrary")
             }
           />
         </Card>
@@ -313,10 +313,10 @@ const CustomFormManager = ({
                   <div>
                     <Space wrap className="custom-form-item-card__meta">
                       <Tag color={form.isGlobal ? "blue" : "gold"}>
-                        {form.isGlobal ? "Template" : "Ticket form"}
+                        {form.isGlobal ? t("customForms.template") : t("customForms.ticketForm")}
                       </Tag>
-                      <Tag>{form.fields.length} questions</Tag>
-                      <Tag>{form.responseCount || 0} responses</Tag>
+                      <Tag>{t("customForms.questionsCount", { count: form.fields.length })}</Tag>
+                      <Tag>{t("customForms.responsesCount", { count: form.responseCount || 0 })}</Tag>
                     </Space>
 
                     <Title level={4} style={{ marginTop: 14, marginBottom: 8 }}>
@@ -324,14 +324,14 @@ const CustomFormManager = ({
                     </Title>
 
                     <Paragraph type="secondary" ellipsis={{ rows: 3 }}>
-                      {localizedDescription || "No description provided."}
+                      {localizedDescription || t("customForms.noDescription")}
                     </Paragraph>
                   </div>
                 </div>
 
                 <Flex vertical gap={10}>
                   <Text type="secondary">
-                    Updated {dayjs(form.updatedAt).format("MMM D, YYYY h:mm A")}
+                    {t("customForms.updatedAt", { date: dayjs(form.updatedAt).format("MMM D, YYYY h:mm A") })}
                   </Text>
 
                   <Space wrap>
@@ -339,35 +339,35 @@ const CustomFormManager = ({
                       icon={<EyeOutlined />}
                       onClick={() => openPreviewPage(form)}
                     >
-                      Preview
+                      {t("customForms.preview")}
                     </Button>
 
                     <Button
                       icon={<TableOutlined />}
                       onClick={() => openResponsesPage(form)}
                     >
-                      Responses
+                      {t("customForms.responsesAction")}
                     </Button>
 
                     <Button
                       icon={<EditOutlined />}
                       onClick={() => openEditPage(form)}
                     >
-                      Edit
+                      {t("customForms.edit")}
                     </Button>
 
                     <Button
                       icon={<LinkOutlined />}
                       onClick={() => showShareModal(form)}
                     >
-                      Share
+                      {t("customForms.share")}
                     </Button>
 
                     <Popconfirm
-                      title="Delete this form?"
-                      description="Responses linked to it will be removed as well."
-                      okText="Delete"
-                      cancelText="Cancel"
+                      title={t("customForms.deleteConfirmTitle")}
+                      description={t("customForms.deleteConfirmDesc")}
+                      okText={t("common.delete", { defaultValue: "Delete" })}
+                      cancelText={t("common.cancel", { defaultValue: "Cancel" })}
                       onConfirm={() => deleteMutation.mutate(form.id)}
                     >
                       <Button
@@ -378,7 +378,7 @@ const CustomFormManager = ({
                           deleteMutation.variables === form.id
                         }
                       >
-                        Delete
+                        {t("common.delete", { defaultValue: "Delete" })}
                       </Button>
                     </Popconfirm>
                   </Space>
@@ -392,7 +392,7 @@ const CustomFormManager = ({
       )}
 
       <Modal
-        title="Attach a template"
+        title={t("customForms.attachTemplateTitle")}
         open={templateModalOpen}
         onCancel={() => setTemplateModalOpen(false)}
         onOk={() =>
@@ -402,29 +402,30 @@ const CustomFormManager = ({
           disabled: !selectedTemplateId,
           loading: attachTemplateMutation.isPending,
         }}
-        okText="Attach"
+        okText={t("customForms.attach")}
       >
         <Paragraph type="secondary">
-          Pick one of your reusable templates and clone it into this ticket.
-          Each ticket keeps its own copy and responses.
+          {t("customForms.attachTemplateDesc")}
         </Paragraph>
 
         <Select
           showSearch
           style={{ width: "100%" }}
-          placeholder="Choose a template"
+          placeholder={t("customForms.chooseTemplate")}
           value={selectedTemplateId}
           onChange={setSelectedTemplateId}
           options={(templateLibraryQuery.data || []).map((form) => ({
             value: form.id,
-            label: `${getLocalizedValue(i18n.language, form.title_en, form.title_ar, form.title)} (${form.fields.length} questions)`,
+            label: `${getLocalizedValue(i18n.language, form.title_en, form.title_ar, form.title)} (${t("customForms.questionsCount", { count: form.fields.length })})`,
           }))}
           loading={templateLibraryQuery.isLoading}
         />
       </Modal>
 
       <Modal
-        title={`Share "${getLocalizedValue(i18n.language, shareForm?.title_en, shareForm?.title_ar, shareForm?.title) || "form"}"`}
+        title={t("customForms.shareTitle", {
+          title: getLocalizedValue(i18n.language, shareForm?.title_en, shareForm?.title_ar, shareForm?.title) || t("customForms.formFallback"),
+        })}
         open={shareModalOpen}
         onCancel={() => {
           setShareModalOpen(false);
@@ -432,15 +433,14 @@ const CustomFormManager = ({
         }}
         onOk={() => shareForm && shareMutation.mutate(shareForm.id)}
         okButtonProps={{ loading: shareMutation.isPending }}
-        okText="Copy link"
+        okText={t("customForms.copyLink")}
       >
         <Paragraph type="secondary">
-          Generate an expiring public link so anyone can answer this form even
-          without a system account.
+          {t("customForms.shareDesc")}
         </Paragraph>
 
         <Flex vertical gap={10}>
-          <Text strong>Link expiry in hours</Text>
+          <Text strong>{t("customForms.linkExpiryHours")}</Text>
           <InputNumber
             min={1}
             max={24 * 30}
@@ -449,7 +449,7 @@ const CustomFormManager = ({
             onChange={(value) => setShareExpiresInHours(Number(value || 72))}
           />
           <Text type="secondary">
-            Example link:{" "}
+            {t("customForms.exampleLink")}{" "}
             <Text code>{shareForm ? buildPublicFormUrl("...token...") : "-"}</Text>
           </Text>
         </Flex>

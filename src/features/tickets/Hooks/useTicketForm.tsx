@@ -7,33 +7,41 @@ import { t } from 'i18next';
 import i18n from '../../../i18n';
 
 
-  export const useTicketProblems = () => {
+  export const useTicketProblems = (enabled = true) => {
     return useQuery({
         queryKey: ['ticketGroupedProblems', i18n.language],
         queryFn: async () => {
             const { data } = await api.get('/v1/lockups/ticket/problems/');
             return data;
         },
+        enabled,
+        staleTime: 5 * 60 * 1000,
     });
 };
   
-  export const useSpecializations = () =>
+  export const useSpecializations = (enabled = true) =>
     useQuery({
       queryKey: ['specializations', i18n.language], queryFn: () =>
-        api.get('v1/lockups/specializations/').then(res => res.data.specializations)
+        api.get('v1/lockups/specializations/').then(res => res.data.specializations),
+      enabled,
+      staleTime: 5 * 60 * 1000,
     });
 
-export const useTechnicians = () =>
+export const useTechnicians = (enabled = true) =>
   useQuery({
     queryKey: ['technicians', i18n.language], queryFn: () =>
-          api.get('v1/lockups/technicians/').then(res => res.data.users)
+          api.get('v1/lockups/technicians/').then(res => res.data.users),
+    enabled,
+    staleTime: 5 * 60 * 1000,
   });
 
 
-export const useAdmins = () =>
+export const useAdmins = (enabled = true) =>
   useQuery({
     queryKey: ['admins', i18n.language], queryFn: () =>
-      api.get('v1/lockups/admins').then(res => res.data.users)
+      api.get('v1/lockups/admins').then(res => res.data.users),
+    enabled,
+    staleTime: 5 * 60 * 1000,
   });
 
 export const useTicketDetails = (id?: string) =>

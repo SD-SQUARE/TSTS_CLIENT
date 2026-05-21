@@ -1,31 +1,40 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
-import { Alert, Button, Card, Divider, Flex, Input, Space, Steps, Tag, Typography, message } from 'antd';
+import { Alert, Button, Card, Col, Divider, Flex, Input, Row, Space, Statistic, Tag, Typography, message } from 'antd';
 import {
+    CheckCircleOutlined,
+    CopyOutlined,
     DesktopOutlined,
     DownloadOutlined,
-    CopyOutlined,
-    CheckCircleOutlined,
     LoadingOutlined,
     ReloadOutlined,
+    SafetyCertificateOutlined,
+    ToolOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useElectron, isElectron } from '../../../hooks/useElectron';
+import { useSelector } from 'react-redux';
+import { isElectron, useElectron } from '../../../hooks/useElectron';
 
-const { Title, Text, Paragraph } = Typography;
+const { Paragraph, Text, Title } = Typography;
 
 const DesktopApp: React.FC = () => {
-    const { t, i18n } = useTranslation();
-    const isArabic = i18n.language.startsWith('ar');
-    const { getLocalId, setLocalId, isRustDeskInstalled, openRustDesk } = useElectron();
+    const { t } = useTranslation();
+    const {
+        getLocalId,
+        isRustDeskInstalled,
+        openRustDesk,
+        registerDesktopDevice,
+    } = useElectron();
     const inElectron = isElectron();
+    const userEmail = useSelector((state: any) => state.auth.user?.email || '');
 
-    const [localId, setLocalIdState] = useState<string>('');
-    const [customId, setCustomId] = useState('');
+    const [localId, setLocalIdState] = useState('');
     const [isLoadingId, setIsLoadingId] = useState(false);
-    const [isSavingId, setIsSavingId] = useState(false);
+    const [isRegistering, setIsRegistering] = useState(false);
     const [rustDeskInstalled, setRustDeskInstalled] = useState<boolean | null>(null);
     const [copied, setCopied] = useState(false);
+    const [registeredKey, setRegisteredKey] = useState('');
+    const [registrationError, setRegistrationError] = useState('');
 
     const fetchLocalId = async () => {
         setIsLoadingId(true);
@@ -33,64 +42,91 @@ const DesktopApp: React.FC = () => {
             const result = await getLocalId();
             if (result.success && result.id) {
                 setLocalIdState(result.id);
-                setCustomId(result.id);
+            } else if (result.error) {
+                setRegistrationError(result.error);
             }
-        } catch { /* ignore */ }
-        finally { setIsLoadingId(false); }
+        } catch (error: any) {
+            setRegistrationError(error.message || t('desktop.idLoadFailed'));
+        } finally {
+            setIsLoadingId(false);
+        }
     };
 
     useEffect(() => {
-        if (inElectron) {
-            isRustDeskInstalled().then(r => setRustDeskInstalled(r.installed));
-            fetchLocalId();
-        }
+        if (!inElectron) return;
+
+        void isRustDeskInstalled().then((result) => setRustDeskInstalled(result.installed));
+        void fetchLocalId();
     }, [inElectron]);
 
-    const handleCopyId = () => {
-        navigator.clipboard.writeText(localId);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-    };
+    const registerDevice = async (email: string, rustdeskId: string, showToast = true) => {
+        const cleanEmail = email.trim().toLowerCase();
+        const cleanId = rustdeskId.trim().replace(/\s+/g, '');
+        if (!cleanEmail || !cleanId) return false;
 
-    const handleSaveId = async () => {
-        const clean = customId.trim().replace(/\s+/g, '');
-        if (!clean) return;
-        setIsSavingId(true);
+        setIsRegistering(true);
+        setRegistrationError('');
         try {
-            const result = await setLocalId(clean);
+            const result = await registerDesktopDevice({ email: cleanEmail, rustdeskId: cleanId });
             if (result.success) {
-                message.success(isArabic ? 'تم تحديث المعرّف بنجاح' : 'ID updated successfully');
-                await fetchLocalId();
-            } else {
-                message.error(result.error || (isArabic ? 'فشل التحديث' : 'Update failed'));
+                setRegisteredKey(`${cleanEmail}:${cleanId}`);
+                if (showToast) message.success(t('desktop.registrationSaved'));
+                return true;
             }
-        } catch (err: any) {
-            message.error(err.message);
+
+            const error = result.error || t('desktop.registrationFailed');
+            setRegistrationError(error);
+            if (showToast) message.error(error);
+            return false;
+        } catch (error: any) {
+            const errorMessage = error.message || t('desktop.registrationFailed');
+            setRegistrationError(errorMessage);
+            if (showToast) message.error(errorMessage);
+            return false;
         } finally {
-            setIsSavingId(false);
+            setIsRegistering(false);
         }
     };
 
-    // ── Not in Electron: show download page ──────────────────────────────────
+    useEffect(() => {
+        const activeEmail = userEmail.trim().toLowerCase();
+        if (!inElectron || !localId || !activeEmail) return;
+        if (!activeEmail) return;
+
+        const key = `${activeEmail}:${localId}`;
+        if (registeredKey === key) return;
+
+        void registerDevice(activeEmail, localId, false);
+    }, [inElectron, localId, registeredKey, userEmail]);
+
+    const handleCopyId = async () => {
+        if (!localId) return;
+        await navigator.clipboard.writeText(localId);
+        setCopied(true);
+        message.success(t('desktop.idCopied'));
+        window.setTimeout(() => setCopied(false), 2000);
+    };
+
+    const statusColor = rustDeskInstalled === false ? 'red' : localId ? 'green' : 'gold';
+    const statusText = rustDeskInstalled === false
+        ? t('desktop.statusMissing')
+        : localId
+            ? t('desktop.statusReady')
+            : t('desktop.statusNeedsId');
+
     if (!inElectron) {
         return (
-            <div style={{ maxWidth: 600 }}>
-                <Title level={4}>
-                    <DesktopOutlined style={{ marginInlineEnd: 8, color: '#1677ff' }} />
-                    {isArabic ? 'تطبيق سطح المكتب' : 'Desktop App'}
-                </Title>
-                <Paragraph type="secondary">
-                    {isArabic
-                        ? 'قم بتحميل تطبيق TSTS Desktop للاستفادة من ميزة التحكم عن بُعد.'
-                        : 'Download TSTS Desktop to enable remote control support.'}
-                </Paragraph>
-
-                <Card style={{ marginBottom: 20 }}>
-                    <Flex align="center" justify="space-between" wrap="wrap" gap={12}>
+            <div className="desktop-app-profile" style={{ maxWidth: 980 }}>
+                <Card bordered={false} style={{ marginBottom: 16 }}>
+                    <Flex justify="space-between" align="center" wrap="wrap" gap={16}>
                         <div>
-                            <Text strong style={{ fontSize: 16 }}>TSTS Desktop</Text>
-                            <br />
-                            <Text type="secondary" style={{ fontSize: 12 }}>Windows 10/11 • 64-bit</Text>
+                            <Tag color="blue" bordered={false}>{t('desktop.remoteSupport')}</Tag>
+                            <Title level={3} style={{ marginTop: 10, marginBottom: 6 }}>
+                                {t('desktop.profileTitle')}
+                            </Title>
+                            <Paragraph type="secondary" style={{ marginBottom: 0, maxWidth: 620 }}>
+                                {t('desktop.profileDescription')}
+                            </Paragraph>
                         </div>
                         <Button
                             type="primary"
@@ -99,139 +135,148 @@ const DesktopApp: React.FC = () => {
                             href="/api/v1/desktop/download"
                             target="_blank"
                         >
-                            {isArabic ? 'تحميل' : 'Download'}
+                            {t('desktop.downloadApp')}
                         </Button>
                     </Flex>
                 </Card>
 
-                <Card title={isArabic ? 'خطوات الإعداد' : 'Setup Steps'}>
-                    <Steps
-                        direction="vertical"
-                        size="small"
-                        items={[
-                            {
-                                title: isArabic ? 'تحميل وتثبيت التطبيق' : 'Download & install the app',
-                                description: isArabic
-                                    ? 'قم بتحميل TSTS Desktop وتثبيته على جهازك'
-                                    : 'Download and install TSTS Desktop on your machine',
-                                status: 'process',
-                                icon: <DownloadOutlined />,
-                            },
-                            {
-                                title: isArabic ? 'تسجيل معرّف جهازك' : 'Register your machine ID',
-                                description: isArabic
-                                    ? 'افتح التطبيق وانتقل إلى الإعدادات → تطبيق سطح المكتب لرؤية معرّفك'
-                                    : 'Open the app and go to Settings → Desktop App to see your ID',
-                                status: 'wait',
-                            },
-                            {
-                                title: isArabic ? 'مشاركة المعرّف مع الدعم التقني' : 'Share ID with support',
-                                description: isArabic
-                                    ? 'أعطِ معرّف جهازك للفني عند طلب المساعدة عن بُعد'
-                                    : 'Give your machine ID to the technician when requesting remote help',
-                                status: 'wait',
-                            },
-                        ]}
-                    />
+                <Row gutter={[16, 16]}>
+                    <Col xs={24} md={8}>
+                        <Card>
+                            <Statistic title={t('desktop.platform')} value="Windows 10/11" prefix={<DesktopOutlined />} />
+                        </Card>
+                    </Col>
+                    <Col xs={24} md={8}>
+                        <Card>
+                            <Statistic title={t('desktop.remoteEngine')} value="RustDesk" prefix={<ToolOutlined />} />
+                        </Card>
+                    </Col>
+                    <Col xs={24} md={8}>
+                        <Card>
+                            <Statistic title={t('desktop.registration')} value={t('desktop.automatic')} prefix={<SafetyCertificateOutlined />} />
+                        </Card>
+                    </Col>
+                </Row>
+
+                <Card title={t('desktop.setupTitle')} style={{ marginTop: 16 }}>
+                    <Row gutter={[16, 16]}>
+                        {['downloadInstall', 'signInDesktop', 'shareMachineId'].map((key, index) => (
+                            <Col xs={24} md={8} key={key}>
+                                <Flex gap={12} align="flex-start">
+                                    <Tag color="blue">{index + 1}</Tag>
+                                    <div>
+                                        <Text strong>{t(`desktop.${key}Title`)}</Text>
+                                        <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                                            {t(`desktop.${key}Description`)}
+                                        </Paragraph>
+                                    </div>
+                                </Flex>
+                            </Col>
+                        ))}
+                    </Row>
                 </Card>
             </div>
         );
     }
 
-    // ── In Electron: show ID management ──────────────────────────────────────
     return (
-        <div style={{ maxWidth: 560 }}>
-            <Title level={4}>
-                <DesktopOutlined style={{ marginInlineEnd: 8, color: '#1677ff' }} />
-                {isArabic ? 'تطبيق سطح المكتب' : 'Desktop App'}
-            </Title>
-            <Paragraph type="secondary">
-                {isArabic
-                    ? 'شارك معرّف جهازك مع الفني للسماح له بالاتصال عن بُعد.'
-                    : 'Share your machine ID with the technician to allow remote connection.'}
-            </Paragraph>
+        <div className="desktop-app-profile" style={{ maxWidth: 980 }}>
+            <Card bordered={false} style={{ marginBottom: 16 }}>
+                <Flex justify="space-between" align="flex-start" wrap="wrap" gap={16}>
+                    <div>
+                        <Tag color={statusColor} bordered={false}>{statusText}</Tag>
+                        <Title level={3} style={{ marginTop: 10, marginBottom: 6 }}>
+                            {t('desktop.profileTitle')}
+                        </Title>
+                        <Paragraph type="secondary" style={{ marginBottom: 0, maxWidth: 660 }}>
+                            {t('desktop.electronDescription')}
+                        </Paragraph>
+                    </div>
+                    <Space wrap>
+                        <Button icon={<ReloadOutlined />} onClick={fetchLocalId} loading={isLoadingId}>
+                            {t('desktop.refreshId')}
+                        </Button>
+                        <Button icon={<DesktopOutlined />} onClick={() => void openRustDesk()}>
+                            {t('desktop.openRustDesk')}
+                        </Button>
+                    </Space>
+                </Flex>
+            </Card>
 
             {rustDeskInstalled === false && (
                 <Alert
                     type="warning"
                     showIcon
-                    message={isArabic ? 'RustDesk غير مثبت' : 'RustDesk not installed'}
-                    description={isArabic
-                        ? 'يبدو أن RustDesk غير مثبت. يرجى إعادة تثبيت TSTS Desktop.'
-                        : 'RustDesk does not appear to be installed. Please reinstall TSTS Desktop.'}
+                    message={t('desktop.rustdeskMissing')}
+                    description={t('desktop.rustdeskMissingDesc')}
                     style={{ marginBottom: 16 }}
                 />
             )}
 
-            {/* Current ID */}
-            <Card title={isArabic ? 'معرّف جهازك الحالي' : 'Your Current Machine ID'} style={{ marginBottom: 16 }}>
+            {registrationError && (
+                <Alert
+                    type="error"
+                    showIcon
+                    message={t('desktop.registrationAttention')}
+                    description={registrationError}
+                    style={{ marginBottom: 16 }}
+                />
+            )}
+
+            <Card
+                title={
+                    <Flex align="center" gap={8}>
+                        <DesktopOutlined />
+                        {t('desktop.currentIdTitle')}
+                    </Flex>
+                }
+            >
                 {isLoadingId ? (
                     <Flex align="center" gap={8}>
                         <LoadingOutlined />
-                        <Text type="secondary">{isArabic ? 'جارٍ التحميل...' : 'Loading...'}</Text>
+                        <Text type="secondary">{t('desktop.loadingId')}</Text>
                     </Flex>
                 ) : localId ? (
-                    <Space direction="vertical" size={12} style={{ width: '100%' }}>
-                        <Flex align="center" gap={8}>
-                            <Input
-                                value={localId}
-                                readOnly
-                                size="large"
-                                style={{ fontFamily: 'monospace', letterSpacing: 3, fontSize: 18, fontWeight: 600 }}
-                            />
-                            <Button
-                                icon={copied ? <CheckCircleOutlined style={{ color: '#52c41a' }} /> : <CopyOutlined />}
-                                onClick={handleCopyId}
-                                size="large"
-                            >
-                                {copied ? (isArabic ? 'تم النسخ' : 'Copied') : (isArabic ? 'نسخ' : 'Copy')}
-                            </Button>
+                    <Space direction="vertical" size={14} style={{ width: '100%' }}>
+                        <Input
+                            value={localId}
+                            readOnly
+                            size="large"
+                            addonBefore={t('desktop.rustdeskId')}
+                            style={{ fontFamily: 'monospace', letterSpacing: 2 }}
+                            suffix={
+                                <Button
+                                    type="text"
+                                    icon={copied ? <CheckCircleOutlined /> : <CopyOutlined />}
+                                    onClick={handleCopyId}
+                                    aria-label={t('common.copy', { defaultValue: 'Copy' })}
+                                />
+                            }
+                        />
+                        <Flex gap={8} wrap="wrap">
+                            <Tag color="green" icon={<CheckCircleOutlined />}>
+                                {t('desktop.visibleToSupport')}
+                            </Tag>
+                            {isRegistering && <Tag icon={<LoadingOutlined />}>{t('desktop.syncing')}</Tag>}
                         </Flex>
-                        <Tag color="green" icon={<CheckCircleOutlined />}>
-                            {isArabic ? 'RustDesk يعمل' : 'RustDesk is running'}
-                        </Tag>
                     </Space>
                 ) : (
-                    <Flex align="center" gap={8}>
-                        <Text type="secondary">{isArabic ? 'لم يتم العثور على معرّف' : 'No ID found'}</Text>
-                        <Button icon={<ReloadOutlined />} size="small" onClick={fetchLocalId}>
-                            {isArabic ? 'إعادة المحاولة' : 'Retry'}
+                    <Flex align="center" justify="space-between" gap={12} wrap="wrap">
+                        <Text type="secondary">{t('desktop.noIdFound')}</Text>
+                        <Button icon={<ReloadOutlined />} onClick={fetchLocalId}>
+                            {t('common.retry', { defaultValue: 'Retry' })}
                         </Button>
                     </Flex>
                 )}
             </Card>
 
-            {/* Custom ID */}
-            <Card title={isArabic ? 'تخصيص المعرّف (اختياري)' : 'Customize ID (Optional)'}>
-                <Space direction="vertical" size={12} style={{ width: '100%' }}>
-                    <Text type="secondary" style={{ fontSize: 13 }}>
-                        {isArabic
-                            ? 'يمكنك تعيين معرّف مخصص لجهازك بدلاً من المعرّف التلقائي. يتطلب صلاحيات المسؤول.'
-                            : 'You can set a custom ID for your machine instead of the auto-generated one. Requires admin privileges.'}
-                    </Text>
-                    <Input
-                        placeholder={isArabic ? 'أدخل المعرّف المخصص' : 'Enter custom ID'}
-                        value={customId}
-                        onChange={e => setCustomId(e.target.value)}
-                        size="large"
-                        style={{ fontFamily: 'monospace' }}
-                    />
-                    <Button
-                        type="primary"
-                        onClick={handleSaveId}
-                        loading={isSavingId}
-                        disabled={!customId.trim() || customId.trim() === localId}
-                    >
-                        {isArabic ? 'حفظ المعرّف' : 'Save ID'}
-                    </Button>
-                </Space>
-            </Card>
-
             <Divider />
-
-            <Button icon={<DesktopOutlined />} onClick={() => openRustDesk()}>
-                {isArabic ? 'فتح RustDesk' : 'Open RustDesk'}
-            </Button>
+            <Alert
+                type="info"
+                showIcon
+                message={t('desktop.securityTitle')}
+                description={t('desktop.securityDescription')}
+            />
         </div>
     );
 };

@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -11,7 +12,15 @@
     "preview": "vite preview",
     "app:ProdBuild": "docker compose up --build -d",
     "app:ProdDown": "docker compose down",
-    "secret:publish": "npx --yes tsx ./scripts/publish-env.ts"
+    "secret:publish": "npx --yes tsx ./scripts/publish-env.ts",
+    "desktop:install": "npm install",
+    "desktop:dev": "cross-env NODE_ENV=development electron electron/main.js",
+    "desktop:build:renderer": "npm run build:staging && node electron/scripts/sync-renderer.mjs",
+    "desktop:prod": "npm run desktop:build:renderer && cross-env NODE_ENV=production electron electron/main.js",
+    "desktop:release": "npm run desktop:build:renderer && electron-builder --win nsis",
+    "desktop:release:dir": "npm run desktop:build:renderer && electron-builder --win dir",
+    "desktop:copy:backend": "node scripts/copy-desktop-installer.mjs",
+    "desktop:release:backend": "npm run desktop:release && npm run desktop:copy:backend"
   },
   "dependencies": {
     "@ant-design/charts": "^2.6.7",
@@ -57,6 +66,9 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "cross-env": "^10.1.0",
+    "electron": "41.6.1",
+    "electron-builder": "^26.8.1",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
@@ -65,5 +77,52 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4"
+  },
+  "build": {
+    "appId": "com.tsts.desktop",
+    "productName": "TSTS Desktop",
+    "asar": true,
+    "directories": {
+      "output": "electron/release"
+    },
+    "files": [
+      "electron/dist/**/*",
+      "electron/main.js",
+      "electron/preload.cjs",
+      "electron/icon.*",
+      "package.json",
+      "!**/*.map"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "electron/icon.ico",
+      "forceCodeSigning": false,
+      "protocols": [
+        {
+          "name": "TSTS Protocol",
+          "schemes": [
+            "tsts"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "include": "electron/installer.nsh",
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "electron/icon.ico",
+      "uninstallerIcon": "electron/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "TSTS Desktop"
+    },
+    "artifactName": "TSTS-Desktop-Setup.${ext}",
+    "extraFiles": [
+      {
+        "from": "electron/rustdesk/",
+        "to": "resources/rustdesk/"
+      }
+    ]
   }
 }

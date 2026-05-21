@@ -2,6 +2,7 @@ export interface Requester {
     id: string;
     name: string;
     image: string;
+    rustdeskId?: string | null;
     university?: LookupItem | null;
     domain?: LookupItem | null;
     departments?: LookupItem[];

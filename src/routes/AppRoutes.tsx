@@ -1,35 +1,11 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
-import { LoginPage } from "../features/login/pages/LoginPage";
 import { APP_BASE_PATH } from "../app/config.ts";
 import NotFound from "../components/utils/NotFound.tsx";
 import Home from "../components/Home.tsx";
 import ServerError from './../components/utils/ServerError';
 import NotAllowed from './../components/utils/NotAllowed';
-import GroupsList from "../features/Groups/GroupsList.tsx";
-import UserList from "../features/Users/Components/UsersList.tsx";
-import ForgotPasswordForm from "../features/ForgotPasswordForm/ForgotPasswordForm.tsx";
-import GroupViewPage from "../features/Groups/GroupViewPage.tsx";
-import UserViewPage from "../features/Users/Components/UsersViewPage.tsx";
 import MainLayout from "../components/MainLayout";
-import UniversitiesPage from "../features/universities/components/Universities";
-import DomainsPage from "../features/domains/components/Domains";
-import DepartmentsPage from "../features/departments/components/Departments";
-import SpecializationsPage from "../features/specializations/components/Specializations";
-import PermissionsPage from "../features/permissions/components/Permissions";
-import KnowledgeBasePage from "../features/knowledge-base/components/KnowledgeBasePage.tsx";
-import KnowledgeGeneratorPage from "../features/knowledge-base/components/KnowledgeGeneratorPage.tsx";
-import KnowledgeGeneratorDetailPage from "../features/knowledge-base/components/KnowledgeGeneratorDetailPage.tsx";
-import ChatCenterPage from "../features/communications/components/ChatCenterPage.tsx";
-import SystemInfoTab from "../features/profile/components/SystemInfo.component.tsx";
-import PersonnelDashboard from "../features/Users/Components/PersonnelDashboard.tsx";
-import PublicFormPage from "../features/CustomForms/pages/PublicFormPage.tsx";
-import CustomFormManager from "../features/CustomForms/components/CustomFormManager";
-import FormEditPage from "../features/CustomForms/components/FormEditPage";
-import FormPreviewPage from "../features/CustomForms/components/FormPreviewPage";
-import ResponsesPage from "../features/CustomForms/components/ResponsesPage";
-import SiteSettingsPage from "../features/site-settings/components/SiteSettingsPage";
-import SlaManagementPage from "../features/sla/components/SlaManagementPage";
-import RecycleBinPage from "../features/recycle-bin/components/RecycleBinPage";
 
 import {
     CheckOutlined,
@@ -48,22 +24,53 @@ import {
     AlertOutlined,
     RestOutlined
 } from '@ant-design/icons';
-import TicketList from "../features/tickets/Components/ticketsList.tsx";
-import TicketForm from "../features/tickets/Components/ticketForm.tsx";
-import TicketView from "../features/tickets/Components/ticketDetails.tsx";
 import GuardedRoute from "./GuardedRoute.tsx";
 import PageLayout from "../components/PageLayout.tsx";
-import Profile from './../features/profile/Profile.page';
 import { useTranslation } from "react-i18next";
-import ProblemsPage from "../features/Problems/components/ProblemsPage.tsx";
-import TrustedDevicesPage from "../features/trusted-devices/pages/TrustedDevicesPage.tsx";
-import AuditLogList from "../features/AuditLogs/Components/AuditLogsList.tsx";
-import AuditLogView from "../features/AuditLogs/Components/AuditLogView.tsx";
-import DashboardPage from "../features/Reports/Components/DashboardPage.tsx";
-import ReportViewPage from "../features/Reports/Components/ReportPage.tsx";
-import AiAssistant from "../features/ai-assistant/AiAssistant.tsx";
+
+const LoginPage = lazy(() => import("../features/login/pages/LoginPage").then((module) => ({ default: module.LoginPage })));
+const GroupsList = lazy(() => import("../features/Groups/GroupsList.tsx"));
+const UserList = lazy(() => import("../features/Users/Components/UsersList.tsx"));
+const ForgotPasswordForm = lazy(() => import("../features/ForgotPasswordForm/ForgotPasswordForm.tsx"));
+const GroupViewPage = lazy(() => import("../features/Groups/GroupViewPage.tsx"));
+const UserViewPage = lazy(() => import("../features/Users/Components/UsersViewPage.tsx"));
+const UniversitiesPage = lazy(() => import("../features/universities/components/Universities"));
+const DomainsPage = lazy(() => import("../features/domains/components/Domains"));
+const DepartmentsPage = lazy(() => import("../features/departments/components/Departments"));
+const SpecializationsPage = lazy(() => import("../features/specializations/components/Specializations"));
+const PermissionsPage = lazy(() => import("../features/permissions/components/Permissions"));
+const KnowledgeBasePage = lazy(() => import("../features/knowledge-base/components/KnowledgeBasePage.tsx"));
+const KnowledgeGeneratorPage = lazy(() => import("../features/knowledge-base/components/KnowledgeGeneratorPage.tsx"));
+const KnowledgeGeneratorDetailPage = lazy(() => import("../features/knowledge-base/components/KnowledgeGeneratorDetailPage.tsx"));
+const ChatCenterPage = lazy(() => import("../features/communications/components/ChatCenterPage.tsx"));
+const SystemInfoTab = lazy(() => import("../features/profile/components/SystemInfo.component.tsx"));
+const PersonnelDashboard = lazy(() => import("../features/Users/Components/PersonnelDashboard.tsx"));
+const PublicFormPage = lazy(() => import("../features/CustomForms/pages/PublicFormPage.tsx"));
+const CustomFormManager = lazy(() => import("../features/CustomForms/components/CustomFormManager"));
+const FormEditPage = lazy(() => import("../features/CustomForms/components/FormEditPage"));
+const FormPreviewPage = lazy(() => import("../features/CustomForms/components/FormPreviewPage"));
+const ResponsesPage = lazy(() => import("../features/CustomForms/components/ResponsesPage"));
+const SiteSettingsPage = lazy(() => import("../features/site-settings/components/SiteSettingsPage"));
+const SlaManagementPage = lazy(() => import("../features/sla/components/SlaManagementPage"));
+const RecycleBinPage = lazy(() => import("../features/recycle-bin/components/RecycleBinPage"));
+const TicketList = lazy(() => import("../features/tickets/Components/ticketsList.tsx"));
+const TicketForm = lazy(() => import("../features/tickets/Components/ticketForm.tsx"));
+const TicketView = lazy(() => import("../features/tickets/Components/ticketDetails.tsx"));
+const Profile = lazy(() => import("./../features/profile/Profile.page"));
+const ProblemsPage = lazy(() => import("../features/Problems/components/ProblemsPage.tsx"));
+const TrustedDevicesPage = lazy(() => import("../features/trusted-devices/pages/TrustedDevicesPage.tsx"));
+const AuditLogList = lazy(() => import("../features/AuditLogs/Components/AuditLogsList.tsx"));
+const AuditLogView = lazy(() => import("../features/AuditLogs/Components/AuditLogView.tsx"));
+const DashboardPage = lazy(() => import("../features/Reports/Components/DashboardPage.tsx"));
+const ReportViewPage = lazy(() => import("../features/Reports/Components/ReportPage.tsx"));
+const AiAssistant = lazy(() => import("../features/ai-assistant/AiAssistant.tsx"));
 
 const withBasePath = (path: string) => `${APP_BASE_PATH}${path}`;
+const routeFallback = (
+    <div style={{ minHeight: 320, display: "grid", placeItems: "center", color: "#6b7280" }}>
+        Loading...
+    </div>
+);
 
 export const AppRoutes = () => {
     const { t } = useTranslation();
@@ -117,6 +124,7 @@ export const AppRoutes = () => {
         { key: withBasePath("/settings/logs"), label: t("sidebar.menu.auditLogs"), icon: <ClockCircleOutlined /> },
     ];
     return (
+        <Suspense fallback={routeFallback}>
         <Routes>
             <Route index path={`${APP_BASE_PATH}/`} element={<Home />} />
             <Route path={`${APP_BASE_PATH}/f/:token`} element={<PublicFormPage />} />
@@ -368,5 +376,6 @@ export const AppRoutes = () => {
             <Route path={`${APP_BASE_PATH}/not-allowed`} element={<PageLayout><NotAllowed /> </PageLayout>} />
             <Route path={`${APP_BASE_PATH}/*`} element={<PageLayout><NotFound /> </PageLayout>} />
         </Routes>
+        </Suspense>
     );
 };

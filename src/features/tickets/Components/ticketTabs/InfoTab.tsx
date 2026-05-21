@@ -26,13 +26,14 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
     const { role } = useParams();
     const currentUserRole = useSelector((state: any) => state.auth.user?.role?.toLowerCase?.() || role || '');
     const isRequester = currentUserRole === 'requester';
+    const isDraftTicket = ticket?.status === 'Draft';
     const canInlineEdit = ['admin', 'technician', 'superadmin'].includes(currentUserRole);
 
     const [isExpanded, setIsExpanded] = useState(false);
 
     const statusMutation = useChangeTicketStatus(ticket?.id);
 
-    const openstate = "Open", reopenstate = "Re Open", closestate = "Closed";
+    const draft_state = "Draft", openstate = "Open", reopenstate = "Re Open", closestate = "Closed";
     const in_progress_state = "In Progress", pending_state = "Pending";
     const out_of_service_state = "Out of Service", resolved_status = "Resolved";
 
@@ -40,6 +41,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
     const { data: groupedData } = useTicketProblems();
 
     const statusMap: Record<string, string> = {
+        [draft_state]: "draft",
         [openstate]: "open",
         [reopenstate]: "re_open",
         [closestate]: "closed",
@@ -114,6 +116,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'Open': return 'green';
+            case 'Draft': return 'default';
             case 'In Progress': return 'blue';
             case 'Pending': return 'gold';
             case 'Closed': return 'red';
@@ -202,7 +205,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
                                     <Typography.Text type="secondary">{t('tickets.status')}</Typography.Text>
                                     <Space size={4}>
                                         <Tag color={getStatusColor(ticket?.status)}>
-                                            {ticket?.status}
+                                            {t(`status.${statusMap[ticket?.status]}`, { defaultValue: ticket?.status })}
                                         </Tag>
 
                                         {canInlineEdit && (
@@ -261,7 +264,7 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
 
 
                                 <Flex gap="small" wrap="wrap" style={{ marginTop: 8 }}>
-                                    {canInlineEdit && (
+                                    {(canInlineEdit || (isRequester && isDraftTicket)) && (
                                         <Button style={btnStyle} styles={{
                                             root: {
                                                 borderColor: 'var(--color-secondary)',
@@ -277,7 +280,13 @@ const TicketInfoTab: React.FC<TicketInfoTabProps> = ({ ticket, onEdit }) => {
 
     if (ticket?.status !== resolved_status) {
         if (isRequester) {
-            if (ticket?.status === closestate) {
+            if (ticket?.status === draft_state) {
+                actionButton = (
+                    <Button style={btnStyle} type="primary" size="large" icon={<CheckCircleOutlined />} onClick={() => handleStatusChange(openstate)} loading={statusMutation.isPending}>
+                        {t('tickets.submitDraft')}
+                    </Button>
+                );
+            } else if (ticket?.status === closestate) {
                 actionButton = (
                     <Button style={btnStyle} size="large" icon={<ReloadOutlined />} onClick={() => handleStatusChange(reopenstate)} loading={statusMutation.isPending}>
                         {t('tickets.reopenTicket')}

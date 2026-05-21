@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useRef, useState } from 'react';
-import { Badge, Button, Flex, Input, Popover, Select, Space, TreeSelect } from 'antd';
+import { Button, Flex, Input, Popover, Select, Space, Tag, TreeSelect } from 'antd';
 import { FilterOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import Highlighter from 'react-highlight-words';
@@ -135,15 +135,6 @@ export const useTicketColumns = ({
             ''
         );
     };
-
-    const withSlaRibbon = (record: Ticket, content: React.ReactNode) =>
-        !isRequester && record.sla?.violated ? (
-            <Badge.Ribbon text={t('sla.violated')} color="red" style={{ position: 'absolute', top: -2, right: -8 }}>
-                <div style={{ paddingTop: 0 }}>{content}</div>
-            </Badge.Ribbon>
-        ) : (
-            content
-        );
 
     const getColumnSearchProps = (dataIndex: SearchableDataIndex, titleKey: string): TableColumnType<Ticket> => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
@@ -294,7 +285,7 @@ export const useTicketColumns = ({
             dataIndex: 'id',
             key: 'id',
             width: 120,
-            fixed: 'left',
+            fixed: isArabic ? 'right' : 'left',
             ...getColumnSearchProps('id' as any, 'tickets.ticket_number'),
             render: (id: string, record: Ticket) => {
                 const displayValue = record.ticket_number || id;
@@ -319,21 +310,16 @@ export const useTicketColumns = ({
             key: 'title',
             width: 450,
             ellipsis: true,
-            onCell: (record: Ticket) => ({
-                style: !isRequester && record.sla?.violated ? {
-                    position: 'relative' as const,
-                } : {}
-            }),
-            render: (text: string, record: Ticket) =>
-                withSlaRibbon(
-                    record,
+            render: (text: string, record: Ticket) => (
+                <Flex className="ticket-title-cell" align="center" gap={8}>
                     <Popover
                         title={t('tickets.title')}
                         content={<div style={{ maxWidth: 400 }}>{text}</div>}
                         trigger="hover"
-                        placement="topLeft"
+                        placement={isArabic ? 'topRight' : 'topLeft'}
                     >
                         <div
+                            className="ticket-title-cell__text"
                             onClick={() => handleView(record.id)}
                             style={{
                                 cursor: 'pointer',
@@ -344,7 +330,13 @@ export const useTicketColumns = ({
                         >
                             <EllipsisComponent content={renderHighlightedText(text, 'title')} />
                         </div>
-                    </Popover>,
+                    </Popover>
+                    {!isRequester && record.sla?.violated && (
+                        <Tag className="ticket-sla-tag" color="red">
+                            {t('sla.violated')}
+                        </Tag>
+                    )}
+                </Flex>
             ),
             ...getColumnSearchProps('title', 'tickets.title'),
         },
@@ -389,6 +381,7 @@ export const useTicketColumns = ({
                 return <span>{renderHighlightedText(translatedStatus, 'status')}</span>;
             },
             ...getColumnSelectProps('status', 'tickets.status', [
+                ...(isRequester ? [{ label: t('status.draft'), value: 'draft' }] : []),
                 { label: t('status.open'), value: 'open' },
                 { label: t('status.re_open'), value: 're_open' },
                 { label: t('status.in_progress'), value: 'in_progress' },

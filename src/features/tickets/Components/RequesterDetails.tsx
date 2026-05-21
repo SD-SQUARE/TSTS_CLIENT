@@ -1,13 +1,15 @@
 import React from 'react';
-import { Collapse, Typography, Avatar, Tag, Flex, Divider, Skeleton, Card } from 'antd';
+import { Button, Collapse, Typography, Avatar, Tag, Flex, Divider, Skeleton, Card, message } from 'antd';
 import { 
     UserOutlined, MailOutlined, PhoneOutlined, BankOutlined, 
     SolutionOutlined, 
     ApartmentOutlined,
-    MobileOutlined
+    MobileOutlined,
+    DesktopOutlined
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useUserProfile } from '../Hooks/useTicket';
+import { useElectron } from '../../../hooks/useElectron';
 
 interface RequesterDetailsProps {
     requesterId: string;
@@ -16,6 +18,7 @@ interface RequesterDetailsProps {
 const RequesterDetails: React.FC<RequesterDetailsProps> = ({ requesterId }) => {
     const { t, i18n } = useTranslation();
     const isAr = i18n.language === 'ar';
+    const { connectViaProtocol } = useElectron();
     
     const { data: profile, isLoading } = useUserProfile(requesterId);
 
@@ -33,6 +36,15 @@ const RequesterDetails: React.FC<RequesterDetailsProps> = ({ requesterId }) => {
     const mobile = profile?.contacts?.mobiles?.[0];
     const phone = profile?.contacts?.phones?.[0];
     const departments = profile?.departments || [];
+    const rustdeskId = profile?.rustdeskId;
+
+    const handleRemoteConnect = async () => {
+        if (!rustdeskId) return;
+        const result = await connectViaProtocol(rustdeskId);
+        if (!result.success) {
+            message.error(result.error || t('desktop.openProtocolFailed'));
+        }
+    };
 
     return (
         <Collapse 
@@ -83,6 +95,16 @@ const RequesterDetails: React.FC<RequesterDetailsProps> = ({ requesterId }) => {
                                     {jobTitle}
                                 </Tag>
                             </div>
+                        )}
+
+                        {rustdeskId && (
+                            <Button
+                                type="primary"
+                                icon={<DesktopOutlined />}
+                                onClick={handleRemoteConnect}
+                            >
+                                {t('desktop.startRemoteSession')}
+                            </Button>
                         )}
 
                         <Divider orientation="horizontal" plain style={{ margin: '8px 0', fontSize: '12px' }}>

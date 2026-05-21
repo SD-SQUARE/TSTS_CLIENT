@@ -60,14 +60,15 @@ const TicketList: React.FC = () => {
     );
     const { data: analyticsData, isLoading: analyticsLoading } = useTicketAnalytics();
     const ticketRows = data?.data || [];
+    const shouldLoadStaffLookups = !isRequester;
     const { data: specs } = useSpecializations();
     const { data: hierarchicalProblems } = useTicketProblems();
-    const { data: technicians } = useTechnicians();
-    const { data: admins } = useAdmins();
+    const { data: technicians } = useTechnicians(shouldLoadStaffLookups);
+    const { data: admins } = useAdmins(shouldLoadStaffLookups);
     const { data: requesters } = useRequestersLookup(!isRequester);
-    const { data: universities } = useTicketUniversitiesLookup();
-    const { data: domains } = useTicketDomainsLookup();
-    const { data: departments } = useTicketDepartmentsLookup();
+    const { data: universities } = useTicketUniversitiesLookup(shouldLoadStaffLookups);
+    const { data: domains } = useTicketDomainsLookup(shouldLoadStaffLookups);
+    const { data: departments } = useTicketDepartmentsLookup(shouldLoadStaffLookups);
 
     const possibleAssignees = useMemo(() => {
         const safeTechs = Array.isArray(technicians) ? technicians : [];

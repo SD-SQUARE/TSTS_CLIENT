@@ -1,8 +1,11 @@
 import axios from 'axios'
 import i18n from '../i18n';
 
+const electronApiBaseUrl =
+    typeof window !== 'undefined' ? window.electronAPI?.apiBaseUrl : undefined;
+
 const api = axios.create({
-    baseURL: '/api',
+    baseURL: electronApiBaseUrl || '/api',
     headers: { 'Content-Type': 'application/json' },
     withCredentials: true,
 })

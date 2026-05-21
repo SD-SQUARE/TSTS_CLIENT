@@ -28,24 +28,42 @@ const TicketListStyles: React.FC = () => (
         .row-highlight-out-of-service { background-color: #fff1f0 !important; }
 
         .ant-table-tbody > tr.row-highlight-open > td.ant-table-cell-fix-start,
-        .ant-table-tbody > tr.row-highlight-open > td.ant-table-cell-fix-left         { background-color: #e6f4ff !important; }
+        .ant-table-tbody > tr.row-highlight-open > td.ant-table-cell-fix-left,
+        .ant-table-tbody > tr.row-highlight-open > td.ant-table-cell-fix-right,
+        .ant-table-tbody > tr.row-highlight-open > td.ant-table-cell-fix-end         { background-color: #e6f4ff !important; }
         .ant-table-tbody > tr.row-highlight-re-open > td.ant-table-cell-fix-start,
-        .ant-table-tbody > tr.row-highlight-re-open > td.ant-table-cell-fix-left         { background-color: #e6f4ff !important; }
+        .ant-table-tbody > tr.row-highlight-re-open > td.ant-table-cell-fix-left,
+        .ant-table-tbody > tr.row-highlight-re-open > td.ant-table-cell-fix-right,
+        .ant-table-tbody > tr.row-highlight-re-open > td.ant-table-cell-fix-end         { background-color: #e6f4ff !important; }
         .ant-table-tbody > tr.row-highlight-closed > td.ant-table-cell-fix-start,
-        .ant-table-tbody > tr.row-highlight-closed > td.ant-table-cell-fix-left       { background-color: #abf6ab !important; }
+        .ant-table-tbody > tr.row-highlight-closed > td.ant-table-cell-fix-left,
+        .ant-table-tbody > tr.row-highlight-closed > td.ant-table-cell-fix-right,
+        .ant-table-tbody > tr.row-highlight-closed > td.ant-table-cell-fix-end       { background-color: #abf6ab !important; }
         .ant-table-tbody > tr.row-highlight-resolved > td.ant-table-cell-fix-start,
-        .ant-table-tbody > tr.row-highlight-resolved > td.ant-table-cell-fix-left     { background-color: #65c165 !important; }
+        .ant-table-tbody > tr.row-highlight-resolved > td.ant-table-cell-fix-left,
+        .ant-table-tbody > tr.row-highlight-resolved > td.ant-table-cell-fix-right,
+        .ant-table-tbody > tr.row-highlight-resolved > td.ant-table-cell-fix-end     { background-color: #65c165 !important; }
         .ant-table-tbody > tr.row-highlight-in-progress > td.ant-table-cell-fix-start,
-        .ant-table-tbody > tr.row-highlight-in-progress > td.ant-table-cell-fix-left  { background-color: #bfcfff !important; }
+        .ant-table-tbody > tr.row-highlight-in-progress > td.ant-table-cell-fix-left,
+        .ant-table-tbody > tr.row-highlight-in-progress > td.ant-table-cell-fix-right,
+        .ant-table-tbody > tr.row-highlight-in-progress > td.ant-table-cell-fix-end  { background-color: #bfcfff !important; }
         .ant-table-tbody > tr.row-highlight-pending > td.ant-table-cell-fix-start,
-        .ant-table-tbody > tr.row-highlight-pending > td.ant-table-cell-fix-left      { background-color: #ffffbf !important; }
+        .ant-table-tbody > tr.row-highlight-pending > td.ant-table-cell-fix-left,
+        .ant-table-tbody > tr.row-highlight-pending > td.ant-table-cell-fix-right,
+        .ant-table-tbody > tr.row-highlight-pending > td.ant-table-cell-fix-end      { background-color: #ffffbf !important; }
         .ant-table-tbody > tr.row-highlight-out-of-service > td.ant-table-cell-fix-start,
-        .ant-table-tbody > tr.row-highlight-out-of-service > td.ant-table-cell-fix-left { background-color: #fff1f0 !important; }
+        .ant-table-tbody > tr.row-highlight-out-of-service > td.ant-table-cell-fix-left,
+        .ant-table-tbody > tr.row-highlight-out-of-service > td.ant-table-cell-fix-right,
+        .ant-table-tbody > tr.row-highlight-out-of-service > td.ant-table-cell-fix-end { background-color: #fff1f0 !important; }
 
         [class^="row-highlight-"]:hover > td { filter: brightness(0.97); }
+        .ticket-title-cell { min-width: 0; width: 100%; overflow: hidden; }
+        .ticket-title-cell__text { min-width: 0; overflow: hidden; }
+        .ticket-sla-tag { flex: 0 0 auto; margin-inline-end: 0; }
         [dir='rtl'] .ant-table-filter-column { flex-direction: row; }
         [dir='rtl'] .ant-table-filter-column-title { text-align: right; }
         [dir='rtl'] .ant-table-filter-trigger { margin-right: 8px; margin-left: 0; }
+        [dir='rtl'] .react-resizable-handle { left: -10px !important; right: auto !important; }
         .react-resizable-handle-w { left: -10px !important; right: auto !important; cursor: col-resize; }
         .react-resizable-handle-e { right: -10px !important; left: auto !important; cursor: col-resize; }
         .react-resizable-handle-active { z-index: 1000; }

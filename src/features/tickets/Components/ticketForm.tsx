@@ -6,7 +6,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Form, Input, Select, Button, Upload, Tag, Dropdown, Typography, message, Flex, Card, Steps, Badge, TreeSelect } from 'antd';
+import { Form, Input, Select, Button, Upload, Tag, Dropdown, Typography, message, Flex, Card, Steps, Badge, TreeSelect, Checkbox } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import RequiredTag from '../../../components/RequiredTag';
@@ -14,8 +14,10 @@ import { useSelector } from 'react-redux';
 import { fetchAdmins, fetchGroups, fetchGroupUsers, useTicketDetails, useTicketMutations, useTicketProblems } from '../Hooks/useTicketForm';
 import { queryClient } from '../../../app/queryClient';
 import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import i18next from 'i18next';
 import { getErrorMessage } from '../../../utils/error';
+import './ticketForm.css';
 
 
 const TicketForm: React.FC = () => {
@@ -40,6 +42,7 @@ const TicketForm: React.FC = () => {
     const { data: groupedData } = useTicketProblems();
     const { data: ticketData, isLoading } = useTicketDetails(id);
     const { createMutation, updateMutation, coordinateMutation } = useTicketMutations(id);
+    const isDraftTicket = ticketData?.status?.toLowerCase?.() === 'draft';
 
     const [fileList, setFileList] = useState<any[]>([]);
 
@@ -334,6 +337,9 @@ const TicketForm: React.FC = () => {
         formData.append('title', values.title);
         formData.append('description', values.description);
         formData.append('requester', user.id);
+        if (!isEdit && values.isDraft) {
+            formData.append('isDraft', 'true');
+        }
 
         if (selectedProblemData) {
             formData.append('problem', selectedProblemData.id);
@@ -456,7 +462,7 @@ const TicketForm: React.FC = () => {
     };
 
     return (
-        <div style={{ width: '100%', padding: '14px', boxSizing: 'border-box' }}>
+        <div className="ticket-form-page" style={{ width: '100%', padding: '14px', boxSizing: 'border-box' }}>
             <Badge.Ribbon
                 text={!isRequester && currentPriority ? t(`priority.${currentPriority}`) : ''}
                 color={getPriorityColor(currentPriority)}
@@ -565,8 +571,19 @@ const TicketForm: React.FC = () => {
                         )}
 
 
+                        {!isEdit && (
+                            <Form.Item
+                                name="isDraft"
+                                valuePropName="checked"
+                                initialValue={false}
+                                style={{ marginBottom: 14 }}
+                            >
+                                <Checkbox>{t('tickets.saveAsDraft')}</Checkbox>
+                            </Form.Item>
+                        )}
+
                         <Form.Item name="title" label={<Flex align="center" gap="small"><span>{t('tickets.title')}</span><RequiredTag /></Flex>} rules={[{ required: true }]}>
-                            <Input readOnly={isEdit} style={{ width: '100%' }} showCount maxLength={255} />
+                            <Input readOnly={isEdit && !isDraftTicket} style={{ width: '100%' }} showCount maxLength={255} />
                         </Form.Item>
 
 
@@ -583,10 +600,11 @@ const TicketForm: React.FC = () => {
                             getValueFromEvent={(value) => value}
                         >
                             <ReactQuill
+                                className="ticket-form-quill"
                                 theme="snow"
                                 modules={modules}
                                 placeholder={t('tickets.descriptionPlaceholder')}
-                                readOnly={isEdit}
+                                readOnly={isEdit && !isDraftTicket}
                                 style={{
                                     height: '16rem',
                                     marginBottom: '1.5rem',
@@ -682,11 +700,7 @@ const TicketForm: React.FC = () => {
                                             updateMutation.isPending ||
                                             coordinateMutation.isPending
                                         }
-                                        styles={{
-                                            root: {
-                                                width: "100%"
-                                            }
-                                        }}
+                                        style={{ width: "100%" }}
                                     >
                                         {isEdit ? t('common.save') : t('common.create')}
                                     </Button>
@@ -695,11 +709,7 @@ const TicketForm: React.FC = () => {
                                 <Button
                                     size="large"
                                     onClick={handleBack}
-                                    styles={{
-                                        root: {
-                                            width: "100%"
-                                        }
-                                    }}
+                                    style={{ width: "100%" }}
                                 >
                                     {t('common.back')}
                                 </Button>

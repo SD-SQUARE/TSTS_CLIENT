@@ -1,6 +1,7 @@
 import { Alert, Button, Card, Checkbox, Form, Input, InputNumber, Radio, Select, Typography } from "antd";
 import type { CustomFormField, CustomFormSettings } from "../types";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import "./customForms.css";
 
 const { Paragraph, Text, Title } = Typography;
@@ -32,7 +33,7 @@ const getLocalizedValue = (
   return en || ar || fallback || "";
 };
 
-const renderFieldControl = (field: CustomFormField, language: string) => {
+const renderFieldControl = (field: CustomFormField, language: string, t: TFunction) => {
   const placeholder = getLocalizedValue(
     language,
     field.placeholder_en,
@@ -42,9 +43,9 @@ const renderFieldControl = (field: CustomFormField, language: string) => {
 
   if (field.type === "short_text" || field.type === "email") {
     return (
-      <Input
+        <Input
         type={field.type === "email" ? "email" : "text"}
-        placeholder={placeholder || "Your answer"}
+        placeholder={placeholder || t("customForms.yourAnswer")}
       />
     );
   }
@@ -53,7 +54,7 @@ const renderFieldControl = (field: CustomFormField, language: string) => {
     return (
       <Input.TextArea
         rows={4}
-        placeholder={placeholder || "Write your answer"}
+        placeholder={placeholder || t("customForms.writeAnswer")}
       />
     );
   }
@@ -62,7 +63,7 @@ const renderFieldControl = (field: CustomFormField, language: string) => {
     return (
       <InputNumber
         style={{ width: "100%" }}
-        placeholder={placeholder || "Enter a number"}
+        placeholder={placeholder || t("customForms.enterNumber")}
         min={field.settings?.min}
         max={field.settings?.max}
       />
@@ -76,7 +77,7 @@ const renderFieldControl = (field: CustomFormField, language: string) => {
   if (field.type === "dropdown") {
     return (
       <Select
-        placeholder="Select one option"
+        placeholder={t("customForms.selectOneOption")}
         options={field.options.map((option) => ({
           label: getLocalizedValue(language, option.label_en, option.label_ar, option.label),
           value: option.id,
@@ -111,7 +112,7 @@ const renderFieldControl = (field: CustomFormField, language: string) => {
   return null;
 };
 
-const buildRules = (field: CustomFormField, language: string) => {
+const buildRules = (field: CustomFormField, language: string, t: TFunction) => {
   const rules = [];
   const fieldLabel = getLocalizedValue(language, field.label_en, field.label_ar, field.label);
 
@@ -122,7 +123,7 @@ const buildRules = (field: CustomFormField, language: string) => {
         const emptyString = typeof value === "string" && value.trim().length === 0;
 
         if (value === undefined || value === null || emptyArray || emptyString) {
-          throw new Error(`${fieldLabel || "This question"} is required.`);
+          throw new Error(t("customForms.questionRequired", { field: fieldLabel || t("customForms.thisQuestion") }));
         }
       },
     });
@@ -131,7 +132,7 @@ const buildRules = (field: CustomFormField, language: string) => {
   if (field.type === "email") {
     rules.push({
       type: "email" as const,
-      message: "Please enter a valid email address.",
+      message: t("customForms.validEmail"),
     });
   }
 
@@ -144,7 +145,7 @@ const buildRules = (field: CustomFormField, language: string) => {
           value.length < (field.settings?.minSelections || 0)
         ) {
           throw new Error(
-            `Pick at least ${field.settings?.minSelections} options.`,
+            t("customForms.minSelections", { count: field.settings?.minSelections }),
           );
         }
       },
@@ -159,7 +160,7 @@ const buildRules = (field: CustomFormField, language: string) => {
           value.length > (field.settings?.maxSelections || Infinity)
         ) {
           throw new Error(
-            `Pick at most ${field.settings?.maxSelections} options.`,
+            t("customForms.maxSelections", { count: field.settings?.maxSelections }),
           );
         }
       },
@@ -182,7 +183,7 @@ const FormRenderer = ({
   submitting,
   previewOnly,
 }: FormRendererProps) => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [form] = Form.useForm();
   const showSubmit = !previewOnly && typeof onSubmit === "function";
   const localizedTitle = getLocalizedValue(i18n.language, title_en, title_ar, title);
@@ -211,7 +212,7 @@ const FormRenderer = ({
           </Paragraph>
         ) : (
           <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-            Fill in the questions below and submit when you are ready.
+            {t("customForms.defaultPublicDescription")}
           </Paragraph>
         )}
       </Card>
@@ -220,8 +221,8 @@ const FormRenderer = ({
         <Alert
           type="info"
           showIcon
-          message="Preview mode"
-          description="This page shows how the form will look to responders. Submission is disabled here."
+          message={t("customForms.previewMode")}
+          description={t("customForms.previewModeDesc")}
         />
       )}
 
@@ -267,10 +268,10 @@ const FormRenderer = ({
 
             <Form.Item
               name={field.id}
-              rules={buildRules(field, i18n.language)}
+              rules={buildRules(field, i18n.language, t)}
               style={{ marginBottom: 0 }}
             >
-              {renderFieldControl(field, i18n.language)}
+              {renderFieldControl(field, i18n.language, t)}
             </Form.Item>
           </Card>
             );
@@ -285,7 +286,7 @@ const FormRenderer = ({
             loading={submitting}
             style={{ minWidth: 180 }}
           >
-            {localizedSubmitLabel || "Submit"}
+            {localizedSubmitLabel || t("customForms.submit")}
           </Button>
         )}
       </Form>

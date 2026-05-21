@@ -1,45 +1,56 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Input, Upload, message as antMessage, Spin, Tag, Tooltip } from 'antd';
+import { Alert, Button, Card, Input, Space, Spin, Tag, Tooltip, Typography, Upload, message as antMessage } from 'antd';
 import {
-    SendOutlined,
-    RobotOutlined,
-    UserOutlined,
+    CheckCircleFilled,
     ClearOutlined,
+    FileAddOutlined,
+    FileOutlined,
     LoadingOutlined,
     PaperClipOutlined,
-    FileOutlined,
-    FileAddOutlined,
-    CheckCircleFilled,
+    RobotOutlined,
+    SendOutlined,
     StopOutlined,
+    UserOutlined,
 } from '@ant-design/icons';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import './AiAssistant.css';
 
-interface Message {
+interface ChatMessage {
+    id: string;
     role: 'user' | 'assistant';
     content: string;
     files?: { name: string; type: string }[];
-    ticketCreated?: { ticketNumber: number; ticketId: string };
+    ticketCreated?: { ticketNumber: number; ticketId: string; isDraft?: boolean };
     isThinking?: boolean;
 }
 
-const SUGGESTED_PROMPTS_EN = [
-    'I have a problem with my email',
-    'I cannot access the university portal',
-    'My computer is not working properly',
-    'I need help with Microsoft Office',
-];
+interface TicketPreview {
+    title: string;
+    description: string;
+    specializationId?: string;
+    problemId?: string;
+    specializationName?: string;
+    problemName?: string;
+}
 
-const SUGGESTED_PROMPTS_AR = [
-    'لدي مشكلة في البريد الإلكتروني',
-    'لا أستطيع الوصول إلى البوابة الإلكترونية',
-    'جهاز الكمبيوتر لا يعمل بشكل صحيح',
-    'أحتاج مساعدة في برامج Office',
-];
+const createId = () =>
+    typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+const formatDescriptionForTicket = (description: string) => {
+    const trimmed = description.trim();
+    if (/<[a-z][\s\S]*>/i.test(trimmed)) return trimmed;
+    return trimmed
+        .split(/\n{2,}/)
+        .map((paragraph) => `<p>${paragraph.replace(/\n/g, '<br />')}</p>`)
+        .join('');
+};
 
 const AiAssistant: React.FC = () => {
     const { t, i18n } = useTranslation();
@@ -47,96 +58,134 @@ const AiAssistant: React.FC = () => {
     const { user } = useSelector((state: any) => state.auth);
     const userRole = typeof user?.role === 'string' ? user.role.toLowerCase() : 'requester';
     const isArabic = i18n.language.startsWith('ar');
+    const dir = isArabic ? 'rtl' : 'ltr';
+    const apiBaseUrl = window.electronAPI?.apiBaseUrl || '/api';
 
-    const [messages, setMessages] = useState<Message[]>([]);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
     const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+    const [pendingTicket, setPendingTicket] = useState<TicketPreview | null>(null);
     const [isCreatingTicket, setIsCreatingTicket] = useState(false);
-    const [toolStatus, setToolStatus] = useState<string | null>(null);
+    const [activityStatus, setActivityStatus] = useState<string | null>(null);
     const [isSlowResponse, setIsSlowResponse] = useState(false);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const abortRef = useRef<AbortController | null>(null);
     const slowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const suggestedPrompts = isArabic ? SUGGESTED_PROMPTS_AR : SUGGESTED_PROMPTS_EN;
-    const dir = isArabic ? 'rtl' : 'ltr';
+    const suggestedPrompts = useMemo(() => [
+        t('ai_assistant.prompts.office'),
+        t('ai_assistant.prompts.email'),
+        t('ai_assistant.prompts.portal'),
+        t('ai_assistant.prompts.computer'),
+    ], [t, i18n.language]);
 
     useEffect(() => {
-        fetch('/api/v1/ai-assistant/health', {
+        fetch(`${apiBaseUrl}/v1/ai-assistant/health`, {
             headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` },
         })
-            .then(r => r.json())
+            .then((r) => r.json())
             .then((d: any) => setIsAvailable(d.available))
             .catch(() => setIsAvailable(false));
-    }, []);
+    }, [apiBaseUrl]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages, toolStatus]);
+    }, [messages, activityStatus, pendingTicket]);
 
-    const handleTicketAction = useCallback(async (ticketData: any) => {
+    const appendAssistantMessage = useCallback((content: string, extra?: Partial<ChatMessage>) => {
+        setMessages((prev) => [
+            ...prev,
+            {
+                id: createId(),
+                role: 'assistant',
+                content,
+                ...extra,
+            },
+        ]);
+    }, []);
+
+    const createTicketFromPreview = useCallback(async (isDraft: boolean) => {
+        if (!pendingTicket) return;
         setIsCreatingTicket(true);
+        setActivityStatus(isDraft ? t('ai_assistant.status.savingDraft') : t('ai_assistant.status.submitting'));
+
         try {
-            const res = await fetch('/api/v1/ai-assistant/create-ticket', {
+            const res = await fetch(`${apiBaseUrl}/v1/ai-assistant/create-ticket`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${sessionStorage.getItem('token')}`,
                 },
-                body: JSON.stringify(ticketData),
+                body: JSON.stringify({
+                    ...pendingTicket,
+                    description: formatDescriptionForTicket(pendingTicket.description),
+                    isDraft,
+                }),
             });
+
             const data = await res.json();
-            if (data.success) {
-                setMessages(prev => [...prev, {
-                    role: 'assistant',
-                    content: isArabic
-                        ? `✅ **تم إنشاء تذكرة الدعم بنجاح!**\n\n**رقم التذكرة:** #${data.ticketNumber}\n\nسيتواصل معك فريق الدعم التقني قريباً.`
-                        : `✅ **Support ticket created successfully!**\n\n**Ticket Number:** #${data.ticketNumber}\n\nThe technical support team will contact you soon.`,
-                    ticketCreated: { ticketNumber: data.ticketNumber, ticketId: data.ticketId },
-                }]);
-                antMessage.success(isArabic ? 'تم إنشاء التذكرة بنجاح' : 'Ticket created successfully');
-            } else throw new Error(data.error);
+            if (!res.ok || !data.success) {
+                throw new Error(data.error || data.message || 'Ticket creation failed');
+            }
+
+            setPendingTicket(null);
+            appendAssistantMessage(
+                isDraft
+                    ? t('ai_assistant.draft_created', { ticketNumber: data.ticketNumber })
+                    : t('ai_assistant.ticket_created', { ticketNumber: data.ticketNumber }),
+                { ticketCreated: { ticketNumber: data.ticketNumber, ticketId: data.ticketId, isDraft } },
+            );
+            antMessage.success(isDraft ? t('tickets.draftSaved') : t('tickets.created'));
         } catch (err: any) {
-            setMessages(prev => [...prev, {
-                role: 'assistant',
-                content: isArabic
-                    ? `❌ فشل إنشاء التذكرة. يمكنك [إنشاؤها يدوياً](/${userRole}/tickets/new-ticket).`
-                    : `❌ Ticket creation failed. You can [create it manually](/${userRole}/tickets/new-ticket).`,
-            }]);
+            appendAssistantMessage(t('ai_assistant.create_failed', { path: `/${userRole}/tickets/new-ticket` }));
+            antMessage.error(err.message || t('errors.submitFailed'));
         } finally {
             setIsCreatingTicket(false);
+            setActivityStatus(null);
         }
-    }, [isArabic, userRole]);
+    }, [apiBaseUrl, appendAssistantMessage, pendingTicket, t, userRole]);
 
     const sendMessage = useCallback(async (text?: string) => {
         const content = (text || input).trim();
-        if (!content && pendingFiles.length === 0) return;
-        if (isLoading) return;
+        if ((!content && pendingFiles.length === 0) || isLoading) return;
 
-        const filesMeta = pendingFiles.map(f => ({ name: f.name, type: f.type }));
-        const userMsg: Message = {
+        const filesMeta = pendingFiles.map((f) => ({ name: f.name, type: f.type }));
+        const userMsg: ChatMessage = {
+            id: createId(),
             role: 'user',
-            content: content || (isArabic ? 'مرفقات:' : 'Attachments:'),
+            content: content || t('ai_assistant.attachmentsOnly'),
             files: filesMeta.length > 0 ? filesMeta : undefined,
         };
+        const thinkingMsg: ChatMessage = {
+            id: createId(),
+            role: 'assistant',
+            content: '',
+            isThinking: true,
+        };
 
-        setMessages(prev => [...prev, userMsg, { role: 'assistant', content: '', isThinking: true }]);
+        const history = [...messages.slice(-10), userMsg].map(({ role, content: msgContent }) => ({ role, content: msgContent }));
+
+        setMessages((prev) => [...prev, userMsg, thinkingMsg]);
+        setPendingTicket(null);
         setInput('');
         setPendingFiles([]);
         setIsLoading(true);
-        setToolStatus(null);
+        setActivityStatus(t('ai_assistant.status.thinking'));
+        setIsSlowResponse(false);
 
         slowTimerRef.current = setTimeout(() => setIsSlowResponse(true), 8000);
         abortRef.current = new AbortController();
 
         let msgContent = content;
-        if (pendingFiles.length > 0) msgContent += `\n[Files: ${pendingFiles.map(f => f.name).join(', ')}]`;
+        if (pendingFiles.length > 0) {
+            msgContent += `\n[Files: ${pendingFiles.map((f) => f.name).join(', ')}]`;
+        }
 
         try {
-            const response = await fetch('/api/v1/ai-assistant/chat', {
+            const response = await fetch(`${apiBaseUrl}/v1/ai-assistant/chat`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -144,7 +193,7 @@ const AiAssistant: React.FC = () => {
                     'Accept-Language': i18n.language,
                 },
                 body: JSON.stringify({
-                    messages: [...messages.slice(-8), { role: 'user', content: msgContent }],
+                    messages: [...history.slice(0, -1), { role: 'user', content: msgContent }],
                     language: isArabic ? 'ar' : 'en',
                 }),
                 signal: abortRef.current.signal,
@@ -152,44 +201,75 @@ const AiAssistant: React.FC = () => {
 
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const reader = response.body?.getReader();
-            if (!reader) throw new Error('No stream');
-            const decoder = new TextDecoder();
+            if (!reader) throw new Error('No response stream');
 
-            while (true) {
+            const decoder = new TextDecoder();
+            let buffer = '';
+            let streamDone = false;
+
+            while (!streamDone) {
                 const { value, done } = await reader.read();
                 if (done) break;
-                const chunk = decoder.decode(value, { stream: true });
-                for (const line of chunk.split('\n\n').filter(Boolean)) {
-                    if (!line.startsWith('data: ')) continue;
-                    const dataStr = line.replace('data: ', '');
-                    if (dataStr === '[DONE]') { setIsLoading(false); break; }
+
+                buffer += decoder.decode(value, { stream: true });
+                const events = buffer.split('\n\n');
+                buffer = events.pop() || '';
+
+                for (const event of events) {
+                    if (!event.startsWith('data: ')) continue;
+                    const dataStr = event.slice(6).trim();
+                    if (dataStr === '[DONE]') {
+                        streamDone = true;
+                        break;
+                    }
+
                     try {
                         const data = JSON.parse(dataStr);
                         if (data.content) {
-                            setToolStatus(null);
-                            setMessages(prev => {
+                            setActivityStatus(null);
+                            setMessages((prev) => {
                                 const updated = [...prev];
                                 const last = updated[updated.length - 1];
-                                updated[updated.length - 1] = { ...last, content: last.content + data.content, isThinking: false };
+                                updated[updated.length - 1] = {
+                                    ...last,
+                                    content: `${last.content}${data.content}`,
+                                    isThinking: false,
+                                };
                                 return updated;
                             });
                         }
-                        if (data.toolStatus) setToolStatus(data.toolStatus);
-                        if (data.ticketAction) {
-                            setIsLoading(false);
-                            setToolStatus(null);
-                            handleTicketAction(data.ticketAction);
+                        if (data.toolStatus) {
+                            setActivityStatus(t('ai_assistant.status.workingOn', { action: data.toolStatus }));
                         }
-                    } catch { /* skip */ }
+                        if (data.ticketAction) {
+                            setPendingTicket(data.ticketAction);
+                            setActivityStatus(t('ai_assistant.status.reviewReady'));
+                            setMessages((prev) => {
+                                const updated = [...prev];
+                                const last = updated[updated.length - 1];
+                                if (last?.isThinking && !last.content) {
+                                    updated[updated.length - 1] = {
+                                        ...last,
+                                        content: t('ai_assistant.preview_ready'),
+                                        isThinking: false,
+                                    };
+                                }
+                                return updated;
+                            });
+                        }
+                    } catch {
+                        // Ignore malformed SSE fragments.
+                    }
                 }
             }
         } catch (err: any) {
             if (err.name !== 'AbortError') {
-                setMessages(prev => {
+                setMessages((prev) => {
                     const updated = [...prev];
                     updated[updated.length - 1] = {
+                        id: createId(),
                         role: 'assistant',
-                        content: isArabic ? 'عذراً، حدث خطأ. يرجى المحاولة مرة أخرى.' : 'Sorry, an error occurred. Please try again.',
+                        content: t('ai_assistant.error'),
                         isThinking: false,
                     };
                     return updated;
@@ -198,16 +278,16 @@ const AiAssistant: React.FC = () => {
         } finally {
             setIsLoading(false);
             setIsSlowResponse(false);
-            setToolStatus(null);
+            if (!pendingTicket) setActivityStatus(null);
             if (slowTimerRef.current) clearTimeout(slowTimerRef.current);
         }
-    }, [input, isLoading, messages, isArabic, i18n.language, pendingFiles, handleTicketAction]);
+    }, [apiBaseUrl, i18n.language, input, isArabic, isLoading, messages, pendingFiles, pendingTicket, t]);
 
     const stopGeneration = () => {
         abortRef.current?.abort();
         setIsLoading(false);
         setIsSlowResponse(false);
-        setToolStatus(null);
+        setActivityStatus(null);
         if (slowTimerRef.current) clearTimeout(slowTimerRef.current);
     };
 
@@ -215,328 +295,276 @@ const AiAssistant: React.FC = () => {
         stopGeneration();
         setMessages([]);
         setPendingFiles([]);
+        setPendingTicket(null);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 120px)', minHeight: 500, direction: dir }}>
-            {/* ── Header ── */}
-            <div style={{
-                padding: '12px 20px', borderBottom: '1px solid #e5e5e5',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                background: '#fff', flexShrink: 0,
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{
-                        width: 36, height: 36, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #1677ff, #0958d9)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                        <RobotOutlined style={{ color: '#fff', fontSize: 18 }} />
+        <section className="ai-assistant-shell" dir={dir}>
+            <header className="ai-assistant-header">
+                <div className="ai-assistant-identity">
+                    <div className="ai-assistant-avatar">
+                        <RobotOutlined />
                     </div>
                     <div>
-                        <div style={{ fontWeight: 600, fontSize: 15, color: '#111' }}>
-                            {t('ai_assistant.title', 'AI Assistant')}
-                        </div>
-                        <div style={{ fontSize: 11, color: isAvailable ? '#52c41a' : '#ff4d4f', display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: isAvailable ? '#52c41a' : '#ff4d4f', display: 'inline-block' }} />
-                            {isAvailable === null ? t('ai_assistant.checking', 'Checking...')
-                                : isAvailable ? t('ai_assistant.online', 'Online')
-                                    : t('ai_assistant.offline', 'Offline')}
+                        <Typography.Title level={4} className="ai-assistant-title">
+                            {t('ai_assistant.title')}
+                        </Typography.Title>
+                        <div className="ai-assistant-presence">
+                            <span className={isAvailable ? 'is-online' : 'is-offline'} />
+                            {isAvailable === null
+                                ? t('ai_assistant.checking')
+                                : isAvailable
+                                    ? t('ai_assistant.online')
+                                    : t('ai_assistant.offline')}
                         </div>
                     </div>
                 </div>
-                <div style={{ display: 'flex', gap: 4 }}>
+
+                <Space>
                     {isSlowResponse && (
-                        <Tag color="warning" style={{ fontSize: 11 }}>
-                            {isArabic ? 'المعالجة تستغرق وقتاً...' : 'Processing on CPU...'}
-                        </Tag>
+                        <Tag color="warning">{t('ai_assistant.status.stillWorking')}</Tag>
                     )}
                     {messages.length > 0 && (
-                        <Tooltip title={t('ai_assistant.clear', 'Clear chat')}>
-                            <Button type="text" icon={<ClearOutlined />} onClick={clearChat} size="small" style={{ color: '#8c8c8c' }} />
+                        <Tooltip title={t('ai_assistant.clear')}>
+                            <Button type="text" icon={<ClearOutlined />} onClick={clearChat} />
                         </Tooltip>
                     )}
-                </div>
-            </div>
+                </Space>
+            </header>
 
-            {/* ── Messages ── */}
-            <div style={{
-                flex: 1, overflowY: 'auto', padding: '24px 0',
-                background: '#fff', display: 'flex', flexDirection: 'column',
-            }}>
+            <main className="ai-assistant-messages">
                 {messages.length === 0 ? (
-                    /* Welcome screen */
-                    <div style={{ margin: 'auto', maxWidth: 560, padding: '0 24px', textAlign: 'center' }}>
-                        <div style={{
-                            width: 64, height: 64, borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #1677ff, #0958d9)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            margin: '0 auto 20px',
-                        }}>
-                            <RobotOutlined style={{ color: '#fff', fontSize: 30 }} />
+                    <div className="ai-assistant-empty">
+                        <div className="ai-assistant-empty-icon">
+                            <RobotOutlined />
                         </div>
-                        <h2 style={{ fontSize: 22, fontWeight: 600, color: '#111', marginBottom: 8 }}>
-                            {t('ai_assistant.welcome_title', 'How can I help you?')}
-                        </h2>
-                        <p style={{ color: '#666', marginBottom: 28, fontSize: 14 }}>
-                            {t('ai_assistant.welcome_desc', 'Describe your problem and I will help you solve it or create a support ticket.')}
-                        </p>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginBottom: 20 }}>
-                            {suggestedPrompts.map((prompt, i) => (
-                                <button key={i} onClick={() => sendMessage(prompt)} style={{
-                                    padding: '10px 16px', borderRadius: 20,
-                                    border: '1px solid #e5e5e5', background: '#fafafa',
-                                    cursor: 'pointer', fontSize: 13, color: '#333',
-                                    transition: 'all 0.15s', fontFamily: 'inherit',
-                                }}
-                                    onMouseEnter={e => { e.currentTarget.style.background = '#f0f5ff'; e.currentTarget.style.borderColor = '#1677ff'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.background = '#fafafa'; e.currentTarget.style.borderColor = '#e5e5e5'; }}
-                                >
+                        <Typography.Title level={2}>{t('ai_assistant.welcome_title')}</Typography.Title>
+                        <Typography.Paragraph type="secondary">
+                            {t('ai_assistant.welcome_desc')}
+                        </Typography.Paragraph>
+                        <div className="ai-assistant-prompts">
+                            {suggestedPrompts.map((prompt) => (
+                                <button key={prompt} type="button" onClick={() => sendMessage(prompt)}>
                                     {prompt}
                                 </button>
                             ))}
                         </div>
-                        <Button type="default" icon={<FileAddOutlined />} onClick={() => navigate(`/${userRole}/tickets/new-ticket`)}>
-                            {isArabic ? 'إنشاء تذكرة مباشرة' : 'Create Ticket Directly'}
+                        <Button icon={<FileAddOutlined />} onClick={() => navigate(`/${userRole}/tickets/new-ticket`)}>
+                            {t('ai_assistant.createDirectly')}
                         </Button>
                     </div>
                 ) : (
-                    <div style={{ maxWidth: 760, width: '100%', margin: '0 auto', padding: '0 24px', display: 'flex', flexDirection: 'column', gap: 0 }}>
-                        {messages.map((msg, idx) => (
+                    <div className="ai-assistant-thread">
+                        {messages.map((msg) => (
                             <MessageRow
-                                key={idx}
+                                key={msg.id}
                                 message={msg}
-                                isArabic={isArabic}
                                 userRole={userRole}
                                 navigate={navigate}
                             />
                         ))}
 
-                        {/* Tool status pill */}
-                        {toolStatus && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 0', paddingInlineStart: 44 }}>
-                                <div style={{
-                                    display: 'flex', alignItems: 'center', gap: 6,
-                                    padding: '4px 12px', borderRadius: 20,
-                                    background: '#f0f5ff', border: '1px solid #d6e4ff',
-                                    fontSize: 12, color: '#1677ff',
-                                }}>
-                                    <LoadingOutlined style={{ fontSize: 11 }} />
-                                    {isArabic ? `جارٍ البحث عن ${toolStatus}...` : `Searching ${toolStatus}...`}
-                                </div>
+                        {activityStatus && (
+                            <div className="ai-assistant-status">
+                                <LoadingOutlined />
+                                <span>{activityStatus}</span>
                             </div>
                         )}
 
-                        {/* Creating ticket spinner */}
-                        {isCreatingTicket && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 0', paddingInlineStart: 44 }}>
-                                <Spin size="small" />
-                                <span style={{ fontSize: 13, color: '#666' }}>
-                                    {isArabic ? 'جارٍ إنشاء التذكرة...' : 'Creating ticket...'}
-                                </span>
-                            </div>
+                        {pendingTicket && (
+                            <TicketPreviewCard
+                                ticket={pendingTicket}
+                                loading={isCreatingTicket}
+                                onSubmit={() => createTicketFromPreview(false)}
+                                onSaveDraft={() => createTicketFromPreview(true)}
+                                onCancel={() => setPendingTicket(null)}
+                            />
                         )}
                     </div>
                 )}
                 <div ref={messagesEndRef} />
-            </div>
+            </main>
 
-            {/* ── Pending files ── */}
             {pendingFiles.length > 0 && (
-                <div style={{ padding: '8px 24px', background: '#f8f9fa', borderTop: '1px solid #f0f0f0', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    {pendingFiles.map((f, i) => (
-                        <Tag key={i} closable onClose={() => setPendingFiles(prev => prev.filter((_, j) => j !== i))} icon={<FileOutlined />} color="blue">
-                            {f.name.length > 24 ? f.name.substring(0, 24) + '...' : f.name}
+                <div className="ai-assistant-files">
+                    {pendingFiles.map((file, index) => (
+                        <Tag
+                            key={`${file.name}-${index}`}
+                            closable
+                            onClose={() => setPendingFiles((prev) => prev.filter((_, itemIndex) => itemIndex !== index))}
+                            icon={<FileOutlined />}
+                            color="blue"
+                        >
+                            {file.name}
                         </Tag>
                     ))}
                 </div>
             )}
 
-            {/* ── Input area ── */}
-            <div style={{ padding: '12px 24px 16px', background: '#fff', borderTop: '1px solid #f0f0f0', flexShrink: 0 }}>
-                <div style={{
-                    maxWidth: 760, margin: '0 auto',
-                    border: '1px solid #e5e5e5', borderRadius: 16,
-                    background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                    overflow: 'hidden',
-                    transition: 'border-color 0.2s, box-shadow 0.2s',
-                }}
-                    onFocus={() => { }}
-                >
+            <footer className="ai-assistant-composer">
+                <div className="ai-assistant-input">
                     <Input.TextArea
                         value={input}
-                        onChange={e => setInput(e.target.value)}
+                        onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder={t('ai_assistant.placeholder', 'Describe your problem... (Enter to send)')}
+                        placeholder={t('ai_assistant.placeholder')}
                         disabled={isLoading}
                         autoSize={{ minRows: 1, maxRows: 6 }}
-                        style={{
-                            border: 'none', boxShadow: 'none', resize: 'none',
-                            padding: '14px 16px', fontSize: 14, background: 'transparent',
-                        }}
                         variant="borderless"
                     />
-                    <div style={{
-                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                        padding: '8px 12px', borderTop: '1px solid #f5f5f5',
-                    }}>
-                        <div style={{ display: 'flex', gap: 4 }}>
-                            <Upload multiple showUploadList={false}
-                                beforeUpload={(file) => { setPendingFiles(prev => [...prev, file]); return false; }}
-                                accept="image/*,.pdf,.doc,.docx,.txt,.xlsx,.xls">
-                                <Tooltip title={isArabic ? 'إرفاق ملف' : 'Attach file'}>
-                                    <Button type="text" icon={<PaperClipOutlined />} size="small" disabled={isLoading} style={{ color: '#8c8c8c' }} />
-                                </Tooltip>
-                            </Upload>
-                        </div>
-                        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                    <div className="ai-assistant-input-actions">
+                        <Upload
+                            multiple
+                            showUploadList={false}
+                            beforeUpload={(file) => {
+                                setPendingFiles((prev) => [...prev, file]);
+                                return false;
+                            }}
+                            accept="image/*,.pdf,.doc,.docx,.txt,.xlsx,.xls"
+                        >
+                            <Tooltip title={t('ai_assistant.attach')}>
+                                <Button type="text" icon={<PaperClipOutlined />} disabled={isLoading} />
+                            </Tooltip>
+                        </Upload>
+
+                        <Space size={6}>
                             {isLoading && (
-                                <Tooltip title={isArabic ? 'إيقاف' : 'Stop'}>
-                                    <Button type="text" icon={<StopOutlined />} size="small" onClick={stopGeneration} style={{ color: '#ff4d4f' }} />
+                                <Tooltip title={t('ai_assistant.stop')}>
+                                    <Button type="text" danger icon={<StopOutlined />} onClick={stopGeneration} />
                                 </Tooltip>
                             )}
                             <Button
                                 type="primary"
                                 shape="circle"
-                                size="small"
                                 icon={isLoading ? <LoadingOutlined /> : <SendOutlined />}
                                 onClick={() => sendMessage()}
                                 disabled={(!input.trim() && pendingFiles.length === 0) || isLoading}
-                                style={{ width: 32, height: 32 }}
                             />
-                        </div>
+                        </Space>
                     </div>
                 </div>
-                <p style={{ textAlign: 'center', fontSize: 11, color: '#bbb', marginTop: 8, marginBottom: 0 }}>
-                    {t('ai_assistant.disclaimer', 'AI may make mistakes. For urgent issues, create a ticket directly.')}
-                </p>
-            </div>
-        </div>
+                <Typography.Text type="secondary" className="ai-assistant-disclaimer">
+                    {t('ai_assistant.disclaimer')}
+                </Typography.Text>
+            </footer>
+        </section>
     );
 };
 
-/* ── Message Row (ChatGPT style) ── */
 const MessageRow: React.FC<{
-    message: Message;
-    isArabic: boolean;
+    message: ChatMessage;
     userRole: string;
-    navigate: (p: string) => void;
-}> = ({ message, isArabic, userRole, navigate }) => {
+    navigate: (path: string) => void;
+}> = ({ message, userRole, navigate }) => {
+    const { t } = useTranslation();
     const isUser = message.role === 'user';
 
     return (
-        <div style={{
-            display: 'flex', gap: 12, padding: '12px 0',
-            flexDirection: isUser ? (isArabic ? 'row-reverse' : 'row') : 'row',
-            alignItems: 'flex-start',
-        }}>
-            {/* Avatar */}
-            <div style={{
-                width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-                background: isUser ? '#1677ff' : '#f0f0f0',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                marginTop: 2,
-            }}>
-                {isUser
-                    ? <UserOutlined style={{ color: '#fff', fontSize: 15 }} />
-                    : <RobotOutlined style={{ color: '#555', fontSize: 15 }} />
-                }
+        <article className={`ai-message-row ${isUser ? 'is-user' : 'is-assistant'}`}>
+            <div className="ai-message-avatar">
+                {isUser ? <UserOutlined /> : <RobotOutlined />}
             </div>
-
-            {/* Content */}
-            <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{
-                    fontSize: 13, fontWeight: 600, color: '#555', marginBottom: 4,
-                    textAlign: isUser && isArabic ? 'right' : isUser ? 'right' : 'left',
-                }}>
-                    {isUser ? (isArabic ? 'أنت' : 'You') : (isArabic ? 'المساعد الذكي' : 'AI Assistant')}
+            <div className="ai-message-main">
+                <div className="ai-message-author">
+                    {isUser ? t('ai_assistant.you') : t('ai_assistant.assistantName')}
+                </div>
+                <div className="ai-message-content">
+                    {message.isThinking && !message.content ? (
+                        <span className="ai-typing">
+                            <span />
+                            <span />
+                            <span />
+                        </span>
+                    ) : isUser ? (
+                        <p>{message.content}</p>
+                    ) : (
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
+                    )}
                 </div>
 
-                {/* Message bubble */}
-                {isUser ? (
-                    <div style={{
-                        background: '#1677ff', color: '#fff',
-                        borderRadius: isArabic ? '18px 4px 18px 18px' : '4px 18px 18px 18px',
-                        padding: '10px 14px', fontSize: 14, lineHeight: 1.6,
-                        display: 'inline-block', maxWidth: '85%',
-                        wordBreak: 'break-word', whiteSpace: 'pre-wrap',
-                        float: isArabic ? 'right' : 'right',
-                    }}>
-                        {message.content}
-                    </div>
-                ) : (
-                    <div style={{ fontSize: 14, lineHeight: 1.7, color: '#111' }}>
-                        {message.isThinking && message.content === '' ? (
-                            <TypingDots />
-                        ) : (
-                            <div className="ai-prose">
-                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {/* File attachments */}
                 {message.files && message.files.length > 0 && (
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6, justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
-                        {message.files.map((f, i) => (
-                            <Tag key={i} icon={<FileOutlined />} color={isUser ? 'blue' : 'default'}>{f.name}</Tag>
+                    <div className="ai-message-files">
+                        {message.files.map((file) => (
+                            <Tag key={file.name} icon={<FileOutlined />}>{file.name}</Tag>
                         ))}
                     </div>
                 )}
 
-                {/* Ticket created badge */}
                 {message.ticketCreated && (
-                    <div style={{ marginTop: 10 }}>
-                        <Button
-                            type="primary"
-                            size="small"
-                            icon={<CheckCircleFilled />}
-                            onClick={() => navigate(`/${userRole}/tickets/${message.ticketCreated!.ticketId}`)}
-                            style={{ background: '#52c41a', borderColor: '#52c41a', borderRadius: 20 }}
-                        >
-                            {isArabic ? `عرض التذكرة #${message.ticketCreated.ticketNumber}` : `View Ticket #${message.ticketCreated.ticketNumber}`}
-                        </Button>
-                    </div>
+                    <Button
+                        type="primary"
+                        size="small"
+                        icon={<CheckCircleFilled />}
+                        className="ai-ticket-link"
+                        onClick={() => navigate(`/${userRole}/tickets/${message.ticketCreated!.ticketId}`)}
+                    >
+                        {message.ticketCreated.isDraft
+                            ? t('ai_assistant.viewDraft', { ticketNumber: message.ticketCreated.ticketNumber })
+                            : t('ai_assistant.viewTicket', { ticketNumber: message.ticketCreated.ticketNumber })}
+                    </Button>
                 )}
             </div>
-        </div>
+        </article>
     );
 };
 
-const TypingDots: React.FC = () => (
-    <div style={{ display: 'flex', gap: 4, alignItems: 'center', height: 24 }}>
-        {[0, 1, 2].map(i => (
-            <div key={i} style={{
-                width: 7, height: 7, borderRadius: '50%', background: '#bbb',
-                animation: `ai-bounce 1.2s ease-in-out ${i * 0.2}s infinite`,
-            }} />
-        ))}
-        <style>{`
-            @keyframes ai-bounce {
-                0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-                30% { transform: translateY(-5px); opacity: 1; }
-            }
-            .ai-prose p { margin: 0 0 10px; }
-            .ai-prose p:last-child { margin-bottom: 0; }
-            .ai-prose ul, .ai-prose ol { padding-inline-start: 22px; margin: 6px 0; }
-            .ai-prose li { margin: 3px 0; }
-            .ai-prose code { background: #f5f5f5; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-family: monospace; }
-            .ai-prose pre { background: #f5f5f5; padding: 12px; border-radius: 8px; overflow-x: auto; margin: 8px 0; }
-            .ai-prose pre code { background: none; padding: 0; }
-            .ai-prose h1, .ai-prose h2, .ai-prose h3 { margin: 12px 0 6px; font-weight: 600; }
-            .ai-prose strong { font-weight: 600; }
-            .ai-prose blockquote { border-inline-start: 3px solid #1677ff; padding-inline-start: 12px; margin: 6px 0; color: #666; }
-            .ai-prose a { color: #1677ff; text-decoration: underline; }
-            .ai-prose table { border-collapse: collapse; width: 100%; margin: 8px 0; }
-            .ai-prose th, .ai-prose td { border: 1px solid #e5e5e5; padding: 6px 10px; text-align: left; }
-            .ai-prose th { background: #fafafa; font-weight: 600; }
-        `}</style>
-    </div>
-);
+const TicketPreviewCard: React.FC<{
+    ticket: TicketPreview;
+    loading: boolean;
+    onSubmit: () => void;
+    onSaveDraft: () => void;
+    onCancel: () => void;
+}> = ({ ticket, loading, onSubmit, onSaveDraft, onCancel }) => {
+    const { t } = useTranslation();
+
+    return (
+        <Card className="ai-ticket-preview" size="small">
+            <div className="ai-ticket-preview-header">
+                <div>
+                    <Typography.Text strong>{t('ai_assistant.reviewTitle')}</Typography.Text>
+                    <Typography.Paragraph type="secondary">
+                        {t('ai_assistant.reviewSubtitle')}
+                    </Typography.Paragraph>
+                </div>
+                {loading && <Spin size="small" />}
+            </div>
+
+            <div className="ai-ticket-preview-grid">
+                <span>{t('tickets.title')}</span>
+                <strong>{ticket.title}</strong>
+
+                <span>{t('tickets.specialization')}</span>
+                <strong>{ticket.specializationName || ticket.specializationId || t('common.empty')}</strong>
+
+                <span>{t('tickets.problemType')}</span>
+                <strong>{ticket.problemName || ticket.problemId || t('common.empty')}</strong>
+
+                <span>{t('tickets.description')}</span>
+                <Typography.Paragraph>{ticket.description}</Typography.Paragraph>
+            </div>
+
+            <Alert type="info" showIcon message={t('ai_assistant.reviewNotice')} />
+
+            <div className="ai-ticket-preview-actions">
+                <Button onClick={onCancel} disabled={loading}>
+                    {t('common.cancel')}
+                </Button>
+                <Button onClick={onSaveDraft} loading={loading}>
+                    {t('tickets.saveDraft')}
+                </Button>
+                <Button type="primary" onClick={onSubmit} loading={loading}>
+                    {t('tickets.submitTicket')}
+                </Button>
+            </div>
+        </Card>
+    );
+};
 
 export default AiAssistant;

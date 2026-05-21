@@ -1,10 +1,12 @@
 // Mobile Nav Drawer
-import { Drawer } from "antd";
+import { Button, Drawer, Space } from "antd";
 import NavTail from "./NavTail";
 import NavPanel from "./NavPanel";
 import i18n from "../../../../i18n";
 import { useTranslation } from "react-i18next";
 import styles from './navbar_item.module.css';
+import Logo from "./Logo";
+import { CloseOutlined } from "@ant-design/icons";
 
 const MobileNavDrawer = ({ open, setOpen, children }) => {
     const { t } = useTranslation();
@@ -13,28 +15,37 @@ const MobileNavDrawer = ({ open, setOpen, children }) => {
     return (
         <Drawer
             placement={drawerSide}
-            size={300}
+            width={320}
             open={open}
             closeIcon={null}
             onClose={() => setOpen(false)}
             title={
-                <div
-                    style={{
-                        textAlign: i18n.language === "ar" ? "right" : "left",
-                        fontWeight: "bold",
-                        fontSize: "1.2em",
-                    }}
-                >
-                    {t("NAVIGATION_TITLE")}
+                <div className={styles.mobileDrawerTitle}>
+                    <Space size={10}>
+                        <Logo onClick={() => setOpen(false)} />
+                        <span>{t("NAVIGATION_TITLE")}</span>
+                    </Space>
+                    <Button
+                        type="text"
+                        shape="circle"
+                        icon={<CloseOutlined />}
+                        onClick={() => setOpen(false)}
+                    />
                 </div>
             }
             className={styles.mobile_drawer_bg}
+            styles={{
+                header: { padding: "14px 16px" },
+                body: { padding: "10px 12px 16px" },
+            }}
         >
-            <NavPanel closeDrawer={() => setOpen(false)}>
-                {children}
-            </NavPanel>
+            <div className={styles.mobileNavItems}>
+                <NavPanel closeDrawer={() => setOpen(false)}>
+                    {children}
+                </NavPanel>
+            </div>
 
-            <div style={{ marginTop: 24 }}>
+            <div className={styles.mobileNavTail}>
                 <NavTail />
             </div>
         </Drawer>

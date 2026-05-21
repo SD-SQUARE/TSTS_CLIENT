@@ -56,6 +56,8 @@ export const useTickets = (page: number, pageSize: number, searchQuery: TicketSe
     return useQuery({
         queryKey: ['tickets', page, pageSize, searchQuery],
         queryFn: () => fetchTickets(page, pageSize, searchQuery),
+        staleTime: 15 * 1000,
+        placeholderData: (previousData) => previousData,
     });
 };
 
@@ -200,33 +202,36 @@ export const useRequestersLookup = (enabled = true) =>
         staleTime: 5 * 60 * 1000,
     });
 
-export const useTicketUniversitiesLookup = () =>
+export const useTicketUniversitiesLookup = (enabled = true) =>
     useQuery({
         queryKey: ['lookup', 'ticket-universities', i18n.language],
         queryFn: async () => {
             const { data } = await api.get('/v1/lockups/universities');
             return extractLookupArray(data, 'universities');
         },
+        enabled,
         staleTime: 5 * 60 * 1000,
     });
 
-export const useTicketDomainsLookup = () =>
+export const useTicketDomainsLookup = (enabled = true) =>
     useQuery({
         queryKey: ['lookup', 'ticket-domains', i18n.language],
         queryFn: async () => {
             const { data } = await api.get('/v1/lockups/domains');
             return extractLookupArray(data, 'domains');
         },
+        enabled,
         staleTime: 5 * 60 * 1000,
     });
 
-export const useTicketDepartmentsLookup = () =>
+export const useTicketDepartmentsLookup = (enabled = true) =>
     useQuery({
         queryKey: ['lookup', 'ticket-departments', i18n.language],
         queryFn: async () => {
             const { data } = await api.get('/v1/lockups/departments');
             return extractLookupArray(data, 'departments');
         },
+        enabled,
         staleTime: 5 * 60 * 1000,
     });
 
