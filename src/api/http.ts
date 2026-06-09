@@ -3,6 +3,8 @@ import i18n from '../i18n';
 
 const electronApiBaseUrl =
     typeof window !== 'undefined' ? window.electronAPI?.apiBaseUrl : undefined;
+const isElectronRuntime =
+    typeof window !== 'undefined' && window.electronAPI?.isElectron === true;
 
 const api = axios.create({
     baseURL: electronApiBaseUrl || '/api',
@@ -13,6 +15,8 @@ const api = axios.create({
 let csrfToken: string | null = null;
 
 export async function loadCsrfToken() {
+    if (isElectronRuntime) return;
+
     const res = await api.get("v1/auth/csrf-token");
     csrfToken = res.data.csrfToken;
 }

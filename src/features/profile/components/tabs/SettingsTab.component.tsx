@@ -120,15 +120,15 @@ const SettingsTab = ({ forceDevices, onTourReady }: any) => {
                             ),
                             children: <TrustedDevices searchTerm={searchTerm} />,
                         },
-                        {
-                            key: "extension",
-                            label: (
-                                <span>
-                                    <AppstoreOutlined /> {t("profile.settings.extension")}
-                                </span>
-                            ),
-                            children: <Extension searchTerm={searchTerm} />,
-                        },
+                        // {
+                        //     key: "extension",
+                        //     label: (
+                        //         <span>
+                        //             <AppstoreOutlined /> {t("profile.settings.extension")}
+                        //         </span>
+                        //     ),
+                        //     children: <Extension searchTerm={searchTerm} />,
+                        // },
                         {
                             key: "quick-messages",
                             label: (

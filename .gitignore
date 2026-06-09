@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Generated — synced from api/docs at build time
+src/features/api-docs/docs/
+public/docs/

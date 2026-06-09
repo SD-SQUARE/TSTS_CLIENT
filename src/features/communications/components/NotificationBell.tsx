@@ -40,8 +40,8 @@ const NotificationBell: React.FC = () => {
   const [filter, setFilter] = useState<NotificationFilter>('all');
   const [page, setPage] = useState(1);
 
-  const isRead = filter === 'unread' ? 'false' : undefined;
-  const notificationsQuery = useNotifications(page, PAGE_SIZE);
+  const isRead = filter === 'unread' ? false : undefined;
+  const notificationsQuery = useNotifications(page, PAGE_SIZE, isRead);
   const unreadQuery = useUnreadNotificationsCount();
   const markAsReadMutation = useMarkNotificationAsRead();
   const markAllAsReadMutation = useMarkAllNotificationsAsRead();

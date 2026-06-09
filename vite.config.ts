@@ -7,7 +7,10 @@ export default ({ mode }) => {
 
     return defineConfig({
         plugins: [react()],
-        base: env.VITE_APP_BASE_PATH || './',
+        // Always use absolute paths in production so assets resolve correctly
+        // regardless of which route the user refreshes on.
+        // For Electron builds, use relative paths so file:// protocol works.
+        base: env.VITE_ELECTRON === 'true' ? './' : (env.VITE_APP_BASE_PATH || '/'),
         define: {
             'process.env': env // optional
         },

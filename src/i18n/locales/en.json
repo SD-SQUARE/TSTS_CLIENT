@@ -96,6 +96,7 @@
       "trustedDevices": "Trusted Devices",
       "permissions": "Permissions",
       "siteSettings": "Site Settings",
+      "apiIntegrations": "API Integrations",
       "slaManagement": "SLA Management",
       "recycleBin": "Recycle Bin",
       "auditLogs": "Audit Logs"
@@ -471,7 +472,52 @@
     "domainSaved": "Email domain saved",
     "deleteDomainConfirm": "Delete this allowed email domain?",
     "invalidDomain": "Enter a valid email domain",
-    "emailDomainNotAllowed": "Email domain is not allowed. Allowed domains: {{domains}}"
+    "emailDomainNotAllowed": "Email domain is not allowed. Allowed domains: {{domains}}",
+    "tabs": {
+      "general": "General",
+      "aiAssistant": "AI Assistant",
+      "emailDomains": "Email Domains"
+    },
+    "aiAssistant": {
+      "title": "AI Assistant Configuration",
+      "enabled": "Enable AI Assistant",
+      "disabledWarning": "AI Assistant is disabled. Users will not be able to use the AI chat or generate text with AI.",
+      "modelName": "Model Name",
+      "modelNameHint": "The AI model to use (e.g. llama3.2, gpt-4o, mistral). Leave empty to use the server default.",
+      "modelNamePlaceholder": "e.g. llama3.2",
+      "apiKey": "API Key",
+      "apiKeyHint": "Optional API key for authenticated AI providers (OpenAI, Groq, etc.). Leave empty for local Ollama.",
+      "apiKeyPlaceholder": "sk-... or leave empty for local Ollama",
+      "chatUrl": "AI Chat URL",
+      "chatUrlHint": "Base URL of the AI service (e.g. http://localhost:11434 for Ollama, https://api.openai.com for OpenAI).",
+      "chatUrlPlaceholder": "http://localhost:11434",
+      "chatUrlInvalid": "Please enter a valid URL",
+      "configNote": "Changes take effect immediately. The AI service must be reachable from the server.",
+      "save": "Save AI Settings",
+      "quickStart": "Quick Start — Choose a Provider",
+      "quickStartDesc": "Click any card below to auto-fill the configuration. You can then adjust the values and save.",
+      "howItWorks": "How it works & setup instructions"
+    }
+  },
+  "apiIntegrations": {
+    "title": "API Integrations",
+    "subtitle": "Issue scoped keys for trusted external systems.",
+    "createKey": "Create API Key",
+    "editKey": "Edit API Key",
+    "name": "Name",
+    "description": "Description",
+    "prefix": "Prefix",
+    "zones": "Zones",
+    "methods": "Methods",
+    "active": "Active",
+    "inactive": "Inactive",
+    "saved": "API key saved",
+    "created": "API key created",
+    "lastUsed": "Last Used",
+    "expiresAt": "Expires At",
+    "revokeConfirm": "Revoke this API key?",
+    "generatedKeyTitle": "Generated API Key",
+    "generatedKeyWarning": "Copy this key now. For security, it will not be shown again."
   },
   "sla": {
     "title": "SLA",
@@ -554,10 +600,14 @@
     "details": "Report Details"
   },
   "common": {
+    "enabled":"Enable",
+    "disabled": "Disabled",
     "reset": "Reset",
     "reset_layout": "Reset Layout",
     "create": "Create Ticket",
     "save": "Save Changes",
+    "done": "Done",
+    "none": "None",
     "edit": "Edit Ticket",
     "download": "Download",
     "downloading": "Downloading...",

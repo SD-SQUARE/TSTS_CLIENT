@@ -74,6 +74,16 @@ api/assets/desktop/TSTS-Desktop-Setup.exe
 - `TSTS_API_URL` overrides the Electron API base URL.
 - `TSTS_API_HOST` and `TSTS_API_PORT` are used when `TSTS_API_URL` is not set.
 - `RUSTDESK_CONFIG` provides the self-hosted RustDesk server config string.
+- `RUSTDESK_PASSWORD` overrides the default unattended access password used for requester machines.
+- `RUSTDESK_EXE_PATH` overrides RustDesk executable discovery.
+
+The NSIS installer also applies the bundled self-hosted RustDesk config during installation, then the Electron app reapplies it before reading the local ID, opening RustDesk, changing the ID, or starting a connection.
+
+Silent installer overrides are supported:
+
+```powershell
+TSTS-Desktop-Setup.exe /S /EMAIL=user@example.com /RUSTDESK_CONFIG=<config-string> /RUSTDESK_PASSWORD=<password>
+```
 
 ## IPC API
 

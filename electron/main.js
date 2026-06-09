@@ -20,7 +20,9 @@ const REGISTRATION_FILE = "desktop-registration.json";
 // Then generate config at: https://rustdesk.com/docs/en/self-host/rustdesk-server-oss/install/
 const RUSTDESK_CONFIG = process.env.RUSTDESK_CONFIG ||
     "==Qfi0za0Umd3FTZwhVcDtUW0Y0T1NFczYkVmJWTV50ar0UQ3RnW3ZTUHNmZx1mbiojI5V2aiwiI0N3boxWYj9Gbv8iOwRHdoJiOikGchJCLiQ3cvhGbhN2bsJiOikXYsVmciwiI0N3boxWYj9GbiojI0N3boJye";
-const RUSTDESK_PASSWORD = "pass123"; // default password set on requester machines
+const RUSTDESK_PASSWORD = process.env.RUSTDESK_PASSWORD || "pass123"; // default password set on requester machines
+const RUSTDESK_COMMAND_TIMEOUT_MS = Number(process.env.RUSTDESK_COMMAND_TIMEOUT_MS || 15000);
+const rustDeskConfiguredPaths = new Set();
 
 // ─── Single instance lock ─────────────────────────────────────────────────────
 const gotTheLock = app.requestSingleInstanceLock();
@@ -48,11 +50,63 @@ if (process.defaultApp) {
 
 // ─── RustDesk path resolution ─────────────────────────────────────────────────
 function getRustDeskPath() {
-    const installed = "C:\\Program Files\\RustDesk\\rustdesk.exe";
-    if (fs.existsSync(installed)) return installed;
-    return isDev
+    const bundled = isDev
         ? path.join(__dirname, "rustdesk", "rustdesk.exe")
         : path.join(process.resourcesPath, "rustdesk", "rustdesk.exe");
+    const candidates = [
+        process.env.RUSTDESK_EXE_PATH,
+        "C:\\Program Files\\RustDesk\\rustdesk.exe",
+        "C:\\Program Files (x86)\\RustDesk\\rustdesk.exe",
+        bundled,
+    ].filter(Boolean);
+
+    return candidates.find(candidate => fs.existsSync(candidate)) || bundled;
+}
+
+function runRustDeskCommand(rustPath, args, timeout = RUSTDESK_COMMAND_TIMEOUT_MS) {
+    if (!fs.existsSync(rustPath)) {
+        return Promise.resolve({ success: false, error: `RustDesk executable not found at ${rustPath}` });
+    }
+
+    return new Promise((resolve) => {
+        execFile(rustPath, args, { windowsHide: true, timeout }, (err, stdout, stderr) => {
+            if (err) {
+                resolve({ success: false, error: stderr?.trim() || err.message });
+                return;
+            }
+
+            resolve({ success: true, stdout: stdout?.trim() });
+        });
+    });
+}
+
+async function ensureRustDeskConfigured(rustPath = getRustDeskPath(), options = {}) {
+    const key = `${rustPath}|${RUSTDESK_CONFIG}|${RUSTDESK_PASSWORD}`;
+    if (!options.force && rustDeskConfiguredPaths.has(key)) {
+        return { success: true };
+    }
+
+    const errors = [];
+    if (RUSTDESK_CONFIG) {
+        const result = await runRustDeskCommand(rustPath, ["--config", RUSTDESK_CONFIG]);
+        if (!result.success) errors.push(result.error);
+    }
+
+    if (RUSTDESK_PASSWORD) {
+        const result = await runRustDeskCommand(rustPath, ["--password", RUSTDESK_PASSWORD]);
+        if (!result.success) errors.push(result.error);
+    }
+
+    if (errors.length > 0) {
+        return { success: false, error: errors.filter(Boolean).join("; ") };
+    }
+
+    rustDeskConfiguredPaths.add(key);
+    return { success: true };
+}
+
+function escapePowerShellSingleQuoted(value) {
+    return String(value || "").replace(/'/g, "''");
 }
 
 function parseArgValue(names) {
@@ -148,14 +202,19 @@ function isMicrosoftAuthUrl(url) {
     }
 }
 
-function getLocalRustDeskId() {
+async function getLocalRustDeskId() {
     const rustPath = getRustDeskPath();
     if (!fs.existsSync(rustPath)) return Promise.resolve({ success: false, error: "RustDesk not installed" });
 
+    const configResult = await ensureRustDeskConfigured(rustPath);
+    if (!configResult.success) {
+        console.warn("RustDesk self-hosted config failed before reading ID:", configResult.error);
+    }
+
     return new Promise((resolve) => {
-        exec(`"${rustPath}" --get-id`, (err, stdout) => {
+        execFile(rustPath, ["--get-id"], { windowsHide: true, timeout: RUSTDESK_COMMAND_TIMEOUT_MS }, (err, stdout, stderr) => {
             if (err) {
-                resolve({ success: false, error: err.message });
+                resolve({ success: false, error: stderr?.trim() || err.message });
             } else {
                 resolve({ success: true, id: stdout.trim() });
             }
@@ -216,7 +275,7 @@ function handleProtocolURL(url) {
         const host = parsed.searchParams.get("host");
         if (host) {
             const cleanId = decodeURIComponent(host).replace(/\s+/g, "");
-            launchRustDeskConnect(cleanId);
+            void launchRustDeskConnect(cleanId);
         }
     } catch (e) {
         console.error("Protocol URL parse error:", e);
@@ -224,19 +283,27 @@ function handleProtocolURL(url) {
 }
 
 // ─── RustDesk: connect to remote ─────────────────────────────────────────────
-function launchRustDeskConnect(remoteId) {
+async function launchRustDeskConnect(remoteId) {
     const rustPath = getRustDeskPath();
     if (!fs.existsSync(rustPath)) {
         dialog.showErrorBox("RustDesk Not Found", `RustDesk executable not found at:\n${rustPath}\n\nPlease install RustDesk first.`);
-        return;
+        return { success: false, error: "RustDesk not installed" };
     }
 
-    const args = ["--connect", remoteId, "--password", RUSTDESK_PASSWORD];
-    if (RUSTDESK_CONFIG) args.unshift("--config", RUSTDESK_CONFIG);
+    const configResult = await ensureRustDeskConfigured(rustPath);
+    if (!configResult.success) {
+        console.warn("RustDesk self-hosted config failed before connect:", configResult.error);
+    }
 
-    execFile(rustPath, args, (err) => {
+    const args = [];
+    if (RUSTDESK_CONFIG) args.push("--config", RUSTDESK_CONFIG);
+    args.push("--connect", remoteId);
+    if (RUSTDESK_PASSWORD) args.push("--password", RUSTDESK_PASSWORD);
+
+    execFile(rustPath, args, { windowsHide: true }, (err) => {
         if (err) console.error("RustDesk connect failed:", err);
     });
+    return { success: true, warning: configResult.success ? undefined : configResult.error };
 }
 
 // ─── IPC Handlers ─────────────────────────────────────────────────────────────
@@ -245,15 +312,13 @@ function launchRustDeskConnect(remoteId) {
 ipcMain.handle("rustdesk:connect", async (event, remoteId) => {
     const cleanId = remoteId?.toString().replace(/\s+/g, "");
     if (!cleanId) return { success: false, error: "No remote ID provided" };
-    launchRustDeskConnect(cleanId);
-    return { success: true };
+    return launchRustDeskConnect(cleanId);
 });
 
 ipcMain.handle("rustdesk:connect-protocol", async (_event, remoteId) => {
     const cleanId = remoteId?.toString().replace(/\s+/g, "");
     if (!cleanId) return { success: false, error: "No remote ID provided" };
-    launchRustDeskConnect(cleanId);
-    return { success: true };
+    return launchRustDeskConnect(cleanId);
 });
 
 // Get the local machine's RustDesk ID
@@ -265,23 +330,38 @@ ipcMain.handle("rustdesk:get-id", async () => {
 ipcMain.handle("rustdesk:set-id", async (event, newId) => {
     const cleanId = newId?.toString().replace(/\s+/g, "").replace(/['"]/g, "");
     const password = RUSTDESK_PASSWORD;
+    const rustPath = getRustDeskPath();
     const configPath = "C:\\Windows\\ServiceProfiles\\LocalService\\AppData\\Roaming\\RustDesk\\config\\RustDesk.toml";
+    const psRustPath = escapePowerShellSingleQuoted(rustPath);
+    const psRustDeskConfig = escapePowerShellSingleQuoted(RUSTDESK_CONFIG);
+    const psPassword = escapePowerShellSingleQuoted(password);
 
     const psScript = `
         $path = "${configPath}"
+        $rustdesk = '${psRustPath}'
+        $serverConfig = '${psRustDeskConfig}'
+        $password = '${psPassword}'
         Stop-Service -Name "rustdesk" -Force -ErrorAction SilentlyContinue
         if (Test-Path $path) {
             $content = Get-Content $path | Where-Object {
                 $_ -notmatch '^(id|enc_id)\\s*=' -and $_ -notmatch '^password\\s*='
             }
-            $newLines = @("id = '${cleanId}'", "password = '${password}'")
+            $newLines = @("id = '${cleanId}'", "password = '$password'")
             $newContent = $newLines + $content
             Set-Content -Path $path -Value $newContent -Encoding UTF8 -Force
         } else {
             New-Item -Path (Split-Path $path) -ItemType Directory -Force -ErrorAction SilentlyContinue
-            Set-Content -Path $path -Value @("id = '${cleanId}'", "password = '${password}'") -Encoding UTF8 -Force
+            Set-Content -Path $path -Value @("id = '${cleanId}'", "password = '$password'") -Encoding UTF8 -Force
         }
         Start-Service -Name "rustdesk"
+        Start-Sleep -Seconds 2
+        if ((Test-Path $rustdesk) -and $serverConfig) {
+            & $rustdesk --config $serverConfig | Out-Null
+        }
+        if ((Test-Path $rustdesk) -and $password) {
+            & $rustdesk --password $password | Out-Null
+        }
+        Restart-Service -Name "rustdesk" -Force -ErrorAction SilentlyContinue
     `;
 
     const encoded = Buffer.from(psScript, "utf16le").toString("base64");
@@ -307,10 +387,14 @@ ipcMain.handle("rustdesk:is-installed", async () => {
 ipcMain.handle("rustdesk:open", async () => {
     const rustPath = getRustDeskPath();
     if (!fs.existsSync(rustPath)) return { success: false, error: "Not installed" };
-    execFile(rustPath, [], (err) => {
+    const configResult = await ensureRustDeskConfigured(rustPath);
+    if (!configResult.success) {
+        console.warn("RustDesk self-hosted config failed before open:", configResult.error);
+    }
+    execFile(rustPath, [], { windowsHide: true }, (err) => {
         if (err) console.error("RustDesk open failed:", err);
     });
-    return { success: true };
+    return { success: true, warning: configResult.success ? undefined : configResult.error };
 });
 
 ipcMain.handle("desktop:register-device", async (_event, payload) => {
@@ -320,6 +404,9 @@ ipcMain.handle("desktop:register-device", async (_event, payload) => {
 // ─── App lifecycle ────────────────────────────────────────────────────────────
 app.whenReady().then(() => {
     createWindow();
+    ensureRustDeskConfigured().catch((error) => {
+        console.warn("RustDesk startup configuration failed:", error);
+    });
     const url = process.argv.find(a => a.startsWith(`${PROTOCOL}://`));
     if (url) handleProtocolURL(url);
     setTimeout(() => {

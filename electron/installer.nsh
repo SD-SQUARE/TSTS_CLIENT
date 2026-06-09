@@ -2,14 +2,33 @@
 !include FileFunc.nsh
 !include nsDialogs.nsh
 
+!define RUSTDESK_CONFIG "==Qfi0za0Umd3FTZwhVcDtUW0Y0T1NFczYkVmJWTV50ar0UQ3RnW3ZTUHNmZx1mbiojI5V2aiwiI0N3boxWYj9Gbv8iOwRHdoJiOikGchJCLiQ3cvhGbhN2bsJiOikXYsVmciwiI0N3boxWYj9GbiojI0N3boJye"
+!define RUSTDESK_PASSWORD "pass123"
+
 !ifndef BUILD_UNINSTALLER
 Var RegistrationEmail
 Var RegistrationEmailInput
+Var RustDeskConfig
+Var RustDeskConfigArg
+Var RustDeskPassword
+Var RustDeskPasswordArg
 
 !macro customInit
+  StrCpy $RustDeskConfig "${RUSTDESK_CONFIG}"
+  StrCpy $RustDeskPassword "${RUSTDESK_PASSWORD}"
   ${GetParameters} $0
   ClearErrors
   ${GetOptions} $0 "/EMAIL=" $RegistrationEmail
+  ClearErrors
+  ${GetOptions} $0 "/RUSTDESK_CONFIG=" $RustDeskConfigArg
+  ${IfNot} ${Errors}
+    StrCpy $RustDeskConfig $RustDeskConfigArg
+  ${EndIf}
+  ClearErrors
+  ${GetOptions} $0 "/RUSTDESK_PASSWORD=" $RustDeskPasswordArg
+  ${IfNot} ${Errors}
+    StrCpy $RustDeskPassword $RustDeskPasswordArg
+  ${EndIf}
 !macroend
 
 !macro customPageAfterChangeDir
@@ -45,6 +64,23 @@ Function RequesterEmailPageLeave
   ${EndIf}
 FunctionEnd
 
+Function ConfigureRustDesk
+  DetailPrint "Configuring RustDesk for the self-hosted server..."
+  StrCpy $1 "$PROGRAMFILES64\RustDesk\rustdesk.exe"
+  IfFileExists "$1" configure 0
+  StrCpy $1 "$PROGRAMFILES\RustDesk\rustdesk.exe"
+  IfFileExists "$1" configure 0
+  StrCpy $1 "$INSTDIR\resources\rustdesk\rustdesk.exe"
+  IfFileExists "$1" configure 0
+  DetailPrint "RustDesk executable was not found; skipping self-hosted configuration."
+  Return
+
+  configure:
+    ExecWait '"$1" --config "$RustDeskConfig"'
+    ExecWait '"$1" --password "$RustDeskPassword"'
+    ExecWait '"$1" --install-service'
+FunctionEnd
+
 !macro customInstall
   DetailPrint "Registering tsts:// protocol handler..."
   DeleteRegKey HKCR "tsts"
@@ -56,6 +92,7 @@ FunctionEnd
   DetailPrint "Installing RustDesk service..."
   IfFileExists "$INSTDIR\resources\rustdesk\rustdesk.exe" 0 +2
     ExecWait '"$INSTDIR\resources\rustdesk\rustdesk.exe" --silent-install'
+  Call ConfigureRustDesk
 
   ${If} $RegistrationEmail != ""
     CreateDirectory "$APPDATA\TSTS Desktop"
@@ -70,4 +107,6 @@ FunctionEnd
   DeleteRegKey HKCR "tsts"
   IfFileExists "$PROGRAMFILES64\RustDesk\rustdesk.exe" 0 +2
     ExecWait '"$PROGRAMFILES64\RustDesk\rustdesk.exe" --uninstall'
+  IfFileExists "$PROGRAMFILES\RustDesk\rustdesk.exe" 0 +2
+    ExecWait '"$PROGRAMFILES\RustDesk\rustdesk.exe" --uninstall'
 !macroend

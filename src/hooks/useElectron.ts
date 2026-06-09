@@ -14,6 +14,8 @@ declare global {
             rustdeskSetId: (newId: string) => Promise<{ success: boolean; error?: string }>;
             rustdeskIsInstalled: () => Promise<{ installed: boolean }>;
             rustdeskOpen: () => Promise<{ success: boolean }>;
+            rustdeskInstallService: () => Promise<{ success: boolean; error?: string }>;
+            rustdeskConfigureServer: () => Promise<{ success: boolean; error?: string }>;
             desktopRegisterDevice: (payload: { email: string; rustdeskId?: string }) => Promise<{ success: boolean; rustdeskId?: string; error?: string }>;
         };
     }
@@ -46,7 +48,8 @@ export const useElectron = () => {
             if (electron && api?.rustdeskConnectViaProtocol) return api.rustdeskConnectViaProtocol(remoteId);
             const cleanId = cleanRemoteId(remoteId);
             if (!cleanId) return { success: false, error: 'No remote ID provided' };
-            window.location.href = buildRustDeskProtocolUrl(cleanId);
+            // Open in new tab so the current page isn't navigated away
+            window.open(buildRustDeskProtocolUrl(cleanId), '_blank');
             return { success: true };
         },
 
@@ -85,6 +88,18 @@ export const useElectron = () => {
         registerDesktopDevice: async (payload: { email: string; rustdeskId?: string }) => {
             if (!electron || !api?.desktopRegisterDevice) return { success: false, error: 'Not running in Electron' };
             return api.desktopRegisterDevice(payload);
+        },
+
+        /** Install RustDesk as a Windows service and configure self-hosted server */
+        installRustDeskService: async () => {
+            if (!electron || !api?.rustdeskInstallService) return { success: false, error: 'Not running in Electron' };
+            return api.rustdeskInstallService();
+        },
+
+        /** Configure self-hosted RustDesk server on an already-installed instance */
+        configureRustDeskServer: async () => {
+            if (!electron || !api?.rustdeskConfigureServer) return { success: false, error: 'Not running in Electron' };
+            return api.rustdeskConfigureServer();
         },
     };
 };

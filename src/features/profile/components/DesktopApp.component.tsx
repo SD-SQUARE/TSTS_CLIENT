@@ -24,6 +24,7 @@ const DesktopApp: React.FC = () => {
         isRustDeskInstalled,
         openRustDesk,
         registerDesktopDevice,
+        configureRustDeskServer,
     } = useElectron();
     const inElectron = isElectron();
     const userEmail = useSelector((state: any) => state.auth.user?.email || '');
@@ -31,6 +32,7 @@ const DesktopApp: React.FC = () => {
     const [localId, setLocalIdState] = useState('');
     const [isLoadingId, setIsLoadingId] = useState(false);
     const [isRegistering, setIsRegistering] = useState(false);
+    const [isConfiguringServer, setIsConfiguringServer] = useState(false);
     const [rustDeskInstalled, setRustDeskInstalled] = useState<boolean | null>(null);
     const [copied, setCopied] = useState(false);
     const [registeredKey, setRegisteredKey] = useState('');
@@ -57,6 +59,13 @@ const DesktopApp: React.FC = () => {
 
         void isRustDeskInstalled().then((result) => setRustDeskInstalled(result.installed));
         void fetchLocalId();
+
+        // If ID not found on first load, retry after 5s — service may still be starting
+        const retryTimer = window.setTimeout(async () => {
+            const result = await getLocalId();
+            if (result.success && result.id) setLocalIdState(result.id);
+        }, 5000);
+        return () => window.clearTimeout(retryTimer);
     }, [inElectron]);
 
     const registerDevice = async (email: string, rustdeskId: string, showToast = true) => {
@@ -195,6 +204,24 @@ const DesktopApp: React.FC = () => {
                     <Space wrap>
                         <Button icon={<ReloadOutlined />} onClick={fetchLocalId} loading={isLoadingId}>
                             {t('desktop.refreshId')}
+                        </Button>
+                        <Button
+                            icon={<SafetyCertificateOutlined />}
+                            loading={isConfiguringServer}
+                            onClick={async () => {
+                                setIsConfiguringServer(true);
+                                try {
+                                    await configureRustDeskServer();
+                                    message.success(t('desktop.serverConfigured', { defaultValue: 'Self-hosted server configured. Refreshing ID...' }));
+                                    setTimeout(() => void fetchLocalId(), 3000);
+                                } catch (e: any) {
+                                    message.error(e?.message || t('desktop.serverConfigFailed', { defaultValue: 'Server configuration failed' }));
+                                } finally {
+                                    setIsConfiguringServer(false);
+                                }
+                            }}
+                        >
+                            {t('desktop.configureServer', { defaultValue: 'Configure Server' })}
                         </Button>
                         <Button icon={<DesktopOutlined />} onClick={() => void openRustDesk()}>
                             {t('desktop.openRustDesk')}

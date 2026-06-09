@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSelector } from 'react-redux';
 import api from '../../../api/http';
 import type {
   ChatConversation,
@@ -22,23 +23,32 @@ export const communicationKeys = {
   teamsLookup: (search: string, mine = false) => ['chat', 'lookup', 'teams', search, mine] as const,
 };
 
-export const useNotifications = (page = 1, pageSize = 10) =>
+export const useNotifications = (page = 1, pageSize = 10, isRead?: boolean) =>
   useQuery<{ data: NotificationItem[]; pagination: { page: number; pageSize: number; total: number } }>({
-    queryKey: [...communicationKeys.notifications, page, pageSize],
+    queryKey: [...communicationKeys.notifications, page, pageSize, isRead],
     queryFn: async () => {
-      const { data } = await api.get('/v1/notifications', { params: { page, pageSize } });
+      const { data } = await api.get('/v1/notifications', {
+        params: { page, pageSize, ...(isRead !== undefined && { isRead }) },
+      });
       return data;
     },
   });
 
-export const useUnreadNotificationsCount = () =>
-  useQuery<NotificationUnreadCount>({
+export const useUnreadNotificationsCount = () => {
+  const isAuthenticated = useSelector((state: any) => !!state.auth?.token);
+  return useQuery<NotificationUnreadCount>({
     queryKey: communicationKeys.unreadNotifications,
     queryFn: async () => {
       const { data } = await api.get('/v1/notifications/unread-count');
       return data;
     },
+    enabled: isAuthenticated,
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+    retry: 1,
   });
+};
 
 export const useMarkNotificationAsRead = () => {
   const queryClient = useQueryClient();

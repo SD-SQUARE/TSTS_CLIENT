@@ -173,7 +173,7 @@ const AiAssistant: React.FC = () => {
         setInput('');
         setPendingFiles([]);
         setIsLoading(true);
-        setActivityStatus(t('ai_assistant.status.thinking'));
+        // setActivityStatus(t('ai_assistant.status.thinking'));
         setIsSlowResponse(false);
 
         slowTimerRef.current = setTimeout(() => setIsSlowResponse(true), 8000);

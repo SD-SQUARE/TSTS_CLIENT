@@ -41,6 +41,15 @@ function App() {
                         : (
 
                             < >
+                                {/* AI Assistant - only for requesters */}
+                                {userRole === "requester" && (
+                                    <NavItem to="/ai-assistant">
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            
+                                            {t("ai_assistant.title", "AI Assistant")}
+                                        </span>
+                                    </NavItem>
+                                )}
                                 <GuardedRoute roles={["admin"]} allowNavigation={false}>
                                     <NavItem to="/dashboard">{t("sidebar.menu.dashboard")}</NavItem>
                                 </GuardedRoute>
@@ -49,15 +58,6 @@ function App() {
                                 
                                 {userRole && <NavItem to={`/${userRole}/tickets`}>{t("sidebar.menu.tickets")}</NavItem>}
 
-                                {/* AI Assistant - only for requesters */}
-                                {userRole === "requester" && (
-                                    <NavItem to="/ai-assistant">
-                                        <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                                            <RobotOutlined />
-                                            {t("ai_assistant.title", "AI Assistant")}
-                                        </span>
-                                    </NavItem>
-                                )}
                                 
                                 <GuardedRoute roles={["admin"]} allowNavigation={false}>
                                     <NavItem to="/identities" activePrefixes={["/identities"]}>{t("sidebar.menu.personnel")}</NavItem>
