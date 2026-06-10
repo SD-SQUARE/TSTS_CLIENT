@@ -77,13 +77,15 @@ api/assets/desktop/TSTS-Desktop-Setup.exe
 - `RUSTDESK_PASSWORD` overrides the default unattended access password used for requester machines.
 - `RUSTDESK_EXE_PATH` overrides RustDesk executable discovery.
 
-The NSIS installer also applies the bundled self-hosted RustDesk config during installation, then the Electron app reapplies it before reading the local ID, opening RustDesk, changing the ID, or starting a connection.
+The NSIS installer validates the requester email, writes it to the desktop registration file, installs/copies the bundled RustDesk executable, registers both `tsts://` and `rustdesk://`, and applies the self-hosted RustDesk config. The Electron app also self-heals this setup before reading the local ID, opening RustDesk, changing the ID, or starting a connection.
 
 Silent installer overrides are supported:
 
 ```powershell
 TSTS-Desktop-Setup.exe /S /EMAIL=user@example.com /RUSTDESK_CONFIG=<config-string> /RUSTDESK_PASSWORD=<password>
 ```
+
+`/EMAIL=` is required for silent installs so the first app launch can register the machine with the API.
 
 ## IPC API
 
@@ -95,4 +97,6 @@ The preload exposes `window.electronAPI` with RustDesk helpers such as:
 - `rustdeskSetId(id)`
 - `rustdeskIsInstalled()`
 - `rustdeskOpen()`
+- `rustdeskInstallService()`
+- `rustdeskConfigureServer()`
 - `desktopRegisterDevice(payload)`

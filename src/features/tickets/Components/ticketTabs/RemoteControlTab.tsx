@@ -104,7 +104,15 @@ const RemoteControlTab: React.FC<Props> = ({ ticket }) => {
                     </div>
                     <Space wrap>
                         {inElectron && (
-                            <Button icon={<DesktopOutlined />} onClick={() => void openRustDesk()}>
+                            <Button
+                                icon={<DesktopOutlined />}
+                                onClick={async () => {
+                                    const result = await openRustDesk();
+                                    if (!result.success) {
+                                        message.error(result.error || t('desktop.remoteOpenFailed', { defaultValue: 'Could not open RustDesk.' }));
+                                    }
+                                }}
+                            >
                                 {t('desktop.openRustDesk')}
                             </Button>
                         )}

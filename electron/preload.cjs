@@ -13,5 +13,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     rustdeskSetId: (newId) => ipcRenderer.invoke("rustdesk:set-id", newId),
     rustdeskIsInstalled: () => ipcRenderer.invoke("rustdesk:is-installed"),
     rustdeskOpen: () => ipcRenderer.invoke("rustdesk:open"),
+    rustdeskInstallService: () => ipcRenderer.invoke("rustdesk:install-service"),
+    rustdeskConfigureServer: () => ipcRenderer.invoke("rustdesk:configure-server"),
     desktopRegisterDevice: (payload) => ipcRenderer.invoke("desktop:register-device", payload),
 });

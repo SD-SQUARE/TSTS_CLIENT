@@ -12,6 +12,14 @@ Var RustDeskConfig
 Var RustDeskConfigArg
 Var RustDeskPassword
 Var RustDeskPasswordArg
+Var EmailValidationResult
+Var EmailValidationIndex
+Var EmailValidationLength
+Var EmailValidationChar
+Var EmailAtCount
+Var EmailDotAfterAt
+Var EmailLastIndex
+Var RustDeskExePath
 
 !macro customInit
   StrCpy $RustDeskConfig "${RUSTDESK_CONFIG}"
@@ -19,6 +27,9 @@ Var RustDeskPasswordArg
   ${GetParameters} $0
   ClearErrors
   ${GetOptions} $0 "/EMAIL=" $RegistrationEmail
+  ${If} $RegistrationEmail != ""
+    Call EnsureValidRegistrationEmail
+  ${EndIf}
   ClearErrors
   ${GetOptions} $0 "/RUSTDESK_CONFIG=" $RustDeskConfigArg
   ${IfNot} ${Errors}
@@ -32,10 +43,10 @@ Var RustDeskPasswordArg
 !macroend
 
 !macro customPageAfterChangeDir
-  Page custom RequesterEmailPage RequesterEmailPageLeave
+  Page custom UserEmailPage UserEmailPageLeave
 !macroend
 
-Function RequesterEmailPage
+Function UserEmailPage
   ${If} ${Silent}
     Abort
   ${EndIf}
@@ -49,39 +60,146 @@ Function RequesterEmailPage
     Abort
   ${EndIf}
 
-  ${NSD_CreateLabel} 0 0 100% 24u "Requester email"
+  ${NSD_CreateLabel} 0 0 100% 24u "User email (required)"
   Pop $0
   ${NSD_CreateText} 0 28u 100% 14u ""
   Pop $RegistrationEmailInput
-  ${NSD_CreateLabel} 0 48u 100% 30u "This email is used to register the requester machine for RustDesk support."
+  ${NSD_CreateLabel} 0 48u 100% 30u "This email is validated and used to register the user machine for RustDesk support."
   Pop $0
   nsDialogs::Show
 FunctionEnd
 
-Function RequesterEmailPageLeave
+Function UserEmailPageLeave
   ${If} $RegistrationEmail == ""
     ${NSD_GetText} $RegistrationEmailInput $RegistrationEmail
   ${EndIf}
+  Call EnsureValidRegistrationEmail
+FunctionEnd
+
+Function ValidateRegistrationEmail
+  StrCpy $EmailValidationResult "0"
+  StrLen $EmailValidationLength $RegistrationEmail
+  ${If} $EmailValidationLength < 5
+    Return
+  ${EndIf}
+
+  StrCpy $EmailValidationIndex 0
+  StrCpy $EmailAtCount 0
+  StrCpy $EmailDotAfterAt 0
+
+  email_validation_loop:
+    ${If} $EmailValidationIndex >= $EmailValidationLength
+      Goto email_validation_done
+    ${EndIf}
+
+    StrCpy $EmailValidationChar $RegistrationEmail 1 $EmailValidationIndex
+    ${If} $EmailValidationChar == " "
+      Return
+    ${EndIf}
+
+    ${If} $EmailValidationChar == "@"
+      IntOp $EmailAtCount $EmailAtCount + 1
+      ${If} $EmailValidationIndex == 0
+        Return
+      ${EndIf}
+      IntOp $EmailLastIndex $EmailValidationLength - 1
+      ${If} $EmailValidationIndex >= $EmailLastIndex
+        Return
+      ${EndIf}
+    ${ElseIf} $EmailValidationChar == "."
+      ${If} $EmailAtCount > 0
+        IntOp $EmailLastIndex $EmailValidationLength - 1
+        ${If} $EmailValidationIndex >= $EmailLastIndex
+          Return
+        ${EndIf}
+        StrCpy $EmailDotAfterAt 1
+      ${EndIf}
+    ${EndIf}
+
+    IntOp $EmailValidationIndex $EmailValidationIndex + 1
+    Goto email_validation_loop
+
+  email_validation_done:
+    ${If} $EmailAtCount == 1
+    ${AndIf} $EmailDotAfterAt == 1
+      StrCpy $EmailValidationResult "1"
+    ${EndIf}
+FunctionEnd
+
+Function EnsureValidRegistrationEmail
+  Call ValidateRegistrationEmail
+  ${If} $EmailValidationResult != "1"
+    ${If} ${Silent}
+      DetailPrint "Invalid user email. Use /EMAIL=user@example.com."
+    ${Else}
+      MessageBox MB_ICONEXCLAMATION|MB_OK "Enter a valid user email address."
+    ${EndIf}
+    Abort
+  ${EndIf}
+FunctionEnd
+
+Function ResolveRustDeskPath
+  StrCpy $RustDeskExePath ""
+  StrCpy $1 "$PROGRAMFILES64\RustDesk\rustdesk.exe"
+  IfFileExists "$1" 0 +3
+    StrCpy $RustDeskExePath "$1"
+    Return
+  StrCpy $1 "$PROGRAMFILES\RustDesk\rustdesk.exe"
+  IfFileExists "$1" 0 +3
+    StrCpy $RustDeskExePath "$1"
+    Return
+  StrCpy $1 "$LOCALAPPDATA\rustdesk\rustdesk.exe"
+  IfFileExists "$1" 0 +3
+    StrCpy $RustDeskExePath "$1"
+    Return
+  StrCpy $1 "$INSTDIR\resources\rustdesk\rustdesk.exe"
+  IfFileExists "$1" 0 +3
+    StrCpy $RustDeskExePath "$1"
+    Return
+FunctionEnd
+
+Function InstallBundledRustDesk
+  DetailPrint "Installing bundled RustDesk client..."
+  IfFileExists "$INSTDIR\resources\rustdesk\rustdesk.exe" 0 done
+    CreateDirectory "$LOCALAPPDATA\rustdesk"
+    CopyFiles /SILENT "$INSTDIR\resources\rustdesk\*.*" "$LOCALAPPDATA\rustdesk\"
+    ExecWait '"$INSTDIR\resources\rustdesk\rustdesk.exe" --silent-install'
+  done:
+FunctionEnd
+
+Function RegisterRustDeskProtocol
+  Call ResolveRustDeskPath
+  ${If} $RustDeskExePath == ""
+    DetailPrint "RustDesk executable was not found; skipping rustdesk:// protocol registration."
+    Return
+  ${EndIf}
+
+  DetailPrint "Registering rustdesk:// protocol handler..."
+  DeleteRegKey HKCR "rustdesk"
+  WriteRegStr HKCR "rustdesk" "" "URL:RustDesk Protocol"
+  WriteRegStr HKCR "rustdesk" "URL Protocol" ""
+  WriteRegStr HKCR "rustdesk\DefaultIcon" "" "$RustDeskExePath,0"
+  WriteRegStr HKCR "rustdesk\shell\open\command" "" '"$RustDeskExePath" "%1"'
 FunctionEnd
 
 Function ConfigureRustDesk
   DetailPrint "Configuring RustDesk for the self-hosted server..."
-  StrCpy $1 "$PROGRAMFILES64\RustDesk\rustdesk.exe"
-  IfFileExists "$1" configure 0
-  StrCpy $1 "$PROGRAMFILES\RustDesk\rustdesk.exe"
-  IfFileExists "$1" configure 0
-  StrCpy $1 "$INSTDIR\resources\rustdesk\rustdesk.exe"
-  IfFileExists "$1" configure 0
+  Call ResolveRustDeskPath
+  ${If} $RustDeskExePath != ""
+    Goto configure
+  ${EndIf}
   DetailPrint "RustDesk executable was not found; skipping self-hosted configuration."
   Return
 
   configure:
-    ExecWait '"$1" --config "$RustDeskConfig"'
-    ExecWait '"$1" --password "$RustDeskPassword"'
-    ExecWait '"$1" --install-service'
+    ExecWait '"$RustDeskExePath" --config "$RustDeskConfig"'
+    ExecWait '"$RustDeskExePath" --password "$RustDeskPassword"'
+    ExecWait '"$RustDeskExePath" --install-service'
 FunctionEnd
 
 !macro customInstall
+  Call EnsureValidRegistrationEmail
+
   DetailPrint "Registering tsts:// protocol handler..."
   DeleteRegKey HKCR "tsts"
   WriteRegStr HKCR "tsts" "" "URL:TSTS Protocol"
@@ -89,22 +207,20 @@ FunctionEnd
   WriteRegStr HKCR "tsts\DefaultIcon" "" "$INSTDIR\${PRODUCT_FILENAME}.exe,0"
   WriteRegStr HKCR "tsts\shell\open\command" "" '"$INSTDIR\${PRODUCT_FILENAME}.exe" "%1"'
 
-  DetailPrint "Installing RustDesk service..."
-  IfFileExists "$INSTDIR\resources\rustdesk\rustdesk.exe" 0 +2
-    ExecWait '"$INSTDIR\resources\rustdesk\rustdesk.exe" --silent-install'
+  Call InstallBundledRustDesk
   Call ConfigureRustDesk
+  Call RegisterRustDeskProtocol
 
-  ${If} $RegistrationEmail != ""
-    CreateDirectory "$APPDATA\TSTS Desktop"
-    FileOpen $0 "$APPDATA\TSTS Desktop\desktop-registration.json" w
-    FileWrite $0 '{"email":"$RegistrationEmail"}'
-    FileClose $0
-  ${EndIf}
+  CreateDirectory "$APPDATA\TSTS Desktop"
+  FileOpen $0 "$APPDATA\TSTS Desktop\desktop-registration.json" w
+  FileWrite $0 '{"email":"$RegistrationEmail"}'
+  FileClose $0
 !macroend
 !endif
 
 !macro customUnInstall
   DeleteRegKey HKCR "tsts"
+  DeleteRegKey HKCR "rustdesk"
   IfFileExists "$PROGRAMFILES64\RustDesk\rustdesk.exe" 0 +2
     ExecWait '"$PROGRAMFILES64\RustDesk\rustdesk.exe" --uninstall'
   IfFileExists "$PROGRAMFILES\RustDesk\rustdesk.exe" 0 +2

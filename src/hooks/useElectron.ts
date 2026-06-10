@@ -13,7 +13,7 @@ declare global {
             rustdeskGetId: () => Promise<{ success: boolean; id?: string; error?: string }>;
             rustdeskSetId: (newId: string) => Promise<{ success: boolean; error?: string }>;
             rustdeskIsInstalled: () => Promise<{ installed: boolean }>;
-            rustdeskOpen: () => Promise<{ success: boolean }>;
+            rustdeskOpen: () => Promise<{ success: boolean; error?: string; warning?: string }>;
             rustdeskInstallService: () => Promise<{ success: boolean; error?: string }>;
             rustdeskConfigureServer: () => Promise<{ success: boolean; error?: string }>;
             desktopRegisterDevice: (payload: { email: string; rustdeskId?: string }) => Promise<{ success: boolean; rustdeskId?: string; error?: string }>;

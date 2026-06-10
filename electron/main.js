@@ -3,6 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { execFile, exec } from "child_process";
 import fs from "fs";
+import os from "os";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,6 +23,9 @@ const RUSTDESK_CONFIG = process.env.RUSTDESK_CONFIG ||
     "==Qfi0za0Umd3FTZwhVcDtUW0Y0T1NFczYkVmJWTV50ar0UQ3RnW3ZTUHNmZx1mbiojI5V2aiwiI0N3boxWYj9Gbv8iOwRHdoJiOikGchJCLiQ3cvhGbhN2bsJiOikXYsVmciwiI0N3boxWYj9GbiojI0N3boJye";
 const RUSTDESK_PASSWORD = process.env.RUSTDESK_PASSWORD || "pass123"; // default password set on requester machines
 const RUSTDESK_COMMAND_TIMEOUT_MS = Number(process.env.RUSTDESK_COMMAND_TIMEOUT_MS || 15000);
+const RUSTDESK_INSTALL_TIMEOUT_MS = Number(process.env.RUSTDESK_INSTALL_TIMEOUT_MS || 90000);
+const RUSTDESK_ID_PATTERN = /^[a-zA-Z0-9_-]{4,64}$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const rustDeskConfiguredPaths = new Set();
 
 // ─── Single instance lock ─────────────────────────────────────────────────────
@@ -49,18 +53,61 @@ if (process.defaultApp) {
 }
 
 // ─── RustDesk path resolution ─────────────────────────────────────────────────
-function getRustDeskPath() {
-    const bundled = isDev
+function getBundledRustDeskPath() {
+    return isDev
         ? path.join(__dirname, "rustdesk", "rustdesk.exe")
         : path.join(process.resourcesPath, "rustdesk", "rustdesk.exe");
-    const candidates = [
+}
+
+function getLocalAppDataRustDeskPath() {
+    const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), "AppData", "Local");
+    return path.join(localAppData, "rustdesk", "rustdesk.exe");
+}
+
+function getRustDeskInstalledCandidates() {
+    return [
         process.env.RUSTDESK_EXE_PATH,
         "C:\\Program Files\\RustDesk\\rustdesk.exe",
         "C:\\Program Files (x86)\\RustDesk\\rustdesk.exe",
-        bundled,
+        getLocalAppDataRustDeskPath(),
     ].filter(Boolean);
+}
 
-    return candidates.find(candidate => fs.existsSync(candidate)) || bundled;
+function getInstalledRustDeskPath() {
+    return getRustDeskInstalledCandidates().find(candidate => fs.existsSync(candidate));
+}
+
+function getRustDeskPath() {
+    const bundled = getBundledRustDeskPath();
+    return getInstalledRustDeskPath() || (fs.existsSync(bundled) ? bundled : bundled);
+}
+
+function normalizeRustDeskId(value) {
+    return String(value || "").trim().replace(/\s+/g, "");
+}
+
+function isValidRustDeskId(value) {
+    return RUSTDESK_ID_PATTERN.test(normalizeRustDeskId(value));
+}
+
+function extractRustDeskId(output) {
+    const text = String(output || "");
+    const lines = String(output || "")
+        .split(/\r\n|\n|\r/)
+        .map(normalizeRustDeskId)
+        .filter(Boolean);
+
+    for (let index = lines.length - 1; index >= 0; index -= 1) {
+        const line = lines[index];
+        if (RUSTDESK_ID_PATTERN.test(line)) return line;
+    }
+
+    const numericCandidates = text.match(/\b\d{6,20}\b/g) || [];
+    return numericCandidates[numericCandidates.length - 1] || "";
+}
+
+function isValidEmail(value) {
+    return EMAIL_PATTERN.test(String(value || "").trim().toLowerCase());
 }
 
 function runRustDeskCommand(rustPath, args, timeout = RUSTDESK_COMMAND_TIMEOUT_MS) {
@@ -78,6 +125,64 @@ function runRustDeskCommand(rustPath, args, timeout = RUSTDESK_COMMAND_TIMEOUT_M
             resolve({ success: true, stdout: stdout?.trim() });
         });
     });
+}
+
+function runWindowsCommand(command, args, timeout = RUSTDESK_COMMAND_TIMEOUT_MS) {
+    return new Promise((resolve) => {
+        execFile(command, args, { windowsHide: true, timeout }, (err, stdout, stderr) => {
+            if (err) {
+                resolve({ success: false, error: stderr?.trim() || err.message });
+                return;
+            }
+
+            resolve({ success: true, stdout: stdout?.trim() });
+        });
+    });
+}
+
+async function registerRustDeskProtocol(rustPath) {
+    if (process.platform !== "win32" || !fs.existsSync(rustPath)) {
+        return { success: true };
+    }
+
+    const key = "HKCU\\Software\\Classes\\rustdesk";
+    const commandValue = `"${rustPath}" "%1"`;
+    const writes = [
+        ["add", key, "/ve", "/d", "URL:RustDesk Protocol", "/f"],
+        ["add", key, "/v", "URL Protocol", "/d", "", "/f"],
+        ["add", `${key}\\DefaultIcon`, "/ve", "/d", `${rustPath},0`, "/f"],
+        ["add", `${key}\\shell\\open\\command`, "/ve", "/d", commandValue, "/f"],
+    ];
+
+    const results = await Promise.all(writes.map((args) => runWindowsCommand("reg.exe", args)));
+    const failed = results.find((result) => !result.success);
+    return failed || { success: true };
+}
+
+async function ensureRustDeskInstalled(options = {}) {
+    const installed = getInstalledRustDeskPath();
+    if (installed && !options.force) {
+        return { success: true, path: installed };
+    }
+
+    const bundled = getBundledRustDeskPath();
+    if (!fs.existsSync(bundled)) {
+        return installed
+            ? { success: true, path: installed }
+            : { success: false, error: `Bundled RustDesk executable not found at ${bundled}` };
+    }
+
+    const result = await runRustDeskCommand(bundled, ["--silent-install"], RUSTDESK_INSTALL_TIMEOUT_MS);
+    const installedAfter = getInstalledRustDeskPath();
+    if (!result.success && !installedAfter) {
+        return { success: false, error: result.error || "RustDesk installation failed" };
+    }
+
+    return {
+        success: true,
+        path: installedAfter || bundled,
+        warning: result.success ? undefined : result.error,
+    };
 }
 
 async function ensureRustDeskConfigured(rustPath = getRustDeskPath(), options = {}) {
@@ -103,6 +208,32 @@ async function ensureRustDeskConfigured(rustPath = getRustDeskPath(), options = 
 
     rustDeskConfiguredPaths.add(key);
     return { success: true };
+}
+
+async function installAndConfigureRustDesk(options = {}) {
+    const installResult = await ensureRustDeskInstalled(options);
+    if (!installResult.success) return installResult;
+
+    const protocolResult = await registerRustDeskProtocol(installResult.path);
+    if (!protocolResult.success) {
+        console.warn("RustDesk protocol registration failed:", protocolResult.error);
+    }
+
+    const configResult = await ensureRustDeskConfigured(installResult.path, { force: options.force });
+    if (!configResult.success) {
+        return {
+            success: false,
+            path: installResult.path,
+            error: configResult.error,
+            warning: installResult.warning || protocolResult.error,
+        };
+    }
+
+    return {
+        success: true,
+        path: installResult.path,
+        warning: installResult.warning || protocolResult.error,
+    };
 }
 
 function escapePowerShellSingleQuoted(value) {
@@ -203,42 +334,41 @@ function isMicrosoftAuthUrl(url) {
 }
 
 async function getLocalRustDeskId() {
-    const rustPath = getRustDeskPath();
-    if (!fs.existsSync(rustPath)) return Promise.resolve({ success: false, error: "RustDesk not installed" });
-
-    const configResult = await ensureRustDeskConfigured(rustPath);
-    if (!configResult.success) {
-        console.warn("RustDesk self-hosted config failed before reading ID:", configResult.error);
+    const setupResult = await installAndConfigureRustDesk();
+    if (!setupResult.success) {
+        return { success: false, error: setupResult.error || "RustDesk is not installed" };
     }
 
-    return new Promise((resolve) => {
-        execFile(rustPath, ["--get-id"], { windowsHide: true, timeout: RUSTDESK_COMMAND_TIMEOUT_MS }, (err, stdout, stderr) => {
-            if (err) {
-                resolve({ success: false, error: stderr?.trim() || err.message });
-            } else {
-                resolve({ success: true, id: stdout.trim() });
-            }
-        });
-    });
+    const rustPath = setupResult.path || getRustDeskPath();
+    const result = await runRustDeskCommand(rustPath, ["--get-id"]);
+    if (!result.success) return { success: false, error: result.error || "Could not load RustDesk ID" };
+
+    const id = extractRustDeskId(result.stdout);
+    if (!id) {
+        return { success: false, error: "No valid RustDesk ID was found. Try opening RustDesk once, then refresh the ID." };
+    }
+
+    return { success: true, id };
 }
 
 async function registerDesktopDevice(email, rustdeskId) {
     const cleanEmail = email?.toString().trim().toLowerCase();
-    if (!cleanEmail) return { success: false, error: "Email is required" };
+    if (!isValidEmail(cleanEmail)) return { success: false, error: "A valid email is required" };
 
     const idResult = rustdeskId
-        ? { success: true, id: rustdeskId.toString().replace(/\s+/g, "") }
+        ? { success: true, id: normalizeRustDeskId(rustdeskId) }
         : await getLocalRustDeskId();
 
-    if (!idResult.success || !idResult.id) {
-        return { success: false, error: idResult.error || "RustDesk ID was not found" };
+    const cleanId = normalizeRustDeskId(idResult.id);
+    if (!idResult.success || !isValidRustDeskId(cleanId)) {
+        return { success: false, error: idResult.error || "A valid RustDesk ID is required" };
     }
 
     try {
         const response = await fetch(`${API_BASE_URL}/v1/desktop/register-device`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: cleanEmail, rustdeskId: idResult.id }),
+            body: JSON.stringify({ email: cleanEmail, rustdeskId: cleanId }),
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok || !data.success) {
@@ -248,12 +378,12 @@ async function registerDesktopDevice(email, rustdeskId) {
         try {
             const filePath = getRegistrationFilePath();
             fs.mkdirSync(path.dirname(filePath), { recursive: true });
-            fs.writeFileSync(filePath, JSON.stringify({ email: cleanEmail, rustdeskId: idResult.id }, null, 2));
+            fs.writeFileSync(filePath, JSON.stringify({ email: cleanEmail, rustdeskId: cleanId }, null, 2));
         } catch {
             // Registration succeeded; local persistence is best-effort.
         }
 
-        return { success: true, rustdeskId: idResult.id };
+        return { success: true, rustdeskId: cleanId };
     } catch (error) {
         return { success: false, error: error.message || "Registration failed" };
     }
@@ -284,39 +414,41 @@ function handleProtocolURL(url) {
 
 // ─── RustDesk: connect to remote ─────────────────────────────────────────────
 async function launchRustDeskConnect(remoteId) {
-    const rustPath = getRustDeskPath();
-    if (!fs.existsSync(rustPath)) {
-        dialog.showErrorBox("RustDesk Not Found", `RustDesk executable not found at:\n${rustPath}\n\nPlease install RustDesk first.`);
-        return { success: false, error: "RustDesk not installed" };
+    const cleanId = normalizeRustDeskId(remoteId);
+    if (!isValidRustDeskId(cleanId)) {
+        return { success: false, error: "A valid remote ID is required" };
     }
 
-    const configResult = await ensureRustDeskConfigured(rustPath);
-    if (!configResult.success) {
-        console.warn("RustDesk self-hosted config failed before connect:", configResult.error);
+    const setupResult = await installAndConfigureRustDesk();
+    if (!setupResult.success) {
+        const rustPath = getRustDeskPath();
+        dialog.showErrorBox("RustDesk Not Found", `RustDesk executable not found at:\n${rustPath}\n\nPlease reinstall TSTS Desktop.`);
+        return { success: false, error: setupResult.error || "RustDesk not installed" };
     }
 
+    const rustPath = setupResult.path || getRustDeskPath();
     const args = [];
     if (RUSTDESK_CONFIG) args.push("--config", RUSTDESK_CONFIG);
-    args.push("--connect", remoteId);
+    args.push("--connect", cleanId);
     if (RUSTDESK_PASSWORD) args.push("--password", RUSTDESK_PASSWORD);
 
     execFile(rustPath, args, { windowsHide: true }, (err) => {
         if (err) console.error("RustDesk connect failed:", err);
     });
-    return { success: true, warning: configResult.success ? undefined : configResult.error };
+    return { success: true, warning: setupResult.warning };
 }
 
 // ─── IPC Handlers ─────────────────────────────────────────────────────────────
 
 // Connect to a remote machine by ID
 ipcMain.handle("rustdesk:connect", async (event, remoteId) => {
-    const cleanId = remoteId?.toString().replace(/\s+/g, "");
+    const cleanId = normalizeRustDeskId(remoteId);
     if (!cleanId) return { success: false, error: "No remote ID provided" };
     return launchRustDeskConnect(cleanId);
 });
 
 ipcMain.handle("rustdesk:connect-protocol", async (_event, remoteId) => {
-    const cleanId = remoteId?.toString().replace(/\s+/g, "");
+    const cleanId = normalizeRustDeskId(remoteId);
     if (!cleanId) return { success: false, error: "No remote ID provided" };
     return launchRustDeskConnect(cleanId);
 });
@@ -328,7 +460,8 @@ ipcMain.handle("rustdesk:get-id", async () => {
 
 // Set the local machine's RustDesk ID and password (requires elevation)
 ipcMain.handle("rustdesk:set-id", async (event, newId) => {
-    const cleanId = newId?.toString().replace(/\s+/g, "").replace(/['"]/g, "");
+    const cleanId = normalizeRustDeskId(newId).replace(/['"]/g, "");
+    if (!isValidRustDeskId(cleanId)) return { success: false, error: "A valid RustDesk ID is required" };
     const password = RUSTDESK_PASSWORD;
     const rustPath = getRustDeskPath();
     const configPath = "C:\\Windows\\ServiceProfiles\\LocalService\\AppData\\Roaming\\RustDesk\\config\\RustDesk.toml";
@@ -385,16 +518,20 @@ ipcMain.handle("rustdesk:is-installed", async () => {
 
 // Open RustDesk standalone (no connection)
 ipcMain.handle("rustdesk:open", async () => {
-    const rustPath = getRustDeskPath();
-    if (!fs.existsSync(rustPath)) return { success: false, error: "Not installed" };
-    const configResult = await ensureRustDeskConfigured(rustPath);
-    if (!configResult.success) {
-        console.warn("RustDesk self-hosted config failed before open:", configResult.error);
-    }
-    execFile(rustPath, [], { windowsHide: true }, (err) => {
-        if (err) console.error("RustDesk open failed:", err);
-    });
-    return { success: true, warning: configResult.success ? undefined : configResult.error };
+    const setupResult = await installAndConfigureRustDesk();
+    if (!setupResult.success) return { success: false, error: setupResult.error || "Not installed" };
+    const rustPath = setupResult.path || getRustDeskPath();
+    const openError = await shell.openPath(rustPath);
+    if (openError) return { success: false, error: openError };
+    return { success: true, warning: setupResult.warning };
+});
+
+ipcMain.handle("rustdesk:install-service", async () => {
+    return installAndConfigureRustDesk({ force: true });
+});
+
+ipcMain.handle("rustdesk:configure-server", async () => {
+    return installAndConfigureRustDesk({ force: true });
 });
 
 ipcMain.handle("desktop:register-device", async (_event, payload) => {
@@ -404,8 +541,8 @@ ipcMain.handle("desktop:register-device", async (_event, payload) => {
 // ─── App lifecycle ────────────────────────────────────────────────────────────
 app.whenReady().then(() => {
     createWindow();
-    ensureRustDeskConfigured().catch((error) => {
-        console.warn("RustDesk startup configuration failed:", error);
+    installAndConfigureRustDesk().catch((error) => {
+        console.warn("RustDesk startup setup failed:", error);
     });
     const url = process.argv.find(a => a.startsWith(`${PROTOCOL}://`));
     if (url) handleProtocolURL(url);

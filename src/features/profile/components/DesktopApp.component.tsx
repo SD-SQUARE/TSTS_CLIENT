@@ -16,6 +16,12 @@ import { useSelector } from 'react-redux';
 import { isElectron, useElectron } from '../../../hooks/useElectron';
 
 const { Paragraph, Text, Title } = Typography;
+const RUSTDESK_ID_PATTERN = /^[a-zA-Z0-9_-]{4,64}$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const normalizeRustDeskId = (value: string) => value.trim().replace(/\s+/g, '');
+const isValidRustDeskId = (value: string) => RUSTDESK_ID_PATTERN.test(normalizeRustDeskId(value));
+const isValidEmail = (value: string) => EMAIL_PATTERN.test(value.trim().toLowerCase());
 
 const DesktopApp: React.FC = () => {
     const { t } = useTranslation();
@@ -43,7 +49,14 @@ const DesktopApp: React.FC = () => {
         try {
             const result = await getLocalId();
             if (result.success && result.id) {
-                setLocalIdState(result.id);
+                const cleanId = normalizeRustDeskId(result.id);
+                if (isValidRustDeskId(cleanId)) {
+                    setLocalIdState(cleanId);
+                    setRegistrationError('');
+                } else {
+                    setLocalIdState('');
+                    setRegistrationError(t('desktop.invalidRustdeskId', { defaultValue: 'A valid RustDesk ID is required' }));
+                }
             } else if (result.error) {
                 setRegistrationError(result.error);
             }
@@ -63,15 +76,29 @@ const DesktopApp: React.FC = () => {
         // If ID not found on first load, retry after 5s — service may still be starting
         const retryTimer = window.setTimeout(async () => {
             const result = await getLocalId();
-            if (result.success && result.id) setLocalIdState(result.id);
+            if (result.success && result.id) {
+                const cleanId = normalizeRustDeskId(result.id);
+                if (isValidRustDeskId(cleanId)) setLocalIdState(cleanId);
+            }
         }, 5000);
         return () => window.clearTimeout(retryTimer);
     }, [inElectron]);
 
     const registerDevice = async (email: string, rustdeskId: string, showToast = true) => {
         const cleanEmail = email.trim().toLowerCase();
-        const cleanId = rustdeskId.trim().replace(/\s+/g, '');
-        if (!cleanEmail || !cleanId) return false;
+        const cleanId = normalizeRustDeskId(rustdeskId);
+        if (!isValidEmail(cleanEmail)) {
+            const error = t('desktop.invalidEmail', { defaultValue: 'A valid email is required' });
+            setRegistrationError(error);
+            if (showToast) message.error(error);
+            return false;
+        }
+        if (!isValidRustDeskId(cleanId)) {
+            const error = t('desktop.invalidRustdeskId', { defaultValue: 'A valid RustDesk ID is required' });
+            setRegistrationError(error);
+            if (showToast) message.error(error);
+            return false;
+        }
 
         setIsRegistering(true);
         setRegistrationError('');
@@ -100,7 +127,7 @@ const DesktopApp: React.FC = () => {
     useEffect(() => {
         const activeEmail = userEmail.trim().toLowerCase();
         if (!inElectron || !localId || !activeEmail) return;
-        if (!activeEmail) return;
+        if (!isValidEmail(activeEmail) || !isValidRustDeskId(localId)) return;
 
         const key = `${activeEmail}:${localId}`;
         if (registeredKey === key) return;
@@ -211,7 +238,10 @@ const DesktopApp: React.FC = () => {
                             onClick={async () => {
                                 setIsConfiguringServer(true);
                                 try {
-                                    await configureRustDeskServer();
+                                    const result = await configureRustDeskServer();
+                                    if (!result.success) {
+                                        throw new Error(result.error || t('desktop.serverConfigFailed', { defaultValue: 'Server configuration failed' }));
+                                    }
                                     message.success(t('desktop.serverConfigured', { defaultValue: 'Self-hosted server configured. Refreshing ID...' }));
                                     setTimeout(() => void fetchLocalId(), 3000);
                                 } catch (e: any) {
@@ -223,7 +253,15 @@ const DesktopApp: React.FC = () => {
                         >
                             {t('desktop.configureServer', { defaultValue: 'Configure Server' })}
                         </Button>
-                        <Button icon={<DesktopOutlined />} onClick={() => void openRustDesk()}>
+                        <Button
+                            icon={<DesktopOutlined />}
+                            onClick={async () => {
+                                const result = await openRustDesk();
+                                if (!result.success) {
+                                    message.error(result.error || t('desktop.remoteOpenFailed', { defaultValue: 'Could not open RustDesk.' }));
+                                }
+                            }}
+                        >
                             {t('desktop.openRustDesk')}
                         </Button>
                     </Space>

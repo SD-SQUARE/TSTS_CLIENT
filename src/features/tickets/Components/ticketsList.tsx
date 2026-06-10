@@ -58,11 +58,12 @@ const TicketList: React.FC = () => {
         pagination.pageSize,
         apiSearchQuery,
     );
-    const { data: analyticsData, isLoading: analyticsLoading } = useTicketAnalytics();
+    const shouldLoadFilterLookups = !isLoading && !isError;
+    const { data: analyticsData, isLoading: analyticsLoading } = useTicketAnalytics(shouldLoadFilterLookups);
     const ticketRows = data?.data || [];
-    const shouldLoadStaffLookups = !isRequester;
-    const { data: specs } = useSpecializations();
-    const { data: hierarchicalProblems } = useTicketProblems();
+    const shouldLoadStaffLookups = shouldLoadFilterLookups && !isRequester;
+    const { data: specs } = useSpecializations(shouldLoadFilterLookups);
+    const { data: hierarchicalProblems } = useTicketProblems(shouldLoadFilterLookups);
     const { data: technicians } = useTechnicians(shouldLoadStaffLookups);
     const { data: admins } = useAdmins(shouldLoadStaffLookups);
     const { data: requesters } = useRequestersLookup(!isRequester);

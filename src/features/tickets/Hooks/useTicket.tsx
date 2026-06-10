@@ -66,10 +66,11 @@ const fetchTicketAnalytics = async (): Promise<TicketAnalytics> => {
     return data || {};
 };
 
-export const useTicketAnalytics = () => {
+export const useTicketAnalytics = (enabled = true) => {
     return useQuery({
         queryKey: ['tickets', 'analytics', i18n.language],
         queryFn: fetchTicketAnalytics,
+        enabled,
         staleTime: 30 * 1000,
     });
 };
