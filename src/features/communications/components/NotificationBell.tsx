@@ -20,7 +20,8 @@ import {
   useMarkAllNotificationsAsRead,
   useMarkNotificationAsRead,
   useNotifications,
-  useUnreadNotificationsCount,
+  useBootstrapNotifications,
+  useBootstrapUnreadCount,
 } from '../hooks/useCommunicationApi';
 import type { NotificationItem } from '../types';
 import { CHAT_DRAWER_OPEN_EVENT } from '../events';
@@ -41,13 +42,26 @@ const NotificationBell: React.FC = () => {
   const [page, setPage] = useState(1);
 
   const isRead = filter === 'unread' ? false : undefined;
-  const notificationsQuery = useNotifications(page, PAGE_SIZE, isRead);
-  const unreadQuery = useUnreadNotificationsCount();
+  
+  // BOOTSTRAP: replaced useUnreadNotificationsCount() (was a separate /unread-count request on mount)
+  const unreadQuery = useBootstrapUnreadCount();
+  const bootstrapNotifications = useBootstrapNotifications();
+
+  // Disable the separate `/notifications` fetch if we're on page 1 of all notifications,
+  // since the bootstrap payload already contains this data.
+  const shouldFetchDirectly = page !== 1 || filter !== 'all' || open;
+  const notificationsQuery = useNotifications(page, PAGE_SIZE, isRead, shouldFetchDirectly);
+
   const markAsReadMutation = useMarkNotificationAsRead();
   const markAllAsReadMutation = useMarkAllNotificationsAsRead();
 
-  const items = notificationsQuery.data?.data || [];
-  const total = notificationsQuery.data?.pagination?.total || 0;
+  // Use bootstrap data if available and we aren't fetching directly
+  const activeData = (!shouldFetchDirectly && bootstrapNotifications.data) 
+    ? bootstrapNotifications.data 
+    : notificationsQuery.data;
+
+  const items = activeData?.data || [];
+  const total = activeData?.pagination?.total || 0;
 
   const localizeNotificationTitle = (item: NotificationItem) => {
     const title = item.notification.title || '';

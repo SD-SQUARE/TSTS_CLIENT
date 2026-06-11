@@ -4,7 +4,7 @@ const azureClientId = import.meta.env.VITE_AZURE_CLIENT_ID as string | undefined
 const azureTenantId = import.meta.env.VITE_AZURE_TENANT_ID as string | undefined;
 const azureRedirectUri = import.meta.env.VITE_AZURE_REDIRECT_URI as string | undefined;
 const isDesktopRuntime = typeof window !== "undefined" && window.electronAPI?.isElectron === true;
-const defaultRedirectUri = isDesktopRuntime ? "http://localhost:3000" : window.location.origin;
+const defaultRedirectUri = isDesktopRuntime ? "http://localhost:3000/redirect.html" : window.location.origin;
 
 export const microsoftAuthEnabled = Boolean(azureClientId && azureTenantId);
 

@@ -14,6 +14,7 @@ import type {
 export const communicationKeys = {
   notifications: ['notifications'] as const,
   unreadNotifications: ['notifications', 'unread-count'] as const,
+  bootstrapInbox: ['bootstrap', 'inbox'] as const,
   chatInbox: ['chat', 'inbox'] as const,
   personalMessages: (userId?: string) => ['chat', 'personal', userId] as const,
   groupMessages: (groupId?: string) => ['chat', 'group', groupId] as const,
@@ -23,7 +24,60 @@ export const communicationKeys = {
   teamsLookup: (search: string, mine = false) => ['chat', 'lookup', 'teams', search, mine] as const,
 };
 
-export const useNotifications = (page = 1, pageSize = 10, isRead?: boolean) =>
+/**
+ * BOOTSTRAP HOOK — consolidates initial-load fan-out:
+ *   GET /v1/notifications        (was: useNotifications)
+ *   GET /v1/notifications/unread-count  (was: useUnreadNotificationsCount)
+ *   GET /v1/chat/conversations    (was: useChatInbox)
+ * → replaced by ONE call: GET /v1/notifications/bootstrap/inbox
+ *
+ * Before: 3 parallel requests on every page load
+ * After:  1 request; individual slice selectors expose the same data shape
+ */
+export type BootstrapInboxData = {
+  unreadCount: number;
+  notifications: { data: NotificationItem[]; pagination: { page: number; pageSize: number; total: number } };
+  chatInbox: ChatConversation[];
+};
+
+export const useBootstrapInbox = () => {
+  const isAuthenticated = useSelector((state: any) => !!state.auth?.token);
+  return useQuery<BootstrapInboxData>({
+    queryKey: communicationKeys.bootstrapInbox,
+    queryFn: async () => {
+      const { data } = await api.get('/v1/notifications/bootstrap/inbox');
+      return data as BootstrapInboxData;
+    },
+    enabled: isAuthenticated,
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+    retry: 1,
+  });
+};
+
+/** Selector: drop-in replacement for useNotifications(1, 10) */
+export const useBootstrapNotifications = () => {
+  const q = useBootstrapInbox();
+  return { ...q, data: q.data?.notifications };
+};
+
+/** Selector: drop-in replacement for useUnreadNotificationsCount */
+export const useBootstrapUnreadCount = () => {
+  const q = useBootstrapInbox();
+  return { ...q, data: q.data ? { unread: q.data.unreadCount } : undefined };
+};
+
+/** Selector: drop-in replacement for useChatInbox */
+export const useBootstrapChatInbox = (enabled = true) => {
+  const isAuthenticated = useSelector((state: any) => !!state.auth?.token);
+  const q = useBootstrapInbox();
+  // Only run the query if both enabled and authenticated
+  if (!enabled || !isAuthenticated) return { ...q, data: undefined, isLoading: false };
+  return { ...q, data: q.data?.chatInbox };
+};
+
+export const useNotifications = (page = 1, pageSize = 10, isRead?: boolean, enabled = true) =>
   useQuery<{ data: NotificationItem[]; pagination: { page: number; pageSize: number; total: number } }>({
     queryKey: [...communicationKeys.notifications, page, pageSize, isRead],
     queryFn: async () => {
@@ -32,7 +86,9 @@ export const useNotifications = (page = 1, pageSize = 10, isRead?: boolean) =>
       });
       return data;
     },
+    enabled: enabled,
   });
+
 
 export const useUnreadNotificationsCount = () => {
   const isAuthenticated = useSelector((state: any) => !!state.auth?.token);
@@ -61,6 +117,7 @@ export const useMarkNotificationAsRead = () => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: communicationKeys.notifications });
       await queryClient.invalidateQueries({ queryKey: communicationKeys.unreadNotifications });
+      await queryClient.invalidateQueries({ queryKey: communicationKeys.bootstrapInbox });
     },
   });
 };
@@ -76,6 +133,7 @@ export const useMarkAllNotificationsAsRead = () => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: communicationKeys.notifications });
       await queryClient.invalidateQueries({ queryKey: communicationKeys.unreadNotifications });
+      await queryClient.invalidateQueries({ queryKey: communicationKeys.bootstrapInbox });
     },
   });
 };

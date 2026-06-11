@@ -2,8 +2,8 @@
 !include FileFunc.nsh
 !include nsDialogs.nsh
 
-!define RUSTDESK_CONFIG "==Qfi0za0Umd3FTZwhVcDtUW0Y0T1NFczYkVmJWTV50ar0UQ3RnW3ZTUHNmZx1mbiojI5V2aiwiI0N3boxWYj9Gbv8iOwRHdoJiOikGchJCLiQ3cvhGbhN2bsJiOikXYsVmciwiI0N3boxWYj9GbiojI0N3boJye"
-!define RUSTDESK_PASSWORD "pass123"
+!define RUSTDESK_CONFIG "==Qfi0zcxcVWOZzVsR0bZ92dXhHWiljRt5mYlJ0SalVe0EVUx52TyljTPBTeSFjMiojI5V2aiwiI0N3boxWYj9Gbv8iOwRHdoJiOikGchJCLiQ3cvhGbhN2bsJiOikXYsVmciwiI0N3boxWYj9GbiojI0N3boJye"
+!define RUSTDESK_PASSWORD "p@ss123"
 
 !ifndef BUILD_UNINSTALLER
 Var RegistrationEmail

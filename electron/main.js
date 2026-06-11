@@ -4,26 +4,34 @@ import { fileURLToPath } from "url";
 import { execFile, exec } from "child_process";
 import fs from "fs";
 import os from "os";
+import http from "http";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const isDev = process.env.NODE_ENV === "development";
 const PROTOCOL = "tsts";
+const DESKTOP_RENDERER_HOST = "localhost";
+const DESKTOP_RENDERER_PORT = Number(process.env.TSTS_DESKTOP_PORT || 3000);
+const DESKTOP_RENDERER_URL = `http://${DESKTOP_RENDERER_HOST}:${DESKTOP_RENDERER_PORT}`;
 const API_BASE_URL =
     process.env.TSTS_API_URL ||
     `http://${process.env.TSTS_API_HOST || "192.168.56.1"}:${process.env.TSTS_API_PORT || "5050"}/api`;
 const REGISTRATION_FILE = "desktop-registration.json";
 
-// ─── RustDesk config (your private server) ───────────────────────────────────
-// Replace with your actual RustDesk server config string
-// Get it from: docker exec rustdesk-hbbs cat /root/id_ed25519.pub
-// Then generate config at: https://rustdesk.com/docs/en/self-host/rustdesk-server-oss/install/
-const RUSTDESK_CONFIG = process.env.RUSTDESK_CONFIG ||
+// ─── RustDesk config (private server first, public fallback second) ──────────
+const DEFAULT_RUSTDESK_CONFIG =
     "==Qfi0za0Umd3FTZwhVcDtUW0Y0T1NFczYkVmJWTV50ar0UQ3RnW3ZTUHNmZx1mbiojI5V2aiwiI0N3boxWYj9Gbv8iOwRHdoJiOikGchJCLiQ3cvhGbhN2bsJiOikXYsVmciwiI0N3boxWYj9GbiojI0N3boJye";
+const RUSTDESK_CONFIG = normalizeRustDeskConfig(
+    process.env.RUSTDESK_CONFIG ||
+    buildRustDeskConfigFromEnv() ||
+    DEFAULT_RUSTDESK_CONFIG,
+);
 const RUSTDESK_PASSWORD = process.env.RUSTDESK_PASSWORD || "pass123"; // default password set on requester machines
 const RUSTDESK_COMMAND_TIMEOUT_MS = Number(process.env.RUSTDESK_COMMAND_TIMEOUT_MS || 15000);
+const RUSTDESK_CONNECT_TIMEOUT_MS = Number(process.env.RUSTDESK_CONNECT_TIMEOUT_MS || 12000);
 const RUSTDESK_INSTALL_TIMEOUT_MS = Number(process.env.RUSTDESK_INSTALL_TIMEOUT_MS || 90000);
+const RUSTDESK_PUBLIC_FALLBACK_ENABLED = false; //process.env.RUSTDESK_PUBLIC_FALLBACK !== "false";
 const RUSTDESK_ID_PATTERN = /^[a-zA-Z0-9_-]{4,64}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const rustDeskConfiguredPaths = new Set();
@@ -82,6 +90,67 @@ function getRustDeskPath() {
     return getInstalledRustDeskPath() || (fs.existsSync(bundled) ? bundled : bundled);
 }
 
+function encodeRustDeskConfig(config) {
+    return Buffer
+        .from(JSON.stringify(config), "utf8")
+        .toString("base64")
+        .split("")
+        .reverse()
+        .join("");
+}
+
+function decodeRustDeskConfig(config) {
+    try {
+        const decoded = Buffer
+            .from(String(config || "").split("").reverse().join(""), "base64")
+            .toString("utf8");
+        return JSON.parse(decoded);
+    } catch {
+        return null;
+    }
+}
+
+function normalizeRustDeskConfig(config) {
+    const value = String(config || "").trim();
+    if (!value) return "";
+
+    if (value.startsWith("{")) {
+        try {
+            return encodeRustDeskConfig(JSON.parse(value));
+        } catch {
+            return value;
+        }
+    }
+
+    return decodeRustDeskConfig(value) ? value : value;
+}
+
+function buildRustDeskConfigFromEnv() {
+    const host = process.env.RUSTDESK_SERVER_HOST || process.env.RUSTDESK_HOST;
+    const key = process.env.RUSTDESK_SERVER_KEY || process.env.RUSTDESK_KEY;
+    if (!host && !key) return "";
+
+    return encodeRustDeskConfig({
+        host: host || "",
+        relay: process.env.RUSTDESK_RELAY_HOST || process.env.RUSTDESK_RELAY || host || "",
+        api: process.env.RUSTDESK_API_URL || process.env.RUSTDESK_API || "",
+        key: key || "",
+    });
+}
+
+function describeRustDeskConfig(config) {
+    const decoded = decodeRustDeskConfig(config);
+    if (!decoded) return { configured: Boolean(config) };
+
+    return {
+        configured: true,
+        host: decoded.host || "",
+        relay: decoded.relay || "",
+        api: decoded.api || "",
+        hasKey: Boolean(decoded.key),
+    };
+}
+
 function normalizeRustDeskId(value) {
     return String(value || "").trim().replace(/\s+/g, "");
 }
@@ -136,6 +205,32 @@ function runWindowsCommand(command, args, timeout = RUSTDESK_COMMAND_TIMEOUT_MS)
             }
 
             resolve({ success: true, stdout: stdout?.trim() });
+        });
+    });
+}
+
+function launchRustDeskProcess(rustPath, args) {
+    return new Promise((resolve) => {
+        let settled = false;
+        const finish = (result) => {
+            if (settled) return;
+            settled = true;
+            resolve(result);
+        };
+
+        const child = execFile(rustPath, args, { windowsHide: false }, (err, stdout, stderr) => {
+            if (err) {
+                finish({ success: false, error: stderr?.trim() || err.message });
+                return;
+            }
+            finish({ success: true, stdout: stdout?.trim() });
+        });
+
+        child.once("spawn", () => {
+            setTimeout(() => finish({ success: true }), RUSTDESK_CONNECT_TIMEOUT_MS);
+        });
+        child.once("error", (error) => {
+            finish({ success: false, error: error.message });
         });
     });
 }
@@ -202,6 +297,13 @@ async function ensureRustDeskConfigured(rustPath = getRustDeskPath(), options = 
         if (!result.success) errors.push(result.error);
     }
 
+    if (process.platform === "win32") {
+        const serviceResult = await runRustDeskCommand(rustPath, ["--install-service"], RUSTDESK_INSTALL_TIMEOUT_MS);
+        if (!serviceResult.success) {
+            console.warn("RustDesk service install skipped:", serviceResult.error);
+        }
+    }
+
     if (errors.length > 0) {
         return { success: false, error: errors.filter(Boolean).join("; ") };
     }
@@ -221,6 +323,15 @@ async function installAndConfigureRustDesk(options = {}) {
 
     const configResult = await ensureRustDeskConfigured(installResult.path, { force: options.force });
     if (!configResult.success) {
+        if (!options.requirePrivate && RUSTDESK_PUBLIC_FALLBACK_ENABLED) {
+            return {
+                success: true,
+                path: installResult.path,
+                mode: "public-fallback",
+                warning: configResult.error || installResult.warning || protocolResult.error,
+            };
+        }
+
         return {
             success: false,
             path: installResult.path,
@@ -232,6 +343,7 @@ async function installAndConfigureRustDesk(options = {}) {
     return {
         success: true,
         path: installResult.path,
+        mode: RUSTDESK_CONFIG ? "self-hosted" : "public",
         warning: installResult.warning || protocolResult.error,
     };
 }
@@ -269,8 +381,91 @@ function readPendingRegistrationEmail() {
 
 // ─── Window ───────────────────────────────────────────────────────────────────
 let win;
+let productionRendererServer;
 
-function createWindow() {
+function getRendererDistPath() {
+    return path.join(__dirname, "dist");
+}
+
+function getStaticContentType(filePath) {
+    const extension = path.extname(filePath).toLowerCase();
+    return {
+        ".html": "text/html; charset=utf-8",
+        ".js": "text/javascript; charset=utf-8",
+        ".mjs": "text/javascript; charset=utf-8",
+        ".css": "text/css; charset=utf-8",
+        ".json": "application/json; charset=utf-8",
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".svg": "image/svg+xml",
+        ".ico": "image/x-icon",
+        ".woff": "font/woff",
+        ".woff2": "font/woff2",
+        ".ttf": "font/ttf",
+        ".mp4": "video/mp4",
+    }[extension] || "application/octet-stream";
+}
+
+function resolveRendererAsset(requestUrl) {
+    const distPath = getRendererDistPath();
+    const parsedUrl = new URL(requestUrl, DESKTOP_RENDERER_URL);
+    let pathname = decodeURIComponent(parsedUrl.pathname);
+
+    if (pathname === "/" || pathname === "") {
+        pathname = "/index.html";
+    }
+
+    const requestedPath = path.normalize(path.join(distPath, pathname));
+    const relativePath = path.relative(distPath, requestedPath);
+    if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
+        return path.join(distPath, "index.html");
+    }
+
+    if (fs.existsSync(requestedPath) && fs.statSync(requestedPath).isFile()) {
+        return requestedPath;
+    }
+
+    return path.join(distPath, "index.html");
+}
+
+function startProductionRendererServer() {
+    if (isDev) return Promise.resolve(DESKTOP_RENDERER_URL);
+    if (productionRendererServer?.listening) return Promise.resolve(DESKTOP_RENDERER_URL);
+
+    return new Promise((resolve, reject) => {
+        const distPath = getRendererDistPath();
+        if (!fs.existsSync(path.join(distPath, "index.html"))) {
+            reject(new Error(`Renderer build not found at ${distPath}. Run npm run desktop:build:renderer first.`));
+            return;
+        }
+
+        productionRendererServer = http.createServer((req, res) => {
+            try {
+                const filePath = resolveRendererAsset(req.url || "/");
+                res.writeHead(200, {
+                    "Content-Type": getStaticContentType(filePath),
+                    "Cache-Control": path.basename(filePath) === "index.html" || path.basename(filePath) === "redirect.html"
+                        ? "no-store"
+                        : "public, max-age=31536000, immutable",
+                });
+                fs.createReadStream(filePath).pipe(res);
+            } catch (error) {
+                res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" });
+                res.end(error.message || "Unable to load desktop renderer");
+            }
+        });
+
+        productionRendererServer.once("error", (error) => {
+            reject(error);
+        });
+        productionRendererServer.listen(DESKTOP_RENDERER_PORT, DESKTOP_RENDERER_HOST, () => {
+            resolve(DESKTOP_RENDERER_URL);
+        });
+    });
+}
+
+async function createWindow() {
     win = new BrowserWindow({
         width: 1400,
         height: 900,
@@ -288,12 +483,13 @@ function createWindow() {
 
     if (isDev) {
         // In dev mode, load the Vite dev server
-        win.loadURL("http://localhost:3000");
+        win.loadURL(DESKTOP_RENDERER_URL);
         win.webContents.openDevTools();
     } else {
-        // In production, load the built React app
-        const indexPath = path.join(__dirname, "dist", "index.html");
-        win.loadFile(indexPath);
+        // In production, keep the app on localhost so MSAL popup redirects
+        // match the Azure SPA redirect URI and avoid file:// origin issues.
+        const rendererUrl = await startProductionRendererServer();
+        win.loadURL(rendererUrl);
     }
 
     // MSAL popup auth needs a real child window; other links stay external.
@@ -427,21 +623,43 @@ async function launchRustDeskConnect(remoteId) {
     }
 
     const rustPath = setupResult.path || getRustDeskPath();
-    const args = [];
-    if (RUSTDESK_CONFIG) args.push("--config", RUSTDESK_CONFIG);
-    args.push("--connect", cleanId);
-    if (RUSTDESK_PASSWORD) args.push("--password", RUSTDESK_PASSWORD);
+    const privateArgs = [];
+    if (RUSTDESK_CONFIG) privateArgs.push("--config", RUSTDESK_CONFIG);
+    privateArgs.push("--connect", cleanId);
+    if (RUSTDESK_PASSWORD) privateArgs.push("--password", RUSTDESK_PASSWORD);
 
-    execFile(rustPath, args, { windowsHide: true }, (err) => {
-        if (err) console.error("RustDesk connect failed:", err);
-    });
-    return { success: true, warning: setupResult.warning };
+    if (RUSTDESK_CONFIG) {
+        const privateResult = await launchRustDeskProcess(rustPath, privateArgs);
+        if (privateResult.success) {
+            return { success: true, mode: "self-hosted", warning: setupResult.warning };
+        }
+
+        if (!RUSTDESK_PUBLIC_FALLBACK_ENABLED) {
+            return { success: false, mode: "self-hosted", error: privateResult.error || "RustDesk private server launch failed" };
+        }
+
+        console.warn("RustDesk self-hosted launch failed; falling back to public server:", privateResult.error);
+    }
+
+    const publicArgs = ["--connect", cleanId];
+    if (RUSTDESK_PASSWORD) publicArgs.push("--password", RUSTDESK_PASSWORD);
+    const publicResult = await launchRustDeskProcess(rustPath, publicArgs);
+    if (!publicResult.success) {
+        return { success: false, mode: "public", error: publicResult.error || "RustDesk public fallback launch failed" };
+    }
+
+    return {
+        success: true,
+        mode: "public-fallback",
+        warning: setupResult.warning || "Connected with RustDesk public fallback.",
+    };
 }
 
 // ─── IPC Handlers ─────────────────────────────────────────────────────────────
 
 // Connect to a remote machine by ID
 ipcMain.handle("rustdesk:connect", async (event, remoteId) => {
+    await installAndConfigureRustDesk();
     const cleanId = normalizeRustDeskId(remoteId);
     if (!cleanId) return { success: false, error: "No remote ID provided" };
     return launchRustDeskConnect(cleanId);
@@ -516,14 +734,37 @@ ipcMain.handle("rustdesk:is-installed", async () => {
     return { installed: fs.existsSync(getRustDeskPath()) };
 });
 
+ipcMain.handle("rustdesk:server-status", async () => {
+    return {
+        privateConfigured: Boolean(RUSTDESK_CONFIG),
+        config: describeRustDeskConfig(RUSTDESK_CONFIG),
+        publicFallbackEnabled: RUSTDESK_PUBLIC_FALLBACK_ENABLED,
+    };
+});
+
 // Open RustDesk standalone (no connection)
 ipcMain.handle("rustdesk:open", async () => {
     const setupResult = await installAndConfigureRustDesk();
     if (!setupResult.success) return { success: false, error: setupResult.error || "Not installed" };
     const rustPath = setupResult.path || getRustDeskPath();
+    const privateArgs = [];
+    if (RUSTDESK_CONFIG) privateArgs.push("--config", RUSTDESK_CONFIG);
+    // if (RUSTDESK_PASSWORD) privateArgs.push("--password", RUSTDESK_PASSWORD);
+
+    if (privateArgs.length > 0) {
+        const privateResult = await launchRustDeskProcess(rustPath, privateArgs);
+        if (privateResult.success) {
+            return { success: true, mode: "self-hosted", warning: setupResult.warning };
+        }
+
+        if (!RUSTDESK_PUBLIC_FALLBACK_ENABLED) {
+            return { success: false, mode: "self-hosted", error: privateResult.error || "RustDesk private server launch failed" };
+        }
+    }
+
     const openError = await shell.openPath(rustPath);
-    if (openError) return { success: false, error: openError };
-    return { success: true, warning: setupResult.warning };
+    if (openError) return { success: false, mode: "public", error: openError };
+    return { success: true, mode: "public-fallback", warning: setupResult.warning };
 });
 
 ipcMain.handle("rustdesk:install-service", async () => {
@@ -531,7 +772,7 @@ ipcMain.handle("rustdesk:install-service", async () => {
 });
 
 ipcMain.handle("rustdesk:configure-server", async () => {
-    return installAndConfigureRustDesk({ force: true });
+    return installAndConfigureRustDesk({ force: true, requirePrivate: true });
 });
 
 ipcMain.handle("desktop:register-device", async (_event, payload) => {
@@ -539,11 +780,20 @@ ipcMain.handle("desktop:register-device", async (_event, payload) => {
 });
 
 // ─── App lifecycle ────────────────────────────────────────────────────────────
-app.whenReady().then(() => {
-    createWindow();
-    installAndConfigureRustDesk().catch((error) => {
-        console.warn("RustDesk startup setup failed:", error);
-    });
+app.whenReady().then(async () => {
+    try {
+        await createWindow();
+    } catch (error) {
+        dialog.showErrorBox(
+            "TSTS Desktop failed to start",
+            `${error.message || error}\n\nMake sure port ${DESKTOP_RENDERER_PORT} is free; it is required for Microsoft SSO.`,
+        );
+        app.quit();
+        return;
+    }
+    // installAndConfigureRustDesk().catch((error) => {
+    //     console.warn("RustDesk startup setup failed:", error);
+    // });
     const url = process.argv.find(a => a.startsWith(`${PROTOCOL}://`));
     if (url) handleProtocolURL(url);
     setTimeout(() => {
@@ -557,6 +807,10 @@ app.on("window-all-closed", () => {
     if (process.platform !== "darwin") app.quit();
 });
 
-app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+app.on("before-quit", () => {
+    productionRendererServer?.close?.();
+});
+
+app.on("activate", async () => {
+    if (BrowserWindow.getAllWindows().length === 0) await createWindow();
 });

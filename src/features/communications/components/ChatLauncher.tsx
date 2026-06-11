@@ -4,7 +4,7 @@ import { MessageOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import ChatWorkspace from './ChatWorkspace';
-import { useChatInbox } from '../hooks/useCommunicationApi';
+import { useBootstrapChatInbox } from '../hooks/useCommunicationApi';
 import { CHAT_DRAWER_OPEN_EVENT } from '../events';
 import chatAudioSrc from '../../../assets/audio/chat.wav';
 
@@ -18,7 +18,8 @@ const ChatLauncher: React.FC = () => {
   const openAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const canUseChat = !!token && role !== 'requester';
-  const inboxQuery = useChatInbox(canUseChat);
+  // BOOTSTRAP: replaced useChatInbox() (was a separate /chat/conversations request on mount)
+  const inboxQuery = useBootstrapChatInbox(canUseChat);
 
   const unreadCount = useMemo(
     () => (inboxQuery.data || []).reduce((sum, item) => sum + (item.unreadCount || 0), 0),
@@ -77,7 +78,7 @@ const ChatLauncher: React.FC = () => {
         width={screens.xl ? 1120 : screens.lg ? 960 : '100%'}
         title={t('messagesCenter.title')}
         placement={i18n.language === 'ar' ? 'left' : 'right'}
-        destroyOnClose
+        destroyOnClose={true}
         styles={{
           body: {
             padding: 16,

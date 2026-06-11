@@ -13,7 +13,8 @@ declare global {
             rustdeskGetId: () => Promise<{ success: boolean; id?: string; error?: string }>;
             rustdeskSetId: (newId: string) => Promise<{ success: boolean; error?: string }>;
             rustdeskIsInstalled: () => Promise<{ installed: boolean }>;
-            rustdeskOpen: () => Promise<{ success: boolean; error?: string; warning?: string }>;
+            rustdeskServerStatus: () => Promise<{ privateConfigured: boolean; config?: Record<string, unknown>; publicFallbackEnabled: boolean }>;
+            rustdeskOpen: () => Promise<{ success: boolean; error?: string; warning?: string; mode?: string }>;
             rustdeskInstallService: () => Promise<{ success: boolean; error?: string }>;
             rustdeskConfigureServer: () => Promise<{ success: boolean; error?: string }>;
             desktopRegisterDevice: (payload: { email: string; rustdeskId?: string }) => Promise<{ success: boolean; rustdeskId?: string; error?: string }>;
@@ -77,6 +78,13 @@ export const useElectron = () => {
         isRustDeskInstalled: async () => {
             if (!electron || !api) return { installed: false };
             return api.rustdeskIsInstalled();
+        },
+
+        getRustDeskServerStatus: async () => {
+            if (!electron || !api?.rustdeskServerStatus) {
+                return { privateConfigured: false, publicFallbackEnabled: false };
+            }
+            return api.rustdeskServerStatus();
         },
 
         /** Open RustDesk standalone */

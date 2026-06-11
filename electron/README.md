@@ -71,11 +71,17 @@ api/assets/desktop/TSTS-Desktop-Setup.exe
 
 ## Environment
 
+- `TSTS_DESKTOP_PORT` overrides the localhost renderer port. Keep this at `3000`
+  unless the Azure SPA redirect URI is changed too.
 - `TSTS_API_URL` overrides the Electron API base URL.
 - `TSTS_API_HOST` and `TSTS_API_PORT` are used when `TSTS_API_URL` is not set.
 - `RUSTDESK_CONFIG` provides the self-hosted RustDesk server config string.
 - `RUSTDESK_PASSWORD` overrides the default unattended access password used for requester machines.
 - `RUSTDESK_EXE_PATH` overrides RustDesk executable discovery.
+
+In production the desktop app serves the built renderer from
+`http://localhost:3000` instead of `file://` so Microsoft SSO can complete on
+the registered SPA redirect URI `http://localhost:3000/redirect.html`.
 
 The NSIS installer validates the requester email, writes it to the desktop registration file, installs/copies the bundled RustDesk executable, registers both `tsts://` and `rustdesk://`, and applies the self-hosted RustDesk config. The Electron app also self-heals this setup before reading the local ID, opening RustDesk, changing the ID, or starting a connection.
 
