@@ -221,7 +221,7 @@ const ApiIntegrationsPage = () => {
             onClick={() => {
               const url = `${window.location.origin}/api-integration-guide`;
               navigator.clipboard.writeText(url).then(() =>
-                message.success('Integration guide link copied!')
+                message.success(t("apiIntegrations.guideLinkCopied", "Integration guide link copied!"))
               );
             }}
           >
@@ -271,7 +271,7 @@ const ApiIntegrationsPage = () => {
                     ))}
                     {zone.paths.length > 3 && (
                       <Typography.Text type="secondary" style={{ fontSize: 11 }}>
-                        +{zone.paths.length - 3} more
+                        {t("apiIntegrations.morePaths", "+{{count}} more", { count: zone.paths.length - 3 })}
                       </Typography.Text>
                     )}
                   </div>
@@ -336,6 +336,7 @@ const ApiIntegrationsPage = () => {
             <Select
               mode="multiple"
               optionFilterProp="label"
+              style={{ width: "100%", minWidth: "150px" }}
               options={(meta?.zones ?? []).map((zone) => ({
                 value: zone.key,
                 label: zone.label,

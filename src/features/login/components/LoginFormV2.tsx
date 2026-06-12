@@ -262,7 +262,7 @@ const LoginFormV2 = () => {
                         form={form}
                         layout="vertical"
                         onFinish={onFinish}
-                        onValuesChange={onValuesChange}
+                        // onValuesChange={onValuesChange}
                         requiredMark={false}
                         validateTrigger="onChange"
                         dir={i18next.language === "ar" ? "rtl" : "ltr"}
@@ -272,7 +272,7 @@ const LoginFormV2 = () => {
                             label={t("Email")}
                             validateDebounce={400}
                             rules={[
-                                { required: true, message: t("Email_IS_Required") },
+                                { required: true, message: t("Email_Is_Required") },
                                 { type: "email", message: t("Invalid_email_address_format") },
                             ]}
                         >
@@ -395,7 +395,7 @@ const LoginFormV2 = () => {
                                 }}
                                     strong
                                 >
-                                    {t("First_Time")}
+                                    {t('First_Time')}
                                 </Text>
                             </NavLink>
                         </div>

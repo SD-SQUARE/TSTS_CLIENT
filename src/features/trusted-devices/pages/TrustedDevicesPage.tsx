@@ -142,7 +142,7 @@ const TrustedDevicesPage = () => {
     return (
         <>
             <AppTable
-                title={() => <Typography.Title level={3}>{t("trusted_devices.Trusted Devices")}</Typography.Title>}
+                title={() => <Typography.Title level={3}>{t("trusted_devices.Trusted_Devices")}</Typography.Title>}
                 rowKey="id"
                 skeletonLoading={isLoading}
                 columns={columns}

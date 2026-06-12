@@ -413,12 +413,12 @@ export const AppRoutes = () => {
             <Route path={`${APP_BASE_PATH}/not-allowed`} element={<PageLayout><NotAllowed /> </PageLayout>} />
 
             {/* Public integration guide — no auth required */}
-            <Route path="/api-integration-guide" element={<IntegrationGuidePage />} />
-            <Route path="/api-integration-guide/:docId" element={<IntegrationGuidePage />} />
+            <Route path="${APP_BASE_PATH}/api-integration-guide" element={<IntegrationGuidePage />} />
+            <Route path="${APP_BASE_PATH}/api-integration-guide/:docId" element={<IntegrationGuidePage />} />
 
             {/* API signatures — public, but linked only from admin sidebar */}
-            <Route path="/api-docs" element={<ApiDocsPage />} />
-            <Route path="/api-docs/:docId" element={<ApiDocsPage />} />
+            <Route path="${APP_BASE_PATH}/api-docs" element={<ApiDocsPage />} />
+            <Route path="${APP_BASE_PATH}/api-docs/:docId" element={<ApiDocsPage />} />
 
             <Route path={`${APP_BASE_PATH}/*`} element={<PageLayout><NotFound /> </PageLayout>} />
         </Routes>

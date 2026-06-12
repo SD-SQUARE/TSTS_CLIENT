@@ -1,4 +1,28 @@
 {
+  "Permissions": "الصلاحيات",
+  "permissions": "الصلاحية",
+  "trusted_devices": {
+    "Trusted_Devices": "الأجهزة الموثوقة",
+    "User": "المستخدم",
+    "Browser": "المتصفح",
+    "Search by email or SSN": "ابحث بالبريد الإلكتروني أو الرقم القومي",
+    "Device Name": "اسم الجهاز",
+    "Activated Since": "تاريخ التفعيل",
+    "Are you sure you want to revoke this device?": "هل أنت متأكد من حذف هذا الجهاز؟",
+    "Confirm Device Revocation": "تأكيد حذف الجهاز",
+    "Type DELETE to confirm device revocation.": "اكتب DELETE لتأكيد حذف الجهاز.",
+    "Cancel": "إلغاء",
+    "Actions": "العمليات",
+    "OS": "نظام التشغيل",
+    "Type": "نوع",
+    "Delete": "حذف",
+    "ipAddress": "العنوان الرقمي"
+  },
+  "no": "لا",
+  "yes": "نعم",
+  "Add_User": "اضافة مستخدم",
+  "First_Time": "هل تستخدم النظام للمرة الأولى؟",
+  "First_time_Title": "تسجيل الدخول الاول",
   "LOGO": "جامعة حلوان",
   "LOGO_ALTER": "جامعة حلوان",
   "Custom Forms": "النماذج المخصصة",
@@ -183,6 +207,8 @@
     "welcome": "مرحباً،",
     "logout": "تسجيل خروج",
     "menu": {
+      "integrationGuide": "دليل تكامل API",
+      "apiDocs": "مستندات API",
       "dashboard": "لوحة التحكم",
       "knowledgeBase": "استكشاف المعرفة",
       "tickets": "طلبات الدعم",
@@ -202,13 +228,15 @@
       "trustedDevices": "الأجهزة الموثوقة",
       "permissions": "الصلاحيات",
       "siteSettings": "إعدادات الموقع",
-      "apiIntegrations": "\u062a\u0643\u0627\u0645\u0644\u0627\u062a API",
+      "apiIntegrations": "تكاملات API",
       "slaManagement": "إدارة SLA",
       "recycleBin": "سلة المحذوفات",
       "auditLogs": "سجلات التدقيق"
     }
   },
   "translation": {
+    "unassigned_members_note": "الاعضاء الغير متواجدين في فريق سيكونون تحت قسم الاعضاء",
+    "team_members_count": "عدد {{count}}",
     "universities": "الجامعات",
     "departments": "الأقسام",
     "Domains": "النطاقات",
@@ -600,24 +628,29 @@
     }
   },
   "apiIntegrations": {
-    "title": "\u062a\u0643\u0627\u0645\u0644\u0627\u062a API",
-    "subtitle": "\u0623\u0635\u062f\u0631 \u0645\u0641\u0627\u062a\u064a\u062d \u0645\u062d\u062f\u062f\u0629 \u0627\u0644\u0646\u0637\u0627\u0642 \u0644\u0644\u0623\u0646\u0638\u0645\u0629 \u0627\u0644\u062e\u0627\u0631\u062c\u064a\u0629 \u0627\u0644\u0645\u0648\u062b\u0648\u0642\u0629.",
-    "createKey": "\u0625\u0646\u0634\u0627\u0621 \u0645\u0641\u062a\u0627\u062d API",
-    "editKey": "\u062a\u0639\u062f\u064a\u0644 \u0645\u0641\u062a\u0627\u062d API",
-    "name": "\u0627\u0644\u0627\u0633\u0645",
-    "description": "\u0627\u0644\u0648\u0635\u0641",
-    "prefix": "\u0627\u0644\u0628\u0627\u062f\u0626\u0629",
-    "zones": "\u0627\u0644\u0646\u0637\u0627\u0642\u0627\u062a",
-    "methods": "\u0627\u0644\u0637\u0631\u0642",
-    "active": "\u0646\u0634\u0637",
-    "inactive": "\u063a\u064a\u0631 \u0646\u0634\u0637",
-    "saved": "\u062a\u0645 \u062d\u0641\u0638 \u0645\u0641\u062a\u0627\u062d API",
-    "created": "\u062a\u0645 \u0625\u0646\u0634\u0627\u0621 \u0645\u0641\u062a\u0627\u062d API",
-    "lastUsed": "\u0622\u062e\u0631 \u0627\u0633\u062a\u062e\u062f\u0627\u0645",
-    "expiresAt": "\u064a\u0646\u062a\u0647\u064a \u0641\u064a",
-    "revokeConfirm": "\u0647\u0644 \u062a\u0631\u064a\u062f \u0625\u0644\u063a\u0627\u0621 \u0647\u0630\u0627 \u0627\u0644\u0645\u0641\u062a\u0627\u062d\u061f",
-    "generatedKeyTitle": "\u0645\u0641\u062a\u0627\u062d API \u0627\u0644\u0645\u0648\u0644\u062f",
-    "generatedKeyWarning": "\u0627\u0646\u0633\u062e \u0647\u0630\u0627 \u0627\u0644\u0645\u0641\u062a\u0627\u062d \u0627\u0644\u0622\u0646. \u0644\u0646 \u064a\u0638\u0647\u0631 \u0645\u0631\u0629 \u0623\u062e\u0631\u0649 \u0644\u0623\u0633\u0628\u0627\u0628 \u0623\u0645\u0646\u064a\u0629."
+    "title": "تكاملات API",
+    "subtitle": "أصدر مفاتيح محددة النطاق للأنظمة الخارجية الموثوقة.",
+    "createKey": "إنشاء مفتاح API",
+    "editKey": "تعديل مفتاح API",
+    "name": "الاسم",
+    "description": "الوصف",
+    "prefix": "البادئة",
+    "zones": "النطاقات",
+    "methods": "الطرق",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "saved": "تم حفظ مفتاح API",
+    "created": "تم إنشاء مفتاح API",
+    "lastUsed": "آخر استخدام",
+    "expiresAt": "ينتهي في",
+    "revokeConfirm": "هل تريد إلغاء هذا المفتاح؟",
+    "generatedKeyTitle": "مفتاح API المولد",
+    "generatedKeyWarning": "انسخ هذا المفتاح الآن. لن يظهر مرة أخرى لأسباب أمنية.",
+    "guideLinkCopied": "تم نسخ رابط دليل الدمج!",
+    "viewDocs": "نسخ رابط الدليل",
+    "availableScopes": "النطاقات المتاحة",
+    "morePaths": "+{{count}} أكثر",
+    "allowedMethods": "طرق HTTP المسموحة:"
   },
   "sla": {
     "title": "SLA",
@@ -637,7 +670,20 @@
     "title": "سلة المحذوفات",
     "selectEntity": "اختر كيانًا",
     "restoreConfirm": "استعادة هذا السجل المحذوف؟",
-    "editDeletedRecord": "تعديل السجل المحذوف"
+    "editDeletedRecord": "تعديل السجل المحذوف",
+    "columns": {
+      "id": "المعرف",
+      "deletedAt": "تاريخ الحذف",
+      "createdAt": "تاريخ الإنشاء",
+      "updatedAt": "تاريخ التحديث",
+      "name": "الاسم",
+      "title": "العنوان",
+      "email": "البريد الإلكتروني",
+      "status": "الحالة",
+      "role": "الدور",
+      "description": "الوصف",
+      "type": "النوع"
+    }
   },
   "audit": {
     "title": "سجلات التدقيق",
@@ -684,7 +730,19 @@
     "trends": "اتجاهات توزيع التذاكر",
     "reports_overview": "مكتبة التقارير",
     "ticket_trends": "اتجاهات التذاكر",
-    "no_reports": "لا توجد تقارير متاحة."
+    "no_reports": "لا توجد تقارير متاحة.",
+    "analytics": {
+      "total_tickets": "إجمالي التذاكر",
+      "open_tickets": "التذاكر المفتوحة",
+      "in_progress": "قيد التنفيذ",
+      "closed_tickets": "التذاكر المغلقة",
+      "sla_compliance": "التزام SLA",
+      "violated": "مخالفة",
+      "avg_resolution_time": "متوسط وقت الحل",
+      "hours": "ساعة",
+      "created_today": "أُنشئت اليوم",
+      "resolved_today": "حُلّت اليوم"
+    }
   },
   "personnelDashboard": {
     "activeAccounts": "الحسابات النشطة",
@@ -700,14 +758,14 @@
     "details": "تفاصيل التقرير"
   },
   "common": {
-    "enabled":"مفعل",
+    "enabled": "مفعل",
     "disabled": "متوقف",
     "reset": "إعادة تعيين",
     "reset_layout": "اعادة تعيين التخطيط",
     "create": "إنشاء التذكرة",
     "save": "حفظ التغييرات",
-    "done": "\u062a\u0645",
-    "none": "\u0644\u0627 \u064a\u0648\u062c\u062f",
+    "done": "تم",
+    "none": "لا يوجد",
     "edit": "تعديل التذكرة",
     "download": "تحميل",
     "downloading": "جاري التحميل...",
@@ -833,8 +891,9 @@
     "unauthorizedDescription": "ليس لديك صلاحية لوصول هذه الصفحة"
   },
   "sso": {
-    "microsoftLogin": "المتابعة عبر Microsoft",
-    "loginFailed": "فشل تسجيل الدخول عبر Microsoft"
+    "microsoftLogin": "المتابعة عبر الإميل الحامعي",
+    "loginFailed": "فشل تسجيل الدخول عبر الإميل الحامعي",
+    "or": "او"
   },
   "Tickets": "طلبات الدعم",
   "Settings": "الاعدادات",
@@ -882,6 +941,17 @@
     }
   },
   "desktop": {
+    "Remote control": "التحكم عن بعد",
+    "remoteControlTitle": "قم بالتحكم بجهاز العميل",
+    "remoteControlBrowserDesc": "يمكنك التحكم بجهاز العميل من ال متصفح في حالة ان لديك ريست ديسك",
+    "remoteControlDesktopDesc": "يمكنك التحكم بجهاز العميل من برنامج ريست ديسك ب استعمال الكود المذكور",
+    "idRegisteredOnProfile": "المستخدم مسجل لدينا",
+    "permissionReminder": "برجاء اعلام المستخدم قبل الاتصال",
+    "requesterMachineId": "كود الجهاز",
+    "nativeMode": "نظام سطح المستخدم",
+    "browserMode": "نظام المتصفح",
+    "remoteOpenFailed": "فشل في فتح الاتصال",
+    "connectWithRustDesk": "قم بالاتصال عن طريق راست ديسك",
     "remoteSupport": "الدعم عن بُعد",
     "profileTitle": "تطبيق سطح المكتب",
     "profileDescription": "ثبّت تطبيق TSTS Desktop لتسجيل معرف RustDesk والسماح للفنيين ببدء جلسات الدعم بسرعة.",
@@ -938,12 +1008,12 @@
       "settings": "الإعدادات",
       "ai_assistant": "المساعد الذكي"
     },
-    "personal":{
+    "personal": {
       "title": "معلومات شخصية",
-      "email":"البريد الالكتروني",
-      "arabicName":"الاسم بالعربية",
-      "englishName":"الاسم بالانجليزية",
-      "ssn":"الرقم القومي"
+      "email": "البريد الالكتروني",
+      "arabicName": "الاسم بالعربية",
+      "englishName": "الاسم بالانجليزية",
+      "ssn": "الرقم القومي"
     },
     "organization": {
       "title": "معلومات المنظمة",
@@ -956,7 +1026,7 @@
       "mobiles": "ارقام الموبايل",
       "copy": "اضغط للنسخ"
     },
-      "actions": {
+    "actions": {
       "changeImage": "تغيير الصورة",
       "editProfile": "تعديل الملف الشخصي",
       "selectImage": "اختيار صورة",
@@ -992,7 +1062,7 @@
       "password": "كلمة المرور",
       "devices": "الأجهزة الموثوقة",
       "extension": "إضافة المتصفح",
-      "desktopApp": "Desktop App",
+      "desktopApp": "برنامج سطح المكتب",
       "reset": {
         "title": "إعادة تعيين كلمة المرور",
         "description": "اختر كلمة مرور قوية للحفاظ على أمان حسابك.",
@@ -1018,175 +1088,173 @@
         "fileMissing": "ملف الإضافة غير متوفر."
       },
       "systemInfo": {
-      "title": "حالة النظام",
-      "description": "مؤشرات مباشرة عن المعالج والذاكرة والقرص وحالة تشغيل الخادم.",
-      "lastUpdated": "آخر تحديث:",
-      "unavailable": "معلومات النظام غير متاحة حالياً.",
-      "cards": {
-        "cpu": "استخدام المعالج",
-        "memory": "استخدام الذاكرة",
-        "disk": "استخدام القرص",
-        "runtime": "بيئة التشغيل",
-        "cores": "أنوية"
+        "title": "حالة النظام",
+        "description": "مؤشرات مباشرة عن المعالج والذاكرة والقرص وحالة تشغيل الخادم.",
+        "lastUpdated": "آخر تحديث:",
+        "unavailable": "معلومات النظام غير متاحة حالياً.",
+        "cards": {
+          "cpu": "استخدام المعالج",
+          "memory": "استخدام الذاكرة",
+          "disk": "استخدام القرص",
+          "runtime": "بيئة التشغيل",
+          "cores": "أنوية"
+        },
+        "details": {
+          "category": "الفئة",
+          "metric": "المؤشر",
+          "value": "القيمة",
+          "cpuModel": "نوع المعالج",
+          "cpuSpeed": "سرعة المعالج",
+          "loadAverage": "متوسط الحمل",
+          "memoryFree": "الذاكرة الحرة",
+          "processMemory": "ذاكرة العملية",
+          "heapUsed": "استخدام Heap",
+          "diskPath": "مسار القرص",
+          "diskFree": "المساحة الحرة",
+          "hostname": "اسم المضيف",
+          "platform": "المنصة",
+          "uptime": "مدة تشغيل النظام",
+          "processUptime": "مدة تشغيل العملية",
+          "nodeVersion": "إصدار Node",
+          "processId": "معرف العملية"
+        }
       },
-      "details": {
-        "category": "الفئة",
-        "metric": "المؤشر",
-        "value": "القيمة",
-        "cpuModel": "نوع المعالج",
-        "cpuSpeed": "سرعة المعالج",
-        "loadAverage": "متوسط الحمل",
-        "memoryFree": "الذاكرة الحرة",
-        "processMemory": "ذاكرة العملية",
-        "heapUsed": "استخدام Heap",
-        "diskPath": "مسار القرص",
-        "diskFree": "المساحة الحرة",
-        "hostname": "اسم المضيف",
-        "platform": "المنصة",
-        "uptime": "مدة تشغيل النظام",
-        "processUptime": "مدة تشغيل العملية",
-        "nodeVersion": "إصدار Node",
-        "processId": "معرف العملية"
+      "trustedDevices": {
+        "cancel": "الغاء",
+        "title": "الأجهزة الموثوقة",
+        "addTitle": "إضافة جهاز موثوق",
+        "add": "إضافة جهاز",
+        "verify": "التحقق من الجهاز",
+        "verified": "تم التحقق",
+        "trusted": "موثوق",
+        "remove": "إزالة الجهاز",
+        "motive": "سجل هذا المتصفح او الجهاز للتسجيل بسرعة وامان",
+        "security": {
+          "title": "تسجيل جهاز آمن",
+          "description": "سيتم التحقق من هذا الجهاز باستخدام WebAuthn واعتماده لتسجيلات الدخول المستقبلية."
+        },
+        "device": {
+          "name": "اسم الجهاز",
+          "namePlaceholder": "مثال: جهاز العمل",
+          "nameHint": "يمكن تعديل اسم الجهاز فقط",
+          "detectedInfo": "معلومات الجهاز المكتشفة",
+          "type": "نوع الجهاز",
+          "browser": "المتصفح",
+          "os": "نظام التشغيل",
+          "activatedSince": "مفعل منذ"
+        },
+        "status": {
+          "notVerifiedTitle": "الجهاز غير موثوق",
+          "notVerifiedDesc": "يجب التحقق من الجهاز قبل إضافته . الرجاء الضغط على الزر ادناه",
+          "verifiedTitle": "تم التحقق من الجهاز بنجاح",
+          "verifiedDesc": "الجهاز جاهز ليكون موثوقاً."
+        },
+        "messages": {
+          "SecurityError": "فشل التحقق من الجهاز. الموقع غير محمي. يرجى المحاولة مرة أخرى باستخدام اتصال امنية.",
+          "verifyError": "فشل التحقق من الجهاز. يرجى التأكد من عدم التحقق منه مسبقاً ثم المحاولة مرة أخرى.",
+          "addSuccess": "تمت إضافة الجهاز الموثوق بنجاح",
+          "addError": "فشل إضافة الجهاز الموثوق"
+        }
+      },
+      "personal": {
+        "title": "المعلومات الشخصية",
+        "arabicName": "الاسم العربي",
+        "email": "البريد الإلكتروني",
+        "ssn": "الرقم القومي"
+      },
+      "contacts": {
+        "title": "جهات الاتصال",
+        "phones": "الهواتف",
+        "mobiles": "الهواتف المحمولة",
+        "copy": "اضغط للنسخ"
+      },
+      "organization": {
+        "title": "المؤسسة",
+        "university": "الجامعة",
+        "domain": "النطاق"
+      },
+      "departments": {
+        "title": "الأقسام",
+        "copy": "اضغط للنسخ",
+        "copySuccess": "تم النسخ"
+      },
+      "profileHeader": {
+        "userType": "نوع المستخدم"
       }
     },
-    "trustedDevices": {
-      "cancel": "الغاء",
-      "title": "الأجهزة الموثوقة",
-      "addTitle": "إضافة جهاز موثوق",
-      "add": "إضافة جهاز",
-      "verify": "التحقق من الجهاز",
-      "verified": "تم التحقق",
-      "trusted": "موثوق",
-      "remove": "إزالة الجهاز",
-      "motive": "سجل هذا المتصفح او الجهاز للتسجيل بسرعة وامان",
-      "security": {
-        "title": "تسجيل جهاز آمن",
-        "description": "سيتم التحقق من هذا الجهاز باستخدام WebAuthn واعتماده لتسجيلات الدخول المستقبلية."
-      },
-      "device": {
-        "name": "اسم الجهاز",
-        "namePlaceholder": "مثال: جهاز العمل",
-        "nameHint": "يمكن تعديل اسم الجهاز فقط",
-        "detectedInfo": "معلومات الجهاز المكتشفة",
-        "type": "نوع الجهاز",
-        "browser": "المتصفح",
-        "os": "نظام التشغيل",
-        "activatedSince": "مفعل منذ"
-      },
-      "status": {
-        "notVerifiedTitle": "الجهاز غير موثوق",
-        "notVerifiedDesc": "يجب التحقق من الجهاز قبل إضافته . الرجاء الضغط على الزر ادناه",
-        "verifiedTitle": "تم التحقق من الجهاز بنجاح",
-        "verifiedDesc": "الجهاز جاهز ليكون موثوقاً."
-      },
-      "messages": {
-        "SecurityError": "فشل التحقق من الجهاز. الموقع غير محمي. يرجى المحاولة مرة أخرى باستخدام اتصال امنية.",
-        "verifyError": "فشل التحقق من الجهاز. يرجى التأكد من عدم التحقق منه مسبقاً ثم المحاولة مرة أخرى.",
-        "addSuccess": "تمت إضافة الجهاز الموثوق بنجاح",
-        "addError": "فشل إضافة الجهاز الموثوق"
+    "Verify_Trusted_Device": "التحقق من الجهاز الموثوق",
+    "Verify_Device": "التحقق من الجهاز",
+    "Trusted_Device_Verification_Failed": "فشل التحقق من الجهاز الموثوق",
+    "Use_Your_Registered_Device": "استخدم جهازك الموثوق لإكمال تسجيل الدخول",
+    "Waiting_For_Device_Verification": "جاري انتظار التحقق من الجهاز…",
+    "Back": "رجوع",
+    "tour": {
+      "secureAccount": "قم بتأمين حسابك",
+      "addTrustedDevice": "أضف جهازًا موثوقًا لتسريع تسجيل الدخول وحماية حسابك.",
+      "profile": {
+        "trustedDevice": {
+          "title": " يجب التحقق من الجهاز الموثوق",
+          "desc": "قم بتحقق من جهازك الموثوق لتسريع تسجيل الدخول وحماية حسابك."
+        }
       }
     },
-    "personal": {
-      "title": "المعلومات الشخصية",
-      "arabicName": "الاسم العربي",
-      "email": "البريد الإلكتروني",
-      "ssn": "الرقم القومي"
+    "Groups": "المجموعات",
+    "Users": "المستخدمين",
+    "Admins": "المسؤولين",
+    "admin": "المسئول",
+    "Technicians": "الفنيين",
+    "technician": "الفني",
+    "team_leader": "الرئيس",
+    "heads": "الرئيسين",
+    "Requesters": "المتقدمين",
+    "Universities": "الجامعات",
+    "Domains": "النطاقات",
+    "Departments": "الأقسام",
+    "Specializations": "التخصصات",
+    "Permissions": "الصلاحيات",
+    "university": "الجامعة",
+    "domain": "النطاقات",
+    "departments": "الأقسام",
+    "permissions": "الصلاحية",
+    "trusted_devices": {
+      "Trusted_Devices": "الأجهزة الموثوقة",
+      "User": "المستخدم",
+      "Browser": "المتصفح",
+      "Search by email or SSN": "ابحث بالبريد الإلكتروني أو الرقم القومي",
+      "Device Name": "اسم الجهاز",
+      "Activated Since": "تاريخ التفعيل",
+      "Are you sure you want to revoke this device?": "هل أنت متأكد من حذف هذا الجهاز؟",
+      "Confirm Device Revocation": "تأكيد حذف الجهاز",
+      "Type DELETE to confirm device revocation.": "اكتب DELETE لتأكيد حذف الجهاز.",
+      "Cancel": "إلغاء",
+      "Actions": "العمليات",
+      "OS": "نظام التشغيل",
+      "Type": "نوع",
+      "Delete": "حذف",
+      "ipAddress": "العنوان الرقمي"
     },
-    "contacts": {
-      "title": "جهات الاتصال",
-      "phones": "الهواتف",
-      "mobiles": "الهواتف المحمولة",
-      "copy": "اضغط للنسخ"
+    "yes": "نعم",
+    "no": "لا",
+    "deleteModal": {
+      "title": "التحقق الأمني",
+      "confirmText": "لتأكيد الحذف، يرجى كتابة",
+      "keyword": "حذف",
+      "placeholder": "اكتب \"{{keyword}}\"",
+      "ok": "حذف",
+      "cancel": "إلغاء"
     },
-    "organization": {
-      "title": "المؤسسة",
-      "university": "الجامعة",
-      "domain": "النطاق"
-    },
-    "departments": {
-      "title": "الأقسام",
-      "copy": "اضغط للنسخ",
-      "copySuccess": "تم النسخ"
-    },
-    "profileHeader": {
-      "userType": "نوع المستخدم"
+    "ai_assistant": {
+      "title": "المساعد الذكي",
+      "checking": "جارٍ التحقق...",
+      "online": "متصل",
+      "offline": "غير متصل - وضع محدود",
+      "kb_only": "قاعدة المعرفة فقط",
+      "clear": "مسح المحادثة",
+      "welcome_title": "كيف يمكنني مساعدتك؟",
+      "welcome_desc": "اسألني أي شيء عن الدعم التقني، أو يمكنني مساعدتك في إنشاء تذكرة.",
+      "placeholder": "اكتب سؤالك... (Enter للإرسال، Shift+Enter لسطر جديد)",
+      "disclaimer": "قد لا تكون ردود الذكاء الاصطناعي دقيقة دائماً. للمشاكل العاجلة، يرجى إنشاء تذكرة دعم."
     }
-  },
-  "Verify_Trusted_Device": "التحقق من الجهاز الموثوق",
-  "Verify_Device": "التحقق من الجهاز",
-  "Trusted_Device_Verification_Failed": "فشل التحقق من الجهاز الموثوق",
-  "Use_Your_Registered_Device": "استخدم جهازك الموثوق لإكمال تسجيل الدخول",
-  "Waiting_For_Device_Verification": "جاري انتظار التحقق من الجهاز…",
-  "Back": "رجوع",
-  "tour": {
-    "secureAccount": "قم بتأمين حسابك",
-    "addTrustedDevice": "أضف جهازًا موثوقًا لتسريع تسجيل الدخول وحماية حسابك.",
-    "profile": {
-      "trustedDevice": {
-        "title": " يجب التحقق من الجهاز الموثوق",
-        "desc": "قم بتحقق من جهازك الموثوق لتسريع تسجيل الدخول وحماية حسابك."
-      }
-    }
-  },
-  "Groups": "المجموعات",
-  "Users": "المستخدمين",
-  "Admins": "المسؤولين",
-  "admin": "المسئول",
-  "Technicians": "الفنيين",
-  "technician": "الفني",
-  "team_leader": "الرئيس",
-  "heads": "الرئيسين",
-  "Requesters": "المتقدمين",
-  "Universities": "الجامعات",
-  "Domains": "النطاقات",
-  "Departments": "الأقسام",
-  "Specializations": "التخصصات",
-  "Permissions": "الصلاحيات",
-  "university": "الجامعة",
-  "domain": "النطاقات",
-  "departments": "الأقسام",
-  "permissions": "الصلاحية",
-  "Add_User": "اضافة مستخدم",
-  "trusted_devices": {
-    "User": "المستخدم",
-    "Browser": "المتصفح",
-    "Trusted Devices": "الأجهزة الموثوقة",
-    "Search by email or SSN": "ابحث بالبريد الإلكتروني أو الرقم القومي",
-    "Device Name": "اسم الجهاز",
-    "Activated Since": "تاريخ التفعيل",
-    "Are you sure you want to revoke this device?": "هل أنت متأكد من حذف هذا الجهاز؟",
-    "Confirm Device Revocation": "تأكيد حذف الجهاز",
-    "Type DELETE to confirm device revocation.": "اكتب DELETE لتأكيد حذف الجهاز.",
-    "Cancel": "إلغاء",
-    "Actions": "العمليات",
-    "OS": "نظام التشغيل",
-    "Type": "نوع",
-    "Delete": "حذف",
-    "ipAddress": "العنوان الرقمي"
-  },
-  "First_Time": "هل تستخدم النظام للمرة الأولى؟",
-  "First_time_Title": "تسجيل الدخول الاول",
-  "yes": "نعم",
-  "no": "لا",
-  "deleteModal": {
-    "title": "التحقق الأمني",
-    "confirmText": "لتأكيد الحذف، يرجى كتابة",
-    "keyword": "حذف",
-    "placeholder": "اكتب \"{{keyword}}\"",
-    "ok": "حذف",
-    "cancel": "إلغاء"
-  },
-  "ai_assistant": {
-    "title": "المساعد الذكي",
-    "checking": "جارٍ التحقق...",
-    "online": "متصل",
-    "offline": "غير متصل - وضع محدود",
-    "kb_only": "قاعدة المعرفة فقط",
-    "clear": "مسح المحادثة",
-    "welcome_title": "كيف يمكنني مساعدتك؟",
-    "welcome_desc": "اسألني أي شيء عن الدعم التقني، أو يمكنني مساعدتك في إنشاء تذكرة.",
-    "placeholder": "اكتب سؤالك... (Enter للإرسال، Shift+Enter لسطر جديد)",
-    "disclaimer": "قد لا تكون ردود الذكاء الاصطناعي دقيقة دائماً. للمشاكل العاجلة، يرجى إنشاء تذكرة دعم."
   },
   "customForms": {
     "editForm": "تعديل النموذج",
@@ -1334,5 +1402,3 @@
     }
   }
 }
-}
-

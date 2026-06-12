@@ -1,4 +1,21 @@
 {
+  "trusted_devices": {
+    "User": "User",
+    "Browser": "Browser",
+    "Trusted_Devices": "Trusted Devices",
+    "Search by email or SSN": "Search by email or SSN",
+    "Device Name": "Device Name",
+    "Activated Since": "Activated Since",
+    "Are you sure you want to revoke this device?": "Are you sure you want to revoke this device?",
+    "Confirm Device Revocation": "Confirm Device Revocation",
+    "Type DELETE to confirm device revocation.": "Type DELETE to confirm device revocation.",
+    "Cancel": "Cancel",
+    "Delete": "Delete",
+    "Actions": "Actions",
+    "OS": "OS",
+    "Type": "Type",
+    "ipAddress": "IP Address"
+  },
   "LOGO": "Helwan University",
   "LOGO_ALTER": "Helwan University",
   "Custom Forms": "Custom Forms",
@@ -103,6 +120,8 @@
     }
   },
   "translation": {
+    "unassigned_members_note": "Members not assigned to any team will stay available at the group level.",
+    "team_members_count": "Total {{count}}",
     "universities": "Universities",
     "departments": "Departments",
     "Domains": "Domains",
@@ -157,11 +176,9 @@
     "delete_prompt_user": "Are you sure you want to delete this user?",
     "delete_name_mismatch_warning_user": "The name entered does not match the user name. Are you sure you want to proceed?"
   },
-  "roles":
-  {
+  "roles": {
     "admin": "Admin"
-  }
-  ,
+  },
   "group_form": {
     "add_title": "Add New Group",
     "edit_title": "Edit Group",
@@ -303,7 +320,6 @@
     "reach_team": "Reach our technical support team directly."
   },
   "tickets": {
-    
     "tabRemoteControl": "Remote Control",
     "participants": "Participants",
     "listTitle": "Tickets Overview",
@@ -380,7 +396,7 @@
     "currently_assigned": "Currently Assigned",
     "details": "Details",
     "reviewSubmitted": "Thank you! Your review has been submitted.",
-    "state" : "State",
+    "state": "State",
     "techs": "Technician",
     "comments": "Comments",
     "requesterInfo": "Requester Info",
@@ -517,7 +533,12 @@
     "expiresAt": "Expires At",
     "revokeConfirm": "Revoke this API key?",
     "generatedKeyTitle": "Generated API Key",
-    "generatedKeyWarning": "Copy this key now. For security, it will not be shown again."
+    "generatedKeyWarning": "Copy this key now. For security, it will not be shown again.",
+    "guideLinkCopied": "Integration guide link copied!",
+    "viewDocs": "Copy Guide Link",
+    "availableScopes": "Available Scopes",
+    "morePaths": "+{{count}} more",
+    "allowedMethods": "Allowed HTTP Methods:"
   },
   "sla": {
     "title": "SLA",
@@ -537,7 +558,20 @@
     "title": "Recycle Bin",
     "selectEntity": "Select an entity",
     "restoreConfirm": "Restore this deleted record?",
-    "editDeletedRecord": "Edit Deleted Record"
+    "editDeletedRecord": "Edit Deleted Record",
+    "columns": {
+      "id": "ID",
+      "deletedAt": "Deleted At",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "name": "Name",
+      "title": "Title",
+      "email": "Email",
+      "status": "Status",
+      "role": "Role",
+      "description": "Description",
+      "type": "Type"
+    }
   },
   "audit": {
     "title": "Audit Logs",
@@ -557,8 +591,8 @@
     "steps": "Execution Steps",
     "metadata": "Changes (Metadata)"
   },
-  "permissionsPage":{
-    "add_perm":"Add Permission",
+  "permissionsPage": {
+    "add_perm": "Add Permission",
     "select_existing_permissions": "Search system permissions",
     "edit_permissions_locked": "Existing permissions are locked in edit mode. You can add more, but you cannot remove current ones here.",
     "no_permissions": "No permissions selected yet."
@@ -584,7 +618,19 @@
     "trends": "Ticket Distribution Trends",
     "reports_overview": "Reports Library",
     "ticket_trends": "Ticket Trends",
-    "no_reports": "No reports available."
+    "no_reports": "No reports available.",
+    "analytics": {
+      "total_tickets": "Total Tickets",
+      "open_tickets": "Open Tickets",
+      "in_progress": "In Progress",
+      "closed_tickets": "Closed Tickets",
+      "sla_compliance": "SLA Compliance",
+      "violated": "Violated",
+      "avg_resolution_time": "Avg Resolution Time",
+      "hours": "hours",
+      "created_today": "Created Today",
+      "resolved_today": "Resolved Today"
+    }
   },
   "personnelDashboard": {
     "activeAccounts": "Active Accounts",
@@ -600,7 +646,7 @@
     "details": "Report Details"
   },
   "common": {
-    "enabled":"Enable",
+    "enabled": "Enable",
     "disabled": "Disabled",
     "reset": "Reset",
     "reset_layout": "Reset Layout",
@@ -736,7 +782,6 @@
     "microsoftLogin": "Continue with Microsoft",
     "loginFailed": "Microsoft sign-in failed"
   },
-
   "problems": "Problems",
   "specialization_type": "Specialization Type",
   "review_required": "Review Required",
@@ -744,7 +789,6 @@
   "not_required": "Not Required",
   "select_specialization": "Select Specialization",
   "filter_by_spec": "Filter by Specialization",
-
   "Tickets": "Tickets",
   "Settings": "Settings",
   "Personnel": "Personnel",
@@ -765,7 +809,6 @@
       "imageUpdated": "Profile image updated successfully",
       "imageUpdateFailed": "Failed to update profile image"
     },
-
     "groups": {
       "title": "User Groups",
       "empty": "No groups assigned to this user",
@@ -775,7 +818,6 @@
         "color": "Color"
       }
     },
-
     "specializations": {
       "title": "User Specializations",
       "empty": "No specializations assigned to this user",
@@ -784,14 +826,13 @@
         "description": "Description"
       }
     },
-    "personal":{
-      "title":"Personal Information",
-      "email":"Email",
-      "arabicName":"Arabic Name",
-      "englishName":"English Name",
-      "ssn":"SSN"
+    "personal": {
+      "title": "Personal Information",
+      "email": "Email",
+      "arabicName": "Arabic Name",
+      "englishName": "English Name",
+      "ssn": "SSN"
     },
-
     "settings": {
       "password": "Password",
       "devices": "Trusted Devices",
@@ -804,7 +845,6 @@
         "title": "Settings Overview",
         "description": "Open any card to browse the related system entities with table filters and pagination."
       },
-
       "reset": {
         "title": "Reset Password",
         "description": "Choose a strong password to keep your account secure.",
@@ -819,7 +859,6 @@
         "hint": "Password must be at least 8 characters long.",
         "weakPassword": "Password must contain uppercase, lowercase, number, and special character"
       },
-
       "extensionSection": {
         "title": "Browser Extension",
         "description": "Install the official browser extension to enhance your workflow.",
@@ -863,7 +902,6 @@
         }
       }
     },
-
     "trustedDevices": {
       "cancel": "Cancel",
       "title": "Trusted Devices",
@@ -878,7 +916,6 @@
         "title": "Secure Device Registration",
         "description": "This device will be verified using WebAuthn and trusted for future sign-ins."
       },
-
       "device": {
         "name": "Device Name",
         "namePlaceholder": "e.g. Work Laptop",
@@ -889,14 +926,12 @@
         "os": "Operating System",
         "activatedSince": "Activated Since"
       },
-
       "status": {
         "notVerifiedTitle": "Device not verified",
         "notVerifiedDesc": "You must verify this device before adding it. please click on the botton below",
         "verifiedTitle": "Device verified successfully",
         "verifiedDesc": "This device is ready to be trusted."
       },
-
       "messages": {
         "SecurityError": "Failed to verify device. Site is not secured. Please try again using a secure connection.",
         "verifyError": "Failed to verify device. Please make sure it was not verified before and try again.",
@@ -904,28 +939,22 @@
         "addError": "Failed to add trusted device"
       }
     },
-
-    
-
     "contacts": {
       "title": "Contacts",
       "phones": "Phones",
       "mobiles": "Mobiles",
       "copy": "Click to copy"
     },
-
     "organization": {
       "title": "Organization",
       "university": "University",
       "domain": "Domain"
     },
-
     "departments": {
       "title": "Departments",
       "copy": "Click to copy",
       "copySuccess": "Copied"
     },
-
     "profileHeader": {
       "userType": "User Type"
     }
@@ -1060,23 +1089,6 @@
   "specializations": "Specializations",
   "permissions": "Permissions",
   "Add_User": "Add User",
-  "trusted_devices": {
-    "User": "User",
-    "Browser": "Browser",
-    "Trusted Devices": "Trusted Devices",
-    "Search by email or SSN": "Search by email or SSN",
-    "Device Name": "Device Name",
-    "Activated Since": "Activated Since",
-    "Are you sure you want to revoke this device?": "Are you sure you want to revoke this device?",
-    "Confirm Device Revocation": "Confirm Device Revocation",
-    "Type DELETE to confirm device revocation.": "Type DELETE to confirm device revocation.",
-    "Cancel": "Cancel",
-    "Delete": "Delete",
-    "Actions": "Actions",
-    "OS": "OS",
-    "Type": "Type",
-    "ipAddress": "IP Address"
-  },
   "First_Time": "Joining us for the first time?",
   "First_time_Title": "First Time Login",
   "yes": "Yes",
@@ -1325,5 +1337,4 @@
       }
     }
   }
- 
 }

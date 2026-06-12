@@ -326,7 +326,7 @@ const UserViewPage: React.FC = () => {
                         ))}
                     </Descriptions>
 
-                    <Card title={t('user_list.perm_title')}>
+                    {/* <Card title={t('user_list.perm_title')}>
                         {!permissionsProfile?.permissions?.length ? (
                             <Text type="secondary">-</Text>
                         ) : (
@@ -340,7 +340,7 @@ const UserViewPage: React.FC = () => {
                                 ))}
                             </Space>
                         )}
-                    </Card>
+                    </Card> */}
                 </Space>
 
             </Card>

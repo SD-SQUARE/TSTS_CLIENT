@@ -11,7 +11,7 @@ import { authInitialized, loginSuccess } from "./features/login/store/authSlice"
 import { useDispatch, useSelector } from "react-redux"
 import { loadCsrfToken } from "./api/http"
 import RealtimeBridge from "./features/communications/components/RealtimeBridge"
-import { RobotOutlined } from "@ant-design/icons"
+
 
 function App() {
 

@@ -245,7 +245,7 @@ const SystemInfoTab = ({ searchTerm = "" }: { searchTerm?: string }) => {
                                 boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)",
                             }}
                         >
-                            <Space direction="vertical" size={16} style={{ width: "100%", alignItems: "center" }}>
+                            <Space direction="vertical" size={16} style={{ width: "100%", alignItems: "center", direction:'ltr' }}>
                                 <Progress
                                     type="dashboard"
                                     percent={Math.min(Math.max(card.percent, 0), 100)}

@@ -44,15 +44,11 @@ const RecycleBinPage = () => {
   });
 
   const columns: ColumnsType<Record<string, unknown>> = useMemo(() => {
-    const visibleColumns = (data?.columns ?? []).filter((column) =>
-      ["id", "deletedAt", "createdAt", "updatedAt", "name", "email", "title", "status"].includes(column),
-    );
-    const fallbackColumns = (data?.columns ?? []).slice(0, 6);
-    const columnKeys = visibleColumns.length ? visibleColumns : fallbackColumns;
+    const columnKeys = data?.columns ?? [];
 
     return [
       ...columnKeys.map((column) => ({
-        title: column,
+        title: t(`recycleBin.columns.${column}`, { defaultValue: column }),
         dataIndex: column,
         key: column,
         ellipsis: true,
