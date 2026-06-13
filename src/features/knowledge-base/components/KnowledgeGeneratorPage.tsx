@@ -165,10 +165,17 @@ const KnowledgeGeneratorPage: React.FC = () => {
             <AutoComplete
               options={titleOptions}
               value={title}
-              onChange={(value) => {
-                setTitle(value);
+              onChange={(val) => {
+                setTitle(val);
+                if (!val) setPage(1);
+              }}
+              onSelect={(val) => {
+                setTitle(val);
                 setPage(1);
               }}
+              filterOption={(inputValue, option) =>
+                (option?.value as string)?.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+              }
               style={{ minWidth: 240, flex: '1 1 240px' }}
             >
               <Input
@@ -181,10 +188,16 @@ const KnowledgeGeneratorPage: React.FC = () => {
             <AutoComplete
               options={authorOptions}
               value={author}
-              onChange={(value) => {
-                setAuthor(value);
+              onSearch={(val) => setAuthor(val)}
+              onChange={(val) => {
+                setAuthor(val);
+                if (!val) setPage(1);
+              }}
+              onSelect={(val) => {
+                setAuthor(val);
                 setPage(1);
               }}
+              filterOption={false}
               style={{ minWidth: 240, flex: '1 1 240px' }}
             >
               <Input

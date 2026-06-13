@@ -26,9 +26,7 @@ import {
   ClockCircleOutlined,
   DeleteOutlined,
   EditOutlined,
-  FileImageOutlined,
   FileOutlined,
-  FilePdfOutlined,
   LinkOutlined,
   MessageOutlined,
   PaperClipOutlined,
@@ -229,7 +227,53 @@ const TicketComments: React.FC<{ assigneeName?: string; requesterId?: string }> 
     file: AttachmentPreviewItem,
     options?: { onRemove?: (id: string) => void },
   ) => {
+    const isMedia = isImageFile(file.mime) || isPdfFile(file.mime) || isVideoFile(file.mime) || isAudioFile(file.mime);
     const previewHeight = 176;
+
+    if (!isMedia) {
+      // Compact chip layout for generic files (docx, xlsx, txt, etc.)
+      return (
+        <Card
+          key={file.id}
+          size="small"
+          style={{ borderRadius: 12, overflow: 'hidden' }}
+          bodyStyle={{ padding: '10px 14px' }}
+        >
+          <Flex align="center" justify="space-between" gap={8}>
+            <Flex align="center" gap={10} style={{ minWidth: 0, flex: 1 }}>
+              <FileOutlined style={{ fontSize: 22, color: '#475569', flexShrink: 0 }} />
+              <Flex vertical style={{ minWidth: 0 }}>
+                <Text strong style={{ lineHeight: 1.4, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                  {file.name}
+                </Text>
+                <Text type="secondary" style={{ fontSize: 11 }}>
+                  {file.mime || t('tickets.tools.attachmentsFile')}
+                </Text>
+              </Flex>
+            </Flex>
+            <Flex align="center" gap={4} style={{ flexShrink: 0 }}>
+              <Button
+                size="small"
+                icon={<LinkOutlined />}
+                href={file.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              />
+              {options?.onRemove && (
+                <Button
+                  type="text"
+                  size="small"
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={() => options.onRemove?.(file.id)}
+                />
+              )}
+            </Flex>
+          </Flex>
+        </Card>
+      );
+    }
+
     const previewBody = (() => {
       if (isImageFile(file.mime)) {
         return (
@@ -276,26 +320,7 @@ const TicketComments: React.FC<{ assigneeName?: string; requesterId?: string }> 
         );
       }
 
-      return (
-        <Flex
-          vertical
-          justify="center"
-          align="center"
-          style={{ height: previewHeight, background: '#f7f9fc', padding: 16 }}
-          gap={10}
-        >
-          {isPdfFile(file.mime) ? (
-            <FilePdfOutlined style={{ fontSize: 36, color: '#dc2626' }} />
-          ) : isImageFile(file.mime) ? (
-            <FileImageOutlined style={{ fontSize: 36, color: '#1d4ed8' }} />
-          ) : (
-            <FileOutlined style={{ fontSize: 36, color: '#475569' }} />
-          )}
-          <Text type="secondary" style={{ textAlign: 'center' }}>
-            {file.mime || t('tickets.tools.attachmentsPreviewUnavailable')}
-          </Text>
-        </Flex>
-      );
+      return null;
     })();
 
     return (

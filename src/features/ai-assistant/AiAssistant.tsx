@@ -66,6 +66,7 @@ const AiAssistant: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
     const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+    const [sessionFiles, setSessionFiles] = useState<File[]>([]);
     const [pendingTicket, setPendingTicket] = useState<TicketPreview | null>(null);
     const [isCreatingTicket, setIsCreatingTicket] = useState(false);
     const [activityStatus, setActivityStatus] = useState<string | null>(null);
@@ -131,6 +132,30 @@ const AiAssistant: React.FC = () => {
                 throw new Error(data.error || data.message || 'Ticket creation failed');
             }
 
+            const ticketId: string = data.ticketId;
+
+            // Upload any pending or accumulated session files as chat attachments on the new ticket
+            const filesToUpload = [...sessionFiles, ...pendingFiles];
+            if (filesToUpload.length > 0) {
+                try {
+                    setActivityStatus(t('ai_assistant.status.uploadingFiles', { defaultValue: 'Uploading files…' }));
+                    const formData = new FormData();
+                    filesToUpload.forEach((f) => formData.append('files', f));
+                    await fetch(`${apiBaseUrl}/v1/tickets/${ticketId}/chat/media`, {
+                        method: 'POST',
+                        headers: {
+                            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                        },
+                        body: formData,
+                    });
+                    setPendingFiles([]);
+                    setSessionFiles([]);
+                } catch {
+                    // Non-fatal — ticket was still created
+                    antMessage.warning(t('ai_assistant.filesPartialError', { defaultValue: 'Ticket created but some files could not be uploaded.' }));
+                }
+            }
+
             setPendingTicket(null);
             appendAssistantMessage(
                 isDraft
@@ -146,7 +171,7 @@ const AiAssistant: React.FC = () => {
             setIsCreatingTicket(false);
             setActivityStatus(null);
         }
-    }, [apiBaseUrl, appendAssistantMessage, pendingTicket, t, userRole]);
+    }, [apiBaseUrl, appendAssistantMessage, pendingFiles, pendingTicket, t, userRole]);
 
     const sendMessage = useCallback(async (text?: string) => {
         const content = (text || input).trim();
@@ -166,11 +191,15 @@ const AiAssistant: React.FC = () => {
             isThinking: true,
         };
 
-        const history = [...messages.slice(-10), userMsg].map(({ role, content: msgContent }) => ({ role, content: msgContent }));
+        const history = [...messages.slice(-10), userMsg]
+            .filter((m) => !m.isThinking && m.content)
+            .map(({ role, content: msgContent }) => ({ role, content: msgContent }));
 
+        const capturedFiles = [...pendingFiles];
         setMessages((prev) => [...prev, userMsg, thinkingMsg]);
         setPendingTicket(null);
         setInput('');
+        setSessionFiles((prev) => [...prev, ...pendingFiles]);
         setPendingFiles([]);
         setIsLoading(true);
         // setActivityStatus(t('ai_assistant.status.thinking'));
@@ -180,8 +209,33 @@ const AiAssistant: React.FC = () => {
         abortRef.current = new AbortController();
 
         let msgContent = content;
-        if (pendingFiles.length > 0) {
-            msgContent += `\n[Files: ${pendingFiles.map((f) => f.name).join(', ')}]`;
+        if (capturedFiles.length > 0) {
+            // For text-based files, read and include content so AI can process them
+            const textMimes = new Set(['text/plain', 'text/csv', 'text/markdown', 'application/json', 'application/xml', 'text/html', 'text/xml']);
+            // Explicit binary blocklist — some browsers assign wrong MIME types for these
+            const binaryExts = /\.(xlsx|xls|doc|docx|ppt|pptx|pdf|zip|rar|7z|tar|gz|png|jpg|jpeg|gif|bmp|webp|mp4|mp3|wav)$/i;
+            const fileContextParts: string[] = [];
+
+            for (const f of capturedFiles) {
+                const isBinary = binaryExts.test(f.name);
+                const isText = !isBinary && (textMimes.has(f.type) || /\.(txt|csv|md|json|xml|html|log)$/i.test(f.name));
+                if (isText && f.size < 20_000) {
+                    try {
+                        let text = await f.text();
+                        // Sanitize: strip null bytes and non-printable control characters
+                        text = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+                        fileContextParts.push(`--- File: ${f.name} ---\n${text.slice(0, 2000)}`);
+                    } catch {
+                        fileContextParts.push(`[File: ${f.name} (${f.type || 'unknown type'}) - could not read]`);
+                    }
+                } else {
+                    fileContextParts.push(`[File: ${f.name} (${f.type || 'unknown type'}) - binary/image, cannot read content]`);
+                }
+            }
+
+            if (fileContextParts.length > 0) {
+                msgContent = `${msgContent}\n\n${fileContextParts.join('\n\n')}`.trim();
+            }
         }
 
         try {
@@ -294,8 +348,11 @@ const AiAssistant: React.FC = () => {
     const clearChat = () => {
         stopGeneration();
         setMessages([]);
-        setPendingFiles([]);
         setPendingTicket(null);
+        setPendingFiles([]);
+        setSessionFiles([]);
+        setInput('');
+        setActivityStatus(null);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {

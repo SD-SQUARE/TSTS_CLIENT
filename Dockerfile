@@ -15,7 +15,7 @@ WORKDIR /etc/nginx
 
 COPY ./nginx.conf /etc/nginx/nginx.http.conf.template
 COPY ./nginx.ssl.conf /etc/nginx/nginx.ssl.conf.template
-COPY ./nginx.docs.conf /etc/nginx/nginx.docs.conf
+# COPY ./nginx.docs.conf /etc/nginx/nginx.docs.conf
 COPY ./scripts/start-nginx.sh /start-nginx.sh
 
 RUN sed -i 's/\r//' /start-nginx.sh && chmod +x /start-nginx.sh

@@ -682,7 +682,18 @@
       "status": "الحالة",
       "role": "الدور",
       "description": "الوصف",
-      "type": "النوع"
+      "type": "النوع",
+      "ticket_number": "رقم التذكرة",
+      "requester": "مقدم الطلب",
+      "assignee": "المعين",
+      "department": "القسم",
+      "specialization": "التخصص",
+      "problem": "نوع المشكلة",
+      "priority": "الأولوية",
+      "user_type": "نوع المستخدم",
+      "phone": "رقم الهاتف",
+      "ip": "عنوان IP",
+      "username": "اسم المستخدم"
     }
   },
   "audit": {

@@ -135,6 +135,7 @@ const ApiIntegrationsPage = () => {
       title: t("apiIntegrations.zones"),
       dataIndex: "zones",
       key: "zones",
+      width: 260,
       render: (zones: string[]) => (
         <Space size={[4, 4]} wrap>
           {zones.map((zone) => (

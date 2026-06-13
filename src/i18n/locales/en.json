@@ -570,7 +570,18 @@
       "status": "Status",
       "role": "Role",
       "description": "Description",
-      "type": "Type"
+      "type": "Type",
+      "ticket_number": "Ticket Number",
+      "requester": "Requester",
+      "assignee": "Assignee",
+      "department": "Department",
+      "specialization": "Specialization",
+      "problem": "Problem Type",
+      "priority": "Priority",
+      "user_type": "User Type",
+      "phone": "Phone Number",
+      "ip": "IP Address",
+      "username": "Username"
     }
   },
   "audit": {
